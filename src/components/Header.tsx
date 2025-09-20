@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Search, Globe, User, BriefcaseIcon } from "lucide-react";
+import { Menu, Search, Globe, User, BriefcaseIcon, Bell } from "lucide-react";
 
 const Header = () => {
   return (
@@ -16,6 +16,10 @@ const Header = () => {
           <nav className="hidden md:flex items-center gap-6">
             <a href="#jobs" className="text-muted-foreground hover:text-primary transition-colors">
               Find Jobs
+            </a>
+            <a href="/alerts" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+              <Bell className="h-4 w-4" />
+              Job Alerts
             </a>
             <a href="#countries" className="text-muted-foreground hover:text-primary transition-colors">
               Countries
