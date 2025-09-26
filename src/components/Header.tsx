@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Search, Globe, User, BriefcaseIcon, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -39,13 +40,17 @@ const Header = () => {
             </Button>
             
             <div className="hidden md:flex items-center gap-3">
-              <Button variant="outline">
-                <User className="h-4 w-4" />
-                Login
-              </Button>
-              <Button variant="hero">
-                Join as Worker
-              </Button>
+              <Link to="/auth">
+                <Button variant="outline">
+                  <User className="h-4 w-4" />
+                  Login
+                </Button>
+              </Link>
+              <Link to="/dashboard">
+                <Button variant="hero">
+                  Dashboard
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
