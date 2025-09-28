@@ -1082,12 +1082,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_signed_document_url: {
+        Args: { document_id: string; expires_in_seconds?: number }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      mask_aadhaar: {
+        Args: { aadhaar_number: string }
+        Returns: string
+      }
+      mask_pan: {
+        Args: { pan_number: string }
+        Returns: string
       }
     }
     Enums: {
