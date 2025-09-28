@@ -1108,6 +1108,9 @@ export type Database = {
         | "photo"
         | "resume"
         | "contract"
+        | "aadhaar_front"
+        | "aadhaar_back"
+        | "pan"
       employer_status: "pending" | "verified" | "suspended" | "blocked"
       gender_type: "male" | "female" | "other" | "prefer_not_to_say"
       job_status: "draft" | "published" | "filled" | "expired" | "cancelled"
@@ -1276,6 +1279,9 @@ export const Constants = {
         "photo",
         "resume",
         "contract",
+        "aadhaar_front",
+        "aadhaar_back",
+        "pan",
       ],
       employer_status: ["pending", "verified", "suspended", "blocked"],
       gender_type: ["male", "female", "other", "prefer_not_to_say"],

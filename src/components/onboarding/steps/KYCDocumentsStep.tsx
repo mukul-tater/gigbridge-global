@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Document {
   id?: string;
-  document_type: string;
+  document_type: 'aadhaar_front' | 'aadhaar_back' | 'pan' | 'passport' | 'visa' | 'aadhaar' | 'certificate' | 'contract' | 'license' | 'photo' | 'resume';
   file_name: string;
   file_url: string;
   file_size: number;
@@ -54,7 +54,7 @@ export default function KYCDocumentsStep({
 
   const handleFileUpload = async (
     file: File, 
-    documentType: string
+    documentType: Document['document_type']
   ) => {
     if (!onboardingId) {
       toast({
@@ -148,7 +148,7 @@ export default function KYCDocumentsStep({
     }
   };
 
-  const removeDocument = async (documentType: string) => {
+  const removeDocument = async (documentType: Document['document_type']) => {
     try {
       const doc = documents.find(d => d.document_type === documentType);
       if (!doc) return;
@@ -186,12 +186,12 @@ export default function KYCDocumentsStep({
     }
   };
 
-  const getDocumentStatus = (documentType: string) => {
+  const getDocumentStatus = (documentType: Document['document_type']) => {
     return documents.find(doc => doc.document_type === documentType);
   };
 
   const renderDocumentUpload = (
-    documentType: string,
+    documentType: Document['document_type'],
     isRequired: boolean
   ) => {
     const document = getDocumentStatus(documentType);
@@ -314,7 +314,7 @@ export default function KYCDocumentsStep({
         <h3 className="text-lg font-semibold">Required Documents</h3>
         <div className="grid gap-4">
           {REQUIRED_DOCUMENTS.map(type => 
-            renderDocumentUpload(type, true)
+            renderDocumentUpload(type as Document['document_type'], true)
           )}
         </div>
       </div>
@@ -326,7 +326,7 @@ export default function KYCDocumentsStep({
         </p>
         <div className="grid gap-4">
           {OPTIONAL_DOCUMENTS.map(type => 
-            renderDocumentUpload(type, false)
+            renderDocumentUpload(type as Document['document_type'], false)
           )}
         </div>
       </div>
