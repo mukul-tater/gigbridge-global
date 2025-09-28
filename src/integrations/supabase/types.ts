@@ -523,6 +523,33 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          contact_number: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          contact_number: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          contact_number?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       skills: {
         Row: {
           category: string
