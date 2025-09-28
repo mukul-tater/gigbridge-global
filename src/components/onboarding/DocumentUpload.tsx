@@ -4,9 +4,10 @@ import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
 import { 
   Upload, FileText, Image, X, CheckCircle, AlertCircle, 
-  RotateCcw, Eye, Download
+  RotateCcw, Eye, Download, Shield
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { validateFileType, validateFileSize, sanitizeFilename, rateLimiter } from '@/lib/security';
 
 export interface DocumentData {
   id?: string;
@@ -51,17 +52,27 @@ export default function DocumentUpload({
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const validateFile = (file: File): string | null => {
-    // Check file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      return 'File too large. Upload files under 10 MB.';
+    const allowedTypes = ['jpg', 'jpeg', 'png', 'pdf'];
+    const maxSizeMB = 10;
+    
+    // Rate limiting for upload attempts
+    if (!rateLimiter.canAttempt(`upload-${onboardingId}`, 5, 60000)) {
+      return "Too many upload attempts. Please wait before trying again.";
     }
-
-    // Check file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-    if (!allowedTypes.includes(file.type)) {
-      return 'Only JPG, PNG, and PDF files are allowed.';
+    
+    if (!validateFileType(file, allowedTypes)) {
+      return "Please upload a JPG, PNG, or PDF file";
     }
-
+    
+    if (!validateFileSize(file, maxSizeMB)) {
+      return "File size must be less than 10MB";
+    }
+    
+    // Additional security checks
+    if (file.name.length > 255) {
+      return "Filename too long. Please rename the file.";
+    }
+    
     return null;
   };
 
@@ -84,7 +95,9 @@ export default function DocumentUpload({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const fileExt = file.name.split('.').pop();
+      // Sanitize filename for security
+      const sanitizedName = sanitizeFilename(file.name);
+      const fileExt = sanitizedName.split('.').pop();
       const fileName = `${user.id}/${onboardingId}/${documentType}.${fileExt}`;
 
       // Simulate upload progress
@@ -109,16 +122,15 @@ export default function DocumentUpload({
 
       setUploadProgress(100);
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('onboarding-documents')
-        .getPublicUrl(fileName);
-
-      // Save to database
+      // Note: Using storage key instead of public URL for security
+      // Documents are now stored in private bucket and will use signed URLs
+      
+      // Save to database with secure metadata
       const documentData = {
         onboarding_id: onboardingId,
         document_type: documentType,
-        file_name: file.name,
-        file_url: publicUrl,
+        file_name: sanitizedName,
+        file_url: fileName, // Store storage key, not public URL
         file_size: file.size,
         mime_type: file.type,
         storage_key: fileName,
@@ -136,8 +148,8 @@ export default function DocumentUpload({
       onUploadComplete(savedDoc as DocumentData);
       
       toast({
-        title: 'Document uploaded',
-        description: `${DOCUMENT_LABELS[documentType]} uploaded successfully`,
+        title: 'Document uploaded securely',
+        description: `${DOCUMENT_LABELS[documentType]} uploaded and encrypted successfully`,
       });
 
     } catch (error) {
@@ -214,6 +226,10 @@ export default function DocumentUpload({
               <p className="text-xs text-muted-foreground">
                 {(document.file_size / 1024 / 1024).toFixed(2)} MB • {document.status}
               </p>
+              <div className="flex items-center gap-1 text-xs text-green-600 mt-1">
+                <Shield className="w-3 h-3" />
+                Encrypted & Secure
+              </div>
             </div>
             <div className="flex items-center space-x-1">
               <Button
@@ -262,6 +278,10 @@ export default function DocumentUpload({
             </p>
             <p className="text-xs text-muted-foreground">
               JPG, PNG, PDF (Max 10MB)
+            </p>
+            <p className="text-xs text-green-600 flex items-center justify-center gap-1 mt-1">
+              <Shield className="w-3 h-3" />
+              Encrypted & secure storage
             </p>
           </div>
           

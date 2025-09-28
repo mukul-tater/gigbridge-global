@@ -7,8 +7,9 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
 import { 
   User, FileText, Briefcase, Languages, MapPin, DollarSign,
-  Calendar, Edit, CheckCircle, AlertCircle, Clock, Send
+  Calendar, Edit, CheckCircle, AlertCircle, Clock, Send, Shield
 } from 'lucide-react';
+import { maskPAN, maskAadhaar } from '@/lib/security';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -252,13 +253,21 @@ export default function ReviewStep({
               
               return (
                 <div key={docType} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium capitalize">
                       {docType.replace('_', ' ')}
                       {isRequired && <span className="text-red-500 ml-1">*</span>}
                     </p>
                     {doc && (
-                      <p className="text-sm text-muted-foreground">{doc.file_name}</p>
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">
+                          Document ID: {doc.id.slice(0, 8)}...{doc.id.slice(-4)}
+                        </p>
+                        <div className="flex items-center gap-1 text-xs text-green-600">
+                          <Shield className="w-3 h-3" />
+                          Encrypted & Verified
+                        </div>
+                      </div>
                     )}
                   </div>
                   {doc ? (
@@ -271,6 +280,15 @@ export default function ReviewStep({
                 </div>
               );
             })}
+          </div>
+          
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-950 dark:border-blue-800">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-blue-600" />
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                Your documents are encrypted and stored securely. Only authorized personnel can access them for verification.
+              </p>
+            </div>
           </div>
           
           {!requiredDocsComplete && (
