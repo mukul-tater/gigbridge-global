@@ -470,6 +470,36 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -573,6 +603,335 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      worker_onboarding: {
+        Row: {
+          created_at: string
+          current_step: number
+          id: string
+          rejection_reasons: string[] | null
+          status: Database["public"]["Enums"]["onboarding_status"]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_step?: number
+          id?: string
+          rejection_reasons?: string[] | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_step?: number
+          id?: string
+          rejection_reasons?: string[] | null
+          status?: Database["public"]["Enums"]["onboarding_status"]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
+      worker_onboarding_certifications: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          id: string
+          issue_date: string
+          issuer: string
+          name: string
+          onboarding_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          issue_date: string
+          issuer: string
+          name: string
+          onboarding_id: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          issue_date?: string
+          issuer?: string
+          name?: string
+          onboarding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_onboarding_certifications_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "worker_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_onboarding_documents: {
+        Row: {
+          created_at: string
+          document_type: Database["public"]["Enums"]["document_type"]
+          file_name: string
+          file_size: number
+          file_url: string
+          id: string
+          mime_type: string
+          ocr_data: Json | null
+          onboarding_id: string
+          status: Database["public"]["Enums"]["document_status"]
+          storage_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: Database["public"]["Enums"]["document_type"]
+          file_name: string
+          file_size: number
+          file_url: string
+          id?: string
+          mime_type: string
+          ocr_data?: Json | null
+          onboarding_id: string
+          status?: Database["public"]["Enums"]["document_status"]
+          storage_key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: Database["public"]["Enums"]["document_type"]
+          file_name?: string
+          file_size?: number
+          file_url?: string
+          id?: string
+          mime_type?: string
+          ocr_data?: Json | null
+          onboarding_id?: string
+          status?: Database["public"]["Enums"]["document_status"]
+          storage_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_onboarding_documents_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "worker_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_onboarding_languages: {
+        Row: {
+          created_at: string
+          id: string
+          language_name: string
+          onboarding_id: string
+          proficiency: Database["public"]["Enums"]["proficiency_level"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language_name: string
+          onboarding_id: string
+          proficiency: Database["public"]["Enums"]["proficiency_level"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language_name?: string
+          onboarding_id?: string
+          proficiency?: Database["public"]["Enums"]["proficiency_level"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_onboarding_languages_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "worker_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_onboarding_preferences: {
+        Row: {
+          availability_date: string
+          contract_length: string
+          created_at: string
+          expected_wage_amount: number
+          expected_wage_currency: string
+          id: string
+          onboarding_id: string
+          preferred_countries: string[]
+          updated_at: string
+        }
+        Insert: {
+          availability_date: string
+          contract_length: string
+          created_at?: string
+          expected_wage_amount: number
+          expected_wage_currency?: string
+          id?: string
+          onboarding_id: string
+          preferred_countries?: string[]
+          updated_at?: string
+        }
+        Update: {
+          availability_date?: string
+          contract_length?: string
+          created_at?: string
+          expected_wage_amount?: number
+          expected_wage_currency?: string
+          id?: string
+          onboarding_id?: string
+          preferred_countries?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_onboarding_preferences_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: true
+            referencedRelation: "worker_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_onboarding_profile: {
+        Row: {
+          created_at: string
+          date_of_birth: string
+          email: string
+          full_name: string
+          gender: Database["public"]["Enums"]["gender_type"] | null
+          id: string
+          onboarding_id: string
+          phone: string
+          profile_photo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth: string
+          email: string
+          full_name: string
+          gender?: Database["public"]["Enums"]["gender_type"] | null
+          id?: string
+          onboarding_id: string
+          phone: string
+          profile_photo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string
+          email?: string
+          full_name?: string
+          gender?: Database["public"]["Enums"]["gender_type"] | null
+          id?: string
+          onboarding_id?: string
+          phone?: string
+          profile_photo_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_onboarding_profile_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: true
+            referencedRelation: "worker_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_onboarding_skills: {
+        Row: {
+          created_at: string
+          experience_years: number
+          id: string
+          onboarding_id: string
+          skill_name: string
+        }
+        Insert: {
+          created_at?: string
+          experience_years?: number
+          id?: string
+          onboarding_id: string
+          skill_name: string
+        }
+        Update: {
+          created_at?: string
+          experience_years?: number
+          id?: string
+          onboarding_id?: string
+          skill_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_onboarding_skills_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "worker_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_onboarding_work_history: {
+        Row: {
+          company_name: string
+          created_at: string
+          end_date: string | null
+          id: string
+          is_current: boolean
+          onboarding_id: string
+          responsibilities: string | null
+          role: string
+          start_date: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_current?: boolean
+          onboarding_id: string
+          responsibilities?: string | null
+          role: string
+          start_date: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_current?: boolean
+          onboarding_id?: string
+          responsibilities?: string | null
+          role?: string
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_onboarding_work_history_onboarding_id_fkey"
+            columns: ["onboarding_id"]
+            isOneToOne: false
+            referencedRelation: "worker_onboarding"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       worker_profiles: {
         Row: {
@@ -711,6 +1070,7 @@ export type Database = {
         | "active"
         | "completed"
         | "cancelled"
+      document_status: "uploaded" | "approved" | "rejected"
       document_type:
         | "passport"
         | "aadhaar"
@@ -721,13 +1081,20 @@ export type Database = {
         | "resume"
         | "contract"
       employer_status: "pending" | "verified" | "suspended" | "blocked"
+      gender_type: "male" | "female" | "other" | "prefer_not_to_say"
       job_status: "draft" | "published" | "filled" | "expired" | "cancelled"
+      onboarding_status:
+        | "draft"
+        | "pending_verification"
+        | "verified"
+        | "rejected"
       payment_status:
         | "pending"
         | "processing"
         | "completed"
         | "failed"
         | "refunded"
+      proficiency_level: "basic" | "conversational" | "fluent" | "native"
       skill_level: "beginner" | "intermediate" | "advanced" | "expert"
       visa_status:
         | "not_required"
@@ -870,6 +1237,7 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      document_status: ["uploaded", "approved", "rejected"],
       document_type: [
         "passport",
         "aadhaar",
@@ -881,7 +1249,14 @@ export const Constants = {
         "contract",
       ],
       employer_status: ["pending", "verified", "suspended", "blocked"],
+      gender_type: ["male", "female", "other", "prefer_not_to_say"],
       job_status: ["draft", "published", "filled", "expired", "cancelled"],
+      onboarding_status: [
+        "draft",
+        "pending_verification",
+        "verified",
+        "rejected",
+      ],
       payment_status: [
         "pending",
         "processing",
@@ -889,6 +1264,7 @@ export const Constants = {
         "failed",
         "refunded",
       ],
+      proficiency_level: ["basic", "conversational", "fluent", "native"],
       skill_level: ["beginner", "intermediate", "advanced", "expert"],
       visa_status: [
         "not_required",
