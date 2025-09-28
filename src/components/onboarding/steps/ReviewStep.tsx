@@ -19,6 +19,7 @@ interface ReviewStepProps {
   onValidationChange: (isValid: boolean) => void;
   onboardingId: string | null;
   allData: any;
+  onNavigateToStep?: (step: number) => void;
 }
 
 export default function ReviewStep({ 
@@ -26,7 +27,8 @@ export default function ReviewStep({
   onComplete, 
   onValidationChange, 
   onboardingId,
-  allData
+  allData,
+  onNavigateToStep
 }: ReviewStepProps) {
   const navigate = useNavigate();
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -175,8 +177,13 @@ export default function ReviewStep({
             <User className="w-5 h-5" />
             Basic Profile
           </CardTitle>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigateToStep?.(1)}
+          >
             <Edit className="w-4 h-4" />
+            Edit
           </Button>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -227,8 +234,13 @@ export default function ReviewStep({
             ) : (
               <AlertCircle className="w-5 h-5 text-red-500" />
             )}
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => onNavigateToStep?.(2)}
+            >
               <Edit className="w-4 h-4" />
+              Edit
             </Button>
           </div>
         </CardHeader>
@@ -278,8 +290,13 @@ export default function ReviewStep({
             <Briefcase className="w-5 h-5" />
             Skills & Experience
           </CardTitle>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigateToStep?.(3)}
+          >
             <Edit className="w-4 h-4" />
+            Edit
           </Button>
         </CardHeader>
         <CardContent>
@@ -318,8 +335,13 @@ export default function ReviewStep({
               <Briefcase className="w-5 h-5" />
               Work History
             </CardTitle>
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => onNavigateToStep?.(4)}
+            >
               <Edit className="w-4 h-4" />
+              Edit
             </Button>
           </CardHeader>
           <CardContent>
@@ -346,8 +368,13 @@ export default function ReviewStep({
             <Languages className="w-5 h-5" />
             Languages
           </CardTitle>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigateToStep?.(5)}
+          >
             <Edit className="w-4 h-4" />
+            Edit
           </Button>
         </CardHeader>
         <CardContent>
@@ -368,8 +395,13 @@ export default function ReviewStep({
             <MapPin className="w-5 h-5" />
             Work Preferences
           </CardTitle>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigateToStep?.(6)}
+          >
             <Edit className="w-4 h-4" />
+            Edit
           </Button>
         </CardHeader>
         <CardContent className="space-y-3">

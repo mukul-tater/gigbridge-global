@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle, Clock } from 'lucide-react';
+import { debounce } from '@/lib/utils';
 
 import BasicProfileStep from './steps/BasicProfileStep';
 import KYCDocumentsStep from './steps/KYCDocumentsStep';
@@ -32,6 +32,8 @@ export default function OnboardingWizard() {
   const [loading, setLoading] = useState(true);
   const [stepData, setStepData] = useState<any>({});
   const [stepValid, setStepValid] = useState<Record<number, boolean>>({});
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [savingIndicator, setSavingIndicator] = useState<string>('');
 
   useEffect(() => {
     initializeOnboarding();
@@ -91,27 +93,52 @@ export default function OnboardingWizard() {
         supabase.from('worker_onboarding_preferences').select('*').eq('onboarding_id', onboardingId).single(),
       ]);
 
-      setStepData({
+      const loadedData = {
         profile: profile.data || {},
         documents: documents.data || [],
         skills: skills.data || [],
         workHistory: workHistory.data || [],
         languages: languages.data || [],
         preferences: preferences.data || {},
-      });
+      };
+      
+      setStepData(loadedData);
+      
+      // Mark steps as completed based on loaded data
+      const completed = new Set<number>();
+      if (profile.data?.full_name) completed.add(1);
+      if (documents.data?.length > 0) completed.add(2);
+      if (skills.data?.length > 0) completed.add(3);
+      if (workHistory.data?.length > 0) completed.add(4);
+      if (languages.data?.length > 0) completed.add(5);
+      if (preferences.data?.availability_date) completed.add(6);
+      
+      setCompletedSteps(completed);
     } catch (error) {
       console.error('Error loading existing data:', error);
     }
   };
 
-  const handleStepComplete = async (step: number, data: any) => {
+  const debouncedSave = useCallback(
+    debounce((step: number, data: any) => {
+      if (onboardingId) {
+        setSavingIndicator('Saving...');
+        saveStepData(step, data).then(() => {
+          setSavingIndicator('Saved');
+          setTimeout(() => setSavingIndicator(''), 2000);
+        });
+      }
+    }, 800),
+    [onboardingId]
+  );
+
+  const handleStepComplete = (step: number, data: any) => {
     setStepData(prev => ({ ...prev, [getStepKey(step)]: data }));
     setStepValid(prev => ({ ...prev, [step]: true }));
+    setCompletedSteps(prev => new Set([...prev, step]));
     
-    // Save to database
-    if (onboardingId) {
-      await saveStepData(step, data);
-    }
+    // Autosave with debounce
+    debouncedSave(step, data);
   };
 
   const saveStepData = async (step: number, data: any) => {
@@ -177,20 +204,15 @@ export default function OnboardingWizard() {
     return keys[step];
   };
 
-  const handleNext = () => {
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
-    }
+  const canNavigateToStep = (step: number) => {
+    // Can navigate to current step, completed steps, or next step if current is valid
+    return step <= currentStep || completedSteps.has(step) || (step === currentStep + 1 && stepValid[currentStep]);
   };
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+  const handleStepClick = (step: number) => {
+    if (canNavigateToStep(step)) {
+      setCurrentStep(step);
     }
-  };
-
-  const canProceed = (step: number) => {
-    return stepValid[step] || step <= currentStep;
   };
 
   if (loading) {
@@ -210,19 +232,31 @@ export default function OnboardingWizard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Progress Bar */}
-      <div className="bg-card border-b p-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="bg-card border-b p-4 w-full">
+        <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl font-bold">Worker Onboarding</h1>
-            <span className="text-sm text-muted-foreground">
-              Step {currentStep} of {STEPS.length}
-            </span>
+            <div className="flex items-center gap-3">
+              {savingIndicator && (
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  {savingIndicator === 'Saving...' ? (
+                    <Clock className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <CheckCircle className="w-3 h-3 text-green-500" />
+                  )}
+                  {savingIndicator}
+                </span>
+              )}
+              <span className="text-sm text-muted-foreground">
+                Step {currentStep} of {STEPS.length}
+              </span>
+            </div>
           </div>
           <Progress value={progress} className="w-full" />
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto p-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Stepper */}
           <div className="lg:col-span-1">
@@ -231,36 +265,42 @@ export default function OnboardingWizard() {
                 <CardTitle className="text-lg">Progress</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {STEPS.map((step) => (
-                  <div
-                    key={step.id}
-                    className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-colors ${
-                      step.id === currentStep
-                        ? 'bg-primary text-primary-foreground'
-                        : step.id < currentStep || stepValid[step.id]
-                        ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                        : 'text-muted-foreground cursor-not-allowed'
-                    }`}
-                    onClick={() => {
-                      if (canProceed(step.id) || step.id <= currentStep) {
-                        setCurrentStep(step.id);
-                      }
-                    }}
-                  >
+                {STEPS.map((step) => {
+                  const isCompleted = completedSteps.has(step.id);
+                  const isCurrent = step.id === currentStep;
+                  const canNavigate = canNavigateToStep(step.id);
+                  
+                  return (
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                        step.id === currentStep
-                          ? 'bg-primary-foreground text-primary'
-                          : step.id < currentStep || stepValid[step.id]
-                          ? 'bg-green-500 text-white'
-                          : 'bg-muted text-muted-foreground'
+                      key={step.id}
+                      className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                        isCurrent
+                          ? 'bg-primary text-primary-foreground'
+                          : isCompleted
+                          ? 'bg-green-50 text-green-700 border border-green-200 cursor-pointer hover:bg-green-100'
+                          : canNavigate
+                          ? 'bg-secondary text-secondary-foreground cursor-pointer hover:bg-secondary/80'
+                          : 'text-muted-foreground cursor-not-allowed'
                       }`}
+                      onClick={() => handleStepClick(step.id)}
                     >
-                      {step.id < currentStep || stepValid[step.id] ? '✓' : step.id}
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                          isCurrent
+                            ? 'bg-primary-foreground text-primary'
+                            : isCompleted
+                            ? 'bg-green-500 text-white'
+                            : canNavigate
+                            ? 'bg-muted text-muted-foreground'
+                            : 'bg-muted-foreground/20 text-muted-foreground'
+                        }`}
+                      >
+                        {isCompleted ? '✓' : step.id}
+                      </div>
+                      <span className="text-sm font-medium">{step.title}</span>
                     </div>
-                    <span className="text-sm font-medium">{step.title}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           </div>
@@ -280,29 +320,8 @@ export default function OnboardingWizard() {
                   }
                   onboardingId={onboardingId}
                   allData={stepData}
+                  onNavigateToStep={handleStepClick}
                 />
-
-                {/* Navigation */}
-                <div className="flex justify-between mt-8">
-                  <Button
-                    variant="outline"
-                    onClick={handlePrevious}
-                    disabled={currentStep === 1}
-                  >
-                    <ChevronLeft className="w-4 h-4 mr-2" />
-                    Previous
-                  </Button>
-                  
-                  {currentStep < STEPS.length && (
-                    <Button
-                      onClick={handleNext}
-                      disabled={!stepValid[currentStep]}
-                    >
-                      Next
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  )}
-                </div>
               </CardContent>
             </Card>
           </div>

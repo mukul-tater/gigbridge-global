@@ -1,39 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
-import { Upload, FileText, Image, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-
-interface Document {
-  id?: string;
-  document_type: 'aadhaar_front' | 'aadhaar_back' | 'pan' | 'passport' | 'visa' | 'aadhaar' | 'certificate' | 'contract' | 'license' | 'photo' | 'resume';
-  file_name: string;
-  file_url: string;
-  file_size: number;
-  mime_type: string;
-  status: 'uploaded' | 'approved' | 'rejected';
-}
+import DocumentUpload, { DocumentData } from '../DocumentUpload';
 
 interface KYCDocumentsStepProps {
-  data: Document[];
-  onComplete: (data: Document[]) => void;
+  data: DocumentData[];
+  onComplete: (data: DocumentData[]) => void;
   onValidationChange: (isValid: boolean) => void;
   onboardingId: string | null;
 }
 
-const REQUIRED_DOCUMENTS = ['aadhaar_front', 'aadhaar_back', 'pan'];
-const OPTIONAL_DOCUMENTS = ['passport', 'visa'];
-
-const DOCUMENT_LABELS = {
-  aadhaar_front: 'Aadhaar Card (Front)',
-  aadhaar_back: 'Aadhaar Card (Back)',
-  pan: 'PAN Card',
-  passport: 'Passport',
-  visa: 'Visa',
-};
+const REQUIRED_DOCUMENTS = ['aadhaar_front', 'aadhaar_back', 'pan'] as const;
+const OPTIONAL_DOCUMENTS = ['passport', 'visa'] as const;
 
 export default function KYCDocumentsStep({ 
   data, 
@@ -41,8 +19,7 @@ export default function KYCDocumentsStep({
   onValidationChange, 
   onboardingId 
 }: KYCDocumentsStepProps) {
-  const [documents, setDocuments] = useState<Document[]>(data || []);
-  const [uploading, setUploading] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<DocumentData[]>(data || []);
 
   useEffect(() => {
     const hasAllRequired = REQUIRED_DOCUMENTS.every(type => 
@@ -52,113 +29,49 @@ export default function KYCDocumentsStep({
     onComplete(documents);
   }, [documents, onValidationChange, onComplete]);
 
-  const handleFileUpload = async (
-    file: File, 
-    documentType: Document['document_type']
-  ) => {
-    if (!onboardingId) {
-      toast({
-        title: 'Error',
-        description: 'Onboarding session not initialized',
-        variant: 'destructive',
-      });
-      return;
+  useEffect(() => {
+    // Load existing documents on mount
+    if (onboardingId) {
+      loadExistingDocuments();
     }
+  }, [onboardingId]);
 
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: 'File too large',
-        description: 'Files must be under 10MB',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-    if (!allowedTypes.includes(file.type)) {
-      toast({
-        title: 'Invalid file type',
-        description: 'Only JPG, PNG, and PDF files are allowed',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setUploading(documentType);
-
+  const loadExistingDocuments = async () => {
+    if (!onboardingId) return;
+    
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${documentType}.${fileExt}`;
-
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from('onboarding-documents')
-        .upload(fileName, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('onboarding-documents')
-        .getPublicUrl(fileName);
-
-      // Save to database
-      const documentData = {
-        onboarding_id: onboardingId,
-        document_type: documentType,
-        file_name: file.name,
-        file_url: publicUrl,
-        file_size: file.size,
-        mime_type: file.type,
-        storage_key: fileName,
-      };
-
-      const { data: savedDoc, error: dbError } = await supabase
+      const { data: existingDocs, error } = await supabase
         .from('worker_onboarding_documents')
-        .upsert([documentData], { onConflict: 'onboarding_id,document_type' })
-        .select()
-        .single();
+        .select('*')
+        .eq('onboarding_id', onboardingId);
 
-      if (dbError) throw dbError;
-
-      // Update local state
-      setDocuments(prev => {
-        const filtered = prev.filter(doc => doc.document_type !== documentType);
-        return [...filtered, savedDoc];
-      });
-
-      toast({
-        title: 'Document uploaded',
-        description: `${DOCUMENT_LABELS[documentType]} uploaded successfully`,
-      });
-
+      if (error) throw error;
+      setDocuments((existingDocs || []) as DocumentData[]);
     } catch (error) {
-      console.error('Error uploading document:', error);
-      toast({
-        title: 'Upload failed',
-        description: 'Failed to upload document. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setUploading(null);
+      console.error('Error loading documents:', error);
     }
   };
 
-  const removeDocument = async (documentType: Document['document_type']) => {
+  const handleDocumentUpload = (document: DocumentData) => {
+    setDocuments(prev => {
+      const filtered = prev.filter(doc => doc.document_type !== document.document_type);
+      return [...filtered, document];
+    });
+  };
+
+  const removeDocument = async (documentType: 'aadhaar_front' | 'aadhaar_back' | 'pan' | 'passport' | 'visa') => {
     try {
       const doc = documents.find(d => d.document_type === documentType);
       if (!doc) return;
 
-      // Remove from storage
-      const { error: storageError } = await supabase.storage
-        .from('onboarding-documents')
-        .remove([doc.file_name]);
+      // Remove from storage if storage_key exists
+      if (doc.storage_key) {
+        const { error: storageError } = await supabase.storage
+          .from('onboarding-documents')
+          .remove([doc.storage_key]);
 
-      if (storageError) console.error('Storage deletion error:', storageError);
+        if (storageError) console.error('Storage deletion error:', storageError);
+      }
 
       // Remove from database
       const { error: dbError } = await supabase
@@ -173,7 +86,7 @@ export default function KYCDocumentsStep({
 
       toast({
         title: 'Document removed',
-        description: `${DOCUMENT_LABELS[documentType]} removed successfully`,
+        description: 'Document removed successfully',
       });
 
     } catch (error) {
@@ -186,110 +99,8 @@ export default function KYCDocumentsStep({
     }
   };
 
-  const getDocumentStatus = (documentType: Document['document_type']) => {
+  const getDocument = (documentType: 'aadhaar_front' | 'aadhaar_back' | 'pan' | 'passport' | 'visa') => {
     return documents.find(doc => doc.document_type === documentType);
-  };
-
-  const renderDocumentUpload = (
-    documentType: Document['document_type'],
-    isRequired: boolean
-  ) => {
-    const document = getDocumentStatus(documentType);
-    const isUploading = uploading === documentType;
-
-    return (
-      <Card key={documentType} className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <h3 className="font-medium">
-              {DOCUMENT_LABELS[documentType]}
-              {isRequired && <span className="text-destructive ml-1">*</span>}
-            </h3>
-            {document && (
-              <div className="flex items-center space-x-1">
-                {document.status === 'uploaded' && (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                )}
-                {document.status === 'approved' && (
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                )}
-                {document.status === 'rejected' && (
-                  <AlertCircle className="w-4 h-4 text-red-500" />
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {document ? (
-          <div className="space-y-3">
-            <div className="flex items-center space-x-3 p-3 bg-secondary rounded-lg">
-              {document.mime_type.startsWith('image/') ? (
-                <Image className="w-8 h-8 text-blue-500" />
-              ) : (
-                <FileText className="w-8 h-8 text-red-500" />
-              )}
-              <div className="flex-1">
-                <p className="font-medium text-sm">{document.file_name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {(document.file_size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeDocument(documentType)}
-                disabled={isUploading}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            {document.mime_type.startsWith('image/') && (
-              <img
-                src={document.file_url}
-                alt={`Preview of ${DOCUMENT_LABELS[documentType]}`}
-                className="w-full max-w-md h-48 object-cover rounded-lg border"
-              />
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-              <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground mb-2">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-muted-foreground">
-                JPG, PNG, PDF (Max 10MB)
-              </p>
-            </div>
-            
-            <input
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,application/pdf"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleFileUpload(file, documentType);
-                }
-              }}
-              disabled={isUploading}
-              className="w-full"
-            />
-            
-            {isUploading && (
-              <div className="space-y-2">
-                <Progress value={33} className="w-full" />
-                <p className="text-sm text-center text-muted-foreground">
-                  Uploading...
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </Card>
-    );
   };
 
   const requiredDocsUploaded = REQUIRED_DOCUMENTS.every(type => 
@@ -313,9 +124,17 @@ export default function KYCDocumentsStep({
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Required Documents</h3>
         <div className="grid gap-4">
-          {REQUIRED_DOCUMENTS.map(type => 
-            renderDocumentUpload(type as Document['document_type'], true)
-          )}
+          {REQUIRED_DOCUMENTS.map(type => (
+            <DocumentUpload
+              key={type}
+              documentType={type}
+              isRequired={true}
+              document={getDocument(type)}
+              onUploadComplete={handleDocumentUpload}
+              onRemove={() => removeDocument(type)}
+              onboardingId={onboardingId!}
+            />
+          ))}
         </div>
       </div>
 
@@ -325,9 +144,17 @@ export default function KYCDocumentsStep({
           These documents can help with visa applications and international placements
         </p>
         <div className="grid gap-4">
-          {OPTIONAL_DOCUMENTS.map(type => 
-            renderDocumentUpload(type as Document['document_type'], false)
-          )}
+          {OPTIONAL_DOCUMENTS.map(type => (
+            <DocumentUpload
+              key={type}
+              documentType={type}
+              isRequired={false}
+              document={getDocument(type)}
+              onUploadComplete={handleDocumentUpload}
+              onRemove={() => removeDocument(type)}
+              onboardingId={onboardingId!}
+            />
+          ))}
         </div>
       </div>
 
