@@ -119,28 +119,6 @@ export default function OnboardingWizard() {
     }
   };
 
-  const debouncedSave = useCallback(
-    debounce((step: number, data: any) => {
-      if (onboardingId) {
-        setSavingIndicator('Saving...');
-        saveStepData(step, data).then(() => {
-          setSavingIndicator('Saved');
-          setTimeout(() => setSavingIndicator(''), 2000);
-        });
-      }
-    }, 800),
-    [onboardingId]
-  );
-
-  const handleStepComplete = (step: number, data: any) => {
-    setStepData(prev => ({ ...prev, [getStepKey(step)]: data }));
-    setStepValid(prev => ({ ...prev, [step]: true }));
-    setCompletedSteps(prev => new Set([...prev, step]));
-    
-    // Autosave with debounce
-    debouncedSave(step, data);
-  };
-
   const saveStepData = async (step: number, data: any) => {
     try {
       switch (step) {
@@ -198,6 +176,29 @@ export default function OnboardingWizard() {
       });
     }
   };
+
+  const debouncedSave = useCallback(
+    debounce((step: number, data: any) => {
+      if (onboardingId) {
+        setSavingIndicator('Saving...');
+        saveStepData(step, data).then(() => {
+          setSavingIndicator('Saved');
+          setTimeout(() => setSavingIndicator(''), 2000);
+        });
+      }
+    }, 800),
+    [onboardingId, saveStepData]
+  );
+
+  const handleStepComplete = (step: number, data: any) => {
+    setStepData(prev => ({ ...prev, [getStepKey(step)]: data }));
+    setStepValid(prev => ({ ...prev, [step]: true }));
+    setCompletedSteps(prev => new Set([...prev, step]));
+    
+    // Autosave with debounce
+    debouncedSave(step, data);
+  };
+
 
   const getStepKey = (step: number) => {
     const keys = ['', 'profile', 'documents', 'skills', 'workHistory', 'languages', 'preferences', 'review'];
