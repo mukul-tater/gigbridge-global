@@ -10,14 +10,28 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 
-const authSchema = z.object({
+const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const signUpSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+  username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
+  contactNumber: z.string().min(10, "Contact number must be at least 10 digits").max(15, "Contact number must be less than 15 digits"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -48,14 +62,24 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const validatedData = authSchema.parse({ email, password });
+      const validatedData = signUpSchema.parse({ 
+        email, 
+        password, 
+        confirmPassword, 
+        username, 
+        contactNumber 
+      });
       const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
         email: validatedData.email,
         password: validatedData.password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            username: validatedData.username,
+            contact_number: validatedData.contactNumber
+          }
         }
       });
 
@@ -103,7 +127,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const validatedData = authSchema.parse({ email, password });
+      const validatedData = signInSchema.parse({ email, password });
       
       const { error } = await supabase.auth.signInWithPassword({
         email: validatedData.email,
@@ -186,6 +210,17 @@ const Auth = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
+                  <Label htmlFor="username-signup">Username</Label>
+                  <Input
+                    id="username-signup"
+                    type="text"
+                    placeholder="Choose a username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="email-signup">Email</Label>
                   <Input
                     id="email-signup"
@@ -197,6 +232,17 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="contact-signup">Contact Number</Label>
+                  <Input
+                    id="contact-signup"
+                    type="tel"
+                    placeholder="Enter your contact number"
+                    value={contactNumber}
+                    onChange={(e) => setContactNumber(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="password-signup">Password</Label>
                   <Input
                     id="password-signup"
@@ -204,6 +250,17 @@ const Auth = () => {
                     placeholder="Choose a password (min 6 characters)"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password-signup">Confirm Password</Label>
+                  <Input
+                    id="confirm-password-signup"
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
                 </div>
