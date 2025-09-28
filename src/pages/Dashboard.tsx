@@ -71,7 +71,7 @@ const Dashboard = () => {
   const handleProfileSelection = (type: 'worker' | 'employer') => {
     setUserType(type);
     if (type === 'worker') {
-      navigate('/profile/worker');
+      navigate('/onboarding');
     } else {
       navigate('/profile/employer');
     }
@@ -172,8 +172,8 @@ const Dashboard = () => {
                         <p className="text-sm text-muted-foreground">
                           Complete your profile to access all features
                         </p>
-                        <Button className="mt-4" onClick={() => navigate(`/profile/${userType}`)}>
-                          {userType === 'worker' ? 'Complete Worker Profile' : 'Complete Employer Profile'}
+                        <Button className="mt-4" onClick={() => navigate(userType === 'worker' ? '/onboarding' : `/profile/${userType}`)}>
+                          {userType === 'worker' ? 'Complete Worker Onboarding' : 'Complete Employer Profile'}
                         </Button>
                       </CardContent>
                     </Card>

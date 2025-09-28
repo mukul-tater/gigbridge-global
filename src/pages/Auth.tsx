@@ -97,13 +97,11 @@ const Auth = () => {
         countryCode,
         contactNumber 
       });
-      const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
         email: validatedData.email,
         password: validatedData.password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             username: validatedData.username,
             contact_number: `${validatedData.countryCode}${validatedData.contactNumber}`
