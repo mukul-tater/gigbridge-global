@@ -6,9 +6,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
+import { parsePhoneNumber, isValidPhoneNumber } from "libphonenumber-js";
+
+// Country codes and validation patterns
+const countries = [
+  { code: 'IN', name: 'India', dialCode: '+91', phoneLength: 10 },
+  { code: 'US', name: 'United States', dialCode: '+1', phoneLength: 10 },
+  { code: 'GB', name: 'United Kingdom', dialCode: '+44', phoneLength: 10 },
+  { code: 'CA', name: 'Canada', dialCode: '+1', phoneLength: 10 },
+  { code: 'AU', name: 'Australia', dialCode: '+61', phoneLength: 9 },
+  { code: 'DE', name: 'Germany', dialCode: '+49', phoneLength: 11 },
+  { code: 'FR', name: 'France', dialCode: '+33', phoneLength: 10 },
+  { code: 'JP', name: 'Japan', dialCode: '+81', phoneLength: 11 },
+  { code: 'CN', name: 'China', dialCode: '+86', phoneLength: 11 },
+  { code: 'BR', name: 'Brazil', dialCode: '+55', phoneLength: 11 },
+];
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -20,10 +36,17 @@ const signUpSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
   username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
-  contactNumber: z.string().min(10, "Contact number must be at least 10 digits").max(15, "Contact number must be less than 15 digits"),
+  countryCode: z.string().min(1, "Please select a country"),
+  contactNumber: z.string().min(1, "Contact number is required"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
+}).refine((data) => {
+  const fullPhoneNumber = `${data.countryCode}${data.contactNumber}`;
+  return isValidPhoneNumber(fullPhoneNumber);
+}, {
+  message: "Invalid phone number for selected country",
+  path: ["contactNumber"],
 });
 
 const Auth = () => {
@@ -31,7 +54,11 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [countryCode, setCountryCode] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState("signin");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -67,6 +94,7 @@ const Auth = () => {
         password, 
         confirmPassword, 
         username, 
+        countryCode,
         contactNumber 
       });
       const redirectUrl = `${window.location.origin}/`;
@@ -78,7 +106,7 @@ const Auth = () => {
           emailRedirectTo: redirectUrl,
           data: {
             username: validatedData.username,
-            contact_number: validatedData.contactNumber
+            contact_number: `${validatedData.countryCode}${validatedData.contactNumber}`
           }
         }
       });
@@ -102,6 +130,8 @@ const Auth = () => {
           title: "Account created!",
           description: "Please check your email to verify your account.",
         });
+        // Navigate to sign in tab after successful signup
+        setActiveTab("signin");
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -170,7 +200,7 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -191,14 +221,30 @@ const Auth = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password-signin">Password</Label>
-                  <Input
-                    id="password-signin"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password-signin"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -232,37 +278,92 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="contact-signup">Contact Number</Label>
-                  <Input
-                    id="contact-signup"
-                    type="tel"
-                    placeholder="Enter your contact number"
-                    value={contactNumber}
-                    onChange={(e) => setContactNumber(e.target.value)}
-                    required
-                  />
+                  <Label>Contact Number</Label>
+                  <div className="flex gap-2">
+                    <Select value={countryCode} onValueChange={setCountryCode} required>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((country) => (
+                          <SelectItem key={country.code} value={country.dialCode}>
+                            {country.dialCode} {country.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="contact-signup"
+                      type="tel"
+                      placeholder="Enter your contact number"
+                      value={contactNumber}
+                      onChange={(e) => setContactNumber(e.target.value)}
+                      required
+                      className="flex-1"
+                    />
+                  </div>
+                  {countryCode && (
+                    <p className="text-xs text-muted-foreground">
+                      Expected format: {countries.find(c => c.dialCode === countryCode)?.phoneLength} digits
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password-signup">Password</Label>
-                  <Input
-                    id="password-signup"
-                    type="password"
-                    placeholder="Choose a password (min 6 characters)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password-signup"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Choose a password (min 6 characters)"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password-signup">Confirm Password</Label>
-                  <Input
-                    id="confirm-password-signup"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirm-password-signup"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {confirmPassword && password !== confirmPassword && (
+                    <p className="text-xs text-destructive">Passwords don't match</p>
+                  )}
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
