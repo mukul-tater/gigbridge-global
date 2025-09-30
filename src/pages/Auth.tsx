@@ -189,8 +189,8 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 pt-20 pb-8">
+      <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Welcome to GigWorker Global</CardTitle>
           <CardDescription>
@@ -214,7 +214,9 @@ const Auth = () => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
                     required
+                    className="text-base" // Prevent zoom on iOS
                   />
                 </div>
                 <div className="space-y-2">
@@ -226,8 +228,9 @@ const Auth = () => {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="current-password"
                       required
-                      className="pr-10"
+                      className="pr-10 text-base" // Prevent zoom on iOS
                     />
                     <Button
                       type="button"
@@ -272,7 +275,9 @@ const Auth = () => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
                     required
+                    className="text-base" // Prevent zoom on iOS
                   />
                 </div>
                 <div className="space-y-2">
@@ -315,8 +320,9 @@ const Auth = () => {
                       placeholder="Choose a password (min 6 characters)"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="new-password"
                       required
-                      className="pr-10"
+                      className="pr-10 text-base" // Prevent zoom on iOS
                     />
                     <Button
                       type="button"
@@ -342,8 +348,9 @@ const Auth = () => {
                       placeholder="Confirm your password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
                       required
-                      className="pr-10"
+                      className="pr-10 text-base" // Prevent zoom on iOS
                     />
                     <Button
                       type="button"

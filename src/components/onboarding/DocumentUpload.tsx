@@ -92,13 +92,12 @@ export default function DocumentUpload({
     setUploadError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      // Sanitize filename for security
-      const sanitizedName = sanitizeFilename(file.name);
-      const fileExt = sanitizedName.split('.').pop();
-      const fileName = `${user.id}/${onboardingId}/${documentType}.${fileExt}`;
+      // Create FormData for the upload API
+      const formData = new FormData();
+      formData.append('files', file);
 
       // Simulate upload progress
       const progressInterval = setInterval(() => {
@@ -108,32 +107,30 @@ export default function DocumentUpload({
         });
       }, 100);
 
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from('onboarding-documents')
-        .upload(fileName, file, { 
-          upsert: true,
-          contentType: file.type
-        });
+      // Upload using our edge function
+      const { data: uploadResponse, error: uploadError } = await supabase.functions.invoke('upload', {
+        body: formData,
+      });
 
       clearInterval(progressInterval);
 
       if (uploadError) throw uploadError;
+      if (!uploadResponse?.success) throw new Error(uploadResponse?.error || 'Upload failed');
 
       setUploadProgress(100);
 
-      // Note: Using storage key instead of public URL for security
-      // Documents are now stored in private bucket and will use signed URLs
+      const uploadedFile = uploadResponse.files[0];
+      const sanitizedName = sanitizeFilename(file.name);
       
       // Save to database with secure metadata
       const documentData = {
         onboarding_id: onboardingId,
         document_type: documentType,
         file_name: sanitizedName,
-        file_url: fileName, // Store storage key, not public URL
+        file_url: uploadedFile.storage_key, // Store storage key, not public URL
         file_size: file.size,
         mime_type: file.type,
-        storage_key: fileName,
+        storage_key: uploadedFile.storage_key,
         status: 'uploaded' as const,
       };
 
@@ -154,10 +151,11 @@ export default function DocumentUpload({
 
     } catch (error) {
       console.error('Error uploading document:', error);
-      setUploadError('Upload failed. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.';
+      setUploadError(errorMessage);
       toast({
         title: 'Upload failed',
-        description: 'Failed to upload document. Please try again.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -271,7 +269,10 @@ export default function DocumentUpload({
         </div>
       ) : (
         <div className="space-y-3">
-          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+          <div 
+            className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground/40 transition-colors"
+            onClick={() => window.document.getElementById(`file-input-${documentType}`)?.click()}
+          >
             <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground mb-2">
               Click to upload or drag and drop
@@ -296,7 +297,7 @@ export default function DocumentUpload({
               }
             }}
             disabled={isUploading || disabled}
-            className="w-full"
+            className="hidden"
           />
           
           {isUploading && (
