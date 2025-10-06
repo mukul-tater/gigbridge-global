@@ -88,6 +88,13 @@ export type Database = {
             referencedRelation: "worker_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "contracts_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       documents: {
@@ -248,6 +255,13 @@ export type Database = {
             columns: ["worker_id"]
             isOneToOne: false
             referencedRelation: "worker_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1075,16 +1089,115 @@ export type Database = {
             referencedRelation: "worker_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "worker_skills_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      worker_profiles_public: {
+        Row: {
+          aadhaar_number: string | null
+          available_from: string | null
+          bio: string | null
+          contract_duration_months: number | null
+          created_at: string | null
+          currency: string | null
+          date_of_birth: string | null
+          email: string | null
+          expected_max_salary: number | null
+          expected_min_salary: number | null
+          first_name: string | null
+          id: string | null
+          kyc_verified: boolean | null
+          languages: string[] | null
+          last_name: string | null
+          nationality: string | null
+          passport_number: string | null
+          phone: string | null
+          preferred_countries: string[] | null
+          profile_photo_url: string | null
+          status: Database["public"]["Enums"]["worker_status"] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          aadhaar_number?: never
+          available_from?: string | null
+          bio?: string | null
+          contract_duration_months?: number | null
+          created_at?: string | null
+          currency?: string | null
+          date_of_birth?: never
+          email?: never
+          expected_max_salary?: number | null
+          expected_min_salary?: number | null
+          first_name?: string | null
+          id?: string | null
+          kyc_verified?: boolean | null
+          languages?: string[] | null
+          last_name?: string | null
+          nationality?: string | null
+          passport_number?: never
+          phone?: never
+          preferred_countries?: string[] | null
+          profile_photo_url?: string | null
+          status?: Database["public"]["Enums"]["worker_status"] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          aadhaar_number?: never
+          available_from?: string | null
+          bio?: string | null
+          contract_duration_months?: number | null
+          created_at?: string | null
+          currency?: string | null
+          date_of_birth?: never
+          email?: never
+          expected_max_salary?: number | null
+          expected_min_salary?: number | null
+          first_name?: string | null
+          id?: string | null
+          kyc_verified?: boolean | null
+          languages?: string[] | null
+          last_name?: string | null
+          nationality?: string | null
+          passport_number?: never
+          phone?: never
+          preferred_countries?: string[] | null
+          profile_photo_url?: string | null
+          status?: Database["public"]["Enums"]["worker_status"] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      employer_has_business_relationship: {
+        Args: { _employer_user_id: string; _worker_id: string }
+        Returns: boolean
+      }
       get_signed_document_url: {
         Args: { document_id: string; expires_in_seconds?: number }
         Returns: string
+      }
+      get_worker_sensitive_data: {
+        Args: { _worker_id: string }
+        Returns: {
+          aadhaar_number: string
+          date_of_birth: string
+          email: string
+          passport_number: string
+          phone: string
+          worker_id: string
+        }[]
       }
       has_role: {
         Args: {
