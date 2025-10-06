@@ -48,6 +48,9 @@ const Header = () => {
                 <Bell className="h-4 w-4" />
                 Job Alerts
               </a>
+              <Link to="/employer-onboarding" className="text-muted-foreground hover:text-primary transition-colors">
+                For Employers
+              </Link>
               <a href="#countries" className="text-muted-foreground hover:text-primary transition-colors">
                 Countries
               </a>
@@ -124,6 +127,13 @@ const Header = () => {
               <Bell className="h-5 w-5" />
               Job Alerts
             </a>
+            <Link 
+              to="/employer-onboarding" 
+              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
+              onClick={closeMobileMenu}
+            >
+              For Employers
+            </Link>
             <a 
               href="#countries" 
               className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
