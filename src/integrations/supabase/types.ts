@@ -75,6 +75,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "contracts_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employer_profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "contracts_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
@@ -351,6 +358,13 @@ export type Database = {
             columns: ["employer_id"]
             isOneToOne: false
             referencedRelation: "employer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_postings_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employer_profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1100,6 +1114,54 @@ export type Database = {
       }
     }
     Views: {
+      employer_profiles_public: {
+        Row: {
+          city: string | null
+          company_name: string | null
+          company_size: string | null
+          country: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          industry: string | null
+          logo_url: string | null
+          status: Database["public"]["Enums"]["employer_status"] | null
+          updated_at: string | null
+          verified: boolean | null
+          website_url: string | null
+        }
+        Insert: {
+          city?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          industry?: string | null
+          logo_url?: string | null
+          status?: Database["public"]["Enums"]["employer_status"] | null
+          updated_at?: string | null
+          verified?: boolean | null
+          website_url?: string | null
+        }
+        Update: {
+          city?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          country?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          industry?: string | null
+          logo_url?: string | null
+          status?: Database["public"]["Enums"]["employer_status"] | null
+          updated_at?: string | null
+          verified?: boolean | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       worker_profiles_public: {
         Row: {
           available_from: string | null
@@ -1198,6 +1260,10 @@ export type Database = {
       mask_pan: {
         Args: { pan_number: string }
         Returns: string
+      }
+      worker_has_business_relationship: {
+        Args: { _employer_id: string; _worker_user_id: string }
+        Returns: boolean
       }
     }
     Enums: {
