@@ -64,7 +64,12 @@ class MockDataService {
         certifications,
         mediaAssets,
         jobs,
-        applications
+        applications,
+        trainings: [],
+        contracts: [],
+        travelDocuments: [],
+        insurancePolicies: [],
+        remittances: []
       };
 
       this.saveToLocalStorage();

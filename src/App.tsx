@@ -21,6 +21,10 @@ import WorkerApplications from "./pages/worker/WorkerApplications";
 import WorkerMessaging from "./pages/worker/WorkerMessaging";
 import WorkerDocuments from "./pages/worker/WorkerDocuments";
 import WorkerNotifications from "./pages/worker/WorkerNotifications";
+import WorkerTraining from "./pages/worker/Training";
+import WorkerContracts from "./pages/worker/Contracts";
+import WorkerTravelStatus from "./pages/worker/TravelStatus";
+import WorkerInsurance from "./pages/worker/Insurance";
 
 // Employer Pages
 import EmployerDashboard from "./pages/employer/EmployerDashboard";
@@ -80,6 +84,26 @@ const App = () => (
             <Route path="/worker/messaging" element={
               <ProtectedRoute allowedRoles={["WORKER"]}>
                 <WorkerMessaging />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/training" element={
+              <ProtectedRoute allowedRoles={["WORKER"]}>
+                <WorkerTraining />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/contracts" element={
+              <ProtectedRoute allowedRoles={["WORKER"]}>
+                <WorkerContracts />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/travel" element={
+              <ProtectedRoute allowedRoles={["WORKER"]}>
+                <WorkerTravelStatus />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/insurance" element={
+              <ProtectedRoute allowedRoles={["WORKER"]}>
+                <WorkerInsurance />
               </ProtectedRoute>
             } />
             <Route path="/worker/documents" element={

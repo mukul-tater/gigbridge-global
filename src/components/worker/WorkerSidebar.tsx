@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, User, Briefcase, FileText, MessageSquare, Upload, Bell } from "lucide-react";
+import { LayoutDashboard, User, Briefcase, FileText, MessageSquare, Upload, Bell, GraduationCap, FileSignature, Plane, Shield } from "lucide-react";
 
 export default function WorkerSidebar() {
   const location = useLocation();
@@ -8,9 +8,13 @@ export default function WorkerSidebar() {
     { path: "/worker/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/worker/profile", icon: User, label: "Profile" },
     { path: "/jobs", icon: Briefcase, label: "Job Search" },
-    { path: "/worker/applications", icon: FileText, label: "My Applications" },
-    { path: "/worker/messaging", icon: MessageSquare, label: "Messages" },
+    { path: "/worker/applications", icon: FileText, label: "Applications" },
+    { path: "/worker/training", icon: GraduationCap, label: "Training & PDOT" },
+    { path: "/worker/contracts", icon: FileSignature, label: "Contracts" },
+    { path: "/worker/travel", icon: Plane, label: "Travel & Visa" },
+    { path: "/worker/insurance", icon: Shield, label: "Insurance & Remittance" },
     { path: "/worker/documents", icon: Upload, label: "Documents" },
+    { path: "/worker/messaging", icon: MessageSquare, label: "Messages" },
     { path: "/worker/notifications", icon: Bell, label: "Notifications" },
   ];
 

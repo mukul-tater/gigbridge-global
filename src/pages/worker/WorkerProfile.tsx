@@ -61,15 +61,54 @@ export default function WorkerProfile() {
           </Card>
 
           <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Immigration Documents</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Passport Number</label>
+                <Input placeholder="Enter passport number" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Passport Issue Date</label>
+                  <Input type="date" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Passport Expiry Date</label>
+                  <Input type="date" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Visa Type</label>
+                <Input placeholder="e.g., Work Visa, Employment Visa" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">ECR/ECNR Status</label>
+                <select className="w-full border rounded-md p-2">
+                  <option value="">Select Status</option>
+                  <option value="ECR">ECR (Emigration Check Required)</option>
+                  <option value="ECNR">ECNR (Emigration Check Not Required)</option>
+                </select>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Work Preferences</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Preferred Locations</label>
-                <Input placeholder="e.g., Dubai, Qatar, Saudi Arabia" />
+                <label className="block text-sm font-medium mb-2">Preferred Countries</label>
+                <Input placeholder="e.g., UAE, Qatar, Saudi Arabia, Kuwait" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Expected Salary (per hour)</label>
-                <Input type="number" placeholder="25" />
+                <label className="block text-sm font-medium mb-2">Preferred Industries</label>
+                <Input placeholder="e.g., Construction, Manufacturing, Oil & Gas" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Expected Salary Range</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input type="number" placeholder="Min (USD)" />
+                  <Input type="number" placeholder="Max (USD)" />
+                </div>
               </div>
             </div>
           </Card>

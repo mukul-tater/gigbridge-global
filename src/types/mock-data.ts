@@ -156,6 +156,87 @@ export interface Application {
   coverLetter?: string;
 }
 
+// Training Types
+export type TrainingStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+
+export interface Training {
+  id: string;
+  workerId: string;
+  name: string;
+  description: string;
+  status: TrainingStatus;
+  startDate: string | null;
+  completedDate: string | null;
+  certificateUrl?: string;
+}
+
+// Contract Types
+export type ContractStatus = 'DRAFT' | 'SENT' | 'SIGNED' | 'ACTIVE' | 'COMPLETED' | 'TERMINATED';
+
+export interface Contract {
+  id: string;
+  workerId: string;
+  employerId: string;
+  jobId: string;
+  title: string;
+  salary: number;
+  currency: string;
+  duration: string;
+  startDate: string;
+  endDate: string;
+  status: ContractStatus;
+  documentUrl: string;
+  signedAt: string | null;
+}
+
+// Travel & Visa Types
+export type VisaStatus = 'NOT_APPLIED' | 'APPLIED' | 'APPROVED' | 'REJECTED' | 'ISSUED';
+export type TravelStatus = 'PENDING' | 'BOOKED' | 'COMPLETED';
+
+export interface TravelDocument {
+  id: string;
+  workerId: string;
+  visaStatus: VisaStatus;
+  visaNumber?: string;
+  visaIssueDate?: string;
+  visaExpiryDate?: string;
+  travelStatus: TravelStatus;
+  flightDetails?: string;
+  departureDate?: string;
+  arrivalDate?: string;
+  destination: string;
+}
+
+// Insurance Types
+export interface InsurancePolicy {
+  id: string;
+  workerId: string;
+  policyNumber: string;
+  provider: string;
+  coverageAmount: number;
+  currency: string;
+  startDate: string;
+  expiryDate: string;
+  status: InsuranceStatus;
+  documentUrl: string;
+}
+
+// Remittance Types
+export type RemittanceStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+
+export interface Remittance {
+  id: string;
+  workerId: string;
+  amount: number;
+  currency: string;
+  recipientName: string;
+  recipientAccount: string;
+  status: RemittanceStatus;
+  initiatedAt: string;
+  completedAt: string | null;
+  transactionId?: string;
+}
+
 // Mock Data Store
 export interface MockDataStore {
   users: User[];
@@ -168,4 +249,9 @@ export interface MockDataStore {
   mediaAssets: MediaAsset[];
   jobs: Job[];
   applications: Application[];
+  trainings: Training[];
+  contracts: Contract[];
+  travelDocuments: TravelDocument[];
+  insurancePolicies: InsurancePolicy[];
+  remittances: Remittance[];
 }
