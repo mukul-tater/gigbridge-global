@@ -41,21 +41,15 @@ const Header = () => {
 
             {/* Navigation - Desktop */}
             <nav className="hidden md:flex items-center gap-6">
-              <a href="#jobs" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/jobs" className="text-muted-foreground hover:text-primary transition-colors">
                 Find Jobs
-              </a>
-              <a href="/alerts" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+              </Link>
+              <Link to="/alerts" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
                 <Bell className="h-4 w-4" />
                 Job Alerts
-              </a>
-              <Link to="/employer-onboarding" className="text-muted-foreground hover:text-primary transition-colors">
-                For Employers
               </Link>
               <a href="#countries" className="text-muted-foreground hover:text-primary transition-colors">
                 Countries
-              </a>
-              <a href="#resources" className="text-muted-foreground hover:text-primary transition-colors">
-                Resources
               </a>
               <a href="#about" className="text-muted-foreground hover:text-primary transition-colors">
                 About
@@ -112,27 +106,20 @@ const Header = () => {
         <div className="px-4 py-6 space-y-6">
           {/* Navigation Links */}
           <nav className="space-y-4">
-            <a 
-              href="#jobs" 
+            <Link 
+              to="/jobs" 
               className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMobileMenu}
             >
               Find Jobs
-            </a>
-            <a 
-              href="/alerts" 
+            </Link>
+            <Link 
+              to="/alerts" 
               className="block text-foreground hover:text-primary transition-colors py-2 text-lg flex items-center gap-2"
               onClick={closeMobileMenu}
             >
               <Bell className="h-5 w-5" />
               Job Alerts
-            </a>
-            <Link 
-              to="/employer-onboarding" 
-              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMobileMenu}
-            >
-              For Employers
             </Link>
             <a 
               href="#countries" 
@@ -140,13 +127,6 @@ const Header = () => {
               onClick={closeMobileMenu}
             >
               Countries
-            </a>
-            <a 
-              href="#resources" 
-              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMobileMenu}
-            >
-              Resources
             </a>
             <a 
               href="#about" 
