@@ -1,0 +1,42 @@
+import { Link, useLocation } from "react-router-dom";
+import { LayoutDashboard, User, Briefcase, FileText, MessageSquare, Upload, Bell } from "lucide-react";
+
+export default function WorkerSidebar() {
+  const location = useLocation();
+  
+  const navItems = [
+    { path: "/worker/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/worker/profile", icon: User, label: "Profile" },
+    { path: "/jobs", icon: Briefcase, label: "Job Search" },
+    { path: "/worker/applications", icon: FileText, label: "My Applications" },
+    { path: "/worker/messaging", icon: MessageSquare, label: "Messages" },
+    { path: "/worker/documents", icon: Upload, label: "Documents" },
+    { path: "/worker/notifications", icon: Bell, label: "Notifications" },
+  ];
+
+  return (
+    <aside className="w-64 bg-card border-r min-h-screen p-6">
+      <h2 className="text-lg font-bold mb-6">Worker Portal</h2>
+      <nav className="space-y-2">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted text-muted-foreground"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}

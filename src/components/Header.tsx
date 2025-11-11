@@ -1,10 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Search, Globe, User, BriefcaseIcon, Bell, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Menu, Search, Globe, User, BriefcaseIcon, Bell, X, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    closeMobileMenu();
+  };
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -44,16 +53,12 @@ const Header = () => {
               <Link to="/jobs" className="text-muted-foreground hover:text-primary transition-colors">
                 Find Jobs
               </Link>
-              <Link to="/alerts" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
-                <Bell className="h-4 w-4" />
-                Job Alerts
+              <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">
+                About Us
               </Link>
-              <a href="#countries" className="text-muted-foreground hover:text-primary transition-colors">
-                Countries
-              </a>
-              <a href="#about" className="text-muted-foreground hover:text-primary transition-colors">
-                About
-              </a>
+              <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+                Contact Us
+              </Link>
             </nav>
 
             {/* Actions */}
@@ -71,17 +76,28 @@ const Header = () => {
               </Button>
               
               <div className="hidden md:flex items-center gap-3">
-                <Link to="/auth">
-                  <Button variant="outline">
-                    <User className="h-4 w-4" />
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/dashboard">
-                  <Button variant="hero">
-                    Dashboard
-                  </Button>
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <Link to="/dashboard">
+                      <Button variant="outline">
+                        <User className="h-4 w-4 mr-2" />
+                        {user?.name}
+                      </Button>
+                    </Link>
+                    <Button variant="ghost" onClick={handleLogout}>
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth">
+                      <Button variant="outline">
+                        <User className="h-4 w-4 mr-2" />
+                        Login
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -114,42 +130,44 @@ const Header = () => {
               Find Jobs
             </Link>
             <Link 
-              to="/alerts" 
-              className="block text-foreground hover:text-primary transition-colors py-2 text-lg flex items-center gap-2"
+              to="/about" 
+              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMobileMenu}
             >
-              <Bell className="h-5 w-5" />
-              Job Alerts
+              About Us
             </Link>
-            <a 
-              href="#countries" 
+            <Link 
+              to="/contact" 
               className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
               onClick={closeMobileMenu}
             >
-              Countries
-            </a>
-            <a 
-              href="#about" 
-              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMobileMenu}
-            >
-              About
-            </a>
+              Contact Us
+            </Link>
           </nav>
 
           {/* Mobile Auth Actions */}
           <div className="pt-4 border-t border-border space-y-3">
-            <Link to="/auth" onClick={closeMobileMenu}>
-              <Button variant="outline" className="w-full justify-start">
-                <User className="h-4 w-4 mr-2" />
-                Login / Sign Up
-              </Button>
-            </Link>
-            <Link to="/dashboard" onClick={closeMobileMenu}>
-              <Button variant="hero" className="w-full">
-                Dashboard
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard" onClick={closeMobileMenu}>
+                  <Button variant="outline" className="w-full justify-start">
+                    <User className="h-4 w-4 mr-2" />
+                    {user?.name}
+                  </Button>
+                </Link>
+                <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth" onClick={closeMobileMenu}>
+                <Button variant="outline" className="w-full justify-start">
+                  <User className="h-4 w-4 mr-2" />
+                  Login / Sign Up
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
