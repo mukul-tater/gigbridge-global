@@ -1,80 +1,26 @@
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { User, LogOut, UserCircle, Building2 } from "lucide-react";
+import { LogOut, UserCircle, Building2, Briefcase, FileText, MessageSquare } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const Dashboard = () => {
-  const [user, setUser] = useState<any>(null);
-  const [userType, setUserType] = useState<'worker' | 'employer' | null>(null);
+export default function Dashboard() {
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
-
-      // Check if user has a profile
-      const { data: workerProfile } = await supabase
-        .from('worker_profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-
-      const { data: employerProfile } = await supabase
-        .from('employer_profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-
-      if (workerProfile) {
-        setUserType('worker');
-      } else if (employerProfile) {
-        setUserType('employer');
-      }
-    };
-
-    checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
-        setUser(session.user);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error signing out",
-        description: error.message,
-        variant: "destructive",
-      });
+    if (!isAuthenticated) {
+      navigate("/auth");
     }
-  };
+  }, [isAuthenticated, navigate]);
 
-  const handleProfileSelection = (type: 'worker' | 'employer') => {
-    setUserType(type);
-    if (type === 'worker') {
-      navigate('/onboarding');
-    } else {
-      navigate('/profile/employer');
-    }
+  const handleSignOut = () => {
+    logout();
+    navigate("/");
   };
 
   if (!user) {
@@ -90,10 +36,10 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
-                Welcome, {user.email}
+                Welcome, {user.name}
               </h1>
               <p className="text-muted-foreground mt-2">
-                Manage your global gig work opportunities
+                Role: {user.role}
               </p>
             </div>
             <Button onClick={handleSignOut} variant="outline">
@@ -102,180 +48,148 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {!userType ? (
-            <div className="max-w-4xl mx-auto">
-              <Card className="mb-8">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl">Choose Your Profile Type</CardTitle>
-                  <CardDescription>
-                    Select whether you're looking for work opportunities or seeking to hire skilled workers
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleProfileSelection('worker')}>
-                      <CardHeader className="text-center">
-                        <UserCircle className="h-16 w-16 mx-auto text-primary mb-4" />
-                        <CardTitle>I'm a Worker</CardTitle>
-                        <CardDescription>
-                          Find international job opportunities in construction, electrical, plumbing, welding, and more
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Button className="w-full">
-                          <User className="mr-2 h-4 w-4" />
-                          Create Worker Profile
-                        </Button>
-                      </CardContent>
-                    </Card>
+          <div className="max-w-6xl mx-auto">
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="jobs">
+                  {user.role === 'WORKER' ? 'Find Jobs' : 'My Jobs'}
+                </TabsTrigger>
+                <TabsTrigger value="applications">
+                  {user.role === 'WORKER' ? 'My Applications' : 'Applications'}
+                </TabsTrigger>
+                <TabsTrigger value="messages">Messages</TabsTrigger>
+              </TabsList>
 
-                    <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleProfileSelection('employer')}>
-                      <CardHeader className="text-center">
-                        <Building2 className="h-16 w-16 mx-auto text-primary mb-4" />
-                        <CardTitle>I'm an Employer</CardTitle>
-                        <CardDescription>
-                          Hire skilled workers from India and other countries for your projects and operations
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Button className="w-full">
-                          <Building2 className="mr-2 h-4 w-4" />
-                          Create Employer Profile
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            <div className="max-w-6xl mx-auto">
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="jobs">
-                    {userType === 'worker' ? 'Find Jobs' : 'My Jobs'}
-                  </TabsTrigger>
-                  <TabsTrigger value="applications">
-                    {userType === 'worker' ? 'My Applications' : 'Applications'}
-                  </TabsTrigger>
-                  <TabsTrigger value="messages">Messages</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="overview" className="mt-6">
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Profile Status</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground">
-                          Complete your profile to access all features
-                        </p>
-                        <Button className="mt-4" onClick={() => navigate(userType === 'worker' ? '/onboarding' : `/profile/${userType}`)}>
-                          {userType === 'worker' ? 'Complete Worker Onboarding' : 'Complete Employer Profile'}
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>
-                          {userType === 'worker' ? 'Available Jobs' : 'Posted Jobs'}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-2xl font-bold">0</p>
-                        <p className="text-sm text-muted-foreground">
-                          {userType === 'worker' ? 'Matching your skills' : 'Currently active'}
-                        </p>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>
-                          {userType === 'worker' ? 'Applications' : 'Candidates'}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-2xl font-bold">0</p>
-                        <p className="text-sm text-muted-foreground">
-                          {userType === 'worker' ? 'Submitted applications' : 'Total applicants'}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="jobs" className="mt-6">
+              <TabsContent value="overview" className="mt-6">
+                <div className="grid md:grid-cols-3 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>
-                        {userType === 'worker' ? 'Find Jobs' : 'Manage Job Postings'}
+                      <CardTitle className="flex items-center gap-2">
+                        <UserCircle className="h-5 w-5" />
+                        Profile Status
                       </CardTitle>
-                      <CardDescription>
-                        {userType === 'worker' 
-                          ? 'Browse international opportunities matching your skills'
-                          : 'Create and manage your job postings'
-                        }
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">
-                        {userType === 'worker' 
-                          ? 'Complete your profile to see personalized job recommendations'
-                          : 'Post your first job to start finding qualified candidates'
-                        }
+                      <p className="text-sm text-muted-foreground">
+                        {user.role === 'WORKER' ? 'Worker Profile Active' : 
+                         user.role === 'EMPLOYER' ? 'Employer Profile Active' : 
+                         'Admin Dashboard'}
                       </p>
-                      <Button className="mt-4">
-                        {userType === 'worker' ? 'Browse Jobs' : 'Post a Job'}
+                      <Button className="mt-4 w-full" variant="outline">
+                        View Profile
                       </Button>
                     </CardContent>
                   </Card>
-                </TabsContent>
 
-                <TabsContent value="applications" className="mt-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>
-                        {userType === 'worker' ? 'My Applications' : 'Job Applications'}
+                      <CardTitle className="flex items-center gap-2">
+                        <Briefcase className="h-5 w-5" />
+                        {user.role === 'WORKER' ? 'Available Jobs' : 'Posted Jobs'}
                       </CardTitle>
-                      <CardDescription>
-                        {userType === 'worker' 
-                          ? 'Track your job applications and their status'
-                          : 'Review and manage candidate applications'
-                        }
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">No applications yet</p>
+                      <p className="text-3xl font-bold">0</p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {user.role === 'WORKER' ? 'Matching your skills' : 'Currently active'}
+                      </p>
                     </CardContent>
                   </Card>
-                </TabsContent>
 
-                <TabsContent value="messages" className="mt-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Messages</CardTitle>
-                      <CardDescription>
-                        Communicate with {userType === 'worker' ? 'employers' : 'candidates'}
-                      </CardDescription>
+                      <CardTitle className="flex items-center gap-2">
+                        <FileText className="h-5 w-5" />
+                        {user.role === 'WORKER' ? 'Applications' : 'Candidates'}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">No messages yet</p>
+                      <p className="text-3xl font-bold">0</p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {user.role === 'WORKER' ? 'Submitted' : 'Total applicants'}
+                      </p>
                     </CardContent>
                   </Card>
-                </TabsContent>
-              </Tabs>
-            </div>
-          )}
+                </div>
+
+                {user.role === 'ADMIN' && (
+                  <Card className="mt-6">
+                    <CardHeader>
+                      <CardTitle>Admin Actions</CardTitle>
+                      <CardDescription>Manage platform users and data</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex gap-4">
+                      <Button variant="outline">Manage Users</Button>
+                      <Button variant="outline">Verify Workers</Button>
+                      <Button variant="outline">Reset Demo</Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              <TabsContent value="jobs" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      {user.role === 'WORKER' ? 'Find Jobs' : 'Manage Job Postings'}
+                    </CardTitle>
+                    <CardDescription>
+                      {user.role === 'WORKER' 
+                        ? 'Browse international opportunities matching your skills'
+                        : 'Create and manage your job postings'
+                      }
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      Coming soon - Job listings will appear here
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="applications" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      {user.role === 'WORKER' ? 'My Applications' : 'Job Applications'}
+                    </CardTitle>
+                    <CardDescription>
+                      {user.role === 'WORKER' 
+                        ? 'Track your job applications and their status'
+                        : 'Review and manage candidate applications'
+                      }
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">No applications yet</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="messages" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      Messages
+                    </CardTitle>
+                    <CardDescription>
+                      Communicate with {user.role === 'WORKER' ? 'employers' : 'candidates'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">No messages yet</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </main>
 
       <Footer />
     </div>
   );
-};
-
-export default Dashboard;
+}
