@@ -33,7 +33,10 @@ import PostJob from "./pages/employer/PostJob";
 import ManageJobs from "./pages/employer/ManageJobs";
 import SearchWorkers from "./pages/employer/SearchWorkers";
 import EmployerMessaging from "./pages/employer/EmployerMessaging";
-import EmployerPayments from "./pages/employer/EmployerPayments";
+import EmployerInterviews from "./pages/employer/InterviewScheduling";
+import EmployerOffers from "./pages/employer/OfferManagement";
+import EmployerEscrow from "./pages/employer/EscrowPayments";
+import EmployerCompliance from "./pages/employer/ComplianceReports";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -143,14 +146,29 @@ const App = () => (
                 <SearchWorkers />
               </ProtectedRoute>
             } />
+            <Route path="/employer/interviews" element={
+              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+                <EmployerInterviews />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/offers" element={
+              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+                <EmployerOffers />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/escrow" element={
+              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+                <EmployerEscrow />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/compliance" element={
+              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+                <EmployerCompliance />
+              </ProtectedRoute>
+            } />
             <Route path="/employer/messaging" element={
               <ProtectedRoute allowedRoles={["EMPLOYER"]}>
                 <EmployerMessaging />
-              </ProtectedRoute>
-            } />
-            <Route path="/employer/payments" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
-                <EmployerPayments />
               </ProtectedRoute>
             } />
 

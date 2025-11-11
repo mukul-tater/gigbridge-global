@@ -1,17 +1,20 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard } from "lucide-react";
+import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck } from "lucide-react";
 
 export default function EmployerSidebar() {
   const location = useLocation();
   
   const navItems = [
     { path: "/employer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { path: "/employer/company", icon: Building2, label: "Company Profile" },
+    { path: "/employer/company", icon: Building2, label: "Company Profile & KYC" },
     { path: "/employer/post-job", icon: PlusCircle, label: "Post a Job" },
     { path: "/employer/manage-jobs", icon: Briefcase, label: "Manage Jobs" },
     { path: "/employer/search-workers", icon: Users, label: "Search Workers" },
+    { path: "/employer/interviews", icon: Calendar, label: "Interview Scheduling" },
+    { path: "/employer/offers", icon: FileSignature, label: "Offer Management" },
+    { path: "/employer/escrow", icon: Shield, label: "Escrow & Payments" },
+    { path: "/employer/compliance", icon: FileCheck, label: "Compliance Reports" },
     { path: "/employer/messaging", icon: MessageSquare, label: "Messages" },
-    { path: "/employer/payments", icon: CreditCard, label: "Payments" },
   ];
 
   return (

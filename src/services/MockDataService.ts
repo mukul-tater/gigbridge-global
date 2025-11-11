@@ -69,7 +69,11 @@ class MockDataService {
         contracts: [],
         travelDocuments: [],
         insurancePolicies: [],
-        remittances: []
+        remittances: [],
+        interviews: [],
+        offerLetters: [],
+        escrowPayments: [],
+        complianceReports: []
       };
 
       this.saveToLocalStorage();

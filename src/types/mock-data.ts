@@ -237,6 +237,72 @@ export interface Remittance {
   transactionId?: string;
 }
 
+// Interview Types
+export type InterviewStatus = 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED';
+export type InterviewMode = 'VIDEO' | 'PHONE' | 'IN_PERSON';
+
+export interface Interview {
+  id: string;
+  jobId: string;
+  workerId: string;
+  employerId: string;
+  scheduledAt: string;
+  duration: number;
+  mode: InterviewMode;
+  meetingLink?: string;
+  status: InterviewStatus;
+  notes?: string;
+}
+
+// Offer Letter Types
+export type OfferStatus = 'DRAFT' | 'SENT' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
+
+export interface OfferLetter {
+  id: string;
+  jobId: string;
+  workerId: string;
+  employerId: string;
+  salary: number;
+  currency: string;
+  benefits: string[];
+  startDate: string;
+  status: OfferStatus;
+  documentUrl: string;
+  sentAt?: string;
+  respondedAt?: string;
+}
+
+// Escrow Payment Types
+export type EscrowStatus = 'PENDING' | 'HELD' | 'RELEASED' | 'REFUNDED';
+
+export interface EscrowPayment {
+  id: string;
+  employerId: string;
+  workerId: string;
+  contractId: string;
+  amount: number;
+  currency: string;
+  status: EscrowStatus;
+  createdAt: string;
+  releasedAt?: string;
+  description: string;
+}
+
+// Compliance Report Types
+export type ComplianceStatus = 'COMPLIANT' | 'PENDING' | 'NON_COMPLIANT';
+
+export interface ComplianceReport {
+  id: string;
+  employerId: string;
+  workerId?: string;
+  reportType: string;
+  status: ComplianceStatus;
+  generatedAt: string;
+  expiresAt?: string;
+  documentUrl: string;
+  notes?: string;
+}
+
 // Mock Data Store
 export interface MockDataStore {
   users: User[];
@@ -254,4 +320,8 @@ export interface MockDataStore {
   travelDocuments: TravelDocument[];
   insurancePolicies: InsurancePolicy[];
   remittances: Remittance[];
+  interviews: Interview[];
+  offerLetters: OfferLetter[];
+  escrowPayments: EscrowPayment[];
+  complianceReports: ComplianceReport[];
 }

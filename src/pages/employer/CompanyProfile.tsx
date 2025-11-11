@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, Upload, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CompanyProfile() {
@@ -10,13 +12,58 @@ export default function CompanyProfile() {
     toast.success("Company profile updated successfully!");
   };
 
+  const handleUploadDocument = () => {
+    toast.success("Document uploaded successfully!");
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <EmployerSidebar />
       <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">Company Profile</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Company Profile & KYC</h1>
+          <p className="text-muted-foreground">Manage your company information and verification status</p>
+        </div>
 
         <div className="max-w-3xl space-y-6">
+          {/* KYC Verification Status */}
+          <Card className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold mb-1">KYC Verification Status</h2>
+                <p className="text-sm text-muted-foreground">Company verification is required to post jobs</p>
+              </div>
+              <Badge className="bg-green-500">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Verified
+              </Badge>
+            </div>
+
+            <div className="space-y-3 mt-4">
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-900">Company Registration</span>
+                </div>
+                <span className="text-xs text-green-700">Verified</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-900">Tax Documents</span>
+                </div>
+                <span className="text-xs text-green-700">Verified</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-900">Trade License</span>
+                </div>
+                <span className="text-xs text-green-700">Verified</span>
+              </div>
+            </div>
+          </Card>
+
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Company Information</h2>
             <div className="space-y-4">
@@ -24,17 +71,29 @@ export default function CompanyProfile() {
                 <label className="block text-sm font-medium mb-2">Company Name</label>
                 <Input defaultValue="ShreeFab Industries" />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Registration Number</label>
-                <Input defaultValue="CIN-U12345MH2015PTC123456" />
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Registration Number</label>
+                  <Input defaultValue="CIN-U12345MH2015PTC123456" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">GST Number</label>
+                  <Input defaultValue="27AABCS1234F1Z5" />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">GST Number</label>
-                <Input defaultValue="27AABCS1234F1Z5" />
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Industry Type</label>
+                  <Input defaultValue="Manufacturing - Steel & Metal" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Year Established</label>
+                  <Input type="number" defaultValue="2015" />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Company Description</label>
-                <Textarea rows={4} placeholder="Tell us about your company..." />
+                <Textarea rows={4} placeholder="Tell us about your company..." defaultValue="Leading steel manufacturing company with operations across Middle East and Asia" />
               </div>
             </div>
           </Card>
@@ -42,17 +101,71 @@ export default function CompanyProfile() {
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Contact Details</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Contact Email</label>
-                <Input type="email" defaultValue="hr@shreefab.com" />
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Contact Email</label>
+                  <Input type="email" defaultValue="hr@shreefab.com" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Contact Phone</label>
+                  <Input defaultValue="+971-4-1234567" />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Contact Phone</label>
-                <Input defaultValue="9876543210" />
+                <label className="block text-sm font-medium mb-2">Headquarters Address</label>
+                <Textarea rows={3} defaultValue="Dubai Investment Park, Plot 597-123, Dubai, UAE" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Address</label>
-                <Textarea rows={3} defaultValue="Plot 45, MIDC Industrial Area, Mumbai, Maharashtra 400001" />
+                <label className="block text-sm font-medium mb-2">Website</label>
+                <Input type="url" placeholder="https://www.company.com" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Legal Documents</h2>
+            <p className="text-sm text-muted-foreground mb-4">Upload company verification documents</p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <p className="font-medium">Trade License</p>
+                  <p className="text-sm text-muted-foreground">trade_license.pdf</p>
+                </div>
+                <Badge className="bg-green-500">Verified</Badge>
+              </div>
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <p className="font-medium">Company Registration Certificate</p>
+                  <p className="text-sm text-muted-foreground">registration_cert.pdf</p>
+                </div>
+                <Badge className="bg-green-500">Verified</Badge>
+              </div>
+              <Button variant="outline" onClick={handleUploadDocument} className="w-full">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Additional Document
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Escrow Account</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div>
+                  <p className="font-medium text-blue-900">Escrow Status</p>
+                  <p className="text-sm text-blue-700">Secure payment account for worker salaries</p>
+                </div>
+                <Badge className="bg-blue-500">Active</Badge>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Current Balance</p>
+                  <p className="text-2xl font-bold">$25,000 USD</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Account Status</p>
+                  <p className="font-medium text-green-600">Active & Verified</p>
+                </div>
               </div>
             </div>
           </Card>
