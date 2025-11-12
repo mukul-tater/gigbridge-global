@@ -280,6 +280,286 @@ export type Database = {
         }
         Relationships: []
       }
+      work_experience: {
+        Row: {
+          company_name: string
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          job_title: string
+          location: string | null
+          start_date: string
+          worker_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          job_title: string
+          location?: string | null
+          start_date: string
+          worker_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          job_title?: string
+          location?: string | null
+          start_date?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_experience_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      worker_certifications: {
+        Row: {
+          certification_name: string
+          created_at: string | null
+          credential_id: string | null
+          credential_url: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string | null
+          issuing_organization: string | null
+          verified: boolean | null
+          worker_id: string
+        }
+        Insert: {
+          certification_name: string
+          created_at?: string | null
+          credential_id?: string | null
+          credential_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          issuing_organization?: string | null
+          verified?: boolean | null
+          worker_id: string
+        }
+        Update: {
+          certification_name?: string
+          created_at?: string | null
+          credential_id?: string | null
+          credential_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          issuing_organization?: string | null
+          verified?: boolean | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_certifications_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      worker_documents: {
+        Row: {
+          document_name: string
+          document_type: string
+          file_size: number | null
+          file_url: string
+          id: string
+          uploaded_at: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+          worker_id: string
+        }
+        Insert: {
+          document_name: string
+          document_type: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          uploaded_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          worker_id: string
+        }
+        Update: {
+          document_name?: string
+          document_type?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          uploaded_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_documents_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      worker_profiles: {
+        Row: {
+          availability: string | null
+          bio: string | null
+          created_at: string | null
+          currency: string | null
+          current_location: string | null
+          expected_salary_max: number | null
+          expected_salary_min: number | null
+          has_passport: boolean | null
+          has_visa: boolean | null
+          id: string
+          languages: string[] | null
+          nationality: string | null
+          updated_at: string | null
+          user_id: string
+          visa_countries: string[] | null
+          years_of_experience: number | null
+        }
+        Insert: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string | null
+          currency?: string | null
+          current_location?: string | null
+          expected_salary_max?: number | null
+          expected_salary_min?: number | null
+          has_passport?: boolean | null
+          has_visa?: boolean | null
+          id?: string
+          languages?: string[] | null
+          nationality?: string | null
+          updated_at?: string | null
+          user_id: string
+          visa_countries?: string[] | null
+          years_of_experience?: number | null
+        }
+        Update: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string | null
+          currency?: string | null
+          current_location?: string | null
+          expected_salary_max?: number | null
+          expected_salary_min?: number | null
+          has_passport?: boolean | null
+          has_visa?: boolean | null
+          id?: string
+          languages?: string[] | null
+          nationality?: string | null
+          updated_at?: string | null
+          user_id?: string
+          visa_countries?: string[] | null
+          years_of_experience?: number | null
+        }
+        Relationships: []
+      }
+      worker_skills: {
+        Row: {
+          created_at: string | null
+          id: string
+          proficiency_level: string | null
+          skill_name: string
+          worker_id: string
+          years_of_experience: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          proficiency_level?: string | null
+          skill_name: string
+          worker_id: string
+          years_of_experience?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          proficiency_level?: string | null
+          skill_name?: string
+          worker_id?: string
+          years_of_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_skills_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      worker_videos: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          duration: number | null
+          id: string
+          skills_demonstrated: string[] | null
+          thumbnail_url: string | null
+          title: string
+          video_url: string
+          views_count: number | null
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          skills_demonstrated?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          video_url: string
+          views_count?: number | null
+          worker_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          duration?: number | null
+          id?: string
+          skills_demonstrated?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          video_url?: string
+          views_count?: number | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_videos_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "worker_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

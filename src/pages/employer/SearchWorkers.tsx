@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import EmployerSidebar from '@/components/employer/EmployerSidebar';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,51 +12,21 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
-// Mock worker data
-const mockWorkers = [
-  {
-    id: '1',
-    name: 'Rajesh Kumar',
-    nationality: 'India',
-    location: 'Mumbai, India',
-    skills: ['Welding', 'Fabrication', 'Safety Management'],
-    experience: 8,
-    availability: 'Immediately',
-    expectedSalary: '$3,200',
-    hasPassport: true,
-    hasVisa: false,
-    rating: 4.8,
-    completedProjects: 45
-  },
-  {
-    id: '2',
-    name: 'Mohammed Ali',
-    nationality: 'Egypt',
-    location: 'Cairo, Egypt',
-    skills: ['Electrical', 'Installation', 'Maintenance'],
-    experience: 6,
-    availability: 'Within 1 month',
-    expectedSalary: '$2,800',
-    hasPassport: true,
-    hasVisa: true,
-    rating: 4.6,
-    completedProjects: 32
-  },
-  {
-    id: '3',
-    name: 'Juan Santos',
-    nationality: 'Philippines',
-    location: 'Manila, Philippines',
-    skills: ['Construction', 'Carpentry', 'Project Management'],
-    experience: 12,
-    availability: 'Within 2 months',
-    expectedSalary: '$3,500',
-    hasPassport: true,
-    hasVisa: false,
-    rating: 4.9,
-    completedProjects: 68
-  },
-];
+interface Worker {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+  nationality: string | null;
+  current_location: string | null;
+  years_of_experience: number | null;
+  expected_salary_min: number | null;
+  expected_salary_max: number | null;
+  currency: string;
+  availability: string | null;
+  has_passport: boolean;
+  has_visa: boolean;
+  skills: Array<{ skill_name: string }>;
+}
 
 export default function SearchWorkers() {
   const { user } = useAuth();
@@ -74,43 +44,149 @@ export default function SearchWorkers() {
   });
   const [loading, setLoading] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [workers, setWorkers] = useState(mockWorkers);
+  const [workers, setWorkers] = useState<Worker[]>([]);
 
-  const handleSearch = () => {
-    setLoading(true);
-    setTimeout(() => {
-      let filtered = [...mockWorkers];
-      
-      if (filters.keyword) {
-        filtered = filtered.filter(worker =>
-          worker.name.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-          worker.skills.some(skill => skill.toLowerCase().includes(filters.keyword.toLowerCase()))
-        );
-      }
-      
-      if (filters.hasPassport) {
-        filtered = filtered.filter(worker => worker.hasPassport);
-      }
-      
-      if (filters.hasVisa) {
-        filtered = filtered.filter(worker => worker.hasVisa);
-      }
-      
-      if (filters.skills.length > 0) {
-        filtered = filtered.filter(worker =>
-          filters.skills.some(skill => worker.skills.includes(skill))
-        );
-      }
-      
-      filtered = filtered.filter(worker =>
-        worker.experience >= filters.experienceYears[0] &&
-        worker.experience <= filters.experienceYears[1]
-      );
-      
-      setWorkers(filtered);
+  useEffect(() => {
+    loadWorkers();
+  }, []);
+
+  const loadWorkers = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          avatar_url,
+          worker_profiles!inner (
+            nationality,
+            current_location,
+            years_of_experience,
+            expected_salary_min,
+            expected_salary_max,
+            currency,
+            availability,
+            has_passport,
+            has_visa
+          ),
+          worker_skills (
+            skill_name
+          )
+        `);
+
+      if (error) throw error;
+
+      const formattedWorkers = data?.map((worker: any) => ({
+        id: worker.id,
+        full_name: worker.full_name,
+        avatar_url: worker.avatar_url,
+        nationality: worker.worker_profiles?.nationality,
+        current_location: worker.worker_profiles?.current_location,
+        years_of_experience: worker.worker_profiles?.years_of_experience,
+        expected_salary_min: worker.worker_profiles?.expected_salary_min,
+        expected_salary_max: worker.worker_profiles?.expected_salary_max,
+        currency: worker.worker_profiles?.currency || 'USD',
+        availability: worker.worker_profiles?.availability,
+        has_passport: worker.worker_profiles?.has_passport || false,
+        has_visa: worker.worker_profiles?.has_visa || false,
+        skills: worker.worker_skills || []
+      })) || [];
+
+      setWorkers(formattedWorkers);
+    } catch (error) {
+      console.error('Error loading workers:', error);
+      toast.error('Failed to load workers');
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      
+      let query = supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          avatar_url,
+          worker_profiles!inner (
+            nationality,
+            current_location,
+            years_of_experience,
+            expected_salary_min,
+            expected_salary_max,
+            currency,
+            availability,
+            has_passport,
+            has_visa
+          ),
+          worker_skills (
+            skill_name
+          )
+        `);
+
+      // Apply filters
+      if (filters.keyword) {
+        query = query.or(`full_name.ilike.%${filters.keyword}%`);
+      }
+
+      if (filters.nationality && filters.nationality !== 'All Nationalities') {
+        query = query.eq('worker_profiles.nationality', filters.nationality);
+      }
+
+      if (filters.hasPassport) {
+        query = query.eq('worker_profiles.has_passport', true);
+      }
+
+      if (filters.hasVisa) {
+        query = query.eq('worker_profiles.has_visa', true);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      let filtered = data?.map((worker: any) => ({
+        id: worker.id,
+        full_name: worker.full_name,
+        avatar_url: worker.avatar_url,
+        nationality: worker.worker_profiles?.nationality,
+        current_location: worker.worker_profiles?.current_location,
+        years_of_experience: worker.worker_profiles?.years_of_experience,
+        expected_salary_min: worker.worker_profiles?.expected_salary_min,
+        expected_salary_max: worker.worker_profiles?.expected_salary_max,
+        currency: worker.worker_profiles?.currency || 'USD',
+        availability: worker.worker_profiles?.availability,
+        has_passport: worker.worker_profiles?.has_passport || false,
+        has_visa: worker.worker_profiles?.has_visa || false,
+        skills: worker.worker_skills || []
+      })) || [];
+
+      // Client-side filtering for complex conditions
+      if (filters.skills.length > 0) {
+        filtered = filtered.filter((worker: Worker) =>
+          filters.skills.some(skill => 
+            worker.skills.some(s => s.skill_name === skill)
+          )
+        );
+      }
+
+      filtered = filtered.filter((worker: Worker) =>
+        (worker.years_of_experience || 0) >= filters.experienceYears[0] &&
+        (worker.years_of_experience || 0) <= filters.experienceYears[1]
+      );
+
+      setWorkers(filtered);
       toast.success(`Found ${filtered.length} workers matching your criteria`);
-    }, 1000);
+    } catch (error) {
+      console.error('Error searching workers:', error);
+      toast.error('Failed to search workers');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveSearch = async (name: string, alertsEnabled: boolean, alertFrequency: string) => {
@@ -186,35 +262,30 @@ export default function SearchWorkers() {
               <Card key={worker.id} className="p-6 hover:shadow-lg transition-shadow">
                 <div className="flex gap-6">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src="" />
+                    <AvatarImage src={worker.avatar_url || ''} />
                     <AvatarFallback className="text-2xl">
-                      {worker.name.split(' ').map(n => n[0]).join('')}
+                      {worker.full_name?.split(' ').map(n => n[0]).join('') || 'W'}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="text-xl font-semibold mb-1">{worker.name}</h3>
+                        <h3 className="text-xl font-semibold mb-1">{worker.full_name || 'Worker'}</h3>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Globe className="h-4 w-4" />
-                            {worker.nationality}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            {worker.location}
-                          </span>
+                          {worker.nationality && (
+                            <span className="flex items-center gap-1">
+                              <Globe className="h-4 w-4" />
+                              {worker.nationality}
+                            </span>
+                          )}
+                          {worker.current_location && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-4 w-4" />
+                              {worker.current_location}
+                            </span>
+                          )}
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 text-warning">
-                          <Star className="h-4 w-4 fill-current" />
-                          <span className="font-semibold">{worker.rating}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {worker.completedProjects} projects
-                        </p>
                       </div>
                     </div>
 
@@ -223,33 +294,44 @@ export default function SearchWorkers() {
                         <p className="text-muted-foreground">Experience</p>
                         <p className="font-semibold flex items-center gap-1">
                           <Award className="h-4 w-4" />
-                          {worker.experience} years
+                          {worker.years_of_experience || 0} years
                         </p>
                       </div>
-                      <div>
-                        <p className="text-muted-foreground">Availability</p>
-                        <p className="font-semibold">{worker.availability}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Expected Salary</p>
-                        <p className="font-semibold">{worker.expectedSalary}/month</p>
-                      </div>
+                      {worker.availability && (
+                        <div>
+                          <p className="text-muted-foreground">Availability</p>
+                          <p className="font-semibold">{worker.availability}</p>
+                        </div>
+                      )}
+                      {worker.expected_salary_min && worker.expected_salary_max && (
+                        <div>
+                          <p className="text-muted-foreground">Expected Salary</p>
+                          <p className="font-semibold">
+                            {worker.currency} {worker.expected_salary_min.toLocaleString()} - {worker.expected_salary_max.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {worker.skills.map(skill => (
-                        <Badge key={skill} variant="outline">{skill}</Badge>
+                      {worker.skills.slice(0, 5).map((skill, idx) => (
+                        <Badge key={idx} variant="outline">{skill.skill_name}</Badge>
                       ))}
-                      {worker.hasPassport && (
+                      {worker.skills.length > 5 && (
+                        <Badge variant="secondary">+{worker.skills.length - 5} more</Badge>
+                      )}
+                      {worker.has_passport && (
                         <Badge variant="secondary">Valid Passport</Badge>
                       )}
-                      {worker.hasVisa && (
+                      {worker.has_visa && (
                         <Badge className="bg-success text-success-foreground">Work Visa</Badge>
                       )}
                     </div>
 
                     <div className="flex gap-3">
-                      <Button>View Profile</Button>
+                      <Link to={`/worker-profile/${worker.id}`}>
+                        <Button>View Profile</Button>
+                      </Link>
                       <Button variant="outline">
                         <Mail className="h-4 w-4 mr-2" />
                         Contact
