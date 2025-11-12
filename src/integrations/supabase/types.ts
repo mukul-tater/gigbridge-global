@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_applications: {
+        Row: {
+          applied_at: string | null
+          cover_letter: string | null
+          employer_id: string
+          id: string
+          job_id: string
+          notes: string | null
+          resume_url: string | null
+          status: string
+          updated_at: string | null
+          worker_id: string
+        }
+        Insert: {
+          applied_at?: string | null
+          cover_letter?: string | null
+          employer_id: string
+          id?: string
+          job_id: string
+          notes?: string | null
+          resume_url?: string | null
+          status?: string
+          updated_at?: string | null
+          worker_id: string
+        }
+        Update: {
+          applied_at?: string | null
+          cover_letter?: string | null
+          employer_id?: string
+          id?: string
+          job_id?: string
+          notes?: string | null
+          resume_url?: string | null
+          status?: string
+          updated_at?: string | null
+          worker_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -80,6 +119,39 @@ export type Database = {
           search_type?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      shortlisted_workers: {
+        Row: {
+          created_at: string | null
+          employer_id: string
+          id: string
+          list_name: string | null
+          notes: string | null
+          rating: number | null
+          updated_at: string | null
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          employer_id: string
+          id?: string
+          list_name?: string | null
+          notes?: string | null
+          rating?: number | null
+          updated_at?: string | null
+          worker_id: string
+        }
+        Update: {
+          created_at?: string | null
+          employer_id?: string
+          id?: string
+          list_name?: string | null
+          notes?: string | null
+          rating?: number | null
+          updated_at?: string | null
+          worker_id?: string
         }
         Relationships: []
       }

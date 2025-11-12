@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark } from "lucide-react";
+import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark, Star, UserCheck } from "lucide-react";
 
 export default function EmployerSidebar() {
   const location = useLocation();
@@ -12,6 +12,8 @@ export default function EmployerSidebar() {
     { path: "/employer/manage-jobs", icon: Briefcase, label: "Manage Jobs" },
     { path: "/employer/search-workers", icon: Users, label: "Search Workers" },
     { path: "/employer/saved-searches", icon: Bookmark, label: "Saved Searches" },
+    { path: "/employer/applications", icon: UserCheck, label: "Applications" },
+    { path: "/employer/shortlist", icon: Star, label: "Shortlist" },
     { path: "/employer/interviews", icon: Calendar, label: "Interview Scheduling" },
     { path: "/employer/offers", icon: FileSignature, label: "Offer Management" },
     { path: "/employer/escrow", icon: Shield, label: "Escrow & Payments" },
