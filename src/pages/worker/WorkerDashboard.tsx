@@ -4,14 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Briefcase, FileText, MessageSquare, TrendingUp } from "lucide-react";
 
 export default function WorkerDashboard() {
-  const { user } = useAuth();
+  const { profile } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
       <main className="flex-1 p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.name}!</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Worker'}!</h1>
           <p className="text-muted-foreground">Here's an overview of your activity</p>
         </div>
 

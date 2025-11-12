@@ -70,136 +70,136 @@ const App = () => (
             
             {/* Worker Routes */}
             <Route path="/worker/dashboard" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerDashboard />
               </ProtectedRoute>
             } />
             <Route path="/worker/profile" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerProfile />
               </ProtectedRoute>
             } />
             <Route path="/worker/applications" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerApplications />
               </ProtectedRoute>
             } />
             <Route path="/worker/messaging" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerMessaging />
               </ProtectedRoute>
             } />
             <Route path="/worker/training" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerTraining />
               </ProtectedRoute>
             } />
             <Route path="/worker/contracts" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerContracts />
               </ProtectedRoute>
             } />
             <Route path="/worker/travel" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerTravelStatus />
               </ProtectedRoute>
             } />
             <Route path="/worker/insurance" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerInsurance />
               </ProtectedRoute>
             } />
             <Route path="/worker/documents" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerDocuments />
               </ProtectedRoute>
             } />
             <Route path="/worker/notifications" element={
-              <ProtectedRoute allowedRoles={["WORKER"]}>
+              <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerNotifications />
               </ProtectedRoute>
             } />
 
             {/* Employer Routes */}
             <Route path="/employer/dashboard" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerDashboard />
               </ProtectedRoute>
             } />
             <Route path="/employer/company" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <CompanyProfile />
               </ProtectedRoute>
             } />
             <Route path="/employer/post-job" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <PostJob />
               </ProtectedRoute>
             } />
             <Route path="/employer/manage-jobs" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <ManageJobs />
               </ProtectedRoute>
             } />
             <Route path="/employer/search-workers" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <SearchWorkers />
               </ProtectedRoute>
             } />
             <Route path="/employer/interviews" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerInterviews />
               </ProtectedRoute>
             } />
             <Route path="/employer/offers" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerOffers />
               </ProtectedRoute>
             } />
             <Route path="/employer/escrow" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerEscrow />
               </ProtectedRoute>
             } />
             <Route path="/employer/compliance" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerCompliance />
               </ProtectedRoute>
             } />
             <Route path="/employer/messaging" element={
-              <ProtectedRoute allowedRoles={["EMPLOYER"]}>
+              <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerMessaging />
               </ProtectedRoute>
             } />
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminDashboard />
               </ProtectedRoute>
             } />
             <Route path="/admin/users" element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <UserManagement />
               </ProtectedRoute>
             } />
             <Route path="/admin/job-verification" element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <JobVerification />
               </ProtectedRoute>
             } />
             <Route path="/admin/compliance" element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <ComplianceCheck />
               </ProtectedRoute>
             } />
             <Route path="/admin/reports" element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <Reports />
               </ProtectedRoute>
             } />
             <Route path="/admin/disputes" element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute allowedRoles={["admin"]}>
                 <DisputeResolution />
               </ProtectedRoute>
             } />

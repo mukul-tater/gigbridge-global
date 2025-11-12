@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, type AppRole } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import type { UserRole } from '@/types/mock-data';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -26,9 +25,9 @@ export default function Auth() {
   // Signup form
   const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
-  const [signupMobile, setSignupMobile] = useState('');
+  const [signupPhone, setSignupPhone] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
-  const [signupRole, setSignupRole] = useState<UserRole>('WORKER');
+  const [signupRole, setSignupRole] = useState<AppRole>('worker');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -58,8 +57,14 @@ export default function Auth() {
     setLoading(true);
 
     // Basic validation
-    if (signupMobile.length !== 10) {
-      setError('Mobile number must be 10 digits');
+    if (!signupName.trim()) {
+      setError('Full name is required');
+      setLoading(false);
+      return;
+    }
+
+    if (signupPassword.length < 6) {
+      setError('Password must be at least 6 characters');
       setLoading(false);
       return;
     }
@@ -67,13 +72,16 @@ export default function Auth() {
     const result = await signup({
       email: signupEmail,
       password: signupPassword,
-      name: signupName,
-      mobile: signupMobile,
+      full_name: signupName,
+      phone: signupPhone,
       role: signupRole
     });
 
     if (result.success) {
-      navigate('/');
+      // Show success message
+      setError('');
+      setActiveTab('login');
+      alert('Account created successfully! You can now login.');
     } else {
       setError(result.error || 'Signup failed');
     }
@@ -85,8 +93,8 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome to SafeWork Global</CardTitle>
-          <CardDescription>Demo mode - Use test credentials or create new account</CardDescription>
+          <CardTitle>Welcome to GlobalGigs</CardTitle>
+          <CardDescription>Sign in to your account or create a new one</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'login' | 'signup')}>
@@ -108,7 +116,7 @@ export default function Auth() {
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="admin@demo.local"
+                    placeholder="your@email.com"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     required
@@ -121,10 +129,11 @@ export default function Auth() {
                     <Input
                       id="login-password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Passw0rd!"
+                      placeholder="Enter your password"
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       required
+                      minLength={6}
                     />
                     <Button
                       type="button"
@@ -136,13 +145,6 @@ export default function Auth() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
-                </div>
-
-                <div className="text-sm text-muted-foreground bg-muted p-3 rounded">
-                  <strong>Test Accounts:</strong><br />
-                  Admin: admin@demo.local / Passw0rd!<br />
-                  Employer: emp@demo.local / Passw0rd!<br />
-                  Worker: worker@demo.local / Passw0rd!
                 </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -184,26 +186,25 @@ export default function Auth() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-mobile">Mobile (10 digits)</Label>
+                  <Label htmlFor="signup-phone">Phone Number (Optional)</Label>
                   <Input
-                    id="signup-mobile"
+                    id="signup-phone"
                     type="tel"
-                    placeholder="9876543210"
-                    value={signupMobile}
-                    onChange={(e) => setSignupMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                    required
+                    placeholder="+1234567890"
+                    value={signupPhone}
+                    onChange={(e) => setSignupPhone(e.target.value)}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="signup-role">Account Type</Label>
-                  <Select value={signupRole} onValueChange={(v) => setSignupRole(v as UserRole)}>
+                  <Label htmlFor="signup-role">I am a...</Label>
+                  <Select value={signupRole} onValueChange={(v) => setSignupRole(v as AppRole)}>
                     <SelectTrigger id="signup-role">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="WORKER">Worker</SelectItem>
-                      <SelectItem value="EMPLOYER">Employer</SelectItem>
+                      <SelectItem value="worker">Worker - Looking for jobs</SelectItem>
+                      <SelectItem value="employer">Employer - Looking to hire</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -214,10 +215,11 @@ export default function Auth() {
                     <Input
                       id="signup-password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Enter password"
+                      placeholder="Minimum 6 characters"
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
                       required
+                      minLength={6}
                     />
                     <Button
                       type="button"

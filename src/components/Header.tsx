@@ -9,8 +9,8 @@ const Header = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
     closeMobileMenu();
   };
@@ -81,7 +81,7 @@ const Header = () => {
                     <Link to="/dashboard">
                       <Button variant="outline">
                         <User className="h-4 w-4 mr-2" />
-                        {user?.name}
+                        Dashboard
                       </Button>
                     </Link>
                     <Button variant="ghost" onClick={handleLogout}>
@@ -152,7 +152,7 @@ const Header = () => {
                 <Link to="/dashboard" onClick={closeMobileMenu}>
                   <Button variant="outline" className="w-full justify-start">
                     <User className="h-4 w-4 mr-2" />
-                    {user?.name}
+                    Dashboard
                   </Button>
                 </Link>
                 <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>

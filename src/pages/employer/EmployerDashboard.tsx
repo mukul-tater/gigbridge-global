@@ -5,7 +5,7 @@ import { Briefcase, Users, Eye, TrendingUp, Clock, CheckCircle, AlertCircle } fr
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function EmployerDashboard() {
-  const { user } = useAuth();
+  const { profile } = useAuth();
 
   // Mock data for analytics
   const hiringMetricsData = [
@@ -44,7 +44,7 @@ export default function EmployerDashboard() {
       <EmployerSidebar />
       <main className="flex-1 p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.name}!</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Employer'}!</h1>
           <p className="text-muted-foreground">Manage your job postings and find talent</p>
         </div>
 

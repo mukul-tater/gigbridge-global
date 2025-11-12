@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export default function WorkerProfile() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   const handleSave = () => {
     toast.success("Profile updated successfully!");
@@ -25,15 +25,15 @@ export default function WorkerProfile() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Full Name</label>
-                <Input defaultValue={user?.name} />
+                <Input defaultValue={profile?.full_name || ''} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Email</label>
-                <Input type="email" defaultValue={user?.email} />
+                <Input type="email" defaultValue={user?.email || ''} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Mobile Number</label>
-                <Input defaultValue={user?.mobile} />
+                <label className="block text-sm font-medium mb-2">Phone Number</label>
+                <Input defaultValue={profile?.phone || ''} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Bio</label>
