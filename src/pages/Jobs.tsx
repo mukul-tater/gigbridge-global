@@ -1,173 +1,248 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { mockDataService } from '@/services/MockDataService';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Building2, Briefcase, IndianRupee, Clock, ArrowRight, Search } from 'lucide-react';
-import type { Job, Company, Factory } from '@/types/mock-data';
+import { Link } from 'react-router-dom';
+import { MapPin, Briefcase, DollarSign, Clock, Globe } from 'lucide-react';
+import JobSearchFilters, { type JobFilters } from '@/components/search/JobSearchFilters';
+import SavedSearchDialog from '@/components/search/SavedSearchDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+
+// Mock job data for demonstration
+const mockJobs = [
+  {
+    id: '1',
+    title: 'Senior Welding Engineer',
+    company: 'Dubai Construction Co.',
+    location: 'Dubai, UAE',
+    salary: '$3,500 - $4,500',
+    type: 'Full-time',
+    visaSponsorship: true,
+    postedDate: '2 days ago',
+    description: 'Experienced welder needed for large construction project.',
+    skills: ['Welding', 'Construction', 'Safety Management']
+  },
+  {
+    id: '2',
+    title: 'Electrical Supervisor',
+    company: 'Gulf Power Systems',
+    location: 'Riyadh, Saudi Arabia',
+    salary: '$4,000 - $5,500',
+    type: 'Full-time',
+    visaSponsorship: true,
+    postedDate: '5 days ago',
+    description: 'Supervise electrical installations in commercial buildings.',
+    skills: ['Electrical', 'Supervision', 'Project Management']
+  },
+  {
+    id: '3',
+    title: 'Construction Foreman',
+    company: 'Qatar Building Corp',
+    location: 'Doha, Qatar',
+    salary: '$3,800 - $4,800',
+    type: 'Full-time',
+    visaSponsorship: true,
+    postedDate: '1 week ago',
+    description: 'Lead construction team on major infrastructure project.',
+    skills: ['Construction', 'Leadership', 'Planning']
+  },
+];
 
 export default function Jobs() {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [factories, setFactories] = useState<Factory[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
-
-  useEffect(() => {
-    const loadData = async () => {
-      await mockDataService.initialize();
-      setJobs(mockDataService.getActiveJobs());
-      setCompanies(mockDataService.getCompanies());
-      setFactories(mockDataService.getFactories());
-    };
-    loadData();
-  }, []);
-
-  const getCompany = (companyId: string) => companies.find(c => c.id === companyId);
-  const getFactory = (factoryId: string) => factories.find(f => f.id === factoryId);
-
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = searchQuery === '' || 
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesType = filterType === 'all' || job.jobType === filterType;
-    
-    return matchesSearch && matchesType;
+  const { user } = useAuth();
+  const [filters, setFilters] = useState<JobFilters>({
+    keyword: '',
+    location: '',
+    country: 'All Countries',
+    jobCategory: 'All Categories',
+    salaryMin: 0,
+    salaryMax: 10000,
+    visaSponsorship: false,
+    skills: [],
+    experienceLevel: 'All Levels'
   });
+  const [loading, setLoading] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [jobs, setJobs] = useState(mockJobs);
 
-  const formatSalary = (min: number, max: number, currency: string) => {
-    if (currency === 'INR') {
-      return `₹${min.toLocaleString()} - ₹${max.toLocaleString()}`;
-    }
-    return `${currency} ${min.toLocaleString()} - ${max.toLocaleString()}`;
+  const handleSearch = () => {
+    setLoading(true);
+    // Simulate search with mock data
+    setTimeout(() => {
+      let filtered = [...mockJobs];
+      
+      // Apply filters
+      if (filters.keyword) {
+        filtered = filtered.filter(job => 
+          job.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
+          job.description.toLowerCase().includes(filters.keyword.toLowerCase())
+        );
+      }
+      
+      if (filters.visaSponsorship) {
+        filtered = filtered.filter(job => job.visaSponsorship);
+      }
+      
+      if (filters.skills.length > 0) {
+        filtered = filtered.filter(job =>
+          filters.skills.some(skill => job.skills.includes(skill))
+        );
+      }
+      
+      setJobs(filtered);
+      setLoading(false);
+      toast.success(`Found ${filtered.length} jobs matching your criteria`);
+    }, 1000);
   };
 
-  const getJobTypeBadge = (type: string) => {
-    const variants = {
-      'FULL_TIME': 'default',
-      'PART_TIME': 'secondary',
-      'CONTRACT': 'outline'
-    } as const;
-    return variants[type as keyof typeof variants] || 'default';
+  const handleSaveSearch = async (name: string, alertsEnabled: boolean, alertFrequency: string) => {
+    if (!user) {
+      toast.error('Please login to save searches');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('saved_searches')
+        .insert({
+          user_id: user.id,
+          search_type: 'jobs',
+          name,
+          filters: filters as any,
+          alerts_enabled: alertsEnabled,
+          alert_frequency: alertFrequency
+        } as any);
+
+      if (error) throw error;
+      toast.success('Search saved successfully!');
+    } catch (error) {
+      console.error('Error saving search:', error);
+      toast.error('Failed to save search');
+      throw error;
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pt-20 pb-12">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-              Browse All Jobs
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              {filteredJobs.length} opportunities available
-            </p>
-          </div>
+      <main className="container mx-auto px-4 py-8 mt-16">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Find Your Next Global Opportunity</h1>
+          <p className="text-muted-foreground">
+            Browse thousands of international job opportunities with visa sponsorship
+          </p>
+        </div>
 
-          {/* Filters */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="relative md:col-span-2">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by job title or keyword..."
-                    className="pl-10"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Select value={filterType} onValueChange={setFilterType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Job Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="FULL_TIME">Full Time</SelectItem>
-                    <SelectItem value="PART_TIME">Part Time</SelectItem>
-                    <SelectItem value="CONTRACT">Contract</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid lg:grid-cols-[350px_1fr] gap-6">
+          {/* Filters Sidebar */}
+          <aside>
+            <JobSearchFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              onSearch={handleSearch}
+              onSaveSearch={() => setShowSaveDialog(true)}
+              loading={loading}
+            />
+            
+            {user && (
+              <Card className="mt-4 p-4">
+                <Link to="/worker/saved-searches">
+                  <Button variant="outline" className="w-full">
+                    View Saved Searches
+                  </Button>
+                </Link>
+              </Card>
+            )}
+          </aside>
 
-          {/* Jobs Grid */}
-          {filteredJobs.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">No jobs found matching your criteria.</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredJobs.map((job) => {
-                const company = getCompany(job.companyId);
-                const factory = getFactory(job.factoryId);
-                
-                return (
-                  <Card key={job.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-start justify-between mb-2">
-                        <Badge variant={getJobTypeBadge(job.jobType)}>
-                          {job.jobType.replace('_', ' ')}
-                        </Badge>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4 mr-1" />
-                          {new Date(job.postedAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                      <CardTitle className="text-xl">{job.title}</CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-2">
-                        <Building2 className="h-4 w-4" />
-                        {company?.name || 'Company'}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {job.description}
-                      </p>
-                      
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        {factory?.city}, {factory?.state}
-                      </div>
-
-                      <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                        <IndianRupee className="h-4 w-4" />
-                        {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
-                      </div>
-
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Briefcase className="h-4 w-4" />
-                        {job.openings} opening{job.openings > 1 ? 's' : ''}
-                      </div>
-
-                      <Link to={`/jobs/${job.id}`}>
-                        <Button className="w-full mt-4" variant="outline">
-                          View Details
-                          <ArrowRight className="h-4 w-4 ml-2" />
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+          {/* Job Listings */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">
+                {jobs.length} Jobs Found
+              </h2>
+              <select className="border rounded-md px-3 py-2 text-sm bg-card">
+                <option>Sort by: Most Recent</option>
+                <option>Sort by: Salary (High to Low)</option>
+                <option>Sort by: Salary (Low to High)</option>
+                <option>Sort by: Relevance</option>
+              </select>
             </div>
-          )}
+
+            {jobs.map((job) => (
+              <Card key={job.id} className="p-6 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
+                    <p className="text-muted-foreground">{job.company}</p>
+                  </div>
+                  {job.visaSponsorship && (
+                    <Badge className="bg-success text-success-foreground">
+                      <Globe className="h-3 w-3 mr-1" />
+                      Visa Sponsorship
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-4 mb-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    {job.location}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <DollarSign className="h-4 w-4" />
+                    {job.salary}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Briefcase className="h-4 w-4" />
+                    {job.type}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {job.postedDate}
+                  </span>
+                </div>
+
+                <p className="text-muted-foreground mb-4">{job.description}</p>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-2">
+                    {job.skills.slice(0, 3).map(skill => (
+                      <Badge key={skill} variant="outline">{skill}</Badge>
+                    ))}
+                  </div>
+                  <Link to={`/jobs/${job.id}`}>
+                    <Button>View Details</Button>
+                  </Link>
+                </div>
+              </Card>
+            ))}
+
+            {jobs.length === 0 && (
+              <Card className="p-12 text-center">
+                <Briefcase className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No jobs found</h3>
+                <p className="text-muted-foreground">
+                  Try adjusting your filters or search criteria
+                </p>
+              </Card>
+            )}
+          </div>
         </div>
       </main>
 
       <Footer />
+
+      <SavedSearchDialog
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
+        onSave={handleSaveSearch}
+      />
     </div>
   );
 }

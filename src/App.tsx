@@ -25,6 +25,7 @@ import WorkerTraining from "./pages/worker/Training";
 import WorkerContracts from "./pages/worker/Contracts";
 import WorkerTravelStatus from "./pages/worker/TravelStatus";
 import WorkerInsurance from "./pages/worker/Insurance";
+import WorkerSavedSearches from "./pages/worker/SavedSearches";
 
 // Employer Pages
 import EmployerDashboard from "./pages/employer/EmployerDashboard";
@@ -38,6 +39,7 @@ import EmployerInterviews from "./pages/employer/InterviewScheduling";
 import EmployerOffers from "./pages/employer/OfferManagement";
 import EmployerEscrow from "./pages/employer/EscrowPayments";
 import EmployerCompliance from "./pages/employer/ComplianceReports";
+import EmployerSavedSearches from "./pages/employer/SavedSearches";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -120,6 +122,11 @@ const App = () => (
                 <WorkerNotifications />
               </ProtectedRoute>
             } />
+            <Route path="/worker/saved-searches" element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <WorkerSavedSearches />
+              </ProtectedRoute>
+            } />
 
             {/* Employer Routes */}
             <Route path="/employer/dashboard" element={
@@ -175,6 +182,11 @@ const App = () => (
             <Route path="/employer/messaging" element={
               <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerMessaging />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/saved-searches" element={
+              <ProtectedRoute allowedRoles={["employer"]}>
+                <EmployerSavedSearches />
               </ProtectedRoute>
             } />
 

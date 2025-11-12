@@ -44,6 +44,45 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_searches: {
+        Row: {
+          alert_frequency: string | null
+          alerts_enabled: boolean | null
+          created_at: string | null
+          filters: Json
+          id: string
+          last_alerted_at: string | null
+          name: string
+          search_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_frequency?: string | null
+          alerts_enabled?: boolean | null
+          created_at?: string | null
+          filters: Json
+          id?: string
+          last_alerted_at?: string | null
+          name: string
+          search_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_frequency?: string | null
+          alerts_enabled?: boolean | null
+          created_at?: string | null
+          filters?: Json
+          id?: string
+          last_alerted_at?: string | null
+          name?: string
+          search_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
