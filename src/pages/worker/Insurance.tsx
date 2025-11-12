@@ -47,7 +47,7 @@ export default function Insurance() {
       case "COMPLETED":
         return <Badge className="bg-green-500">Completed</Badge>;
       case "PROCESSING":
-        return <Badge className="bg-blue-500">Processing</Badge>;
+        return <Badge className="bg-primary">Processing</Badge>;
       case "FAILED":
         return <Badge className="bg-red-500">Failed</Badge>;
       case "EXPIRED":

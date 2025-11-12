@@ -45,7 +45,7 @@ export default function Training() {
       case "COMPLETED":
         return <Badge className="bg-green-500">Completed</Badge>;
       case "IN_PROGRESS":
-        return <Badge className="bg-blue-500">In Progress</Badge>;
+        return <Badge className="bg-primary">In Progress</Badge>;
       default:
         return <Badge variant="secondary">Not Started</Badge>;
     }

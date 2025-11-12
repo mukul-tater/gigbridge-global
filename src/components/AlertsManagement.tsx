@@ -95,7 +95,7 @@ const AlertsManagement = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "critical": return "bg-destructive text-destructive-foreground";
-      case "high": return "bg-orange-500 text-white";
+      case "high": return "bg-warning text-warning-foreground";
       case "medium": return "bg-primary text-primary-foreground";
       default: return "bg-secondary text-secondary-foreground";
     }

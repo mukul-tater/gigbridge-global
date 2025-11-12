@@ -44,7 +44,7 @@ export default function InterviewScheduling() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "SCHEDULED":
-        return <Badge className="bg-blue-500">Scheduled</Badge>;
+        return <Badge className="bg-primary">Scheduled</Badge>;
       case "COMPLETED":
         return <Badge className="bg-green-500">Completed</Badge>;
       case "CANCELLED":

@@ -224,7 +224,7 @@ export default function FileUpload({
           {selectedFiles.map((file, index) => (
             <div key={`${file.name}-${index}`} className="flex items-center space-x-3 p-3 bg-secondary rounded-lg">
               {file.type.startsWith('image/') ? (
-                <Image className="w-6 h-6 text-blue-500" />
+                <Image className="w-6 h-6 text-primary" />
               ) : (
                 <FileText className="w-6 h-6 text-red-500" />
               )}

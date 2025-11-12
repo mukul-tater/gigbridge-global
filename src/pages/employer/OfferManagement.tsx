@@ -42,7 +42,7 @@ export default function OfferManagement() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "SENT":
-        return <Badge className="bg-blue-500">Sent - Awaiting Response</Badge>;
+        return <Badge className="bg-primary">Sent - Awaiting Response</Badge>;
       case "ACCEPTED":
         return <Badge className="bg-green-500">Accepted</Badge>;
       case "REJECTED":

@@ -68,7 +68,7 @@ const JobAlertsSubscription = () => {
   const getDemandColor = (demand: string) => {
     switch (demand) {
       case "Critical": return "bg-destructive text-destructive-foreground";
-      case "Very High": return "bg-orange-500 text-white";
+      case "Very High": return "bg-warning text-warning-foreground";
       case "High": return "bg-primary text-primary-foreground";
       default: return "bg-secondary text-secondary-foreground";
     }

@@ -50,7 +50,7 @@ export default function Contracts() {
       case "ACTIVE":
         return <Badge className="bg-green-500">Active</Badge>;
       case "SENT":
-        return <Badge className="bg-blue-500">Awaiting Signature</Badge>;
+        return <Badge className="bg-primary">Awaiting Signature</Badge>;
       case "SIGNED":
         return <Badge className="bg-purple-500">Signed</Badge>;
       case "COMPLETED":

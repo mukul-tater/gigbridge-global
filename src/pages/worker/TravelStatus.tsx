@@ -26,7 +26,7 @@ export default function TravelStatus() {
       case "APPROVED":
         return <Badge className="bg-green-500">Approved</Badge>;
       case "ISSUED":
-        return <Badge className="bg-blue-500">Issued</Badge>;
+        return <Badge className="bg-primary">Issued</Badge>;
       case "APPLIED":
         return <Badge className="bg-yellow-500">Applied</Badge>;
       case "REJECTED":
@@ -39,7 +39,7 @@ export default function TravelStatus() {
   const getTravelStatusBadge = (status: string) => {
     switch (status) {
       case "BOOKED":
-        return <Badge className="bg-blue-500">Booked</Badge>;
+        return <Badge className="bg-primary">Booked</Badge>;
       case "COMPLETED":
         return <Badge className="bg-green-500">Completed</Badge>;
       default:
@@ -185,12 +185,12 @@ export default function TravelStatus() {
                   </div>
                 </div>
 
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
                   <div className="flex items-start gap-2">
-                    <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-primary mt-0.5" />
                     <div>
-                      <p className="font-medium text-blue-900">Travel Reminder</p>
-                      <p className="text-sm text-blue-700 mt-1">
+                      <p className="font-medium text-foreground">Travel Reminder</p>
+                      <p className="text-sm text-muted-foreground mt-1">
                         Please arrive at the airport at least 3 hours before departure. Keep your passport, visa, and ticket ready.
                       </p>
                     </div>

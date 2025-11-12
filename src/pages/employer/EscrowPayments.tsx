@@ -44,7 +44,7 @@ export default function EscrowPayments() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "HELD":
-        return <Badge className="bg-blue-500">Held in Escrow</Badge>;
+        return <Badge className="bg-primary">Held in Escrow</Badge>;
       case "RELEASED":
         return <Badge className="bg-green-500">Released</Badge>;
       case "PENDING":
@@ -91,12 +91,12 @@ export default function EscrowPayments() {
             </Button>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
             <div className="flex items-start gap-2">
-              <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
+              <Shield className="h-5 w-5 text-primary mt-0.5" />
               <div>
-                <p className="font-medium text-blue-900">Secure Escrow Protection</p>
-                <p className="text-sm text-blue-700 mt-1">
+                <p className="font-medium text-foreground">Secure Escrow Protection</p>
+                <p className="text-sm text-muted-foreground mt-1">
                   Funds are held securely and released only when contract milestones are met or payments are due.
                 </p>
               </div>

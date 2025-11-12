@@ -108,9 +108,9 @@ export default function PostJob() {
               <Textarea rows={3} placeholder="Housing, Transportation, Medical Insurance, Annual Leave..." />
             </div>
 
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="font-medium text-blue-900 mb-2">Compliance Checks</h3>
-              <div className="space-y-2 text-sm text-blue-700">
+            <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+              <h3 className="font-medium text-foreground mb-2">Compliance Checks</h3>
+              <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" required />
                   <span>Work visa sponsorship available</span>

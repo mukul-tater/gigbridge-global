@@ -150,12 +150,12 @@ export default function CompanyProfile() {
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Escrow Account</h2>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-lg">
                 <div>
-                  <p className="font-medium text-blue-900">Escrow Status</p>
-                  <p className="text-sm text-blue-700">Secure payment account for worker salaries</p>
+                  <p className="font-medium text-foreground">Escrow Status</p>
+                  <p className="text-sm text-muted-foreground">Secure payment account for worker salaries</p>
                 </div>
-                <Badge className="bg-blue-500">Active</Badge>
+                <Badge className="bg-primary">Active</Badge>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
