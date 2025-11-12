@@ -27,6 +27,7 @@ import WorkerTravelStatus from "./pages/worker/TravelStatus";
 import WorkerInsurance from "./pages/worker/Insurance";
 import WorkerSavedSearches from "./pages/worker/SavedSearches";
 import WorkerPublicProfile from "./pages/worker/WorkerPublicProfile";
+import SeedData from "./pages/SeedData";
 
 // Employer Pages
 import EmployerDashboard from "./pages/employer/EmployerDashboard";
@@ -64,6 +65,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/seed-data" element={<SeedData />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/about" element={<AboutUs />} />
