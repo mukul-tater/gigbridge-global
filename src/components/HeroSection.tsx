@@ -6,30 +6,34 @@ import heroImage from "@/assets/hero-workers.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-[600px] bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden">
-      {/* Background Image */}
+    <section className="relative min-h-[700px] bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 overflow-hidden">
+      {/* Animated Background */}
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImage} 
-          alt="Global gig workers" 
-          className="w-full h-full object-cover opacity-10"
+          alt="Global gig workers connecting worldwide" 
+          className="w-full h-full object-cover opacity-15 animate-fade-in"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-secondary/20 to-accent/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
       </div>
 
+      {/* Floating Elements */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
       <div className="container mx-auto px-4 lg:px-6 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center min-h-[600px] gap-12">
+        <div className="flex flex-col lg:flex-row items-center min-h-[700px] gap-12">
           {/* Left Content */}
-          <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <TrendingUp className="h-4 w-4" />
-              Over 50,000 international opportunities
+          <div className="flex-1 text-center lg:text-left animate-fade-in">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-success/20 to-success/10 text-success px-4 py-2 rounded-full text-sm font-medium mb-6 border border-success/20 shadow-lg">
+              <TrendingUp className="h-4 w-4 animate-pulse" />
+              <span className="font-semibold">Over 50,000 international opportunities</span>
             </div>
             
-            <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-4xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
               Find Your Next 
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"> Global </span>
-              Opportunity
+              <span className="block lg:inline bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-pulse"> Global Career </span>
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl">
@@ -87,57 +91,57 @@ const HeroSection = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 mt-8 max-w-lg mx-auto lg:mx-0">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">50K+</div>
-                <div className="text-sm text-muted-foreground">Active Jobs</div>
+              <div className="text-center p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
+                <div className="text-3xl font-bold text-primary mb-1">50K+</div>
+                <div className="text-xs text-muted-foreground font-medium">Active Jobs</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-secondary">15+</div>
-                <div className="text-sm text-muted-foreground">Countries</div>
+              <div className="text-center p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
+                <div className="text-3xl font-bold text-secondary mb-1">32</div>
+                <div className="text-xs text-muted-foreground font-medium">Countries</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-success">98%</div>
-                <div className="text-sm text-muted-foreground">Success Rate</div>
+              <div className="text-center p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
+                <div className="text-3xl font-bold text-success mb-1">98%</div>
+                <div className="text-xs text-muted-foreground font-medium">Success Rate</div>
               </div>
             </div>
           </div>
 
           {/* Right Content - Feature Cards */}
-          <div className="flex-1 lg:max-w-md">
+          <div className="flex-1 lg:max-w-md animate-fade-in delay-300">
             <div className="space-y-4">
-              <div className="bg-card p-6 rounded-xl border border-border shadow-sm">
+              <div className="bg-card/80 backdrop-blur-sm p-6 rounded-xl border border-border shadow-lg hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-primary/10 p-2 rounded-lg">
-                    <Globe className="h-5 w-5 text-primary" />
+                  <div className="bg-gradient-to-br from-primary/20 to-primary/10 p-3 rounded-xl">
+                    <Globe className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-foreground">Global Reach</h3>
+                  <h3 className="font-bold text-foreground text-lg">Global Reach</h3>
                 </div>
-                <p className="text-muted-foreground text-sm">
-                  Access opportunities in countries with the highest demand for skilled workers
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Access opportunities in 32+ countries with the highest demand for skilled workers
                 </p>
               </div>
 
-              <div className="bg-card p-6 rounded-xl border border-border shadow-sm">
+              <div className="bg-card/80 backdrop-blur-sm p-6 rounded-xl border border-border shadow-lg hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-secondary/10 p-2 rounded-lg">
-                    <MapPin className="h-5 w-5 text-secondary" />
+                  <div className="bg-gradient-to-br from-secondary/20 to-secondary/10 p-3 rounded-xl">
+                    <MapPin className="h-6 w-6 text-secondary" />
                   </div>
-                  <h3 className="font-semibold text-foreground">Country Insights</h3>
+                  <h3 className="font-bold text-foreground text-lg">Fast Track Hiring</h3>
                 </div>
-                <p className="text-muted-foreground text-sm">
-                  Get detailed information about visa processes, culture, and job requirements
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Countries with 1-4 week hiring times and simplified visa processes
                 </p>
               </div>
 
-              <div className="bg-card p-6 rounded-xl border border-border shadow-sm">
+              <div className="bg-card/80 backdrop-blur-sm p-6 rounded-xl border border-border shadow-lg hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-success/10 p-2 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-success" />
+                  <div className="bg-gradient-to-br from-success/20 to-success/10 p-3 rounded-xl">
+                    <TrendingUp className="h-6 w-6 text-success" />
                   </div>
-                  <h3 className="font-semibold text-foreground">High Demand Areas</h3>
+                  <h3 className="font-bold text-foreground text-lg">Verified Opportunities</h3>
                 </div>
-                <p className="text-muted-foreground text-sm">
-                  Focus on regions with labor shortages and reconstruction needs
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Every job verified with transparent salaries and real employer reviews
                 </p>
               </div>
             </div>
