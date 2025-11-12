@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Menu, Search, Globe, User, BriefcaseIcon, Bell, X, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -6,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, profile, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -79,9 +80,16 @@ const Header = () => {
                 {isAuthenticated ? (
                   <>
                     <Link to="/dashboard">
-                      <Button variant="outline">
-                        <User className="h-4 w-4 mr-2" />
-                        Dashboard
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={profile?.avatar_url || undefined} />
+                          <AvatarFallback className="text-xs">
+                            {profile?.full_name?.[0] || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="hidden lg:inline">
+                          {profile?.full_name || 'Dashboard'}
+                        </span>
                       </Button>
                     </Link>
                     <Button variant="ghost" onClick={handleLogout}>
@@ -150,9 +158,14 @@ const Header = () => {
             {isAuthenticated ? (
               <>
                 <Link to="/dashboard" onClick={closeMobileMenu}>
-                  <Button variant="outline" className="w-full justify-start">
-                    <User className="h-4 w-4 mr-2" />
-                    Dashboard
+                  <Button variant="outline" className="w-full justify-start flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={profile?.avatar_url || undefined} />
+                      <AvatarFallback className="text-xs">
+                        {profile?.full_name?.[0] || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{profile?.full_name || 'Dashboard'}</span>
                   </Button>
                 </Link>
                 <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>

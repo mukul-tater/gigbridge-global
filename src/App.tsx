@@ -28,6 +28,7 @@ import WorkerInsurance from "./pages/worker/Insurance";
 
 // Employer Pages
 import EmployerDashboard from "./pages/employer/EmployerDashboard";
+import EmployerProfile from "./pages/employer/EmployerProfile";
 import CompanyProfile from "./pages/employer/CompanyProfile";
 import PostJob from "./pages/employer/PostJob";
 import ManageJobs from "./pages/employer/ManageJobs";
@@ -124,6 +125,11 @@ const App = () => (
             <Route path="/employer/dashboard" element={
               <ProtectedRoute allowedRoles={["employer"]}>
                 <EmployerDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/profile" element={
+              <ProtectedRoute allowedRoles={["employer"]}>
+                <EmployerProfile />
               </ProtectedRoute>
             } />
             <Route path="/employer/company" element={

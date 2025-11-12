@@ -1,17 +1,84 @@
+import { useState, useEffect } from 'react';
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import AvatarUpload from "@/components/AvatarUpload";
+import { workerProfileSchema, type WorkerProfileFormData } from "@/lib/validations/profile";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 export default function WorkerProfile() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    toast.success("Profile updated successfully!");
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<WorkerProfileFormData>({
+    resolver: zodResolver(workerProfileSchema),
+    defaultValues: {
+      full_name: profile?.full_name || '',
+      phone: profile?.phone || '',
+      bio: '',
+      skills: '',
+      experience_years: 0,
+      certifications: '',
+      passport_number: '',
+      visa_type: '',
+      preferred_countries: '',
+      expected_salary_min: 0,
+      expected_salary_max: 0,
+    }
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setValue('full_name', profile.full_name || '');
+      setValue('phone', profile.phone || '');
+    }
+  }, [profile, setValue]);
+
+  const onSubmit = async (data: WorkerProfileFormData) => {
+    if (!user) return;
+
+    try {
+      setSaving(true);
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.full_name,
+          phone: data.phone || null,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error("Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleAvatarUploadComplete = async (url: string) => {
+    await refreshProfile();
+  };
+
+  if (!user || !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -19,102 +86,216 @@ export default function WorkerProfile() {
       <main className="flex-1 p-8">
         <h1 className="text-3xl font-bold mb-8">My Profile</h1>
 
-        <div className="max-w-3xl space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
+          {/* Avatar Section */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Profile Picture</h2>
+            <AvatarUpload
+              currentAvatarUrl={profile.avatar_url}
+              userId={user.id}
+              onUploadComplete={handleAvatarUploadComplete}
+              fallbackText={profile.full_name?.[0] || 'W'}
+            />
+          </Card>
+
+          {/* Personal Information */}
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Personal Information</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
-                <Input defaultValue={profile?.full_name || ''} />
+                <Label htmlFor="full_name">Full Name *</Label>
+                <Input
+                  id="full_name"
+                  {...register('full_name')}
+                  className={errors.full_name ? 'border-destructive' : ''}
+                />
+                {errors.full_name && (
+                  <p className="text-sm text-destructive mt-1">{errors.full_name.message}</p>
+                )}
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <Input type="email" defaultValue={user?.email || ''} />
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={user.email || ''}
+                  disabled
+                  className="bg-muted"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Phone Number</label>
-                <Input defaultValue={profile?.phone || ''} />
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  {...register('phone')}
+                  placeholder="+1234567890"
+                  className={errors.phone ? 'border-destructive' : ''}
+                />
+                {errors.phone && (
+                  <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>
+                )}
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Bio</label>
-                <Textarea rows={4} placeholder="Tell us about yourself..." />
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  {...register('bio')}
+                  rows={4}
+                  placeholder="Tell us about yourself..."
+                  className={errors.bio ? 'border-destructive' : ''}
+                />
+                {errors.bio && (
+                  <p className="text-sm text-destructive mt-1">{errors.bio.message}</p>
+                )}
               </div>
             </div>
           </Card>
 
+          {/* Skills & Experience */}
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Skills & Experience</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Primary Skills</label>
-                <Input placeholder="e.g., Welding, Electrical, Plumbing" />
+                <Label htmlFor="skills">Primary Skills</Label>
+                <Input
+                  id="skills"
+                  {...register('skills')}
+                  placeholder="e.g., Welding, Electrical, Plumbing"
+                  className={errors.skills ? 'border-destructive' : ''}
+                />
+                {errors.skills && (
+                  <p className="text-sm text-destructive mt-1">{errors.skills.message}</p>
+                )}
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Years of Experience</label>
-                <Input type="number" placeholder="5" />
+                <Label htmlFor="experience_years">Years of Experience</Label>
+                <Input
+                  id="experience_years"
+                  type="number"
+                  {...register('experience_years', { valueAsNumber: true })}
+                  placeholder="5"
+                  className={errors.experience_years ? 'border-destructive' : ''}
+                />
+                {errors.experience_years && (
+                  <p className="text-sm text-destructive mt-1">{errors.experience_years.message}</p>
+                )}
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Certifications</label>
-                <Textarea rows={3} placeholder="List your certifications..." />
+                <Label htmlFor="certifications">Certifications</Label>
+                <Textarea
+                  id="certifications"
+                  {...register('certifications')}
+                  rows={3}
+                  placeholder="List your certifications..."
+                  className={errors.certifications ? 'border-destructive' : ''}
+                />
+                {errors.certifications && (
+                  <p className="text-sm text-destructive mt-1">{errors.certifications.message}</p>
+                )}
               </div>
             </div>
           </Card>
 
+          {/* Immigration Documents */}
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Immigration Documents</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Passport Number</label>
-                <Input placeholder="Enter passport number" />
+                <Label htmlFor="passport_number">Passport Number</Label>
+                <Input
+                  id="passport_number"
+                  {...register('passport_number')}
+                  placeholder="Enter passport number"
+                  className={errors.passport_number ? 'border-destructive' : ''}
+                />
+                {errors.passport_number && (
+                  <p className="text-sm text-destructive mt-1">{errors.passport_number.message}</p>
+                )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Passport Issue Date</label>
-                  <Input type="date" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Passport Expiry Date</label>
-                  <Input type="date" />
-                </div>
-              </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Visa Type</label>
-                <Input placeholder="e.g., Work Visa, Employment Visa" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">ECR/ECNR Status</label>
-                <select className="w-full border rounded-md p-2">
-                  <option value="">Select Status</option>
-                  <option value="ECR">ECR (Emigration Check Required)</option>
-                  <option value="ECNR">ECNR (Emigration Check Not Required)</option>
-                </select>
+                <Label htmlFor="visa_type">Visa Type</Label>
+                <Input
+                  id="visa_type"
+                  {...register('visa_type')}
+                  placeholder="e.g., Work Visa, Employment Visa"
+                  className={errors.visa_type ? 'border-destructive' : ''}
+                />
+                {errors.visa_type && (
+                  <p className="text-sm text-destructive mt-1">{errors.visa_type.message}</p>
+                )}
               </div>
             </div>
           </Card>
 
+          {/* Work Preferences */}
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Work Preferences</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Preferred Countries</label>
-                <Input placeholder="e.g., UAE, Qatar, Saudi Arabia, Kuwait" />
+                <Label htmlFor="preferred_countries">Preferred Countries</Label>
+                <Input
+                  id="preferred_countries"
+                  {...register('preferred_countries')}
+                  placeholder="e.g., UAE, Qatar, Saudi Arabia, Kuwait"
+                  className={errors.preferred_countries ? 'border-destructive' : ''}
+                />
+                {errors.preferred_countries && (
+                  <p className="text-sm text-destructive mt-1">{errors.preferred_countries.message}</p>
+                )}
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Preferred Industries</label>
-                <Input placeholder="e.g., Construction, Manufacturing, Oil & Gas" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Expected Salary Range</label>
+                <Label>Expected Salary Range (USD/month)</Label>
                 <div className="grid grid-cols-2 gap-4">
-                  <Input type="number" placeholder="Min (USD)" />
-                  <Input type="number" placeholder="Max (USD)" />
+                  <div>
+                    <Input
+                      type="number"
+                      {...register('expected_salary_min', { valueAsNumber: true })}
+                      placeholder="Min"
+                      className={errors.expected_salary_min ? 'border-destructive' : ''}
+                    />
+                    {errors.expected_salary_min && (
+                      <p className="text-sm text-destructive mt-1">{errors.expected_salary_min.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Input
+                      type="number"
+                      {...register('expected_salary_max', { valueAsNumber: true })}
+                      placeholder="Max"
+                      className={errors.expected_salary_max ? 'border-destructive' : ''}
+                    />
+                    {errors.expected_salary_max && (
+                      <p className="text-sm text-destructive mt-1">{errors.expected_salary_max.message}</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </Card>
 
-          <Button onClick={handleSave} className="w-full">Save Changes</Button>
-        </div>
+          <div className="flex gap-4">
+            <Button type="submit" disabled={saving} className="flex-1">
+              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {saving ? 'Saving...' : 'Save Changes'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => reset()}
+              disabled={saving}
+            >
+              Reset
+            </Button>
+          </div>
+        </form>
       </main>
     </div>
   );

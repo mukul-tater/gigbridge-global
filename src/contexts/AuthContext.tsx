@@ -9,6 +9,7 @@ interface Profile {
   email: string;
   full_name: string | null;
   phone: string | null;
+  avatar_url: string | null;
 }
 
 interface AuthContextType {
@@ -28,6 +29,7 @@ interface AuthContextType {
   }) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   hasRole: (role: AppRole) => boolean;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -171,6 +173,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return role === checkRole;
   };
 
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -183,7 +191,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         signup,
         logout,
-        hasRole
+        hasRole,
+        refreshProfile
       }}
     >
       {children}
