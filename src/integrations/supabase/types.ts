@@ -53,6 +53,110 @@ export type Database = {
         }
         Relationships: []
       }
+      job_skills: {
+        Row: {
+          created_at: string | null
+          id: string
+          job_id: string
+          skill_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          job_id: string
+          skill_name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          job_id?: string
+          skill_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_skills_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          benefits: string | null
+          country: string
+          created_at: string | null
+          currency: string
+          description: string
+          employer_id: string
+          experience_level: string
+          expires_at: string | null
+          id: string
+          job_type: string
+          location: string
+          openings: number
+          posted_at: string | null
+          remote_allowed: boolean | null
+          requirements: string | null
+          responsibilities: string | null
+          salary_max: number | null
+          salary_min: number | null
+          status: string
+          title: string
+          updated_at: string | null
+          visa_sponsorship: boolean | null
+        }
+        Insert: {
+          benefits?: string | null
+          country: string
+          created_at?: string | null
+          currency?: string
+          description: string
+          employer_id: string
+          experience_level: string
+          expires_at?: string | null
+          id?: string
+          job_type: string
+          location: string
+          openings?: number
+          posted_at?: string | null
+          remote_allowed?: boolean | null
+          requirements?: string | null
+          responsibilities?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title: string
+          updated_at?: string | null
+          visa_sponsorship?: boolean | null
+        }
+        Update: {
+          benefits?: string | null
+          country?: string
+          created_at?: string | null
+          currency?: string
+          description?: string
+          employer_id?: string
+          experience_level?: string
+          expires_at?: string | null
+          id?: string
+          job_type?: string
+          location?: string
+          openings?: number
+          posted_at?: string | null
+          remote_allowed?: boolean | null
+          requirements?: string | null
+          responsibilities?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+          visa_sponsorship?: boolean | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
