@@ -428,6 +428,8 @@ export type Database = {
           created_at: string | null
           currency: string | null
           current_location: string | null
+          ecr_category: string | null
+          ecr_status: string | null
           expected_salary_max: number | null
           expected_salary_min: number | null
           has_passport: boolean | null
@@ -435,6 +437,7 @@ export type Database = {
           id: string
           languages: string[] | null
           nationality: string | null
+          passport_number: string | null
           updated_at: string | null
           user_id: string
           visa_countries: string[] | null
@@ -446,6 +449,8 @@ export type Database = {
           created_at?: string | null
           currency?: string | null
           current_location?: string | null
+          ecr_category?: string | null
+          ecr_status?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
           has_passport?: boolean | null
@@ -453,6 +458,7 @@ export type Database = {
           id?: string
           languages?: string[] | null
           nationality?: string | null
+          passport_number?: string | null
           updated_at?: string | null
           user_id: string
           visa_countries?: string[] | null
@@ -464,6 +470,8 @@ export type Database = {
           created_at?: string | null
           currency?: string | null
           current_location?: string | null
+          ecr_category?: string | null
+          ecr_status?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
           has_passport?: boolean | null
@@ -471,6 +479,7 @@ export type Database = {
           id?: string
           languages?: string[] | null
           nationality?: string | null
+          passport_number?: string | null
           updated_at?: string | null
           user_id?: string
           visa_countries?: string[] | null
