@@ -1,20 +1,113 @@
+import { useState, useEffect } from 'react';
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Upload, AlertCircle } from "lucide-react";
+import { CheckCircle, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+
+interface EmployerProfileData {
+  company_name: string;
+  company_registration: string;
+  industry: string;
+  company_size: string;
+  website: string;
+  bio: string;
+}
 
 export default function CompanyProfile() {
-  const handleSave = () => {
-    toast.success("Company profile updated successfully!");
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState<EmployerProfileData>({
+    company_name: '',
+    company_registration: '',
+    industry: '',
+    company_size: '',
+    website: '',
+    bio: ''
+  });
+
+  useEffect(() => {
+    loadCompanyProfile();
+  }, [user]);
+
+  const loadCompanyProfile = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const { data, error } = await (supabase as any)
+        .from('employer_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') throw error;
+
+      if (data) {
+        setFormData({
+          company_name: (data as any).company_name || '',
+          company_registration: (data as any).company_registration || '',
+          industry: (data as any).industry || '',
+          company_size: (data as any).company_size || '',
+          website: (data as any).website || '',
+          bio: (data as any).bio || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading company profile:', error);
+      toast.error('Failed to load company profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+
+    try {
+      setSaving(true);
+      const { error } = await (supabase as any)
+        .from('employer_profiles')
+        .upsert({
+          user_id: user.id,
+          ...formData
+        } as any, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+
+      toast.success("Company profile updated successfully!");
+    } catch (error) {
+      console.error('Error saving company profile:', error);
+      toast.error("Failed to update company profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (field: keyof EmployerProfileData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleUploadDocument = () => {
     toast.success("Document uploaded successfully!");
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -68,23 +161,40 @@ export default function CompanyProfile() {
             <h2 className="text-xl font-bold mb-4">Company Information</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Company Name</label>
-                <Input defaultValue="ShreeFab Industries" />
+                <Label htmlFor="company_name">Company Name *</Label>
+                <Input 
+                  id="company_name"
+                  value={formData.company_name} 
+                  onChange={(e) => handleChange('company_name', e.target.value)}
+                />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Registration Number</label>
-                  <Input defaultValue="CIN-U12345MH2015PTC123456" />
+                  <Label htmlFor="company_registration">Registration Number</Label>
+                  <Input 
+                    id="company_registration"
+                    value={formData.company_registration} 
+                    onChange={(e) => handleChange('company_registration', e.target.value)}
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">GST Number</label>
-                  <Input defaultValue="27AABCS1234F1Z5" />
+                  <Label htmlFor="industry">Industry Type</Label>
+                  <Input 
+                    id="industry"
+                    value={formData.industry} 
+                    onChange={(e) => handleChange('industry', e.target.value)}
+                  />
                 </div>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Industry Type</label>
-                  <Input defaultValue="Manufacturing - Steel & Metal" />
+                  <Label htmlFor="company_size">Company Size</Label>
+                  <Input 
+                    id="company_size"
+                    value={formData.company_size} 
+                    onChange={(e) => handleChange('company_size', e.target.value)}
+                    placeholder="e.g., 50-100 employees"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Year Established</label>
