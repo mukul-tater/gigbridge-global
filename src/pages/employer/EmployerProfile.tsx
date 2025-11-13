@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 export default function EmployerProfile() {
   const { user, profile, refreshProfile } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<EmployerProfileFormData>({
     resolver: zodResolver(employerProfileSchema),
@@ -33,11 +34,46 @@ export default function EmployerProfile() {
   });
 
   useEffect(() => {
-    if (profile) {
-      setValue('full_name', profile.full_name || '');
-      setValue('phone', profile.phone || '');
-    }
-  }, [profile, setValue]);
+    const loadEmployerProfile = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        
+        // Load employer profile data
+        const { data: employerProfile, error } = await supabase
+          .from('employer_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error && error.code !== 'PGRST116') throw error;
+
+        // Set form values from profiles table
+        if (profile) {
+          setValue('full_name', profile.full_name || '');
+          setValue('phone', profile.phone || '');
+        }
+
+        // Set form values from employer_profiles table
+        if (employerProfile) {
+          setValue('bio', employerProfile.bio || '');
+          setValue('company_name', employerProfile.company_name || '');
+          setValue('company_registration', employerProfile.company_registration || '');
+          setValue('industry', employerProfile.industry || '');
+          setValue('company_size', employerProfile.company_size || '');
+          setValue('website', employerProfile.website || '');
+        }
+      } catch (error) {
+        console.error('Error loading employer profile:', error);
+        toast.error("Failed to load profile data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEmployerProfile();
+  }, [user, profile, setValue]);
 
   const onSubmit = async (data: EmployerProfileFormData) => {
     if (!user) return;
@@ -45,7 +81,8 @@ export default function EmployerProfile() {
     try {
       setSaving(true);
 
-      const { error } = await supabase
+      // Update profiles table
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           full_name: data.full_name,
@@ -53,7 +90,24 @@ export default function EmployerProfile() {
         })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Upsert employer_profiles table
+      const { error: employerError } = await supabase
+        .from('employer_profiles')
+        .upsert({
+          user_id: user.id,
+          bio: data.bio || null,
+          company_name: data.company_name || null,
+          company_registration: data.company_registration || null,
+          industry: data.industry || null,
+          company_size: data.company_size || null,
+          website: data.website || null,
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (employerError) throw employerError;
 
       await refreshProfile();
       toast.success("Profile updated successfully!");
@@ -69,7 +123,7 @@ export default function EmployerProfile() {
     await refreshProfile();
   };
 
-  if (!user || !profile) {
+  if (!user || !profile || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

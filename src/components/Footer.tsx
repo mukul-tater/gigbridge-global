@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BriefcaseIcon, Mail, Phone, MapPin, Globe, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
 const Footer = () => {
   return <footer className="bg-foreground text-background py-16">
       <div className="container mx-auto px-4 lg:px-6">
@@ -34,11 +35,11 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">For Workers</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Find Jobs</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Create Profile</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Visa Guide</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Success Stories</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Support Center</a></li>
+              <li><Link to="/jobs" className="text-background/80 hover:text-background transition-colors">Find Jobs</Link></li>
+              <li><Link to="/auth" className="text-background/80 hover:text-background transition-colors">Create Profile</Link></li>
+              <li><Link to="/about" className="text-background/80 hover:text-background transition-colors">Visa Guide</Link></li>
+              <li><Link to="/about" className="text-background/80 hover:text-background transition-colors">Success Stories</Link></li>
+              <li><Link to="/contact" className="text-background/80 hover:text-background transition-colors">Support Center</Link></li>
             </ul>
           </div>
 
@@ -46,11 +47,11 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Resources</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Country Insights</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Salary Guide</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Language Resources</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Cultural Guides</a></li>
-              <li><a href="#" className="text-background/80 hover:text-background transition-colors">Legal Advice</a></li>
+              <li><Link to="/about" className="text-background/80 hover:text-background transition-colors">Country Insights</Link></li>
+              <li><Link to="/jobs" className="text-background/80 hover:text-background transition-colors">Salary Guide</Link></li>
+              <li><Link to="/about" className="text-background/80 hover:text-background transition-colors">Language Resources</Link></li>
+              <li><Link to="/about" className="text-background/80 hover:text-background transition-colors">Cultural Guides</Link></li>
+              <li><Link to="/contact" className="text-background/80 hover:text-background transition-colors">Legal Advice</Link></li>
             </ul>
           </div>
 

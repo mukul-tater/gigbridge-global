@@ -73,12 +73,14 @@ const HeroSection = () => {
                   <Input 
                     placeholder="Job title or skill" 
                     className="pl-10 h-12"
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
                   />
                 </div>
                 
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Select>
+                  <Select value={searchLocation} onValueChange={setSearchLocation}>
                     <SelectTrigger className="pl-10 h-12">
                       <SelectValue placeholder="Country" />
                     </SelectTrigger>
@@ -93,7 +95,7 @@ const HeroSection = () => {
                   </Select>
                 </div>
 
-                <Select>
+                <Select value={searchCategory} onValueChange={setSearchCategory}>
                   <SelectTrigger className="h-12">
                     <SelectValue placeholder="Job Category" />
                   </SelectTrigger>
@@ -108,7 +110,12 @@ const HeroSection = () => {
                 </Select>
               </div>
               
-              <Button size="xl" variant="hero" className="w-full">
+              <Button 
+                size="xl" 
+                variant="hero" 
+                className="w-full"
+                onClick={handleSearch}
+              >
                 <Search className="h-5 w-5" />
                 Search Global Jobs
               </Button>
