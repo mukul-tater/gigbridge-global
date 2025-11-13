@@ -204,8 +204,15 @@ export default function WorkerDocuments() {
                         <SelectItem value="Driving License">Driving License</SelectItem>
                         <SelectItem value="PAN Card">PAN Card</SelectItem>
                         <SelectItem value="Identity Card">Identity Card</SelectItem>
-                        <SelectItem value="Work Permit">Work Permit</SelectItem>
-                        <SelectItem value="Educational Certificate">Educational Certificate</SelectItem>
+                        <SelectItem value="Work Permit">Work Permit / LMIA</SelectItem>
+                        <SelectItem value="Educational Certificate">Educational Qualification Proof</SelectItem>
+                        <SelectItem value="Experience Certificate">Experience Certificate / Resume</SelectItem>
+                        <SelectItem value="Professional License">Professional License</SelectItem>
+                        <SelectItem value="Job Offer Letter">Job Offer Letter / Employment Contract</SelectItem>
+                        <SelectItem value="Employer Sponsorship">Employer Sponsorship Documents</SelectItem>
+                        <SelectItem value="Medical Exam">Medical Exam Results</SelectItem>
+                        <SelectItem value="Police Clearance">Police Clearance Certificate</SelectItem>
+                        <SelectItem value="Tax Returns">Tax Returns / Salary Slips</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>

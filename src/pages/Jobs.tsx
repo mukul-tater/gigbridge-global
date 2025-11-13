@@ -82,9 +82,46 @@ export default function Jobs() {
       if (filters.keyword) {
         filtered = filtered.filter(job => 
           job.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-          job.description.toLowerCase().includes(filters.keyword.toLowerCase())
+          job.description.toLowerCase().includes(filters.keyword.toLowerCase()) ||
+          job.company.toLowerCase().includes(filters.keyword.toLowerCase())
         );
       }
+
+      if (filters.location) {
+        filtered = filtered.filter(job =>
+          job.location.toLowerCase().includes(filters.location.toLowerCase())
+        );
+      }
+
+      if (filters.country && filters.country !== 'All Countries') {
+        filtered = filtered.filter(job =>
+          job.location.toLowerCase().includes(filters.country.toLowerCase())
+        );
+      }
+
+      if (filters.jobCategory && filters.jobCategory !== 'All Categories') {
+        filtered = filtered.filter(job =>
+          job.title.toLowerCase().includes(filters.jobCategory.toLowerCase()) ||
+          job.description.toLowerCase().includes(filters.jobCategory.toLowerCase())
+        );
+      }
+
+      if (filters.experienceLevel && filters.experienceLevel !== 'All Levels') {
+        // This would need to be in the job data in a real app
+        filtered = filtered;
+      }
+
+      // Salary range filter
+      const extractSalary = (salaryStr: string): number => {
+        const match = salaryStr.match(/\$?(\d+,?\d*)/);
+        return match ? parseInt(match[1].replace(',', '')) : 0;
+      };
+
+      filtered = filtered.filter(job => {
+        const jobMinSalary = extractSalary(job.salary.split('-')[0]);
+        const jobMaxSalary = extractSalary(job.salary.split('-')[1] || job.salary);
+        return jobMaxSalary >= filters.salaryMin && jobMinSalary <= filters.salaryMax;
+      });
       
       if (filters.visaSponsorship) {
         filtered = filtered.filter(job => job.visaSponsorship);
@@ -92,7 +129,11 @@ export default function Jobs() {
       
       if (filters.skills.length > 0) {
         filtered = filtered.filter(job =>
-          filters.skills.some(skill => job.skills.includes(skill))
+          filters.skills.some(skill => 
+            job.skills.some(jobSkill => 
+              jobSkill.toLowerCase().includes(skill.toLowerCase())
+            )
+          )
         );
       }
       
