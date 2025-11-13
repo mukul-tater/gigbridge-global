@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import WorkerSidebar from '@/components/worker/WorkerSidebar';
+import WorkerHeader from '@/components/worker/WorkerHeader';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -102,9 +103,12 @@ export default function SavedSearches() {
     return (
       <div className="flex min-h-screen bg-background">
         <WorkerSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
+        <div className="flex-1 flex flex-col">
+          <WorkerHeader />
+          <main className="flex-1 p-8 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </main>
+        </div>
       </div>
     );
   }
@@ -112,13 +116,15 @@ export default function SavedSearches() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Saved Searches</h1>
-          <p className="text-muted-foreground">
-            Manage your saved job searches and alerts
-          </p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Saved Searches</h1>
+            <p className="text-muted-foreground">
+              Manage your saved job searches and alerts
+            </p>
+          </div>
 
         {searches.length === 0 ? (
           <Card className="p-12 text-center">
@@ -206,24 +212,25 @@ export default function SavedSearches() {
             ))}
           </div>
         )}
-      </main>
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Saved Search?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this saved search and disable any alerts.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Saved Search?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this saved search and disable any alerts.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </main>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Bell, Briefcase, MessageSquare, CheckCircle } from "lucide-react";
 
@@ -36,32 +37,35 @@ export default function WorkerNotifications() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">Notifications</h1>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-8">
+          <h1 className="text-3xl font-bold mb-8">Notifications</h1>
 
-        <div className="space-y-4 max-w-3xl">
-          {notifications.map((notification) => {
-            const Icon = notification.icon;
-            return (
-              <Card
-                key={notification.id}
-                className={`p-6 ${notification.unread ? "border-l-4 border-l-primary" : ""}`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-lg ${notification.unread ? "bg-primary/10" : "bg-muted"}`}>
-                    <Icon className={`h-5 w-5 ${notification.unread ? "text-primary" : "text-muted-foreground"}`} />
+          <div className="space-y-4 max-w-3xl">
+            {notifications.map((notification) => {
+              const Icon = notification.icon;
+              return (
+                <Card
+                  key={notification.id}
+                  className={`p-6 ${notification.unread ? "border-l-4 border-l-primary" : ""}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-lg ${notification.unread ? "bg-primary/10" : "bg-muted"}`}>
+                      <Icon className={`h-5 w-5 ${notification.unread ? "text-primary" : "text-muted-foreground"}`} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-1">{notification.title}</h3>
+                      <p className="text-muted-foreground mb-2">{notification.message}</p>
+                      <span className="text-sm text-muted-foreground">{notification.time}</span>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold mb-1">{notification.title}</h3>
-                    <p className="text-muted-foreground mb-2">{notification.message}</p>
-                    <span className="text-sm text-muted-foreground">{notification.time}</span>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      </main>
+                </Card>
+              );
+            })}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
