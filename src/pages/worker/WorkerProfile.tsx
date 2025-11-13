@@ -18,12 +18,13 @@ import { useForm } from "react-hook-form";
 export default function WorkerProfile() {
   const { user, profile, refreshProfile } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<WorkerProfileFormData>({
     resolver: zodResolver(workerProfileSchema),
     defaultValues: {
-      full_name: profile?.full_name || '',
-      phone: profile?.phone || '',
+      full_name: '',
+      phone: '',
       bio: '',
       skills: '',
       experience_years: 0,
@@ -37,11 +38,45 @@ export default function WorkerProfile() {
   });
 
   useEffect(() => {
-    if (profile) {
-      setValue('full_name', profile.full_name || '');
-      setValue('phone', profile.phone || '');
-    }
-  }, [profile, setValue]);
+    const loadWorkerProfile = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        
+        // Load worker profile data
+        const { data: workerProfile, error } = await supabase
+          .from('worker_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        // Set form values from profiles table
+        if (profile) {
+          setValue('full_name', profile.full_name || '');
+          setValue('phone', profile.phone || '');
+        }
+
+        // Set form values from worker_profiles table
+        if (workerProfile) {
+          setValue('bio', workerProfile.bio || '');
+          setValue('experience_years', workerProfile.years_of_experience || 0);
+          setValue('passport_number', workerProfile.passport_number || '');
+          setValue('expected_salary_min', workerProfile.expected_salary_min || 0);
+          setValue('expected_salary_max', workerProfile.expected_salary_max || 0);
+        }
+      } catch (error) {
+        console.error('Error loading worker profile:', error);
+        toast.error("Failed to load profile data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadWorkerProfile();
+  }, [user, profile, setValue]);
 
   const onSubmit = async (data: WorkerProfileFormData) => {
     if (!user) return;
@@ -49,7 +84,8 @@ export default function WorkerProfile() {
     try {
       setSaving(true);
 
-      const { error } = await supabase
+      // Update profiles table
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           full_name: data.full_name,
@@ -57,7 +93,23 @@ export default function WorkerProfile() {
         })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Upsert worker_profiles table
+      const { error: workerError } = await supabase
+        .from('worker_profiles')
+        .upsert({
+          user_id: user.id,
+          bio: data.bio || null,
+          years_of_experience: data.experience_years || null,
+          passport_number: data.passport_number || null,
+          expected_salary_min: data.expected_salary_min || null,
+          expected_salary_max: data.expected_salary_max || null,
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (workerError) throw workerError;
 
       await refreshProfile();
       toast.success("Profile updated successfully!");
@@ -73,7 +125,7 @@ export default function WorkerProfile() {
     await refreshProfile();
   };
 
-  if (!user || !profile) {
+  if (!user || !profile || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
