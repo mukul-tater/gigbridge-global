@@ -8,9 +8,13 @@ import DisputeManagementCard from "@/components/admin/DisputeManagementCard";
 import ContentModerationCard from "@/components/admin/ContentModerationCard";
 import UserManagementCard from "@/components/admin/UserManagementCard";
 import MessageMonitoringCard from "@/components/admin/MessageMonitoringCard";
+import { useSwipe } from "@/hooks/use-swipe";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const [currentSection, setCurrentSection] = useState(0);
   const [disputes, setDisputes] = useState([]);
   const [contentFlags, setContentFlags] = useState([]);
   const [moderationActions, setModerationActions] = useState([]);
@@ -22,6 +26,23 @@ export default function AdminDashboard() {
     platformHealth: 98
   });
   const [loading, setLoading] = useState(true);
+
+  const sections = ['overview', 'disputes', 'moderation', 'activity'];
+
+  useSwipe({
+    onSwipeLeft: () => {
+      if (isMobile && currentSection < sections.length - 1) {
+        setCurrentSection(prev => prev + 1);
+        document.getElementById(`section-${sections[currentSection + 1]}`)?.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    onSwipeRight: () => {
+      if (isMobile && currentSection > 0) {
+        setCurrentSection(prev => prev - 1);
+        document.getElementById(`section-${sections[currentSection - 1]}`)?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
 
   useEffect(() => {
     fetchAdminData();
@@ -82,13 +103,31 @@ export default function AdminDashboard() {
   return (
     <div className="flex min-h-screen bg-background w-full">
       <AdminSidebar />
-      <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+      <main className="flex-1 p-4 md:p-8 overflow-x-hidden md:pl-8 pl-16">
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground text-sm md:text-base">System overview and management</p>
+          {isMobile && (
+            <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
+              {sections.map((section, idx) => (
+                <button
+                  key={section}
+                  onClick={() => {
+                    setCurrentSection(idx);
+                    document.getElementById(`section-${section}`)?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`px-3 py-1 rounded-full text-xs whitespace-nowrap ${
+                    currentSection === idx ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  }`}
+                >
+                  {section.charAt(0).toUpperCase() + section.slice(1)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div id="section-overview" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <Users className="h-8 w-8 text-primary" />
@@ -122,12 +161,12 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div id="section-disputes" className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           <DisputeManagementCard disputes={disputes} />
           <ContentModerationCard flags={contentFlags} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div id="section-moderation" className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           <UserManagementCard 
             moderationActions={moderationActions} 
             onRefresh={fetchAdminData}
@@ -135,7 +174,7 @@ export default function AdminDashboard() {
           <MessageMonitoringCard messages={messages} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <div id="section-activity" className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
             <div className="space-y-4">

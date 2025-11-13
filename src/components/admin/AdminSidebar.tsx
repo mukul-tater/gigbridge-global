@@ -1,8 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, BriefcaseIcon } from "lucide-react";
+import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, BriefcaseIcon, Menu, X } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function AdminSidebar() {
   const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   const navItems = [
     { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -13,8 +18,8 @@ export default function AdminSidebar() {
     { path: "/admin/disputes", icon: AlertTriangle, label: "Dispute Resolution" },
   ];
 
-  return (
-    <aside className="w-64 bg-card border-r min-h-screen p-4 md:p-6">
+  const SidebarContent = () => (
+    <>
       <Link to="/" className="flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity">
         <BriefcaseIcon className="h-6 w-6 text-primary" />
         <span className="text-lg font-bold text-foreground">GlobalGigs</span>
@@ -28,6 +33,7 @@ export default function AdminSidebar() {
             <Link
               key={item.path}
               to={item.path}
+              onClick={() => setOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 isActive
                   ? "bg-primary text-primary-foreground"
@@ -40,6 +46,29 @@ export default function AdminSidebar() {
           );
         })}
       </nav>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <button className="fixed top-4 left-4 z-50 p-2 bg-card border rounded-lg shadow-lg md:hidden">
+              <Menu className="h-6 w-6" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-4">
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
+  return (
+    <aside className="hidden md:block w-64 bg-card border-r min-h-screen p-4 md:p-6">
+      <SidebarContent />
     </aside>
   );
 }
