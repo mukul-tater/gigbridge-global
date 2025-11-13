@@ -82,16 +82,27 @@ export default function WorkerDocuments() {
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
       
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('worker-documents')
-        .upload(fileName, selectedFile);
+        .upload(fileName, selectedFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      // Get signed URL for private bucket
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('worker-documents')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 31536000); // 1 year expiry
+
+      if (urlError) {
+        console.error('URL error:', urlError);
+        throw urlError;
+      }
 
       // Save document record
       const { error: dbError } = await supabase
@@ -100,11 +111,14 @@ export default function WorkerDocuments() {
           worker_id: user.id,
           document_name: documentName,
           document_type: documentType,
-          file_url: publicUrl,
+          file_url: urlData.signedUrl,
           file_size: selectedFile.size,
         });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw dbError;
+      }
 
       toast.success("Document uploaded successfully!");
       setShowUploadDialog(false);
@@ -112,9 +126,9 @@ export default function WorkerDocuments() {
       setDocumentName("");
       setDocumentType("");
       loadDocuments();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading document:', error);
-      toast.error("Failed to upload document");
+      toast.error(error?.message || "Failed to upload document");
     } finally {
       setUploading(false);
     }

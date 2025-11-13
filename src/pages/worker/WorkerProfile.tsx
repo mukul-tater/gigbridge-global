@@ -66,6 +66,12 @@ export default function WorkerProfile() {
           setValue('passport_number', workerProfile.passport_number || '');
           setValue('expected_salary_min', workerProfile.expected_salary_min || 0);
           setValue('expected_salary_max', workerProfile.expected_salary_max || 0);
+          
+          // Additional worker profile fields
+          setValue('skills', workerProfile.languages?.join(', ') || '');
+          setValue('certifications', '');
+          setValue('visa_type', workerProfile.ecr_category || '');
+          setValue('preferred_countries', workerProfile.visa_countries?.join(', ') || '');
         }
       } catch (error) {
         console.error('Error loading worker profile:', error);
@@ -105,6 +111,9 @@ export default function WorkerProfile() {
           passport_number: data.passport_number || null,
           expected_salary_min: data.expected_salary_min || null,
           expected_salary_max: data.expected_salary_max || null,
+          languages: data.skills ? data.skills.split(',').map(s => s.trim()) : null,
+          ecr_category: data.visa_type || null,
+          visa_countries: data.preferred_countries ? data.preferred_countries.split(',').map(c => c.trim()) : null,
         }, {
           onConflict: 'user_id'
         });
