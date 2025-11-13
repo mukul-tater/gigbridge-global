@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PageTransition from "./components/PageTransition";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Jobs from "./pages/Jobs";
@@ -65,7 +66,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <PWAInstallPrompt />
-          <Routes>
+          <PageTransition>
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/install" element={<InstallPWA />} />
@@ -244,6 +246,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </PageTransition>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
