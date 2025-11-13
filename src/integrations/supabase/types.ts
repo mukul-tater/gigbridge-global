@@ -62,6 +62,152 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_checks: {
+        Row: {
+          check_type: string
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          findings: Json | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          risk_level: string | null
+          status: string
+        }
+        Insert: {
+          check_type: string
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          findings?: Json | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_level?: string | null
+          status?: string
+        }
+        Update: {
+          check_type?: string
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          findings?: Json | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_level?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      content_flags: {
+        Row: {
+          action_taken: string | null
+          content_id: string
+          content_type: string
+          created_at: string | null
+          description: string | null
+          flag_reason: string
+          flagged_by: string | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          action_taken?: string | null
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          description?: string | null
+          flag_reason: string
+          flagged_by?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          action_taken?: string | null
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          description?: string | null
+          flag_reason?: string
+          flagged_by?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      disputes: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          description: string
+          dispute_type: string
+          evidence: Json | null
+          filed_against: string
+          filed_by: string
+          id: string
+          job_id: string | null
+          priority: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          description: string
+          dispute_type: string
+          evidence?: Json | null
+          filed_against: string
+          filed_by: string
+          id?: string
+          job_id?: string | null
+          priority?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          description?: string
+          dispute_type?: string
+          evidence?: Json | null
+          filed_against?: string
+          filed_by?: string
+          id?: string
+          job_id?: string | null
+          priority?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_applications: {
         Row: {
           applied_at: string | null
@@ -204,6 +350,66 @@ export type Database = {
           visa_sponsorship?: boolean | null
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          flagged_reason: string | null
+          id: string
+          is_flagged: boolean | null
+          is_read: boolean | null
+          job_id: string | null
+          parent_message_id: string | null
+          receiver_id: string
+          sender_id: string
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          flagged_reason?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          is_read?: boolean | null
+          job_id?: string | null
+          parent_message_id?: string | null
+          receiver_id: string
+          sender_id: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          flagged_reason?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          is_read?: boolean | null
+          job_id?: string | null
+          parent_message_id?: string | null
+          receiver_id?: string
+          sender_id?: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -366,6 +572,45 @@ export type Database = {
           rating?: number | null
           updated_at?: string | null
           worker_id?: string
+        }
+        Relationships: []
+      }
+      user_moderation: {
+        Row: {
+          action: string
+          actioned_by: string
+          created_at: string | null
+          duration_days: number | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          actioned_by: string
+          created_at?: string | null
+          duration_days?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          actioned_by?: string
+          created_at?: string | null
+          duration_days?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          reason?: string
+          user_id?: string
         }
         Relationships: []
       }
