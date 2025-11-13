@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,8 +84,10 @@ export default function WorkerProfile() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">My Profile</h1>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-8">
+          <h1 className="text-3xl font-bold mb-8">My Profile</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
           {/* Avatar Section */}
@@ -297,6 +300,7 @@ export default function WorkerProfile() {
           </div>
         </form>
       </main>
+      </div>
     </div>
   );
 }

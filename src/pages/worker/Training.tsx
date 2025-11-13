@@ -1,4 +1,5 @@
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -58,11 +59,13 @@ export default function Training() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Training & Pre-Departure Orientation</h1>
-          <p className="text-muted-foreground">Complete required training programs before departure</p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Training & Pre-Departure Orientation</h1>
+            <p className="text-muted-foreground">Complete required training programs before departure</p>
+          </div>
 
         <div className="grid gap-6">
           {trainings.map((training) => (
@@ -127,6 +130,7 @@ export default function Training() {
           ))}
         </div>
       </main>
+      </div>
     </div>
   );
 }

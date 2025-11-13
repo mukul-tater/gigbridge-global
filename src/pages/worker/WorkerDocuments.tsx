@@ -1,4 +1,5 @@
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, Download } from "lucide-react";
@@ -18,39 +19,42 @@ export default function WorkerDocuments() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">My Documents</h1>
-          <Button onClick={handleUpload}>
-            <Upload className="h-4 w-4 mr-2" />
-            Upload Document
-          </Button>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold">My Documents</h1>
+            <Button onClick={handleUpload}>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Document
+            </Button>
+          </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {documents.map((doc) => (
-            <Card key={doc.id} className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <FileText className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">{doc.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{doc.type}</p>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>{doc.uploadDate}</span>
-                    <span>•</span>
-                    <span>{doc.size}</span>
+          <div className="grid md:grid-cols-2 gap-6">
+            {documents.map((doc) => (
+              <Card key={doc.id} className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="bg-primary/10 p-3 rounded-lg">
+                    <FileText className="h-6 w-6 text-primary" />
                   </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold mb-1">{doc.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{doc.type}</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>{doc.uploadDate}</span>
+                      <span>•</span>
+                      <span>{doc.size}</span>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon">
+                    <Download className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button variant="ghost" size="icon">
-                  <Download className="h-4 w-4" />
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </main>
+              </Card>
+            ))}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

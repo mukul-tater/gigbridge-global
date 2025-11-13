@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Briefcase, FileText, MessageSquare, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -55,12 +56,15 @@ export default function WorkerDashboard() {
     return (
       <div className="flex min-h-screen bg-background">
         <WorkerSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
-          </div>
-        </main>
+        <div className="flex-1 flex flex-col">
+          <WorkerHeader />
+          <main className="flex-1 p-8 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
@@ -68,11 +72,13 @@ export default function WorkerDashboard() {
   return (
     <div className="flex min-h-screen bg-background w-full">
       <WorkerSidebar />
-      <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Worker'}!</h1>
-          <p className="text-muted-foreground text-sm md:text-base">Here's an overview of your activity</p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Worker'}!</h1>
+            <p className="text-muted-foreground text-sm md:text-base">Here's an overview of your activity</p>
+          </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="p-6">
@@ -185,6 +191,7 @@ export default function WorkerDashboard() {
           </Card>
         </div>
       </main>
+      </div>
     </div>
   );
 }
