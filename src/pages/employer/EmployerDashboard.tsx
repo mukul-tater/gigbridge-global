@@ -1,8 +1,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
+import InteractiveChart from "@/components/InteractiveChart";
 import { Card } from "@/components/ui/card";
 import { Clock, CheckCircle, AlertCircle, Users } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import BackgroundVerificationCard from "@/components/employer/BackgroundVerificationCard";
@@ -119,44 +120,29 @@ export default function EmployerDashboard() {
           <PaymentManagementCard payments={payments} />
         </div>
 
-        {/* Analytics Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-          {/* Hiring Metrics Chart */}
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
           <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Hiring Metrics (6 Months)</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={hiringMetricsData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="month" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-                <Legend />
-                <Line type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={2} name="Applications" />
-                <Line type="monotone" dataKey="shortlisted" stroke="hsl(var(--chart-2))" strokeWidth={2} name="Shortlisted" />
-                <Line type="monotone" dataKey="hired" stroke="hsl(var(--chart-5))" strokeWidth={2} name="Hired" />
-              </LineChart>
-            </ResponsiveContainer>
+            <InteractiveChart
+              title="Hiring Metrics"
+              type="line"
+              data={hiringMetricsData}
+              dataKeys={[
+                { key: 'applications', color: 'hsl(var(--primary))', name: 'Applications' },
+                { key: 'shortlisted', color: 'hsl(var(--chart-2))', name: 'Shortlisted' },
+                { key: 'hired', color: 'hsl(var(--success))', name: 'Hired' }
+              ]}
+            />
           </Card>
 
-          {/* Time to Hire Chart */}
           <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Average Time to Hire (Days)</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={timeToHireData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis dataKey="position" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-                <Bar dataKey="days" fill="hsl(var(--chart-3))" name="Days" />
-              </BarChart>
-            </ResponsiveContainer>
-            <div className="mt-4 p-3 bg-muted/50 rounded-lg flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-sm font-medium">Average: 28 days</p>
-                <p className="text-xs text-muted-foreground">Industry benchmark: 32 days</p>
-              </div>
-            </div>
+            <InteractiveChart
+              title="Time to Hire by Position"
+              type="bar"
+              data={timeToHireData.map(item => ({ month: item.position, days: item.days }))}
+              dataKeys={[
+                { key: 'days', color: 'hsl(var(--chart-3))', name: 'Days to Hire' }
+              ]}
+            />
           </Card>
         </div>
 
@@ -165,17 +151,23 @@ export default function EmployerDashboard() {
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Candidate Pipeline</h2>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={pipelineData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis type="number" className="text-xs" />
-                <YAxis dataKey="stage" type="category" className="text-xs" />
-                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-                <Bar dataKey="count" name="Candidates">
+              <PieChart>
+                <Pie
+                  data={pipelineData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="count"
+                  label
+                >
                   {pipelineData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
-                </Bar>
-              </BarChart>
+                </Pie>
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+              </PieChart>
             </ResponsiveContainer>
           </Card>
 

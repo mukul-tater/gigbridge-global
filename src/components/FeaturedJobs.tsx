@@ -4,13 +4,18 @@ import { mockDataService } from '@/services/MockDataService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Building2, Briefcase, IndianRupee, Clock, ArrowRight } from 'lucide-react';
+import { MapPin, Building2, Briefcase, IndianRupee, Clock, ArrowRight, Bookmark, Share2, Zap } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Job, Company, Factory } from '@/types/mock-data';
 
 export default function FeaturedJobs() {
+  const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [factories, setFactories] = useState<Factory[]>([]);
+  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadData = async () => {
@@ -42,6 +47,66 @@ export default function FeaturedJobs() {
     return variants[type as keyof typeof variants] || 'default';
   };
 
+  const handleSaveJob = (jobId: string) => {
+    const newSavedJobs = new Set(savedJobs);
+    if (newSavedJobs.has(jobId)) {
+      newSavedJobs.delete(jobId);
+      toast({
+        title: "Job removed",
+        description: "Job removed from your saved list",
+      });
+    } else {
+      newSavedJobs.add(jobId);
+      toast({
+        title: "Job saved!",
+        description: "Job added to your saved list",
+      });
+    }
+    setSavedJobs(newSavedJobs);
+  };
+
+  const handleShareJob = async (job: Job, company: Company | undefined) => {
+    const shareData = {
+      title: job.title,
+      text: `Check out this job: ${job.title} at ${company?.name || 'Company'}`,
+      url: window.location.origin + '/jobs/' + job.id,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared successfully!",
+          description: "Job has been shared",
+        });
+      } catch (err) {
+        console.log('Share cancelled');
+      }
+    } else {
+      navigator.clipboard.writeText(shareData.url);
+      toast({
+        title: "Link copied!",
+        description: "Job link copied to clipboard",
+      });
+    }
+  };
+
+  const handleQuickApply = (jobId: string) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login required",
+        description: "Please login to apply for jobs",
+        variant: "destructive"
+      });
+      return;
+    }
+    toast({
+      title: "Application started!",
+      description: "Redirecting to application form...",
+    });
+    // Navigate to application would go here
+  };
+
   return (
     <section className="py-16 bg-background" id="jobs">
       <div className="container mx-auto px-4">
@@ -66,7 +131,29 @@ export default function FeaturedJobs() {
                 const factory = getFactory(job.factoryId);
                 
                 return (
-                  <Card key={job.id} className="hover:shadow-lg transition-shadow">
+                  <Card key={job.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                    {/* Quick Action Buttons */}
+                    <div className="absolute top-3 right-3 z-10 flex gap-2">
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
+                        onClick={() => handleSaveJob(job.id)}
+                      >
+                        <Bookmark 
+                          className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-current' : ''}`} 
+                        />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
+                        onClick={() => handleShareJob(job, company)}
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
                     <CardHeader>
                       <div className="flex items-start justify-between mb-2">
                         <Badge variant={getJobTypeBadge(job.jobType)}>
