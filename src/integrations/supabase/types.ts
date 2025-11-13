@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      background_verifications: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          documents_verified: Json | null
+          employer_id: string
+          id: string
+          notes: string | null
+          requested_at: string | null
+          result: string | null
+          status: string
+          updated_at: string | null
+          verification_type: string
+          verified_by: string | null
+          worker_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          documents_verified?: Json | null
+          employer_id: string
+          id?: string
+          notes?: string | null
+          requested_at?: string | null
+          result?: string | null
+          status?: string
+          updated_at?: string | null
+          verification_type: string
+          verified_by?: string | null
+          worker_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          documents_verified?: Json | null
+          employer_id?: string
+          id?: string
+          notes?: string | null
+          requested_at?: string | null
+          result?: string | null
+          status?: string
+          updated_at?: string | null
+          verification_type?: string
+          verified_by?: string | null
+          worker_id?: string
+        }
+        Relationships: []
+      }
       job_applications: {
         Row: {
           applied_at: string | null
@@ -156,6 +204,68 @@ export type Database = {
           visa_sponsorship?: boolean | null
         }
         Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string
+          description: string | null
+          employer_id: string
+          id: string
+          job_id: string | null
+          metadata: Json | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_type: string
+          status: string
+          transaction_id: string | null
+          updated_at: string | null
+          worker_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          employer_id: string
+          id?: string
+          job_id?: string | null
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_type: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+          worker_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          employer_id?: string
+          id?: string
+          job_id?: string | null
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_type?: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

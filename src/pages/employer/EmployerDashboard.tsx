@@ -1,11 +1,72 @@
 import { useAuth } from "@/contexts/AuthContext";
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
 import { Card } from "@/components/ui/card";
-import { Briefcase, Users, Eye, TrendingUp, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { Clock, CheckCircle, AlertCircle, Users } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import BackgroundVerificationCard from "@/components/employer/BackgroundVerificationCard";
+import PaymentManagementCard from "@/components/employer/PaymentManagementCard";
+import AnalyticsSummaryCard from "@/components/employer/AnalyticsSummaryCard";
 
 export default function EmployerDashboard() {
   const { profile } = useAuth();
+  const [verifications, setVerifications] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (profile?.id) {
+      fetchDashboardData();
+    }
+  }, [profile?.id]);
+
+  const fetchDashboardData = async () => {
+    try {
+      const [verificationsRes, paymentsRes, jobsRes, applicationsRes] = await Promise.all([
+        supabase.from('background_verifications').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
+        supabase.from('payments').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
+        supabase.from('jobs').select('*').eq('employer_id', profile?.id),
+        supabase.from('job_applications').select('*').eq('employer_id', profile?.id)
+      ]);
+
+      setVerifications(verificationsRes.data || []);
+      setPayments(paymentsRes.data || []);
+      setJobs(jobsRes.data || []);
+      setApplications(applicationsRes.data || []);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const analyticsData = {
+    totalJobs: jobs.length,
+    activeJobs: jobs.filter((j: any) => j.status === 'ACTIVE').length,
+    totalApplications: applications.length,
+    totalViews: jobs.reduce((sum: number, job: any) => sum + (job.views || 0), 0),
+    shortlistedCandidates: applications.filter((a: any) => a.status === 'SHORTLISTED').length,
+    hiredCandidates: applications.filter((a: any) => a.status === 'HIRED').length,
+    avgTimeToHire: 28,
+    conversionRate: applications.length > 0 ? ((applications.filter((a: any) => a.status === 'HIRED').length / applications.length) * 100) : 0
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <EmployerSidebar />
+        <main className="flex-1 p-8 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   // Mock data for analytics
   const hiringMetricsData = [
@@ -48,38 +109,14 @@ export default function EmployerDashboard() {
           <p className="text-muted-foreground">Manage your job postings and find talent</p>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Briefcase className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">8</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Active Jobs</p>
-          </Card>
+        <AnalyticsSummaryCard data={analyticsData} />
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Users className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">45</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Total Applications</p>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Eye className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">234</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Job Views</p>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">12</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Shortlisted</p>
-          </Card>
+        <div className="grid md:grid-cols-2 gap-6 my-8">
+          <BackgroundVerificationCard 
+            verifications={verifications} 
+            onRefresh={fetchDashboardData}
+          />
+          <PaymentManagementCard payments={payments} />
         </div>
 
         {/* Analytics Section */}
