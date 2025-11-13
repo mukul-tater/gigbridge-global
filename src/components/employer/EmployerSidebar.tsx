@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark, Star, UserCheck } from "lucide-react";
+import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark, Star, UserCheck, BriefcaseIcon } from "lucide-react";
 
 export default function EmployerSidebar() {
   const location = useLocation();
@@ -22,8 +22,12 @@ export default function EmployerSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-card border-r min-h-screen p-6">
-      <h2 className="text-lg font-bold mb-6">Employer Portal</h2>
+    <aside className="w-64 bg-card border-r min-h-screen p-4 md:p-6">
+      <Link to="/" className="flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity">
+        <BriefcaseIcon className="h-6 w-6 text-primary" />
+        <span className="text-lg font-bold text-foreground">GlobalGigs</span>
+      </Link>
+      <h2 className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-4">Employer Portal</h2>
       <nav className="space-y-2">
         {navItems.map((item) => {
           const Icon = item.icon;

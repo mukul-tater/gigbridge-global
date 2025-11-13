@@ -101,17 +101,17 @@ export default function EmployerDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <EmployerSidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Employer'}!</h1>
-          <p className="text-muted-foreground">Manage your job postings and find talent</p>
+      <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Employer'}!</h1>
+          <p className="text-muted-foreground text-sm md:text-base">Manage your job postings and find talent</p>
         </div>
 
         <AnalyticsSummaryCard data={analyticsData} />
 
-        <div className="grid md:grid-cols-2 gap-6 my-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 my-6 md:my-8">
           <BackgroundVerificationCard 
             verifications={verifications} 
             onRefresh={fetchDashboardData}
@@ -120,7 +120,7 @@ export default function EmployerDashboard() {
         </div>
 
         {/* Analytics Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           {/* Hiring Metrics Chart */}
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Hiring Metrics (6 Months)</h2>
@@ -160,7 +160,7 @@ export default function EmployerDashboard() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           {/* Candidate Pipeline */}
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Candidate Pipeline</h2>
@@ -233,7 +233,7 @@ export default function EmployerDashboard() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Recent Applications</h2>
             <div className="space-y-4">

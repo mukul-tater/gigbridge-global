@@ -41,8 +41,8 @@ const HeroSection = () => {
             </p>
 
             {/* Search Form */}
-            <div className="bg-card p-6 rounded-2xl shadow-lg border border-border max-w-2xl mx-auto lg:mx-0">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="bg-card p-4 md:p-6 rounded-2xl shadow-lg border border-border max-w-2xl mx-auto lg:mx-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
@@ -90,17 +90,17 @@ const HeroSection = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 mt-8 max-w-lg mx-auto lg:mx-0">
-              <div className="text-center p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
-                <div className="text-3xl font-bold text-primary mb-1">50K+</div>
+            <div className="grid grid-cols-3 gap-3 md:gap-6 mt-6 md:mt-8 max-w-lg mx-auto lg:mx-0">
+              <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
+                <div className="text-2xl md:text-3xl font-bold text-primary mb-1">50K+</div>
                 <div className="text-xs text-muted-foreground font-medium">Active Jobs</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
-                <div className="text-3xl font-bold text-secondary mb-1">32</div>
+              <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
+                <div className="text-2xl md:text-3xl font-bold text-secondary mb-1">32</div>
                 <div className="text-xs text-muted-foreground font-medium">Countries</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
-                <div className="text-3xl font-bold text-success mb-1">98%</div>
+              <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
+                <div className="text-2xl md:text-3xl font-bold text-success mb-1">98%</div>
                 <div className="text-xs text-muted-foreground font-medium">Success Rate</div>
               </div>
             </div>

@@ -80,15 +80,15 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <AdminSidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">System overview and management</p>
+      <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Admin Dashboard</h1>
+          <p className="text-muted-foreground text-sm md:text-base">System overview and management</p>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <Users className="h-8 w-8 text-primary" />
@@ -122,12 +122,12 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           <DisputeManagementCard disputes={disputes} />
           <ContentModerationCard flags={contentFlags} />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           <UserManagementCard 
             moderationActions={moderationActions} 
             onRefresh={fetchAdminData}
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
           <MessageMonitoringCard messages={messages} />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
             <div className="space-y-4">
