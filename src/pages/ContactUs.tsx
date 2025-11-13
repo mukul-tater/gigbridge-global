@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,8 +23,9 @@ export default function ContactUs() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
+      <MobileBottomNav />
       <main className="flex-1">
         <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
           <div className="container mx-auto px-4">

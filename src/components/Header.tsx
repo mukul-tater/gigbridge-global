@@ -62,128 +62,108 @@ const Header = () => {
               </Link>
             </nav>
 
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="md:hidden" 
-                onClick={toggleMobileMenu}
-                aria-controls="mobile-menu"
-                aria-expanded={isMobileMenuOpen}
-                aria-label="Toggle mobile menu"
-              >
-                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-              
-              <div className="hidden md:flex items-center gap-3">
-                {isAuthenticated ? (
-                  <>
-                    <Link to="/dashboard">
-                      <Button variant="outline" className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={profile?.avatar_url || undefined} />
-                          <AvatarFallback className="text-xs">
-                            {profile?.full_name?.[0] || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="hidden lg:inline">
-                          {profile?.full_name || 'Dashboard'}
-                        </span>
-                      </Button>
-                    </Link>
-                    <Button variant="ghost" onClick={handleLogout}>
-                      <LogOut className="h-4 w-4" />
+            {/* Mobile Menu Toggle */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden" 
+              onClick={toggleMobileMenu}
+              aria-controls="mobile-menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center gap-3">
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard">
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={profile?.avatar_url || undefined} />
+                        <AvatarFallback className="text-xs">
+                          {profile?.full_name?.[0] || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="hidden lg:inline">
+                        {profile?.full_name || 'Dashboard'}
+                      </span>
                     </Button>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/auth">
-                      <Button variant="outline">
-                        <User className="h-4 w-4 mr-2" />
-                        Login
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </div>
+                  </Link>
+                  <Button variant="ghost" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/auth">
+                    <Button variant="outline">
+                      <User className="h-4 w-4 mr-2" />
+                      Login
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
       </header>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
-          onClick={closeMobileMenu}
-        />
-      )}
-
       {/* Mobile Menu */}
-      <div 
-        id="mobile-menu"
-        className={`fixed top-16 left-0 right-0 bg-card border-b border-border shadow-lg z-50 md:hidden transform transition-transform duration-200 ease-in-out ${
-          isMobileMenuOpen ? 'translate-y-0' : '-translate-y-full'
-        }`}
-      >
-        <div className="px-4 py-6 space-y-6">
-          {/* Navigation Links */}
-          <nav className="space-y-4">
-            <Link 
-              to="/jobs" 
-              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMobileMenu}
-            >
-              Find Jobs
-            </Link>
-            <Link 
-              to="/about" 
-              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMobileMenu}
-            >
-              About Us
-            </Link>
-            <Link 
-              to="/contact" 
-              className="block text-foreground hover:text-primary transition-colors py-2 text-lg"
-              onClick={closeMobileMenu}
-            >
-              Contact Us
-            </Link>
-          </nav>
-
-          {/* Mobile Auth Actions */}
-          <div className="pt-4 border-t border-border space-y-3">
-            {isAuthenticated ? (
-              <>
-                <Link to="/dashboard" onClick={closeMobileMenu}>
-                  <Button variant="outline" className="w-full justify-start flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={profile?.avatar_url || undefined} />
-                      <AvatarFallback className="text-xs">
-                        {profile?.full_name?.[0] || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>{profile?.full_name || 'Dashboard'}</span>
-                  </Button>
-                </Link>
-                <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <Link to="/auth" onClick={closeMobileMenu}>
-                <Button variant="outline" className="w-full justify-start">
-                  <User className="h-4 w-4 mr-2" />
-                  Login / Sign Up
-                </Button>
+      {isMobileMenuOpen && (
+        <>
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+            onClick={closeMobileMenu}
+            aria-hidden="true"
+          />
+          
+          {/* Menu Content */}
+          <div 
+            id="mobile-menu"
+            className="fixed top-16 left-0 right-0 bottom-16 bg-card border-b border-border z-50 md:hidden overflow-y-auto animate-in slide-in-from-top-2 duration-300"
+          >
+            <nav className="container mx-auto px-4 py-6 space-y-4">
+              <Link 
+                to="/jobs" 
+                className="block px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-colors"
+                onClick={closeMobileMenu}
+              >
+                <div className="flex items-center gap-3">
+                  <Search className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium">Find Jobs</span>
+                </div>
               </Link>
-            )}
+              
+              <Link 
+                to="/about" 
+                className="block px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-colors"
+                onClick={closeMobileMenu}
+              >
+                <div className="flex items-center gap-3">
+                  <Globe className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium">About Us</span>
+                </div>
+              </Link>
+              
+              <Link 
+                to="/contact" 
+                className="block px-4 py-3 rounded-lg text-foreground hover:bg-muted transition-colors"
+                onClick={closeMobileMenu}
+              >
+                <div className="flex items-center gap-3">
+                  <Bell className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium">Contact Us</span>
+                </div>
+              </Link>
+            </nav>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 };
