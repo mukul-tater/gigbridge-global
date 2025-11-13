@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, BriefcaseIcon, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, BriefcaseIcon, Menu, FileCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,6 +13,7 @@ export default function AdminSidebar() {
     { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/admin/users", icon: Users, label: "User Management" },
     { path: "/admin/job-verification", icon: CheckCircle, label: "Job Verification" },
+    { path: "/admin/document-verification", icon: FileCheck, label: "Document Verification" },
     { path: "/admin/compliance", icon: Shield, label: "Compliance & ECR" },
     { path: "/admin/reports", icon: BarChart3, label: "Reports & Analytics" },
     { path: "/admin/disputes", icon: AlertTriangle, label: "Dispute Resolution" },
