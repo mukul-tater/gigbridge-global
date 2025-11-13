@@ -52,6 +52,7 @@ import WorkerShortlist from "./pages/employer/WorkerShortlist";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import JobVerification from "./pages/admin/JobVerification";
+import DocumentVerification from "./pages/admin/DocumentVerification";
 import ComplianceCheck from "./pages/admin/ComplianceCheck";
 import Reports from "./pages/admin/Reports";
 import DisputeResolution from "./pages/admin/DisputeResolution";
@@ -226,6 +227,11 @@ const App = () => (
             <Route path="/admin/job-verification" element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <JobVerification />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/document-verification" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <DocumentVerification />
               </ProtectedRoute>
             } />
             <Route path="/admin/compliance" element={

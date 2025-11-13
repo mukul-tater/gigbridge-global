@@ -198,10 +198,14 @@ export default function WorkerDocuments() {
                       <SelectContent>
                         <SelectItem value="Resume">Resume/CV</SelectItem>
                         <SelectItem value="Certification">Certification</SelectItem>
-                        <SelectItem value="Identity">Identity Document</SelectItem>
+                        <SelectItem value="Aadhar">Aadhar Card</SelectItem>
                         <SelectItem value="Passport">Passport</SelectItem>
                         <SelectItem value="Visa">Visa</SelectItem>
-                        <SelectItem value="License">License</SelectItem>
+                        <SelectItem value="Driving License">Driving License</SelectItem>
+                        <SelectItem value="PAN Card">PAN Card</SelectItem>
+                        <SelectItem value="Identity Card">Identity Card</SelectItem>
+                        <SelectItem value="Work Permit">Work Permit</SelectItem>
+                        <SelectItem value="Educational Certificate">Educational Certificate</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
