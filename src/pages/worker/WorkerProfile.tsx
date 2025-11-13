@@ -67,11 +67,14 @@ export default function WorkerProfile() {
           setValue('expected_salary_min', workerProfile.expected_salary_min || 0);
           setValue('expected_salary_max', workerProfile.expected_salary_max || 0);
           
-          // Additional worker profile fields
+          // Map languages array to skills field (Primary Skills)
           setValue('skills', workerProfile.languages?.join(', ') || '');
+          
+          // Map visa_countries array to preferred_countries field
+          setValue('preferred_countries', workerProfile.visa_countries?.join(', ') || '');
+          
           setValue('certifications', '');
           setValue('visa_type', workerProfile.ecr_category || '');
-          setValue('preferred_countries', workerProfile.visa_countries?.join(', ') || '');
         }
       } catch (error) {
         console.error('Error loading worker profile:', error);
