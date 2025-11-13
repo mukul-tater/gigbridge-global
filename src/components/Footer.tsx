@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BriefcaseIcon, Mail, Phone, MapPin, Globe, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
-
 const Footer = () => {
-  return (
-    <footer className="bg-foreground text-background py-16">
+  return <footer className="bg-foreground text-background py-16">
       <div className="container mx-auto px-4 lg:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Company Info */}
@@ -63,10 +61,7 @@ const Footer = () => {
               Get weekly updates on new opportunities and industry insights.
             </p>
             <div className="space-y-2">
-              <Input 
-                placeholder="Enter your email" 
-                className="bg-background/10 border-background/20 text-background placeholder:text-background/60"
-              />
+              <Input placeholder="Enter your email" className="bg-background/10 border-background/20 text-background placeholder:text-background/60" />
               <Button variant="secondary" className="w-full">
                 <Mail className="h-4 w-4" />
                 Subscribe
@@ -80,11 +75,14 @@ const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-primary" />
-              <span className="text-background/80">support@globalgigs.com</span>
+              <span className="text-background/80">mukultater@gmail.com</span>
             </div>
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-primary" />
-              <span className="text-background/80">+1 (555) 123-4567</span>
+              <span className="text-background/80">+91-9950085843
+
+
+  </span>
             </div>
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-primary" />
@@ -105,8 +103,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
