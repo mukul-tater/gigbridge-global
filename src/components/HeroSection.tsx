@@ -3,8 +3,33 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, Globe, TrendingUp } from "lucide-react";
 import heroImage from "@/assets/hero-workers.jpg";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const [isSticky, setIsSticky] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroHeight = window.innerHeight * 0.6;
+      setIsSticky(window.scrollY > heroHeight);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchKeyword) params.set('keyword', searchKeyword);
+    if (searchLocation) params.set('location', searchLocation);
+    if (searchCategory) params.set('category', searchCategory);
+    navigate(`/jobs?${params.toString()}`);
+  };
   return (
     <section className="relative min-h-[700px] bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 overflow-hidden">
       {/* Animated Background */}
@@ -148,6 +173,29 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+
+      {/* Sticky Mobile Search Bar */}
+      {isSticky && (
+        <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-card border-b border-border shadow-lg animate-in slide-in-from-top-2 duration-300">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search jobs..." 
+                  className="pl-10 h-10"
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                />
+              </div>
+              <Button size="sm" className="h-10 px-4" onClick={handleSearch}>
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
