@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      application_status_history: {
+        Row: {
+          application_id: string
+          changed_by: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          status: string
+        }
+        Insert: {
+          application_id: string
+          changed_by: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          status: string
+        }
+        Update: {
+          application_id?: string
+          changed_by?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_status_history_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       background_verifications: {
         Row: {
           completed_at: string | null
@@ -285,6 +320,141 @@ export type Database = {
           worker_id?: string
         }
         Relationships: []
+      }
+      job_formalities: {
+        Row: {
+          actual_joining_date: string | null
+          application_id: string
+          arrival_date: string | null
+          completion_percentage: number | null
+          contract_sent: boolean | null
+          contract_signed: boolean | null
+          contract_signed_date: string | null
+          contract_url: string | null
+          created_at: string | null
+          departure_date: string | null
+          ecr_certificate_url: string | null
+          ecr_check_required: boolean | null
+          ecr_check_status: string | null
+          ecr_clearance_date: string | null
+          expected_joining_date: string | null
+          flight_booking_status: string | null
+          id: string
+          job_id: string
+          medical_certificate_url: string | null
+          medical_exam_date: string | null
+          medical_exam_required: boolean | null
+          medical_exam_status: string | null
+          notes: string | null
+          overall_status: string | null
+          police_certificate_url: string | null
+          police_verification_date: string | null
+          police_verification_required: boolean | null
+          police_verification_status: string | null
+          travel_details: Json | null
+          updated_at: string | null
+          visa_application_date: string | null
+          visa_approval_date: string | null
+          visa_expiry_date: string | null
+          visa_required: boolean | null
+          visa_status: string | null
+          visa_type: string | null
+          worker_id: string
+        }
+        Insert: {
+          actual_joining_date?: string | null
+          application_id: string
+          arrival_date?: string | null
+          completion_percentage?: number | null
+          contract_sent?: boolean | null
+          contract_signed?: boolean | null
+          contract_signed_date?: string | null
+          contract_url?: string | null
+          created_at?: string | null
+          departure_date?: string | null
+          ecr_certificate_url?: string | null
+          ecr_check_required?: boolean | null
+          ecr_check_status?: string | null
+          ecr_clearance_date?: string | null
+          expected_joining_date?: string | null
+          flight_booking_status?: string | null
+          id?: string
+          job_id: string
+          medical_certificate_url?: string | null
+          medical_exam_date?: string | null
+          medical_exam_required?: boolean | null
+          medical_exam_status?: string | null
+          notes?: string | null
+          overall_status?: string | null
+          police_certificate_url?: string | null
+          police_verification_date?: string | null
+          police_verification_required?: boolean | null
+          police_verification_status?: string | null
+          travel_details?: Json | null
+          updated_at?: string | null
+          visa_application_date?: string | null
+          visa_approval_date?: string | null
+          visa_expiry_date?: string | null
+          visa_required?: boolean | null
+          visa_status?: string | null
+          visa_type?: string | null
+          worker_id: string
+        }
+        Update: {
+          actual_joining_date?: string | null
+          application_id?: string
+          arrival_date?: string | null
+          completion_percentage?: number | null
+          contract_sent?: boolean | null
+          contract_signed?: boolean | null
+          contract_signed_date?: string | null
+          contract_url?: string | null
+          created_at?: string | null
+          departure_date?: string | null
+          ecr_certificate_url?: string | null
+          ecr_check_required?: boolean | null
+          ecr_check_status?: string | null
+          ecr_clearance_date?: string | null
+          expected_joining_date?: string | null
+          flight_booking_status?: string | null
+          id?: string
+          job_id?: string
+          medical_certificate_url?: string | null
+          medical_exam_date?: string | null
+          medical_exam_required?: boolean | null
+          medical_exam_status?: string | null
+          notes?: string | null
+          overall_status?: string | null
+          police_certificate_url?: string | null
+          police_verification_date?: string | null
+          police_verification_required?: boolean | null
+          police_verification_status?: string | null
+          travel_details?: Json | null
+          updated_at?: string | null
+          visa_application_date?: string | null
+          visa_approval_date?: string | null
+          visa_expiry_date?: string | null
+          visa_required?: boolean | null
+          visa_status?: string | null
+          visa_type?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_formalities_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_formalities_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_skills: {
         Row: {

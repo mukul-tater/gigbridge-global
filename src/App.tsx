@@ -22,6 +22,7 @@ import InstallPWA from "./pages/InstallPWA";
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import WorkerProfile from "./pages/worker/WorkerProfile";
 import WorkerApplications from "./pages/worker/WorkerApplications";
+import ApplicationTracking from "./pages/worker/ApplicationTracking";
 import WorkerMessaging from "./pages/worker/WorkerMessaging";
 import WorkerDocuments from "./pages/worker/WorkerDocuments";
 import WorkerNotifications from "./pages/worker/WorkerNotifications";
@@ -48,6 +49,7 @@ import EmployerCompliance from "./pages/employer/ComplianceReports";
 import EmployerSavedSearches from "./pages/employer/SavedSearches";
 import ApplicationReview from "./pages/employer/ApplicationReview";
 import WorkerShortlist from "./pages/employer/WorkerShortlist";
+import ManageFormalities from "./pages/employer/ManageFormalities";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -99,6 +101,11 @@ const App = () => (
             <Route path="/worker/applications" element={
               <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerApplications />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/application-tracking" element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <ApplicationTracking />
               </ProtectedRoute>
             } />
             <Route path="/worker/messaging" element={
@@ -212,6 +219,11 @@ const App = () => (
             <Route path="/employer/shortlist" element={
               <ProtectedRoute allowedRoles={["employer"]}>
                 <WorkerShortlist />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/formalities" element={
+              <ProtectedRoute allowedRoles={["employer"]}>
+                <ManageFormalities />
               </ProtectedRoute>
             } />
 
