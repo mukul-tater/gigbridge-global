@@ -52,17 +52,34 @@ export default function ApplicationReview() {
 
   const fetchApplications = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: applicationsData, error: appsError } = await supabase
         .from("job_applications")
-        .select(`
-          *,
-          profiles!job_applications_worker_id_fkey (full_name, email, avatar_url)
-        `)
+        .select("*")
         .eq("employer_id", user?.id)
         .order("applied_at", { ascending: false });
 
-      if (error) throw error;
-      setApplications(data as any || []);
+      if (appsError) throw appsError;
+
+      // Fetch worker profiles separately
+      const workerIds = applicationsData?.map(app => app.worker_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, avatar_url")
+        .in("id", workerIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const enrichedApplications = applicationsData?.map(app => ({
+        ...app,
+        profiles: profilesData?.find(profile => profile.id === app.worker_id) || {
+          full_name: null,
+          email: "",
+          avatar_url: null
+        }
+      })) || [];
+
+      setApplications(enrichedApplications as any);
     } catch (error: any) {
       toast({
         title: "Error",
