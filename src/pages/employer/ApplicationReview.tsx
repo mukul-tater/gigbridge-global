@@ -181,6 +181,7 @@ export default function ApplicationReview() {
     switch (status) {
       case "PENDING": return "default";
       case "REVIEWING": return "secondary";
+      case "APPROVED": return "default";
       case "SHORTLISTED": return "default";
       case "INTERVIEWED": return "secondary";
       case "OFFERED": return "default";
@@ -233,6 +234,7 @@ export default function ApplicationReview() {
               <SelectItem value="ALL">All Applications</SelectItem>
               <SelectItem value="PENDING">Pending</SelectItem>
               <SelectItem value="REVIEWING">Reviewing</SelectItem>
+              <SelectItem value="APPROVED">Approved</SelectItem>
               <SelectItem value="SHORTLISTED">Shortlisted</SelectItem>
               <SelectItem value="INTERVIEWED">Interviewed</SelectItem>
               <SelectItem value="OFFERED">Offered</SelectItem>
@@ -287,6 +289,25 @@ export default function ApplicationReview() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
+                    {app.status === 'PENDING' && (
+                      <div className="flex gap-2 mb-2">
+                        <Button
+                          size="sm"
+                          onClick={() => updateApplicationStatus(app.id, 'APPROVED')}
+                          className="flex-1"
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => updateApplicationStatus(app.id, 'REJECTED')}
+                          className="flex-1"
+                        >
+                          Reject
+                        </Button>
+                      </div>
+                    )}
                     <Select
                       value={app.status}
                       onValueChange={(value) => updateApplicationStatus(app.id, value)}
@@ -297,6 +318,7 @@ export default function ApplicationReview() {
                       <SelectContent>
                         <SelectItem value="PENDING">Pending</SelectItem>
                         <SelectItem value="REVIEWING">Reviewing</SelectItem>
+                        <SelectItem value="APPROVED">Approved</SelectItem>
                         <SelectItem value="SHORTLISTED">Shortlisted</SelectItem>
                         <SelectItem value="INTERVIEWED">Interviewed</SelectItem>
                         <SelectItem value="OFFERED">Offered</SelectItem>
