@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
+import JobCategories from "./pages/JobCategories";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AboutUs from "./pages/AboutUs";
@@ -75,6 +76,7 @@ const App = () => (
             <Route path="/seed-data" element={<SeedData />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
+            <Route path="/job-categories" element={<JobCategories />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/dashboard" element={

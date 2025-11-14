@@ -146,10 +146,12 @@ const JobCategories = () => {
         </div>
 
         <div className="text-center">
-          <Button variant="outline" size="lg">
-            View All Categories
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          <Link to="/job-categories">
+            <Button variant="outline" size="lg">
+              View All Categories
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
