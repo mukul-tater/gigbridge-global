@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
+import EmployerHeader from "@/components/employer/EmployerHeader";
 import InteractiveChart from "@/components/InteractiveChart";
 import { Card } from "@/components/ui/card";
 import { Clock, CheckCircle, AlertCircle, Users } from "lucide-react";
@@ -102,9 +103,11 @@ export default function EmployerDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <EmployerSidebar />
-      <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-background w-full">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Employer'}!</h1>
           <p className="text-muted-foreground text-sm md:text-base">Manage your job postings and find talent</p>
@@ -259,6 +262,7 @@ export default function EmployerDashboard() {
           </Card>
         </div>
       </main>
+      </div>
     </div>
   );
 }
