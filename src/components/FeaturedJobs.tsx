@@ -1,41 +1,71 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { mockDataService } from '@/services/MockDataService';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Building2, Briefcase, IndianRupee, Clock, ArrowRight, Bookmark, Share2, Zap } from 'lucide-react';
+import { MapPin, Building2, Briefcase, DollarSign, Clock, ArrowRight, Bookmark, Share2, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Job, Company, Factory } from '@/types/mock-data';
+
+interface FeaturedJob {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  country: string;
+  salary_min: number;
+  salary_max: number;
+  currency: string;
+  job_type: string;
+  visa_sponsorship: boolean;
+  posted_at: string;
+  employer_profiles?: {
+    company_name: string;
+  } | null;
+  job_skills: {
+    skill_name: string;
+  }[];
+}
 
 export default function FeaturedJobs() {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [factories, setFactories] = useState<Factory[]>([]);
+  const navigate = useNavigate();
+  const [jobs, setJobs] = useState<FeaturedJob[]>([]);
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      await mockDataService.initialize();
-      const activeJobs = mockDataService.getActiveJobs().slice(0, 6);
-      setJobs(activeJobs);
-      setCompanies(mockDataService.getCompanies());
-      setFactories(mockDataService.getFactories());
-    };
-    loadData();
-  }, []);
+    const loadJobs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('jobs')
+          .select(`
+            *,
+            employer_profiles!jobs_employer_id_fkey (company_name),
+            job_skills (skill_name)
+          `)
+          .eq('status', 'ACTIVE')
+          .order('posted_at', { ascending: false })
+          .limit(6);
 
-  const getCompany = (companyId: string) => companies.find(c => c.id === companyId);
-  const getFactory = (factoryId: string) => factories.find(f => f.id === factoryId);
+        if (error) throw error;
+        setJobs((data as any) || []);
+      } catch (error) {
+        console.error('Error loading jobs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadJobs();
+  }, []);
 
   const formatSalary = (min: number, max: number, currency: string) => {
     if (currency === 'INR') {
-      return `₹${min.toLocaleString()} - ₹${max.toLocaleString()}`;
+      return `₹${(min / 1000).toFixed(0)}K - ₹${(max / 1000).toFixed(0)}K`;
     }
-    return `${currency} ${min.toLocaleString()} - ${max.toLocaleString()}`;
+    return `$${(min / 1000).toFixed(0)}K - $${(max / 1000).toFixed(0)}K`;
   };
 
   const getJobTypeBadge = (type: string) => {
@@ -45,6 +75,13 @@ export default function FeaturedJobs() {
       'CONTRACT': 'outline'
     } as const;
     return variants[type as keyof typeof variants] || 'default';
+  };
+
+  const getDaysAgo = (dateString: string) => {
+    const days = Math.floor((Date.now() - new Date(dateString).getTime()) / (1000 * 60 * 60 * 24));
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    return `${days} days ago`;
   };
 
   const handleSaveJob = (jobId: string) => {
@@ -65,10 +102,10 @@ export default function FeaturedJobs() {
     setSavedJobs(newSavedJobs);
   };
 
-  const handleShareJob = async (job: Job, company: Company | undefined) => {
+  const handleShareJob = async (job: FeaturedJob) => {
     const shareData = {
       title: job.title,
-      text: `Check out this job: ${job.title} at ${company?.name || 'Company'}`,
+      text: `Check out this job: ${job.title} at ${job.employer_profiles?.company_name || 'Company'}`,
       url: window.location.origin + '/jobs/' + job.id,
     };
 
@@ -98,14 +135,24 @@ export default function FeaturedJobs() {
         description: "Please login to apply for jobs",
         variant: "destructive"
       });
+      navigate('/auth');
       return;
     }
-    toast({
-      title: "Application started!",
-      description: "Redirecting to application form...",
-    });
-    // Navigate to application would go here
+    navigate(`/jobs/${jobId}`);
   };
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-background" id="jobs">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading featured jobs...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-background" id="jobs">
@@ -126,80 +173,94 @@ export default function FeaturedJobs() {
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {jobs.map((job) => {
-                const company = getCompany(job.companyId);
-                const factory = getFactory(job.factoryId);
-                
-                return (
-                  <Card key={job.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-                    {/* Quick Action Buttons */}
-                    <div className="absolute top-3 right-3 z-10 flex gap-2">
-                      <Button
-                        size="icon"
-                        variant="secondary"
-                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
-                        onClick={() => handleSaveJob(job.id)}
-                      >
-                        <Bookmark 
-                          className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-current' : ''}`} 
-                        />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="secondary"
-                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
-                        onClick={() => handleShareJob(job, company)}
-                      >
-                        <Share2 className="h-4 w-4" />
-                      </Button>
+              {jobs.map((job) => (
+                <Card key={job.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                  {/* Quick Action Buttons */}
+                  <div className="absolute top-3 right-3 z-10 flex gap-2">
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
+                      onClick={() => handleSaveJob(job.id)}
+                    >
+                      <Bookmark 
+                        className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-current' : ''}`} 
+                      />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
+                      onClick={() => handleShareJob(job)}
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <CardHeader>
+                    <div className="flex items-start justify-between mb-2">
+                      <Badge variant={getJobTypeBadge(job.job_type)}>
+                        {job.job_type.replace('_', ' ')}
+                      </Badge>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4 mr-1" />
+                        {getDaysAgo(job.posted_at)}
+                      </div>
+                    </div>
+                    <CardTitle className="text-xl">{job.title}</CardTitle>
+                    <CardDescription className="flex items-center gap-2 mt-2">
+                      <Building2 className="h-4 w-4" />
+                      {job.employer_profiles?.company_name || 'Company'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {job.description}
+                    </p>
+                    
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      {job.location}, {job.country}
                     </div>
 
-                    <CardHeader>
-                      <div className="flex items-start justify-between mb-2">
-                        <Badge variant={getJobTypeBadge(job.jobType)}>
-                          {job.jobType.replace('_', ' ')}
-                        </Badge>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4 mr-1" />
-                          {new Date(job.postedAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                      <CardTitle className="text-xl">{job.title}</CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-2">
-                        <Building2 className="h-4 w-4" />
-                        {company?.name || 'Company'}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {job.description}
-                      </p>
-                      
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        {factory?.city}, {factory?.state}
-                      </div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                      <DollarSign className="h-4 w-4" />
+                      {formatSalary(job.salary_min, job.salary_max, job.currency)}
+                    </div>
 
-                      <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                        <IndianRupee className="h-4 w-4" />
-                        {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
-                      </div>
+                    {job.visa_sponsorship && (
+                      <Badge variant="secondary" className="w-fit">
+                        <Zap className="h-3 w-3 mr-1" />
+                        Visa Sponsorship
+                      </Badge>
+                    )}
 
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Briefcase className="h-4 w-4" />
-                        {job.openings} opening{job.openings > 1 ? 's' : ''}
+                    {job.job_skills && job.job_skills.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {job.job_skills.slice(0, 3).map((skill, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {skill.skill_name}
+                          </Badge>
+                        ))}
                       </div>
+                    )}
 
-                      <Link to={`/jobs/${job.id}`}>
-                        <Button className="w-full mt-4" variant="outline">
+                    <div className="flex gap-2">
+                      <Link to={`/jobs/${job.id}`} className="flex-1">
+                        <Button className="w-full" variant="outline">
                           View Details
-                          <ArrowRight className="h-4 w-4 ml-2" />
                         </Button>
                       </Link>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                      <Button 
+                        className="flex-1" 
+                        onClick={() => handleQuickApply(job.id)}
+                      >
+                        Apply Now
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
 
             <div className="text-center">
