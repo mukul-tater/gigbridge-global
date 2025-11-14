@@ -230,6 +230,7 @@ export default function SavedSearches() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
     </div>
   );
 }

@@ -167,6 +167,7 @@ export default function OfferManagement() {
           <Button>Create Offer</Button>
         </Card>
       </main>
+      </div>
     </div>
   );
 }
