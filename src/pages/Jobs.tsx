@@ -7,32 +7,30 @@ import WorkerHeader from '@/components/worker/WorkerHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { MapPin, Briefcase, DollarSign, Clock, Globe } from 'lucide-react';
 import JobSearchFilters, { type JobFilters } from '@/components/search/JobSearchFilters';
 import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import mockJobsData from '@/../mock/jobs.json';
-
-// Convert mock data to display format
-const mockJobs = mockJobsData.map((job: any) => ({
-  id: job.id,
-  title: job.title,
-  company: 'SafeWork Global',
-  location: 'Multiple Locations',
-  salary: `₹${(job.salaryMin / 1000).toFixed(0)}K - ₹${(job.salaryMax / 1000).toFixed(0)}K`,
-  type: job.jobType === 'FULL_TIME' ? 'Full-time' : 'Contract',
-  category: job.category || 'General',
-  visaSponsorship: true,
-  postedDate: new Date(job.postedAt).toLocaleDateString(),
-  description: job.description,
-  skills: job.requiredSkills || []
-}));
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  salary: string;
+  type: string;
+  category: string;
+  visaSponsorship: boolean;
+  postedDate: string;
+  description: string;
+  skills: string[];
+}
 
 export default function Jobs() {
-  const { user, role } = useAuth();
+  const { user, role, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<JobFilters>({
     keyword: '',
@@ -45,90 +43,111 @@ export default function Jobs() {
     skills: [],
     experienceLevel: 'All Levels'
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [jobs, setJobs] = useState(mockJobs);
+  const [jobs, setJobs] = useState<Job[]>([]);
 
-  // Handle URL params on mount
+  // Load jobs on mount
   useEffect(() => {
     const category = searchParams.get('category');
     if (category) {
       setFilters(prev => ({ ...prev, jobCategory: category }));
-      handleSearch({ ...filters, jobCategory: category });
     }
+    fetchJobs();
   }, [searchParams]);
 
-  const handleSearch = (customFilters?: JobFilters) => {
-    const searchFilters = customFilters || filters;
-    setLoading(true);
-    // Simulate search with mock data
-    setTimeout(() => {
-      let filtered = [...mockJobs];
-      
-      // Apply filters
-      if (searchFilters.keyword) {
-        filtered = filtered.filter(job => 
-          job.title.toLowerCase().includes(searchFilters.keyword.toLowerCase()) ||
-          job.description.toLowerCase().includes(searchFilters.keyword.toLowerCase()) ||
-          job.company.toLowerCase().includes(searchFilters.keyword.toLowerCase())
-        );
-      }
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('jobs')
+        .select(`
+          *,
+          job_skills (skill_name),
+          employer_profiles!jobs_employer_id_fkey (company_name)
+        `)
+        .eq('status', 'ACTIVE')
+        .order('posted_at', { ascending: false });
 
-      if (searchFilters.location) {
-        filtered = filtered.filter(job =>
-          job.location.toLowerCase().includes(searchFilters.location.toLowerCase())
-        );
-      }
+      if (error) throw error;
 
-      if (searchFilters.country && searchFilters.country !== 'All Countries') {
-        filtered = filtered.filter(job =>
-          job.location.toLowerCase().includes(searchFilters.country.toLowerCase())
-        );
-      }
+      const formattedJobs: Job[] = (data || []).map((job: any) => ({
+        id: job.id,
+        title: job.title,
+        company: job.employer_profiles?.company_name || 'Company',
+        location: `${job.location}, ${job.country}`,
+        salary: `${job.currency} ${(job.salary_min / 1000).toFixed(0)}K - ${(job.salary_max / 1000).toFixed(0)}K`,
+        type: job.job_type === 'FULL_TIME' ? 'Full-time' : job.job_type === 'PART_TIME' ? 'Part-time' : 'Contract',
+        category: job.title.split(' ')[0],
+        visaSponsorship: job.visa_sponsorship || false,
+        postedDate: new Date(job.posted_at).toLocaleDateString(),
+        description: job.description.substring(0, 150) + '...',
+        skills: job.job_skills?.map((s: any) => s.skill_name) || []
+      }));
 
-      if (searchFilters.jobCategory && searchFilters.jobCategory !== 'All Categories') {
-        filtered = filtered.filter(job =>
-          job.category?.toLowerCase().includes(searchFilters.jobCategory.toLowerCase()) ||
-          job.title.toLowerCase().includes(searchFilters.jobCategory.toLowerCase()) ||
-          job.description.toLowerCase().includes(searchFilters.jobCategory.toLowerCase())
-        );
-      }
-
-      if (searchFilters.experienceLevel && searchFilters.experienceLevel !== 'All Levels') {
-        // This would need to be in the job data in a real app
-        filtered = filtered;
-      }
-
-      // Salary range filter
-      const extractSalary = (salaryStr: string): number => {
-        const match = salaryStr.match(/\$?(\d+,?\d*)/);
-        return match ? parseInt(match[1].replace(',', '')) : 0;
-      };
-
-      filtered = filtered.filter(job => {
-        const jobMinSalary = extractSalary(job.salary.split('-')[0]);
-        const jobMaxSalary = extractSalary(job.salary.split('-')[1] || job.salary);
-        return jobMaxSalary >= filters.salaryMin && jobMinSalary <= filters.salaryMax;
-      });
-      
-      if (filters.visaSponsorship) {
-        filtered = filtered.filter(job => job.visaSponsorship);
-      }
-      
-      if (filters.skills.length > 0) {
-        filtered = filtered.filter(job =>
-          filters.skills.some(skill => 
-            job.skills.some(jobSkill => 
-              jobSkill.toLowerCase().includes(skill.toLowerCase())
-            )
-          )
-        );
-      }
-      
-      setJobs(filtered);
+      applyFilters(formattedJobs);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      toast.error('Failed to load jobs');
+      setJobs([]);
+    } finally {
       setLoading(false);
+    }
+  };
+
+  const applyFilters = (jobsToFilter: Job[]) => {
+    let filtered = [...jobsToFilter];
+    
+    if (filters.keyword) {
+      filtered = filtered.filter(job => 
+        job.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
+        job.description.toLowerCase().includes(filters.keyword.toLowerCase()) ||
+        job.company.toLowerCase().includes(filters.keyword.toLowerCase())
+      );
+    }
+
+    if (filters.location) {
+      filtered = filtered.filter(job =>
+        job.location.toLowerCase().includes(filters.location.toLowerCase())
+      );
+    }
+
+    if (filters.country && filters.country !== 'All Countries') {
+      filtered = filtered.filter(job =>
+        job.location.toLowerCase().includes(filters.country.toLowerCase())
+      );
+    }
+
+    if (filters.jobCategory && filters.jobCategory !== 'All Categories') {
+      filtered = filtered.filter(job =>
+        job.category?.toLowerCase().includes(filters.jobCategory.toLowerCase()) ||
+        job.title.toLowerCase().includes(filters.jobCategory.toLowerCase()) ||
+        job.description.toLowerCase().includes(filters.jobCategory.toLowerCase())
+      );
+    }
+
+    if (filters.visaSponsorship) {
+      filtered = filtered.filter(job => job.visaSponsorship);
+    }
+
+    if (filters.skills.length > 0) {
+      filtered = filtered.filter(job =>
+        filters.skills.some(skill =>
+          job.skills.some(jobSkill => 
+            jobSkill.toLowerCase().includes(skill.toLowerCase())
+          )
+        )
+      );
+    }
+
+    setJobs(filtered);
+    if (!loading) {
       toast.success(`Found ${filtered.length} jobs matching your criteria`);
-    }, 1000);
+    }
+  };
+
+  const handleSearch = () => {
+    fetchJobs();
   };
 
   const handleSaveSearch = async (name: string, alertsEnabled: boolean, alertFrequency: string) => {
@@ -207,7 +226,14 @@ export default function Jobs() {
                   </select>
                 </div>
 
-                {jobs.map((job) => (
+                {loading ? (
+                  <Card className="p-12 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading jobs...</p>
+                  </Card>
+                ) : (
+                  <>
+                    {jobs.map((job) => (
                   <Card key={job.id} className="p-6 hover:shadow-lg transition-shadow">
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -249,9 +275,21 @@ export default function Jobs() {
                           <Badge key={skill} variant="outline">{skill}</Badge>
                         ))}
                       </div>
-                      <Link to={`/jobs/${job.id}`}>
-                        <Button>View Details</Button>
-                      </Link>
+                      <div className="flex gap-2">
+                        <Link to={`/jobs/${job.id}`}>
+                          <Button variant="outline">View Details</Button>
+                        </Link>
+                        <Button onClick={() => {
+                          if (!isAuthenticated) {
+                            toast.error('Please login as a worker to apply for jobs');
+                            navigate('/auth');
+                          } else {
+                            navigate(`/jobs/${job.id}`);
+                          }
+                        }}>
+                          Apply Now
+                        </Button>
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -265,6 +303,8 @@ export default function Jobs() {
                     </p>
                   </Card>
                 )}
+              </>
+            )}
               </div>
             </div>
           </main>
@@ -329,7 +369,14 @@ export default function Jobs() {
               </select>
             </div>
 
-            {jobs.map((job) => (
+            {loading ? (
+              <Card className="p-12 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading jobs...</p>
+              </Card>
+            ) : (
+              <>
+                {jobs.map((job) => (
               <Card key={job.id} className="p-6 hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -371,9 +418,21 @@ export default function Jobs() {
                       <Badge key={skill} variant="outline">{skill}</Badge>
                     ))}
                   </div>
-                  <Link to={`/jobs/${job.id}`}>
-                    <Button>View Details</Button>
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link to={`/jobs/${job.id}`}>
+                      <Button variant="outline">View Details</Button>
+                    </Link>
+                    <Button onClick={() => {
+                      if (!isAuthenticated) {
+                        toast.error('Please login as a worker to apply for jobs');
+                        navigate('/auth');
+                      } else {
+                        navigate(`/jobs/${job.id}`);
+                      }
+                    }}>
+                      Apply Now
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -387,6 +446,8 @@ export default function Jobs() {
                 </p>
               </Card>
             )}
+          </>
+        )}
           </div>
         </div>
       </main>
