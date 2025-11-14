@@ -130,7 +130,7 @@ class SeedService {
     };
   }
 
-  async seedJobsData(employerId: string): Promise<SeedResult> {
+  async seedJobsData(employerId: string, jobCount: number = 100): Promise<SeedResult> {
     try {
       // Job categories with templates
       const categories = [
@@ -186,8 +186,8 @@ class SeedService {
       
       const jobs = [];
       
-      // Generate 100 jobs
-      for (let i = 0; i < 100; i++) {
+      // Generate jobs based on jobCount parameter
+      for (let i = 0; i < jobCount; i++) {
         const category = categories[i % categories.length];
         const title = category.titles[Math.floor(Math.random() * category.titles.length)];
         const location = locations[i % locations.length];
@@ -412,23 +412,23 @@ class SeedService {
     }
   }
 
-  async getEmployerUserId(): Promise<string | null> {
+  async getEmployerUserIds(): Promise<string[]> {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', 'employer@globalgigs.demo')
-        .maybeSingle();
+      // Get all employer role user IDs
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'employer');
 
-      if (error || !data) {
-        console.error('Error getting employer user ID:', error);
-        return null;
+      if (roleError || !roleData || roleData.length === 0) {
+        console.error('Error getting employer user IDs:', roleError);
+        return [];
       }
 
-      return data.id;
+      return roleData.map(r => r.user_id);
     } catch (error) {
-      console.error('Error getting employer user ID:', error);
-      return null;
+      console.error('Error getting employer user IDs:', error);
+      return [];
     }
   }
 
@@ -465,15 +465,28 @@ class SeedService {
     // Wait for accounts to be fully created
     await new Promise(resolve => setTimeout(resolve, 3000));
 
-    // Step 2: Get employer ID and seed jobs
-    console.log('Step 2: Getting employer ID and seeding jobs...');
-    const employerId = await this.getEmployerUserId();
-    if (!employerId) {
-      errors.push('Could not find employer account');
+    // Step 2: Get employer IDs and seed jobs
+    console.log('Step 2: Getting employer IDs and seeding jobs...');
+    const employerIds = await this.getEmployerUserIds();
+    if (employerIds.length === 0) {
+      errors.push('Could not find any employer accounts');
     } else {
-      const jobsResult = await this.seedJobsData(employerId);
-      if (!jobsResult.success) {
-        errors.push(`Jobs: ${jobsResult.message}`);
+      console.log(`Found ${employerIds.length} employer accounts`);
+      // Distribute jobs across all employers
+      const jobsPerEmployer = Math.ceil(100 / employerIds.length);
+      
+      for (let i = 0; i < employerIds.length; i++) {
+        const jobsToCreate = i === employerIds.length - 1 
+          ? 100 - (i * jobsPerEmployer) // Last employer gets remaining jobs
+          : jobsPerEmployer;
+        
+        const jobsResult = await this.seedJobsData(employerIds[i], jobsToCreate);
+        if (!jobsResult.success) {
+          errors.push(`Jobs for employer ${i + 1}: ${jobsResult.message}`);
+        }
+        
+        // Small delay between employers
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
 
