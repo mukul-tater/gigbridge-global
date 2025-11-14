@@ -558,7 +558,15 @@ export type Database = {
           updated_at?: string | null
           visa_sponsorship?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "jobs_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employer_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       messages: {
         Row: {
