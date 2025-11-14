@@ -366,6 +366,7 @@ export default function WorkerShortlist() {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }
