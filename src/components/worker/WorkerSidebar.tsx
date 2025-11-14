@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, User, Briefcase, FileText, MessageSquare, Upload, Bell, GraduationCap, FileSignature, Plane, Shield, Bookmark, BriefcaseIcon, Menu, X } from "lucide-react";
+import { LayoutDashboard, User, Briefcase, FileText, MessageSquare, Upload, Bell, GraduationCap, FileSignature, Plane, Shield, Bookmark, BriefcaseIcon, Menu, X, FileCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,6 +15,7 @@ export default function WorkerSidebar() {
     { path: "/jobs", icon: Briefcase, label: "Job Search" },
     { path: "/worker/saved-searches", icon: Bookmark, label: "Saved Searches" },
     { path: "/worker/applications", icon: FileText, label: "Applications" },
+    { path: "/worker/application-tracking", icon: FileCheck, label: "Track Applications" },
     { path: "/worker/training", icon: GraduationCap, label: "Training & PDOT" },
     { path: "/worker/contracts", icon: FileSignature, label: "Contracts" },
     { path: "/worker/travel", icon: Plane, label: "Travel & Visa" },
