@@ -1,4 +1,5 @@
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
+import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,9 +66,11 @@ export default function EscrowPayments() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <main className="flex-1 p-8">
+    <div className="flex flex-col min-h-screen bg-background">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
+        <main className="flex-1 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Escrow & Payment System</h1>
           <p className="text-muted-foreground">Secure salary payments through escrow</p>
@@ -251,6 +254,7 @@ export default function EscrowPayments() {
           </div>
         </Card>
       </main>
+      </div>
     </div>
   );
 }

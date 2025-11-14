@@ -1,4 +1,5 @@
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
+import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -197,19 +198,24 @@ export default function ApplicationReview() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
-          <div className="text-center">Loading applications...</div>
-        </main>
+      <div className="flex flex-col min-h-screen bg-background">
+        <EmployerHeader />
+        <div className="flex flex-1">
+          <EmployerSidebar />
+          <main className="flex-1 p-8">
+            <div className="text-center">Loading applications...</div>
+          </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <main className="flex-1 p-8">
+    <div className="flex flex-col min-h-screen bg-background">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
+        <main className="flex-1 p-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">Application Review</h1>
         </div>
@@ -372,6 +378,7 @@ export default function ApplicationReview() {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }
