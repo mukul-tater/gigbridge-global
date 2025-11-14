@@ -208,6 +208,45 @@ export type Database = {
           },
         ]
       }
+      employer_profiles: {
+        Row: {
+          bio: string | null
+          company_name: string | null
+          company_registration: string | null
+          company_size: string | null
+          created_at: string | null
+          id: string
+          industry: string | null
+          updated_at: string | null
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          company_name?: string | null
+          company_registration?: string | null
+          company_size?: string | null
+          created_at?: string | null
+          id?: string
+          industry?: string | null
+          updated_at?: string | null
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          company_name?: string | null
+          company_registration?: string | null
+          company_size?: string | null
+          created_at?: string | null
+          id?: string
+          industry?: string | null
+          updated_at?: string | null
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       job_applications: {
         Row: {
           applied_at: string | null

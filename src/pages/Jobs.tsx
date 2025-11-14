@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileBottomNav from '@/components/MobileBottomNav';
@@ -7,56 +7,33 @@ import WorkerHeader from '@/components/worker/WorkerHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { MapPin, Briefcase, DollarSign, Clock, Globe } from 'lucide-react';
 import JobSearchFilters, { type JobFilters } from '@/components/search/JobSearchFilters';
 import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import mockJobsData from '@/../mock/jobs.json';
 
-// Mock job data for demonstration
-const mockJobs = [
-  {
-    id: '1',
-    title: 'Senior Welding Engineer',
-    company: 'Dubai Construction Co.',
-    location: 'Dubai, UAE',
-    salary: '$3,500 - $4,500',
-    type: 'Full-time',
-    visaSponsorship: true,
-    postedDate: '2 days ago',
-    description: 'Experienced welder needed for large construction project.',
-    skills: ['Welding', 'Construction', 'Safety Management']
-  },
-  {
-    id: '2',
-    title: 'Electrical Supervisor',
-    company: 'Gulf Power Systems',
-    location: 'Riyadh, Saudi Arabia',
-    salary: '$4,000 - $5,500',
-    type: 'Full-time',
-    visaSponsorship: true,
-    postedDate: '5 days ago',
-    description: 'Supervise electrical installations in commercial buildings.',
-    skills: ['Electrical', 'Supervision', 'Project Management']
-  },
-  {
-    id: '3',
-    title: 'Construction Foreman',
-    company: 'Qatar Building Corp',
-    location: 'Doha, Qatar',
-    salary: '$3,800 - $4,800',
-    type: 'Full-time',
-    visaSponsorship: true,
-    postedDate: '1 week ago',
-    description: 'Lead construction team on major infrastructure project.',
-    skills: ['Construction', 'Leadership', 'Planning']
-  },
-];
+// Convert mock data to display format
+const mockJobs = mockJobsData.map((job: any) => ({
+  id: job.id,
+  title: job.title,
+  company: 'SafeWork Global',
+  location: 'Multiple Locations',
+  salary: `₹${(job.salaryMin / 1000).toFixed(0)}K - ₹${(job.salaryMax / 1000).toFixed(0)}K`,
+  type: job.jobType === 'FULL_TIME' ? 'Full-time' : 'Contract',
+  category: job.category || 'General',
+  visaSponsorship: true,
+  postedDate: new Date(job.postedAt).toLocaleDateString(),
+  description: job.description,
+  skills: job.requiredSkills || []
+}));
 
 export default function Jobs() {
   const { user, role } = useAuth();
+  const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<JobFilters>({
     keyword: '',
     location: '',
@@ -72,41 +49,52 @@ export default function Jobs() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [jobs, setJobs] = useState(mockJobs);
 
-  const handleSearch = () => {
+  // Handle URL params on mount
+  useEffect(() => {
+    const category = searchParams.get('category');
+    if (category) {
+      setFilters(prev => ({ ...prev, jobCategory: category }));
+      handleSearch({ ...filters, jobCategory: category });
+    }
+  }, [searchParams]);
+
+  const handleSearch = (customFilters?: JobFilters) => {
+    const searchFilters = customFilters || filters;
     setLoading(true);
     // Simulate search with mock data
     setTimeout(() => {
       let filtered = [...mockJobs];
       
       // Apply filters
-      if (filters.keyword) {
+      if (searchFilters.keyword) {
         filtered = filtered.filter(job => 
-          job.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-          job.description.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-          job.company.toLowerCase().includes(filters.keyword.toLowerCase())
+          job.title.toLowerCase().includes(searchFilters.keyword.toLowerCase()) ||
+          job.description.toLowerCase().includes(searchFilters.keyword.toLowerCase()) ||
+          job.company.toLowerCase().includes(searchFilters.keyword.toLowerCase())
         );
       }
 
-      if (filters.location) {
+      if (searchFilters.location) {
         filtered = filtered.filter(job =>
-          job.location.toLowerCase().includes(filters.location.toLowerCase())
+          job.location.toLowerCase().includes(searchFilters.location.toLowerCase())
         );
       }
 
-      if (filters.country && filters.country !== 'All Countries') {
+      if (searchFilters.country && searchFilters.country !== 'All Countries') {
         filtered = filtered.filter(job =>
-          job.location.toLowerCase().includes(filters.country.toLowerCase())
+          job.location.toLowerCase().includes(searchFilters.country.toLowerCase())
         );
       }
 
-      if (filters.jobCategory && filters.jobCategory !== 'All Categories') {
+      if (searchFilters.jobCategory && searchFilters.jobCategory !== 'All Categories') {
         filtered = filtered.filter(job =>
-          job.title.toLowerCase().includes(filters.jobCategory.toLowerCase()) ||
-          job.description.toLowerCase().includes(filters.jobCategory.toLowerCase())
+          job.category?.toLowerCase().includes(searchFilters.jobCategory.toLowerCase()) ||
+          job.title.toLowerCase().includes(searchFilters.jobCategory.toLowerCase()) ||
+          job.description.toLowerCase().includes(searchFilters.jobCategory.toLowerCase())
         );
       }
 
-      if (filters.experienceLevel && filters.experienceLevel !== 'All Levels') {
+      if (searchFilters.experienceLevel && searchFilters.experienceLevel !== 'All Levels') {
         // This would need to be in the job data in a real app
         filtered = filtered;
       }
