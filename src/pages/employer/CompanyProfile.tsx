@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
+import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -110,9 +111,11 @@ export default function CompanyProfile() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <main className="flex-1 p-8">
+    <div className="flex flex-col min-h-screen bg-background">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
+        <main className="flex-1 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Company Profile & KYC</h1>
           <p className="text-muted-foreground">Manage your company information and verification status</p>
@@ -283,6 +286,7 @@ export default function CompanyProfile() {
           <Button onClick={handleSave} className="w-full">Save Changes</Button>
         </div>
       </main>
+      </div>
     </div>
   );
 }

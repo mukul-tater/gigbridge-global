@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import EmployerSidebar from '@/components/employer/EmployerSidebar';
+import EmployerHeader from '@/components/employer/EmployerHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -214,9 +215,11 @@ export default function SearchWorkers() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <main className="flex-1 p-8">
+    <div className="flex flex-col min-h-screen bg-background">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
+        <main className="flex-1 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Find Skilled Workers</h1>
           <p className="text-muted-foreground">
@@ -361,6 +364,7 @@ export default function SearchWorkers() {
         onOpenChange={setShowSaveDialog}
         onSave={handleSaveSearch}
       />
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import EmployerSidebar from '@/components/employer/EmployerSidebar';
+import EmployerHeader from '@/components/employer/EmployerHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -152,9 +153,10 @@ export default function ManageFormalities() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
-        <EmployerSidebar />
-        <div className="flex-1 ml-64">
+      <div className="flex flex-col min-h-screen">
+        <EmployerHeader />
+        <div className="flex flex-1">
+          <EmployerSidebar />
           <main className="p-6">
             <p>Loading formalities...</p>
           </main>
@@ -164,9 +166,10 @@ export default function ManageFormalities() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <div className="flex-1 ml-64">
+    <div className="flex flex-col min-h-screen bg-background">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
         <main className="p-6">
           <div className="mb-6">
             <h1 className="text-3xl font-bold mb-2">Manage Post-Approval Formalities</h1>

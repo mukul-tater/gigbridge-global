@@ -1,4 +1,5 @@
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
+import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -142,9 +143,11 @@ export default function PostJob() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <main className="flex-1 p-8">
+    <div className="flex flex-col min-h-screen bg-background">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
+        <main className="flex-1 p-8">
         <h1 className="text-3xl font-bold mb-8">Post a New Job</h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -451,6 +454,7 @@ export default function PostJob() {
           </div>
         </form>
       </main>
+      </div>
     </div>
   );
 }

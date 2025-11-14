@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import EmployerSidebar from '@/components/employer/EmployerSidebar';
+import EmployerHeader from '@/components/employer/EmployerHeader';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -100,19 +101,24 @@ export default function SavedSearches() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <EmployerSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
+      <div className="flex flex-col min-h-screen bg-background">
+        <EmployerHeader />
+        <div className="flex flex-1">
+          <EmployerSidebar />
+          <main className="flex-1 p-8 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <main className="flex-1 p-8">
+    <div className="flex flex-col min-h-screen bg-background">
+      <EmployerHeader />
+      <div className="flex flex-1">
+        <EmployerSidebar />
+        <main className="flex-1 p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Saved Searches</h1>
           <p className="text-muted-foreground">
