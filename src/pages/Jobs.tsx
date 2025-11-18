@@ -47,12 +47,19 @@ export default function Jobs() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
 
-  // Load jobs on mount
+  // Load jobs on mount and when search params change
   useEffect(() => {
+    const keyword = searchParams.get('keyword');
+    const location = searchParams.get('location');
     const category = searchParams.get('category');
-    if (category) {
-      setFilters(prev => ({ ...prev, jobCategory: category }));
-    }
+    
+    setFilters(prev => ({
+      ...prev,
+      keyword: keyword || '',
+      location: location || '',
+      jobCategory: category || 'All Categories'
+    }));
+    
     fetchJobs();
   }, [searchParams]);
 
