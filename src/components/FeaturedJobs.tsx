@@ -174,14 +174,21 @@ export default function FeaturedJobs() {
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {jobs.map((job) => (
-                <Card key={job.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                <Card 
+                  key={job.id} 
+                  className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden cursor-pointer"
+                  onClick={() => navigate(`/jobs/${job.id}`)}
+                >
                   {/* Quick Action Buttons */}
                   <div className="absolute top-3 right-3 z-10 flex gap-2">
                     <Button
                       size="icon"
                       variant="secondary"
                       className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
-                      onClick={() => handleSaveJob(job.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSaveJob(job.id);
+                      }}
                     >
                       <Bookmark 
                         className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-current' : ''}`} 
@@ -191,7 +198,10 @@ export default function FeaturedJobs() {
                       size="icon"
                       variant="secondary"
                       className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
-                      onClick={() => handleShareJob(job)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShareJob(job);
+                      }}
                     >
                       <Share2 className="h-4 w-4" />
                     </Button>
@@ -246,16 +256,15 @@ export default function FeaturedJobs() {
                     )}
 
                     <div className="flex gap-2">
-                      <Link to={`/jobs/${job.id}`} className="flex-1">
-                        <Button className="w-full" variant="outline">
-                          View Details
-                        </Button>
-                      </Link>
                       <Button 
-                        className="flex-1" 
-                        onClick={() => handleQuickApply(job.id)}
+                        className="w-full" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickApply(job.id);
+                        }}
                       >
-                        Apply Now
+                        <ArrowRight className="mr-2 h-4 w-4" />
+                        View & Apply
                       </Button>
                     </div>
                   </CardContent>

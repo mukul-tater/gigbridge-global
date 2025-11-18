@@ -234,7 +234,11 @@ export default function Jobs() {
                 ) : (
                   <>
                     {jobs.map((job) => (
-                  <Card key={job.id} className="p-6 hover:shadow-lg transition-shadow">
+                  <Card 
+                    key={job.id} 
+                    className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => navigate(`/jobs/${job.id}`)}
+                  >
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
@@ -377,7 +381,11 @@ export default function Jobs() {
             ) : (
               <>
                 {jobs.map((job) => (
-              <Card key={job.id} className="p-6 hover:shadow-lg transition-shadow">
+              <Card 
+                key={job.id} 
+                className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate(`/jobs/${job.id}`)}
+              >
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
@@ -419,18 +427,13 @@ export default function Jobs() {
                     ))}
                   </div>
                   <div className="flex gap-2">
-                    <Link to={`/jobs/${job.id}`}>
-                      <Button variant="outline">View Details</Button>
-                    </Link>
-                    <Button onClick={() => {
-                      if (!isAuthenticated) {
-                        toast.error('Please login as a worker to apply for jobs');
-                        navigate('/auth');
-                      } else {
+                    <Button 
+                      onClick={(e) => {
+                        e.stopPropagation();
                         navigate(`/jobs/${job.id}`);
-                      }
-                    }}>
-                      Apply Now
+                      }}
+                    >
+                      View & Apply
                     </Button>
                   </div>
                 </div>
