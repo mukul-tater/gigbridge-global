@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import DocumentVerificationCard from "@/components/worker/DocumentVerificationCard";
 import ECRStatusCard from "@/components/worker/ECRStatusCard";
 import ProfileProgressCard from "@/components/worker/ProfileProgressCard";
+import JobJourneyProgressCard from "@/components/worker/JobJourneyProgressCard";
 
 export default function WorkerDashboard() {
   const { profile } = useAuth();
@@ -17,6 +18,7 @@ export default function WorkerDashboard() {
   const [experience, setExperience] = useState([]);
   const [certifications, setCertifications] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [jobFormalities, setJobFormalities] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,13 +29,24 @@ export default function WorkerDashboard() {
 
   const fetchWorkerData = async () => {
     try {
-      const [docsRes, profileRes, skillsRes, expRes, certsRes, appsRes] = await Promise.all([
+      const [docsRes, profileRes, skillsRes, expRes, certsRes, appsRes, formalitiesRes] = await Promise.all([
         supabase.from('worker_documents').select('*').eq('worker_id', profile?.id),
         supabase.from('worker_profiles').select('*').eq('user_id', profile?.id).single(),
         supabase.from('worker_skills').select('*').eq('worker_id', profile?.id),
         supabase.from('work_experience').select('*').eq('worker_id', profile?.id),
         supabase.from('worker_certifications').select('*').eq('worker_id', profile?.id),
-        supabase.from('job_applications').select('*').eq('worker_id', profile?.id)
+        supabase.from('job_applications').select('*').eq('worker_id', profile?.id),
+        supabase
+          .from('job_formalities')
+          .select(`
+            *,
+            jobs:job_id (
+              title,
+              location,
+              country
+            )
+          `)
+          .eq('worker_id', profile?.id)
       ]);
 
       setDocuments(docsRes.data || []);
@@ -42,6 +55,7 @@ export default function WorkerDashboard() {
       setExperience(expRes.data || []);
       setCertifications(certsRes.data || []);
       setApplications(appsRes.data || []);
+      setJobFormalities(formalitiesRes.data || []);
     } catch (error) {
       console.error('Error fetching worker data:', error);
     } finally {
@@ -134,6 +148,13 @@ export default function WorkerDashboard() {
         <div className="mb-6 md:mb-8">
           <DocumentVerificationCard documents={documents} />
         </div>
+
+        {jobFormalities.length > 0 && (
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-xl font-bold mb-4">Job Journey Progress</h2>
+            <JobJourneyProgressCard formalities={jobFormalities} />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card className="p-6">
