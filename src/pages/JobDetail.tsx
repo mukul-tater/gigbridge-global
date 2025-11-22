@@ -40,7 +40,7 @@ interface JobData {
 export default function JobDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, role } = useAuth();
   const { toast } = useToast();
   
   const [job, setJob] = useState<JobData | null>(null);
@@ -104,6 +104,15 @@ export default function JobDetail() {
         variant: 'destructive'
       });
       navigate('/auth');
+      return;
+    }
+
+    if (role === 'employer') {
+      toast({
+        title: 'Not Allowed',
+        description: 'Employers cannot apply for jobs. You can only post and manage jobs.',
+        variant: 'destructive'
+      });
       return;
     }
 
@@ -221,25 +230,35 @@ export default function JobDetail() {
               </div>
             </CardHeader>
             <CardContent>
-              <Button 
-                size="lg" 
-                onClick={handleApply}
-                disabled={hasApplied || applying || job.status !== 'ACTIVE' || !isAuthenticated}
-                className="w-full"
-              >
-                {hasApplied ? (
-                  <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Already Applied
-                  </>
-                ) : applying ? (
-                  'Submitting...'
-                ) : !isAuthenticated ? (
-                  'Login to Apply'
-                ) : (
-                  'Apply Now'
-                )}
-              </Button>
+              {role === 'employer' ? (
+                <Alert>
+                  <AlertDescription>
+                    As an employer, you cannot apply for jobs. You can post and manage jobs from your employer dashboard.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <>
+                  <Button 
+                    size="lg" 
+                    onClick={handleApply}
+                    disabled={hasApplied || applying || job.status !== 'ACTIVE' || !isAuthenticated}
+                    className="w-full"
+                  >
+                    {hasApplied ? (
+                      <>
+                        <CheckCircle2 className="mr-2 h-5 w-5" />
+                        Already Applied
+                      </>
+                    ) : applying ? (
+                      'Submitting...'
+                    ) : !isAuthenticated ? (
+                      'Login to Apply'
+                    ) : (
+                      'Apply Now'
+                    )}
+                  </Button>
+                </>
+              )}
               
               {hasApplied && (
                 <Alert className="mt-4">
