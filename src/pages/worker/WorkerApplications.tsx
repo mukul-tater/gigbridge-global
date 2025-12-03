@@ -1,14 +1,25 @@
+import { Link } from "react-router-dom";
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
 import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, FileText, Calendar } from "lucide-react";
+import { Eye, FileText, Calendar, MapPin, Briefcase, DollarSign } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+
+interface JobData {
+  title: string;
+  location: string;
+  country: string;
+  job_type: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  currency: string;
+}
 
 interface Application {
   id: string;
@@ -17,6 +28,7 @@ interface Application {
   cover_letter: string | null;
   applied_at: string;
   updated_at: string;
+  job: JobData | null;
 }
 
 export default function WorkerApplications() {
@@ -33,14 +45,30 @@ export default function WorkerApplications() {
 
   const fetchApplications = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: appsData, error: appsError } = await supabase
         .from("job_applications")
         .select("*")
         .eq("worker_id", user?.id)
         .order("applied_at", { ascending: false });
 
-      if (error) throw error;
-      setApplications(data || []);
+      if (appsError) throw appsError;
+
+      // Fetch job details for each application
+      const jobIds = appsData?.map(app => app.job_id) || [];
+      const { data: jobsData, error: jobsError } = await supabase
+        .from("jobs")
+        .select("id, title, location, country, job_type, salary_min, salary_max, currency")
+        .in("id", jobIds);
+
+      if (jobsError) throw jobsError;
+
+      // Combine data
+      const enrichedApps = appsData?.map(app => ({
+        ...app,
+        job: jobsData?.find(job => job.id === app.job_id) || null
+      })) || [];
+
+      setApplications(enrichedApps);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -50,6 +78,13 @@ export default function WorkerApplications() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatSalary = (min: number | null, max: number | null, currency: string) => {
+    if (!min && !max) return null;
+    if (min && max) return `${currency} ${min.toLocaleString()} - ${max.toLocaleString()}`;
+    if (min) return `${currency} ${min.toLocaleString()}+`;
+    return `Up to ${currency} ${max?.toLocaleString()}`;
   };
 
   const getStatusColor = (status: string) => {
@@ -100,14 +135,36 @@ export default function WorkerApplications() {
               </p>
             </Card>
           ) : (
-            <div className="space-y-4">
+          <div className="space-y-4">
               {applications.map((app) => (
                 <Card key={app.id} className="p-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-1">Job ID: {app.job_id}</h3>
+                      <h3 className="text-xl font-bold mb-2">
+                        {app.job?.title || "Job Position"}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
+                        {app.job && (
+                          <>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-4 w-4" />
+                              {app.job.location}, {app.job.country}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Briefcase className="h-4 w-4" />
+                              {app.job.job_type}
+                            </span>
+                            {formatSalary(app.job.salary_min, app.job.salary_max, app.job.currency) && (
+                              <span className="flex items-center gap-1">
+                                <DollarSign className="h-4 w-4" />
+                                {formatSalary(app.job.salary_min, app.job.salary_max, app.job.currency)}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
                       {app.cover_letter && (
-                        <p className="text-muted-foreground mb-2 line-clamp-2">
+                        <p className="text-muted-foreground mb-3 line-clamp-2 text-sm">
                           {app.cover_letter}
                         </p>
                       )}
@@ -121,9 +178,11 @@ export default function WorkerApplications() {
                         </span>
                       </div>
                     </div>
-                    <Button variant="outline">
-                      <Eye className="h-4 w-4 mr-2" />
-                      View Details
+                    <Button variant="outline" asChild>
+                      <Link to={`/worker/applications/${app.id}`}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Link>
                     </Button>
                   </div>
                 </Card>
