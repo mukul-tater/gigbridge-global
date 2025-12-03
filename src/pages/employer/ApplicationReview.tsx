@@ -325,14 +325,12 @@ export default function ApplicationReview() {
                         </Badge>
                       </div>
                       <h3 className="text-xl font-bold mb-1">
-                        {app.profiles?.full_name || "Anonymous"}
+                        {app.profiles?.full_name || "Applicant"}
                       </h3>
                       
                       {/* Contact Info */}
                       <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
-                        <span className="flex items-center gap-1">
-                          <span>{app.profiles?.email}</span>
-                        </span>
+                        <span>{app.profiles?.email}</span>
                         {app.profiles?.phone && (
                           <span className="flex items-center gap-1">
                             <Phone className="h-3 w-3" />
@@ -412,88 +410,76 @@ export default function ApplicationReview() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {app.status === 'PENDING' && (
-                      <div className="flex gap-2 mb-2">
-                        <Button
-                          size="sm"
-                          onClick={() => updateApplicationStatus(app.id, 'APPROVED')}
-                          className="flex-1"
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => updateApplicationStatus(app.id, 'REJECTED')}
-                          className="flex-1"
-                        >
-                          Reject
-                        </Button>
-                      </div>
-                    )}
-                    <Select
-                      value={app.status}
-                      onValueChange={(value) => updateApplicationStatus(app.id, value)}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="PENDING">Pending</SelectItem>
-                        <SelectItem value="REVIEWING">Reviewing</SelectItem>
-                        <SelectItem value="APPROVED">Approved</SelectItem>
-                        <SelectItem value="SHORTLISTED">Shortlisted</SelectItem>
-                        <SelectItem value="INTERVIEWED">Interviewed</SelectItem>
-                        <SelectItem value="OFFERED">Offered</SelectItem>
-                        <SelectItem value="HIRED">Hired</SelectItem>
-                        <SelectItem value="REJECTED">Rejected</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addToShortlist(app.worker_id)}
-                    >
-                      <Star className="h-4 w-4 mr-2" />
-                      Shortlist
-                    </Button>
+                    {/* Primary action - View Full Application */}
                     <Button variant="default" size="sm" asChild>
                       <Link to={`/employer/applications/${app.id}`}>
                         <Eye className="h-4 w-4 mr-2" />
-                        View Full Profile
+                        Review Application
                       </Link>
                     </Button>
-                    <Dialog>
-                      <DialogTrigger asChild>
+                    
+                    {/* Quick actions only for non-pending applications (already reviewed) */}
+                    {app.status !== 'PENDING' && (
+                      <>
+                        <Select
+                          value={app.status}
+                          onValueChange={(value) => updateApplicationStatus(app.id, value)}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="REVIEWING">Reviewing</SelectItem>
+                            <SelectItem value="APPROVED">Approved</SelectItem>
+                            <SelectItem value="SHORTLISTED">Shortlisted</SelectItem>
+                            <SelectItem value="INTERVIEWED">Interviewed</SelectItem>
+                            <SelectItem value="OFFERED">Offered</SelectItem>
+                            <SelectItem value="HIRED">Hired</SelectItem>
+                            <SelectItem value="REJECTED">Rejected</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            setSelectedApp(app);
-                            setNotes(app.notes || "");
-                          }}
+                          onClick={() => addToShortlist(app.worker_id)}
                         >
-                          <FileText className="h-4 w-4 mr-2" />
-                          Notes
+                          <Star className="h-4 w-4 mr-2" />
+                          Shortlist
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Application Notes</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <Textarea
-                            placeholder="Add notes about this application..."
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            rows={6}
-                          />
-                          <Button onClick={updateNotes} className="w-full">
-                            Save Notes
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedApp(app);
+                                setNotes(app.notes || "");
+                              }}
+                            >
+                              <FileText className="h-4 w-4 mr-2" />
+                              Notes
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Application Notes</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <Textarea
+                                placeholder="Add notes about this application..."
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                rows={6}
+                              />
+                              <Button onClick={updateNotes} className="w-full">
+                                Save Notes
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </>
+                    )}
                   </div>
                 </div>
               </Card>
