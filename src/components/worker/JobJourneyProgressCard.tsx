@@ -2,6 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, Circle, Clock, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface JobFormality {
   id: string;
@@ -15,6 +17,7 @@ interface JobFormality {
   visa_status: string;
   flight_booking_status: string;
   overall_status: string;
+  completion_percentage: number;
   expected_joining_date: string | null;
   jobs: {
     title: string;
@@ -25,9 +28,65 @@ interface JobFormality {
 
 interface JobJourneyProgressCardProps {
   formalities: JobFormality[];
+  onUpdate?: (formalities: JobFormality[]) => void;
 }
 
-export default function JobJourneyProgressCard({ formalities }: JobJourneyProgressCardProps) {
+export default function JobJourneyProgressCard({ formalities: initialFormalities, onUpdate }: JobJourneyProgressCardProps) {
+  const [formalities, setFormalities] = useState<JobFormality[]>(initialFormalities);
+
+  useEffect(() => {
+    setFormalities(initialFormalities);
+  }, [initialFormalities]);
+
+  // Subscribe to real-time updates from employer
+  useEffect(() => {
+    if (formalities.length === 0) return;
+
+    const formalityIds = formalities.map(f => f.id);
+    
+    const channel = supabase
+      .channel('job-formalities-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'job_formalities',
+          filter: `id=in.(${formalityIds.join(',')})`
+        },
+        async (payload) => {
+          // Fetch the updated formality with job details
+          const { data } = await supabase
+            .from('job_formalities')
+            .select(`
+              *,
+              jobs:job_id (
+                title,
+                location,
+                country
+              )
+            `)
+            .eq('id', payload.new.id)
+            .single();
+
+          if (data) {
+            setFormalities(prev => {
+              const updated = prev.map(f => 
+                f.id === data.id ? data as JobFormality : f
+              );
+              onUpdate?.(updated);
+              return updated;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [formalities.length]);
+
   if (!formalities || formalities.length === 0) {
     return null;
   }
@@ -59,7 +118,7 @@ export default function JobJourneyProgressCard({ formalities }: JobJourneyProgre
     }
   };
 
-  const getStatusText = (status: string | boolean, label: string) => {
+  const getStatusText = (status: string | boolean) => {
     if (typeof status === 'boolean') {
       return status ? 'Completed' : 'Pending';
     }
@@ -83,24 +142,12 @@ export default function JobJourneyProgressCard({ formalities }: JobJourneyProgre
     }
   };
 
-  const calculateProgress = (formality: JobFormality) => {
-    const stages = [
-      formality.contract_signed,
-      formality.ecr_check_status === 'COMPLETED' || formality.ecr_check_status === 'APPROVED',
-      formality.medical_exam_status === 'COMPLETED' || formality.medical_exam_status === 'VERIFIED',
-      formality.police_verification_status === 'COMPLETED' || formality.police_verification_status === 'VERIFIED',
-      formality.visa_status === 'APPROVED',
-      formality.flight_booking_status === 'CONFIRMED'
-    ];
-    
-    const completedStages = stages.filter(Boolean).length;
-    return (completedStages / stages.length) * 100;
-  };
-
   return (
     <div className="space-y-4">
       {formalities.map((formality) => {
-        const progressPercentage = calculateProgress(formality);
+        // Use the completion_percentage from database (updated by employer)
+        const progressPercentage = formality.completion_percentage || 0;
+        
         const stages = [
           { label: 'Contract Signed', status: formality.contract_signed },
           { label: 'ECR Check', status: formality.ecr_check_status },
@@ -127,10 +174,13 @@ export default function JobJourneyProgressCard({ formalities }: JobJourneyProgre
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-bold text-primary">
-                    {Math.round(progressPercentage)}%
+                    {progressPercentage}%
                   </span>
-                  <Badge variant={formality.overall_status === 'COMPLETED' ? 'default' : 'secondary'} className="ml-2">
-                    {formality.overall_status.replace(/_/g, ' ')}
+                  <Badge 
+                    variant={formality.overall_status === 'COMPLETED' ? 'default' : 'secondary'} 
+                    className="ml-2"
+                  >
+                    {formality.overall_status?.replace(/_/g, ' ') || 'IN PROGRESS'}
                   </Badge>
                 </div>
               </div>
@@ -143,7 +193,7 @@ export default function JobJourneyProgressCard({ formalities }: JobJourneyProgre
                   {getStatusIcon(stage.status)}
                   <div className="flex-1">
                     <span className={
-                      getStatusText(stage.status, stage.label) === 'Completed'
+                      getStatusText(stage.status) === 'Completed'
                         ? 'text-foreground font-medium'
                         : 'text-muted-foreground'
                     }>
@@ -151,7 +201,7 @@ export default function JobJourneyProgressCard({ formalities }: JobJourneyProgre
                     </span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {getStatusText(stage.status, stage.label)}
+                    {getStatusText(stage.status)}
                   </span>
                 </div>
               ))}
