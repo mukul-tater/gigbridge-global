@@ -67,19 +67,40 @@ export default function ApplicationTracking() {
 
   const fetchApplications = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch applications first
+      const { data: appsData, error: appsError } = await supabase
         .from('job_applications')
         .select(`
           *,
-          jobs!inner (title, location, country),
           application_status_history (status, notes, created_at),
           job_formalities (*)
         `)
         .eq('worker_id', user?.id)
         .order('applied_at', { ascending: false });
 
-      if (error) throw error;
-      setApplications((data as any) || []);
+      if (appsError) throw appsError;
+
+      if (!appsData || appsData.length === 0) {
+        setApplications([]);
+        return;
+      }
+
+      // Fetch jobs separately
+      const jobIds = appsData.map(app => app.job_id);
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id, title, location, country')
+        .in('id', jobIds);
+
+      if (jobsError) throw jobsError;
+
+      // Combine data
+      const enrichedApps = appsData.map(app => ({
+        ...app,
+        jobs: jobsData?.find(job => job.id === app.job_id) || { title: 'Unknown Job', location: '', country: '' }
+      }));
+
+      setApplications(enrichedApps as any);
     } catch (error: any) {
       toast({
         title: 'Error',
