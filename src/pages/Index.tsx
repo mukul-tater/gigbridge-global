@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import SuccessMetrics from "@/components/SuccessMetrics";
+import ProcessTimeline from "@/components/ProcessTimeline";
 import FeaturedJobs from "@/components/FeaturedJobs";
 import JobCategories from "@/components/JobCategories";
 import InteractiveJobMap from "@/components/InteractiveJobMap";
@@ -34,6 +35,7 @@ const Index = () => {
       
       <HeroSection />
       <SuccessMetrics />
+      <ProcessTimeline />
       <FeaturedJobs />
       <JobCategories />
       <InteractiveJobMap />
