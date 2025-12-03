@@ -52,6 +52,7 @@ import ApplicationReview from "./pages/employer/ApplicationReview";
 import ApplicationDetail from "./pages/employer/ApplicationDetail";
 import WorkerShortlist from "./pages/employer/WorkerShortlist";
 import ManageFormalities from "./pages/employer/ManageFormalities";
+import EmployerPayments from "./pages/employer/EmployerPayments";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -236,6 +237,11 @@ const App = () => (
             <Route path="/employer/formalities" element={
               <ProtectedRoute allowedRoles={["employer"]}>
                 <ManageFormalities />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/payments" element={
+              <ProtectedRoute allowedRoles={["employer"]}>
+                <EmployerPayments />
               </ProtectedRoute>
             } />
 

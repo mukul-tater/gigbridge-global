@@ -34,22 +34,34 @@ export default function EmployerDashboard() {
         supabase.from('payments').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
         supabase.from('jobs').select('*').eq('employer_id', profile?.id),
         supabase.from('job_applications').select('*').eq('employer_id', profile?.id),
-        supabase.from('shortlisted_workers').select(`
-          id,
-          worker_id,
-          list_name,
-          notes,
-          rating,
-          created_at,
-          profiles!shortlisted_workers_worker_id_fkey(full_name, email, avatar_url)
-        `).eq('employer_id', profile?.id).order('created_at', { ascending: false }).limit(5)
+        supabase.from('shortlisted_workers').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }).limit(5)
       ]);
 
       setVerifications(verificationsRes.data || []);
       setPayments(paymentsRes.data || []);
       setJobs(jobsRes.data || []);
       setApplications(applicationsRes.data || []);
-      setShortlistedWorkers(shortlistRes.data || []);
+
+      // Fetch profiles separately for shortlisted workers
+      if (shortlistRes.data && shortlistRes.data.length > 0) {
+        const workerIds = shortlistRes.data.map(w => w.worker_id);
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, avatar_url')
+          .in('id', workerIds);
+
+        const enrichedWorkers = shortlistRes.data.map(worker => ({
+          ...worker,
+          profiles: profilesData?.find(p => p.id === worker.worker_id) || {
+            full_name: null,
+            email: "",
+            avatar_url: null
+          }
+        }));
+        setShortlistedWorkers(enrichedWorkers);
+      } else {
+        setShortlistedWorkers([]);
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {

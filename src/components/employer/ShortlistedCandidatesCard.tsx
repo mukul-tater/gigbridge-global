@@ -83,7 +83,11 @@ export default function ShortlistedCandidatesCard({ workers, loading }: Shortlis
       </div>
       <div className="space-y-4">
         {workers.map((worker) => (
-          <div key={worker.id} className="flex items-start gap-3 pb-3 border-b last:border-0">
+          <Link 
+            key={worker.id} 
+            to={`/worker-profile/${worker.worker_id}`}
+            className="flex items-start gap-3 pb-3 border-b last:border-0 hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors cursor-pointer"
+          >
             <Avatar className="h-10 w-10">
               <AvatarImage src={worker.profiles?.avatar_url || undefined} />
               <AvatarFallback className="bg-primary/10">
@@ -124,7 +128,7 @@ export default function ShortlistedCandidatesCard({ workers, loading }: Shortlis
                 </span>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </Card>
