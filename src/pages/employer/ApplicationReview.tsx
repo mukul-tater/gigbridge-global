@@ -6,8 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -54,8 +52,6 @@ export default function ApplicationReview() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -148,34 +144,6 @@ export default function ApplicationReview() {
       });
 
       fetchApplications();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const updateNotes = async () => {
-    if (!selectedApp) return;
-
-    try {
-      const { error } = await supabase
-        .from("job_applications")
-        .update({ notes })
-        .eq("id", selectedApp.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Notes saved",
-      });
-
-      fetchApplications();
-      setSelectedApp(null);
-      setNotes("");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -420,65 +388,34 @@ export default function ApplicationReview() {
                     
                     {/* Quick actions only for non-pending applications (already reviewed) */}
                     {app.status !== 'PENDING' && (
-                      <>
-                        <Select
-                          value={app.status}
-                          onValueChange={(value) => updateApplicationStatus(app.id, value)}
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                          onClick={() => updateApplicationStatus(app.id, 'APPROVED')}
+                          disabled={app.status === 'APPROVED'}
                         >
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="PENDING">Pending</SelectItem>
-                            <SelectItem value="REVIEWING">Reviewing</SelectItem>
-                            <SelectItem value="APPROVED">Approved</SelectItem>
-                            <SelectItem value="SHORTLISTED">Shortlisted</SelectItem>
-                            <SelectItem value="INTERVIEWED">Interviewed</SelectItem>
-                            <SelectItem value="OFFERED">Offered</SelectItem>
-                            <SelectItem value="HIRED">Hired</SelectItem>
-                            <SelectItem value="REJECTED">Rejected</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          Approve
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => updateApplicationStatus(app.id, 'REJECTED')}
+                          disabled={app.status === 'REJECTED'}
+                        >
+                          Reject
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => addToShortlist(app.worker_id)}
                         >
-                          <Star className="h-4 w-4 mr-2" />
+                          <Star className="h-4 w-4 mr-1" />
                           Shortlist
                         </Button>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedApp(app);
-                                setNotes(app.notes || "");
-                              }}
-                            >
-                              <FileText className="h-4 w-4 mr-2" />
-                              Notes
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Application Notes</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <Textarea
-                                placeholder="Add notes about this application..."
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                rows={6}
-                              />
-                              <Button onClick={updateNotes} className="w-full">
-                                Save Notes
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>

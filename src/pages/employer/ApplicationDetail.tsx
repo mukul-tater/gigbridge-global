@@ -363,6 +363,142 @@ export default function ApplicationDetail() {
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              {/* Sidebar Actions - 1 column */}
+              <div className="xl:col-span-1 space-y-4 order-first xl:order-last">
+                {/* Actions Card */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Status Actions */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Update Status</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          variant={application.status === 'APPROVED' ? 'default' : 'outline'}
+                          className={application.status !== 'APPROVED' ? 'text-green-600 hover:text-green-700 hover:bg-green-50' : ''}
+                          onClick={() => updateStatus('APPROVED')}
+                          disabled={application.status === 'APPROVED'}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={application.status === 'REJECTED' ? 'destructive' : 'outline'}
+                          className={application.status !== 'REJECTED' ? 'text-red-600 hover:text-red-700 hover:bg-red-50' : ''}
+                          onClick={() => updateStatus('REJECTED')}
+                          disabled={application.status === 'REJECTED'}
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Reject
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          variant={application.status === 'SHORTLISTED' ? 'default' : 'outline'}
+                          onClick={() => updateStatus('SHORTLISTED')}
+                          disabled={application.status === 'SHORTLISTED'}
+                        >
+                          Shortlist
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={application.status === 'INTERVIEWED' ? 'default' : 'outline'}
+                          onClick={() => updateStatus('INTERVIEWED')}
+                          disabled={application.status === 'INTERVIEWED'}
+                        >
+                          Interviewed
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          variant={application.status === 'OFFERED' ? 'default' : 'outline'}
+                          onClick={() => updateStatus('OFFERED')}
+                          disabled={application.status === 'OFFERED'}
+                        >
+                          Offered
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={application.status === 'HIRED' ? 'default' : 'outline'}
+                          onClick={() => updateStatus('HIRED')}
+                          disabled={application.status === 'HIRED'}
+                        >
+                          Hired
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-3 space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quick Actions</p>
+                      <Button
+                        variant={isShortlisted ? 'default' : 'outline'}
+                        size="sm"
+                        className="w-full"
+                        onClick={toggleShortlist}
+                      >
+                        <BookmarkPlus className="h-4 w-4 mr-2" />
+                        {isShortlisted ? 'Remove from Shortlist' : 'Add to Shortlist'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        asChild
+                      >
+                        <Link to={`/employer/interviews?workerId=${application.worker_id}`}>
+                          <CalendarPlus className="h-4 w-4 mr-2" />
+                          Schedule Interview
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        asChild
+                      >
+                        <Link to={`/employer/messaging?to=${application.worker_id}`}>
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Send Message
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Notes Card */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Notes
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      placeholder="Add private notes about this applicant..."
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      rows={4}
+                      className="mb-3"
+                    />
+                    <Button 
+                      onClick={saveNotes} 
+                      disabled={savingNotes}
+                      size="sm"
+                      className="w-full"
+                    >
+                      {savingNotes ? 'Saving...' : 'Save Notes'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
               {/* Main Content - 3 columns */}
               <div className="xl:col-span-3 space-y-6">
                 {/* Worker Profile Card */}
@@ -738,80 +874,6 @@ export default function ApplicationDetail() {
                     </Card>
                   </TabsContent>
                 </Tabs>
-              </div>
-
-              {/* Action Sidebar - 1 column */}
-              <div className="space-y-4">
-                <Card className="sticky top-6">
-                  <CardHeader>
-                    <CardTitle>Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Primary Actions */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        className="w-full bg-green-600 hover:bg-green-700"
-                        onClick={() => updateStatus('APPROVED')}
-                        disabled={application.status === 'APPROVED'}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approve
-                      </Button>
-                      <Button 
-                        variant="destructive"
-                        className="w-full"
-                        onClick={() => updateStatus('REJECTED')}
-                        disabled={application.status === 'REJECTED'}
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Reject
-                      </Button>
-                    </div>
-
-                    {/* Secondary Actions */}
-                    <div className="space-y-2">
-                      <Button 
-                        variant={isShortlisted ? "secondary" : "outline"} 
-                        className="w-full"
-                        onClick={toggleShortlist}
-                      >
-                        <BookmarkPlus className="h-4 w-4 mr-2" />
-                        {isShortlisted ? 'Shortlisted' : 'Add to Shortlist'}
-                      </Button>
-                      <Button variant="outline" className="w-full" asChild>
-                        <Link to="/employer/interviews">
-                          <CalendarPlus className="h-4 w-4 mr-2" />
-                          Schedule Interview
-                        </Link>
-                      </Button>
-                      <Button variant="outline" className="w-full" asChild>
-                        <Link to="/employer/messaging">
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          Send Message
-                        </Link>
-                      </Button>
-                    </div>
-
-                    {/* Notes Section */}
-                    <div className="pt-4 border-t">
-                      <label className="text-sm font-medium mb-2 block">Notes</label>
-                      <Textarea
-                        placeholder="Add notes about this candidate..."
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        rows={4}
-                      />
-                      <Button 
-                        variant="outline" 
-                        className="w-full mt-2"
-                        onClick={saveNotes}
-                        disabled={savingNotes}
-                      >
-                        {savingNotes ? 'Saving...' : 'Save Notes'}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           </main>
