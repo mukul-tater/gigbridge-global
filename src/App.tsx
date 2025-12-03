@@ -22,6 +22,7 @@ import InstallPWA from "./pages/InstallPWA";
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import WorkerProfile from "./pages/worker/WorkerProfile";
 import WorkerApplications from "./pages/worker/WorkerApplications";
+import WorkerApplicationDetail from "./pages/worker/WorkerApplicationDetail";
 import ApplicationTracking from "./pages/worker/ApplicationTracking";
 import WorkerMessaging from "./pages/worker/WorkerMessaging";
 import WorkerDocuments from "./pages/worker/WorkerDocuments";
@@ -102,6 +103,11 @@ const App = () => (
             <Route path="/worker/applications" element={
               <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerApplications />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/applications/:applicationId" element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <WorkerApplicationDetail />
               </ProtectedRoute>
             } />
             <Route path="/worker/application-tracking" element={

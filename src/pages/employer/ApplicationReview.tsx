@@ -28,6 +28,14 @@ interface Application {
     email: string;
     avatar_url: string | null;
   };
+  job: {
+    title: string;
+  } | null;
+  worker_profile: {
+    years_of_experience: number | null;
+    nationality: string | null;
+    current_location: string | null;
+  } | null;
 }
 
 export default function ApplicationReview() {
@@ -63,21 +71,26 @@ export default function ApplicationReview() {
 
       // Fetch worker profiles separately
       const workerIds = applicationsData?.map(app => app.worker_id) || [];
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, full_name, email, avatar_url")
-        .in("id", workerIds);
+      const jobIds = applicationsData?.map(app => app.job_id) || [];
 
-      if (profilesError) throw profilesError;
+      const [profilesResult, workerProfilesResult, jobsResult] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, email, avatar_url").in("id", workerIds),
+        supabase.from("worker_profiles").select("user_id, years_of_experience, nationality, current_location").in("user_id", workerIds),
+        supabase.from("jobs").select("id, title").in("id", jobIds)
+      ]);
+
+      if (profilesResult.error) throw profilesResult.error;
 
       // Combine the data
       const enrichedApplications = applicationsData?.map(app => ({
         ...app,
-        profiles: profilesData?.find(profile => profile.id === app.worker_id) || {
+        profiles: profilesResult.data?.find(profile => profile.id === app.worker_id) || {
           full_name: null,
           email: "",
           avatar_url: null
-        }
+        },
+        job: jobsResult.data?.find(job => job.id === app.job_id) || null,
+        worker_profile: workerProfilesResult.data?.find(wp => wp.user_id === app.worker_id) || null
       })) || [];
 
       setApplications(enrichedApplications as any);
@@ -292,12 +305,34 @@ export default function ApplicationReview() {
                       )}
                     </div>
                     <div className="flex-1">
+                      <p className="text-sm text-primary font-medium mb-1">
+                        {app.job?.title || "Job Position"}
+                      </p>
                       <h3 className="text-xl font-bold mb-1">
                         {app.profiles?.full_name || "Anonymous"}
                       </h3>
                       <p className="text-sm text-muted-foreground mb-2">
                         {app.profiles?.email}
                       </p>
+                      {app.worker_profile && (
+                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-2">
+                          {app.worker_profile.years_of_experience && (
+                            <span className="bg-muted px-2 py-1 rounded">
+                              {app.worker_profile.years_of_experience} yrs exp
+                            </span>
+                          )}
+                          {app.worker_profile.nationality && (
+                            <span className="bg-muted px-2 py-1 rounded">
+                              {app.worker_profile.nationality}
+                            </span>
+                          )}
+                          {app.worker_profile.current_location && (
+                            <span className="bg-muted px-2 py-1 rounded">
+                              {app.worker_profile.current_location}
+                            </span>
+                          )}
+                        </div>
+                      )}
                       {app.cover_letter && (
                         <p className="text-sm mb-3 line-clamp-2">{app.cover_letter}</p>
                       )}
