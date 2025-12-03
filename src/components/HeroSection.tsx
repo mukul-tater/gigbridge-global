@@ -85,12 +85,12 @@ const HeroSection = () => {
                       <SelectValue placeholder="Country" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="japan">Japan</SelectItem>
-                      <SelectItem value="russia">Russia</SelectItem>
-                      <SelectItem value="nepal">Nepal</SelectItem>
-                      <SelectItem value="iran">Iran</SelectItem>
-                      <SelectItem value="oman">Oman</SelectItem>
-                      <SelectItem value="germany">Germany</SelectItem>
+                      <SelectItem value="Japan">Japan</SelectItem>
+                      <SelectItem value="Germany">Germany</SelectItem>
+                      <SelectItem value="UAE">UAE</SelectItem>
+                      <SelectItem value="Saudi Arabia">Saudi Arabia</SelectItem>
+                      <SelectItem value="Qatar">Qatar</SelectItem>
+                      <SelectItem value="Singapore">Singapore</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
