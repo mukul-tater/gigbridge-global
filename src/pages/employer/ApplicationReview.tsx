@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { FileText, Star, User, Calendar, Search, Eye } from "lucide-react";
+import { FileText, Star, User, Calendar, Search, Eye, MapPin, Briefcase, Phone, Globe, Award } from "lucide-react";
 
 interface Application {
   id: string;
@@ -27,6 +27,7 @@ interface Application {
     full_name: string | null;
     email: string;
     avatar_url: string | null;
+    phone: string | null;
   };
   job: {
     title: string;
@@ -35,7 +36,14 @@ interface Application {
     years_of_experience: number | null;
     nationality: string | null;
     current_location: string | null;
+    bio: string | null;
+    availability: string | null;
+    languages: string[] | null;
   } | null;
+  skills: {
+    skill_name: string;
+    proficiency_level: string | null;
+  }[];
 }
 
 export default function ApplicationReview() {
@@ -73,10 +81,11 @@ export default function ApplicationReview() {
       const workerIds = applicationsData?.map(app => app.worker_id) || [];
       const jobIds = applicationsData?.map(app => app.job_id) || [];
 
-      const [profilesResult, workerProfilesResult, jobsResult] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email, avatar_url").in("id", workerIds),
-        supabase.from("worker_profiles").select("user_id, years_of_experience, nationality, current_location").in("user_id", workerIds),
-        supabase.from("jobs").select("id, title").in("id", jobIds)
+      const [profilesResult, workerProfilesResult, jobsResult, skillsResult] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, email, avatar_url, phone").in("id", workerIds),
+        supabase.from("worker_profiles").select("user_id, years_of_experience, nationality, current_location, bio, availability, languages").in("user_id", workerIds),
+        supabase.from("jobs").select("id, title").in("id", jobIds),
+        supabase.from("worker_skills").select("worker_id, skill_name, proficiency_level").in("worker_id", workerIds)
       ]);
 
       if (profilesResult.error) throw profilesResult.error;
@@ -87,10 +96,12 @@ export default function ApplicationReview() {
         profiles: profilesResult.data?.find(profile => profile.id === app.worker_id) || {
           full_name: null,
           email: "",
-          avatar_url: null
+          avatar_url: null,
+          phone: null
         },
         job: jobsResult.data?.find(job => job.id === app.job_id) || null,
-        worker_profile: workerProfilesResult.data?.find(wp => wp.user_id === app.worker_id) || null
+        worker_profile: workerProfilesResult.data?.find(wp => wp.user_id === app.worker_id) || null,
+        skills: skillsResult.data?.filter(skill => skill.worker_id === app.worker_id) || []
       })) || [];
 
       setApplications(enrichedApplications as any);
@@ -305,46 +316,99 @@ export default function ApplicationReview() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-primary font-medium mb-1">
-                        {app.job?.title || "Job Position"}
-                      </p>
-                      <h3 className="text-xl font-bold mb-1">
-                        {app.profiles?.full_name || "Anonymous"}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {app.profiles?.email}
-                      </p>
-                      {app.worker_profile && (
-                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-2">
-                          {app.worker_profile.years_of_experience && (
-                            <span className="bg-muted px-2 py-1 rounded">
-                              {app.worker_profile.years_of_experience} yrs exp
-                            </span>
-                          )}
-                          {app.worker_profile.nationality && (
-                            <span className="bg-muted px-2 py-1 rounded">
-                              {app.worker_profile.nationality}
-                            </span>
-                          )}
-                          {app.worker_profile.current_location && (
-                            <span className="bg-muted px-2 py-1 rounded">
-                              {app.worker_profile.current_location}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                      {app.cover_letter && (
-                        <p className="text-sm mb-3 line-clamp-2">{app.cover_letter}</p>
-                      )}
-                      <div className="flex items-center gap-4 flex-wrap">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline" className="text-xs">
+                          {app.job?.title || "Job Position"}
+                        </Badge>
                         <Badge variant={getStatusColor(app.status)}>
                           {getStatusLabel(app.status)}
                         </Badge>
-                        <span className="text-sm text-muted-foreground flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {format(new Date(app.applied_at), "MMM d, yyyy")}
-                        </span>
                       </div>
+                      <h3 className="text-xl font-bold mb-1">
+                        {app.profiles?.full_name || "Anonymous"}
+                      </h3>
+                      
+                      {/* Contact Info */}
+                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
+                        <span className="flex items-center gap-1">
+                          <span>{app.profiles?.email}</span>
+                        </span>
+                        {app.profiles?.phone && (
+                          <span className="flex items-center gap-1">
+                            <Phone className="h-3 w-3" />
+                            {app.profiles.phone}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Worker Details */}
+                      {app.worker_profile && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {app.worker_profile.years_of_experience && (
+                            <Badge variant="secondary" className="text-xs">
+                              <Briefcase className="h-3 w-3 mr-1" />
+                              {app.worker_profile.years_of_experience} yrs experience
+                            </Badge>
+                          )}
+                          {app.worker_profile.nationality && (
+                            <Badge variant="secondary" className="text-xs">
+                              <Globe className="h-3 w-3 mr-1" />
+                              {app.worker_profile.nationality}
+                            </Badge>
+                          )}
+                          {app.worker_profile.current_location && (
+                            <Badge variant="secondary" className="text-xs">
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {app.worker_profile.current_location}
+                            </Badge>
+                          )}
+                          {app.worker_profile.availability && (
+                            <Badge variant="secondary" className="text-xs">
+                              {app.worker_profile.availability}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Skills */}
+                      {app.skills && app.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          <Award className="h-4 w-4 text-muted-foreground mr-1" />
+                          {app.skills.slice(0, 5).map((skill, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {skill.skill_name}
+                              {skill.proficiency_level && (
+                                <span className="ml-1 text-muted-foreground">• {skill.proficiency_level}</span>
+                              )}
+                            </Badge>
+                          ))}
+                          {app.skills.length > 5 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{app.skills.length - 5} more
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Languages */}
+                      {app.worker_profile?.languages && app.worker_profile.languages.length > 0 && (
+                        <p className="text-xs text-muted-foreground mb-3">
+                          <span className="font-medium">Languages:</span> {app.worker_profile.languages.join(", ")}
+                        </p>
+                      )}
+
+                      {/* Cover Letter Preview */}
+                      {app.cover_letter && (
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2 italic">
+                          "{app.cover_letter}"
+                        </p>
+                      )}
+
+                      {/* Applied Date */}
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Applied {format(new Date(app.applied_at), "MMM d, yyyy")}
+                      </span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
