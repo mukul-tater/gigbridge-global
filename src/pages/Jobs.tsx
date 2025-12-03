@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 interface Job {
   id: string;
+  slug: string;
   title: string;
   company: string;
   location: string;
@@ -81,6 +82,7 @@ export default function Jobs() {
 
       const formattedJobs: Job[] = (data || []).map((job: any) => ({
         id: job.id,
+        slug: job.slug || job.id,
         title: job.title,
         company: job.employer_profiles?.company_name || 'Company',
         location: `${job.location}, ${job.country}`,
@@ -245,7 +247,7 @@ export default function Jobs() {
                   <Card 
                     key={job.id} 
                     className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/jobs/${job.id}`)}
+                    onClick={() => navigate(`/jobs/${job.slug}`)}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -288,7 +290,7 @@ export default function Jobs() {
                         ))}
                       </div>
                       <div className="flex gap-2">
-                        <Link to={`/jobs/${job.id}`}>
+                        <Link to={`/jobs/${job.slug}`}>
                           <Button variant="outline">View Details</Button>
                         </Link>
                         <Button onClick={() => {
@@ -296,7 +298,7 @@ export default function Jobs() {
                             toast.error('Please login as a worker to apply for jobs');
                             navigate('/auth');
                           } else {
-                            navigate(`/jobs/${job.id}`);
+                            navigate(`/jobs/${job.slug}`);
                           }
                         }}>
                           Apply Now
@@ -392,7 +394,7 @@ export default function Jobs() {
               <Card 
                 key={job.id} 
                 className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/jobs/${job.id}`)}
+                onClick={() => navigate(`/jobs/${job.slug}`)}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -438,7 +440,7 @@ export default function Jobs() {
                     <Button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/jobs/${job.id}`);
+                        navigate(`/jobs/${job.slug}`);
                       }}
                     >
                       View & Apply

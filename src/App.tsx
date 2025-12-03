@@ -79,7 +79,7 @@ const App = () => (
             <Route path="/install" element={<InstallPWA />} />
             <Route path="/seed-data" element={<SeedData />} />
             <Route path="/jobs" element={<Jobs />} />
-            <Route path="/jobs/:id" element={<JobDetail />} />
+            <Route path="/jobs/:slug" element={<JobDetail />} />
             <Route path="/job-categories" element={<JobCategories />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />

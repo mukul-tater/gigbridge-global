@@ -15,6 +15,7 @@ import { Briefcase, Plus, Eye, Trash2, MapPin, Users, Calendar } from "lucide-re
 
 interface Job {
   id: string;
+  slug: string | null;
   title: string;
   location: string;
   country: string;
@@ -254,7 +255,7 @@ export default function ManageJobs() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/jobs/${job.id}`)}
+                      onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
                     >
                       <Eye className="h-4 w-4 mr-2" />
                       View

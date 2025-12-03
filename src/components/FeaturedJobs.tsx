@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface FeaturedJob {
   id: string;
+  slug: string;
   title: string;
   description: string;
   location: string;
@@ -128,7 +129,7 @@ export default function FeaturedJobs() {
     }
   };
 
-  const handleQuickApply = (jobId: string) => {
+  const handleQuickApply = (jobSlug: string) => {
     if (!isAuthenticated) {
       toast({
         title: "Login required",
@@ -138,7 +139,7 @@ export default function FeaturedJobs() {
       navigate('/auth');
       return;
     }
-    navigate(`/jobs/${jobId}`);
+    navigate(`/jobs/${jobSlug}`);
   };
 
   if (loading) {
@@ -177,7 +178,7 @@ export default function FeaturedJobs() {
                 <Card 
                   key={job.id} 
                   className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/jobs/${job.id}`)}
+                  onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
                 >
                   {/* Quick Action Buttons */}
                   <div className="absolute top-3 right-3 z-10 flex gap-2">
@@ -260,7 +261,7 @@ export default function FeaturedJobs() {
                         className="w-full" 
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleQuickApply(job.id);
+                          handleQuickApply(job.slug || job.id);
                         }}
                       >
                         <ArrowRight className="mr-2 h-4 w-4" />

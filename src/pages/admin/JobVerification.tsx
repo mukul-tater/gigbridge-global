@@ -20,6 +20,7 @@ import {
 
 interface Job {
   id: string;
+  slug: string | null;
   title: string;
   company_name: string;
   status: string;
@@ -42,7 +43,7 @@ export default function JobVerification() {
     try {
       const { data: jobsData, error: jobsError } = await supabase
         .from("jobs")
-        .select("id, title, status, posted_at, location, employer_id")
+        .select("id, slug, title, status, posted_at, location, employer_id")
         .order("posted_at", { ascending: false });
 
       if (jobsError) throw jobsError;
@@ -173,7 +174,7 @@ export default function JobVerification() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => navigate(`/jobs/${job.id}`)}
+                    onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
                     title="View details"
                   >
                     <Eye className="h-4 w-4" />
