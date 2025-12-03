@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Bell, Globe, Briefcase, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { JOB_CATEGORIES } from "@/lib/constants";
 
 const JobAlertsSubscription = () => {
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
@@ -17,21 +18,22 @@ const JobAlertsSubscription = () => {
     { id: "japan", name: "Japan", demand: "High", reason: "Industrial automation growth" },
     { id: "germany", name: "Germany", demand: "High", reason: "Green energy transition" },
     { id: "uae", name: "UAE", demand: "Very High", reason: "Infrastructure expansion" },
+    { id: "saudi_arabia", name: "Saudi Arabia", demand: "Very High", reason: "Vision 2030 projects" },
+    { id: "qatar", name: "Qatar", demand: "High", reason: "World Cup infrastructure" },
+    { id: "kuwait", name: "Kuwait", demand: "High", reason: "Oil & gas sector" },
+    { id: "oman", name: "Oman", demand: "Medium", reason: "Tourism development" },
+    { id: "bahrain", name: "Bahrain", demand: "Medium", reason: "Financial hub growth" },
+    { id: "singapore", name: "Singapore", demand: "High", reason: "Tech & construction" },
+    { id: "malaysia", name: "Malaysia", demand: "High", reason: "Manufacturing hub" },
+    { id: "australia", name: "Australia", demand: "High", reason: "Mining & construction" },
+    { id: "canada", name: "Canada", demand: "High", reason: "Skilled trades shortage" },
     { id: "norway", name: "Norway", demand: "High", reason: "Oil & gas sector growth" },
+    { id: "uk", name: "UK", demand: "Medium", reason: "Post-Brexit labor needs" },
     { id: "russia", name: "Russia", demand: "Critical", reason: "Post-conflict reconstruction" },
-    { id: "ukraine", name: "Ukraine", demand: "Critical", reason: "Reconstruction efforts" },
+    { id: "south_korea", name: "South Korea", demand: "High", reason: "Manufacturing expansion" },
   ];
 
-  const industries = [
-    "Construction & Infrastructure",
-    "Electrical & Electronics",
-    "Welding & Metalwork",
-    "Plumbing & HVAC",
-    "Manufacturing",
-    "Delivery & Logistics",
-    "Healthcare Support",
-    "Technology & IT"
-  ];
+  const industries = JOB_CATEGORIES.filter(c => c !== 'All Categories');
 
   const handleCountryToggle = (countryId: string) => {
     setSelectedCountries(prev => 
@@ -99,7 +101,7 @@ const JobAlertsSubscription = () => {
               Choose countries where you'd like to receive job alerts
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+        <CardContent className="space-y-4 max-h-96 overflow-y-auto">
             {countries.map((country) => (
               <div key={country.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors">
                 <div className="flex items-center space-x-3">

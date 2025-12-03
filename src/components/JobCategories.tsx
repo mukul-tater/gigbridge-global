@@ -15,7 +15,7 @@ const JobCategories = () => {
       avgSalary: "$3,200/month",
       description: "Infrastructure projects, residential and commercial building",
       demand: "High",
-      countries: ["Japan", "Germany", "UAE"]
+      countries: ["Japan", "Germany", "UAE", "Saudi Arabia", "Qatar"]
     },
     {
       icon: electricianIcon,
@@ -24,7 +24,7 @@ const JobCategories = () => {
       avgSalary: "$3,800/month",
       description: "Industrial electrical work, renewable energy projects",
       demand: "Very High",
-      countries: ["Norway", "Australia", "Canada"]
+      countries: ["Norway", "Australia", "Canada", "Singapore", "UK"]
     },
     {
       icon: welderIcon,
@@ -33,7 +33,7 @@ const JobCategories = () => {
       avgSalary: "$4,100/month",
       description: "Pipeline, shipbuilding, and heavy industry welding",
       demand: "High",
-      countries: ["Qatar", "Russia", "South Korea"]
+      countries: ["Qatar", "South Korea", "Kuwait", "Bahrain", "Malaysia"]
     },
     {
       icon: "🔧",
@@ -42,7 +42,7 @@ const JobCategories = () => {
       avgSalary: "$2,900/month",
       description: "Residential and commercial plumbing systems",
       demand: "Medium",
-      countries: ["UK", "Ireland", "New Zealand"]
+      countries: ["UK", "Ireland", "New Zealand", "Australia", "Canada"]
     },
     {
       icon: "🚚",
@@ -51,7 +51,7 @@ const JobCategories = () => {
       avgSalary: "$2,400/month",
       description: "Package delivery, freight, and supply chain",
       demand: "Very High",
-      countries: ["Netherlands", "Belgium", "Denmark"]
+      countries: ["Netherlands", "Belgium", "Denmark", "Germany", "France"]
     },
     {
       icon: "🏭",
@@ -60,7 +60,7 @@ const JobCategories = () => {
       avgSalary: "$3,000/month",
       description: "Assembly line, quality control, machine operation",
       demand: "High",
-      countries: ["Czech Republic", "Poland", "Slovakia"]
+      countries: ["Czech Republic", "Poland", "Malaysia", "Vietnam", "Thailand"]
     }
   ];
 

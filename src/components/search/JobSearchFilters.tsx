@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Search, Save, X, MapPin, DollarSign, Briefcase, Globe } from 'lucide-react';
+import { DESTINATION_COUNTRIES, JOB_CATEGORIES, EXPERIENCE_LEVELS, POPULAR_SKILLS } from '@/lib/constants';
 
 export interface JobFilters {
   keyword: string;
@@ -28,25 +29,6 @@ interface JobSearchFiltersProps {
   onSaveSearch: () => void;
   loading?: boolean;
 }
-
-const COUNTRIES = [
-  'All Countries', 'UAE', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Oman', 'Bahrain',
-  'Japan', 'Singapore', 'South Korea', 'Germany', 'UK', 'Canada', 'Australia'
-];
-
-const JOB_CATEGORIES = [
-  'All Categories', 'Construction', 'Electrical', 'Welding', 'Plumbing',
-  'Manufacturing', 'Delivery', 'Hospitality', 'Healthcare', 'IT', 'Engineering'
-];
-
-const EXPERIENCE_LEVELS = [
-  'All Levels', 'Entry Level', '1-3 years', '3-5 years', '5-10 years', '10+ years'
-];
-
-const POPULAR_SKILLS = [
-  'Welding', 'Electrical', 'Plumbing', 'Construction', 'Manufacturing',
-  'Carpentry', 'Painting', 'Heavy Equipment', 'Safety Management', 'Quality Control'
-];
 
 export default function JobSearchFilters({
   filters,
@@ -112,8 +94,8 @@ export default function JobSearchFilters({
             <SelectTrigger id="country">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-card z-50">
-              {COUNTRIES.map(country => (
+            <SelectContent className="bg-card z-50 max-h-64">
+              {DESTINATION_COUNTRIES.map(country => (
                 <SelectItem key={country} value={country}>{country}</SelectItem>
               ))}
             </SelectContent>

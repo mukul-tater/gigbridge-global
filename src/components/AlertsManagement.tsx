@@ -19,6 +19,7 @@ import {
   Eye
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DESTINATION_COUNTRIES } from "@/lib/constants";
 
 interface JobAlert {
   id: string;
@@ -260,12 +261,11 @@ const AlertsManagement = () => {
             <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="Country" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-64">
               <SelectItem value="all">All Countries</SelectItem>
-              <SelectItem value="Japan">Japan</SelectItem>
-              <SelectItem value="UAE">UAE</SelectItem>
-              <SelectItem value="Germany">Germany</SelectItem>
-              <SelectItem value="Norway">Norway</SelectItem>
+              {DESTINATION_COUNTRIES.filter(c => c !== 'All Countries').map(country => (
+                <SelectItem key={country} value={country}>{country}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           
