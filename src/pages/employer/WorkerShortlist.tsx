@@ -54,22 +54,46 @@ export default function WorkerShortlist() {
 
   const fetchShortlistedWorkers = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch shortlisted workers first
+      const { data: shortlistData, error: shortlistError } = await supabase
         .from("shortlisted_workers")
-        .select(`
-          *,
-          profiles!shortlisted_workers_worker_id_fkey (full_name, email, avatar_url)
-        `)
+        .select("*")
         .eq("employer_id", user?.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (shortlistError) throw shortlistError;
 
-      setShortlistedWorkers(data as any || []);
+      if (!shortlistData || shortlistData.length === 0) {
+        setShortlistedWorkers([]);
+        setLists([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch profiles separately
+      const workerIds = shortlistData.map(w => w.worker_id);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, avatar_url")
+        .in("id", workerIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data manually
+      const enrichedWorkers = shortlistData.map(worker => ({
+        ...worker,
+        profiles: profilesData?.find(p => p.id === worker.worker_id) || {
+          full_name: null,
+          email: "",
+          avatar_url: null
+        }
+      }));
+
+      setShortlistedWorkers(enrichedWorkers as any);
       
       // Extract unique list names
-      const uniqueLists = [...new Set(data?.map(w => w.list_name) || [])];
-      setLists(uniqueLists);
+      const uniqueLists = [...new Set(shortlistData?.map(w => w.list_name).filter(Boolean) || [])];
+      setLists(uniqueLists as string[]);
     } catch (error: any) {
       toast({
         title: "Error",
