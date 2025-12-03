@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Users, Briefcase, Eye, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface AnalyticsData {
   totalJobs: number;
@@ -24,7 +25,8 @@ export default function AnalyticsSummaryCard({ data }: AnalyticsSummaryCardProps
       total: data.totalJobs,
       icon: Briefcase,
       color: "text-primary",
-      bgColor: "bg-primary/10"
+      bgColor: "bg-primary/10",
+      link: "/employer/manage-jobs"
     },
     {
       label: "Total Applications",
@@ -32,7 +34,8 @@ export default function AnalyticsSummaryCard({ data }: AnalyticsSummaryCardProps
       icon: Users,
       color: "text-blue-600 dark:text-blue-400",
       bgColor: "bg-blue-500/10",
-      trend: "+12%"
+      trend: "+12%",
+      link: "/employer/applications"
     },
     {
       label: "Job Views",
@@ -40,21 +43,24 @@ export default function AnalyticsSummaryCard({ data }: AnalyticsSummaryCardProps
       icon: Eye,
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-500/10",
-      trend: "+8%"
+      trend: "+8%",
+      link: "/employer/manage-jobs"
     },
     {
       label: "Shortlisted",
       value: data.shortlistedCandidates,
       icon: CheckCircle,
       color: "text-green-600 dark:text-green-400",
-      bgColor: "bg-green-500/10"
+      bgColor: "bg-green-500/10",
+      link: "/employer/shortlist"
     }
   ];
 
   return (
     <div className="grid md:grid-cols-4 gap-6">
       {metrics.map((metric, index) => (
-        <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
+        <Link key={index} to={metric.link}>
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer hover:border-primary/50">
           <div className="flex items-start justify-between mb-4">
             <div className={`p-3 rounded-lg ${metric.bgColor}`}>
               <metric.icon className={`h-6 w-6 ${metric.color}`} />
@@ -79,7 +85,8 @@ export default function AnalyticsSummaryCard({ data }: AnalyticsSummaryCardProps
             </p>
             <p className="text-sm text-muted-foreground">{metric.label}</p>
           </div>
-        </Card>
+          </Card>
+        </Link>
       ))}
     </div>
   );
