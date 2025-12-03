@@ -505,6 +505,7 @@ export type Database = {
           responsibilities: string | null
           salary_max: number | null
           salary_min: number | null
+          slug: string | null
           status: string
           title: string
           updated_at: string | null
@@ -529,6 +530,7 @@ export type Database = {
           responsibilities?: string | null
           salary_max?: number | null
           salary_min?: number | null
+          slug?: string | null
           status?: string
           title: string
           updated_at?: string | null
@@ -553,6 +555,7 @@ export type Database = {
           responsibilities?: string | null
           salary_max?: number | null
           salary_min?: number | null
+          slug?: string | null
           status?: string
           title?: string
           updated_at?: string | null

@@ -10,10 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { 
-  MapPin, Building2, Briefcase, IndianRupee, Clock, 
-  CheckCircle2, ArrowLeft, Users 
+  MapPin, Building2, Briefcase, DollarSign, Clock, 
+  CheckCircle2, ArrowLeft, Users, Globe, Shield, Calendar,
+  Share2, Bookmark
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 interface JobData {
   id: string;
@@ -34,33 +36,42 @@ interface JobData {
   openings: number;
   visa_sponsorship: boolean;
   posted_at: string;
+  slug: string;
   job_skills: { skill_name: string }[];
 }
 
+interface EmployerProfile {
+  company_name: string | null;
+  industry: string | null;
+  company_size: string | null;
+  bio: string | null;
+}
+
 export default function JobDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated, role } = useAuth();
   const { toast } = useToast();
   
   const [job, setJob] = useState<JobData | null>(null);
+  const [employer, setEmployer] = useState<EmployerProfile | null>(null);
   const [hasApplied, setHasApplied] = useState(false);
   const [applying, setApplying] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      if (!id) return;
+      if (!slug) return;
       
       try {
-        // Fetch job with skills
+        // Fetch job by slug with skills
         const { data: jobData, error: jobError } = await supabase
           .from('jobs')
           .select(`
             *,
             job_skills (skill_name)
           `)
-          .eq('id', id)
+          .eq('slug', slug)
           .single();
 
         if (jobError || !jobData) {
@@ -75,13 +86,24 @@ export default function JobDetail() {
 
         setJob(jobData as any);
 
+        // Fetch employer profile
+        const { data: employerData } = await supabase
+          .from('employer_profiles')
+          .select('company_name, industry, company_size, bio')
+          .eq('user_id', jobData.employer_id)
+          .maybeSingle();
+
+        if (employerData) {
+          setEmployer(employerData);
+        }
+
         // Check if user has already applied
         if (user) {
           const { data: application } = await supabase
             .from('job_applications')
             .select('id')
             .eq('worker_id', user.id)
-            .eq('job_id', id)
+            .eq('job_id', jobData.id)
             .maybeSingle();
 
           setHasApplied(!!application);
@@ -94,7 +116,7 @@ export default function JobDetail() {
     };
     
     loadData();
-  }, [id, user, navigate, toast]);
+  }, [slug, user, navigate, toast]);
 
   const handleApply = async () => {
     if (!isAuthenticated) {
@@ -116,13 +138,11 @@ export default function JobDetail() {
       return;
     }
 
-    if (!user) return;
-    if (!job) return;
+    if (!user || !job) return;
 
     setApplying(true);
 
     try {
-      // Create application in database
       const { error } = await supabase
         .from('job_applications')
         .insert({
@@ -151,13 +171,31 @@ export default function JobDetail() {
     }
   };
 
-  if (loading || !job) {
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: job?.title,
+        text: `Check out this job: ${job?.title}`,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: 'Link Copied',
+        description: 'Job link has been copied to clipboard',
+      });
+    }
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="pt-20 pb-12">
           <div className="container mx-auto px-4">
-            <p className="text-center text-muted-foreground">Loading...</p>
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
           </div>
         </main>
         <Footer />
@@ -165,12 +203,30 @@ export default function JobDetail() {
     );
   }
 
+  if (!job) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-20 pb-12">
+          <div className="container mx-auto px-4 text-center py-12">
+            <h1 className="text-2xl font-bold mb-4">Job Not Found</h1>
+            <p className="text-muted-foreground mb-6">This job listing may have been removed or expired.</p>
+            <Button onClick={() => navigate('/jobs')}>Browse All Jobs</Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const companyName = employer?.company_name || 'SafeWork Global';
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <main className="pt-20 pb-12">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
           {/* Back Button */}
           <Link to="/jobs">
             <Button variant="ghost" className="mb-6">
@@ -179,197 +235,241 @@ export default function JobDetail() {
             </Button>
           </Link>
 
-          {/* Job Header */}
-          <Card className="mb-6">
-            <CardHeader>
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Badge variant="outline" className="text-sm">
-                      {job.job_type.replace('_', ' ')}
-                    </Badge>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Job Header Card */}
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <Badge variant="outline">{job.job_type.replace('_', ' ')}</Badge>
+                    <Badge variant="outline">{job.experience_level}</Badge>
+                    {job.visa_sponsorship && (
+                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                        <Shield className="h-3 w-3 mr-1" />
+                        Visa Sponsorship
+                      </Badge>
+                    )}
                     <Badge variant={job.status === 'ACTIVE' ? 'default' : 'secondary'}>
                       {job.status}
                     </Badge>
                   </div>
-                  <h1 className="text-3xl font-bold text-foreground mb-2">{job.title}</h1>
-                  <div className="flex items-center gap-2 text-muted-foreground">
+
+                  <h1 className="text-3xl font-bold mb-3">{job.title}</h1>
+                  
+                  <div className="flex items-center gap-2 text-lg text-muted-foreground mb-4">
                     <Building2 className="h-5 w-5" />
-                    <span className="text-lg">SafeWork Global</span>
+                    <span className="font-medium">{companyName}</span>
                   </div>
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Building2 className="h-4 w-4" />
-                  <span>SafeWork Global</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span>{job.location}, {job.country}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Briefcase className="h-4 w-4" />
-                  <span>{job.job_type.replace('_', ' ')}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <IndianRupee className="h-4 w-4" />
-                  <span className="font-semibold">
-                    {job.currency} {job.salary_min?.toLocaleString()} - {job.salary_max?.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>Posted {new Date(job.posted_at).toLocaleDateString()}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  <span>{job.openings} openings</span>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {role === 'employer' ? (
-                <Alert>
-                  <AlertDescription>
-                    As an employer, you cannot apply for jobs. You can post and manage jobs from your employer dashboard.
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                <>
-                  <Button 
-                    size="lg" 
-                    onClick={handleApply}
-                    disabled={hasApplied || applying || job.status !== 'ACTIVE' || !isAuthenticated}
-                    className="w-full"
-                  >
-                    {hasApplied ? (
-                      <>
-                        <CheckCircle2 className="mr-2 h-5 w-5" />
-                        Already Applied
-                      </>
-                    ) : applying ? (
-                      'Submitting...'
-                    ) : !isAuthenticated ? (
-                      'Login to Apply'
-                    ) : (
-                      'Apply Now'
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="h-4 w-4 shrink-0" />
+                      <span>{job.location}, {job.country}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <DollarSign className="h-4 w-4 shrink-0" />
+                      <span className="font-semibold text-foreground">
+                        {job.currency} {job.salary_min?.toLocaleString()} - {job.salary_max?.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Users className="h-4 w-4 shrink-0" />
+                      <span>{job.openings} openings</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="h-4 w-4 shrink-0" />
+                      <span>Posted {format(new Date(job.posted_at), 'MMM d, yyyy')}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Job Description */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>About the Role</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{job.description}</p>
+                </CardContent>
+              </Card>
+
+              {/* Responsibilities */}
+              {job.responsibilities && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Key Responsibilities</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{job.responsibilities}</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Requirements */}
+              {job.requirements && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Requirements</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{job.requirements}</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Benefits */}
+              {job.benefits && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Benefits & Perks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{job.benefits}</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Required Skills */}
+              {job.job_skills && job.job_skills.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Required Skills</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {job.job_skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary" className="text-sm py-1 px-3">
+                          {skill.skill_name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Apply Card */}
+              <Card className="sticky top-24">
+                <CardContent className="p-6 space-y-4">
+                  {role === 'employer' ? (
+                    <Alert>
+                      <AlertDescription>
+                        As an employer, you cannot apply for jobs.
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <Button 
+                      size="lg" 
+                      onClick={handleApply}
+                      disabled={hasApplied || applying || job.status !== 'ACTIVE' || !isAuthenticated}
+                      className="w-full"
+                    >
+                      {hasApplied ? (
+                        <>
+                          <CheckCircle2 className="mr-2 h-5 w-5" />
+                          Already Applied
+                        </>
+                      ) : applying ? (
+                        'Submitting...'
+                      ) : !isAuthenticated ? (
+                        'Login to Apply'
+                      ) : (
+                        'Apply Now'
+                      )}
+                    </Button>
+                  )}
+                  
+                  {hasApplied && (
+                    <Alert className="bg-green-500/10 border-green-500/20">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertDescription className="text-green-700">
+                        Your application is under review.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="flex-1" onClick={handleShare}>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share
+                    </Button>
+                    <Button variant="outline" className="flex-1">
+                      <Bookmark className="h-4 w-4 mr-2" />
+                      Save
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Company Info Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">About the Company</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Building2 className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">{companyName}</h4>
+                      {employer?.industry && (
+                        <p className="text-sm text-muted-foreground">{employer.industry}</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {employer?.bio && (
+                    <p className="text-sm text-muted-foreground">{employer.bio}</p>
+                  )}
+                  
+                  <Separator />
+                  
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    {employer?.company_size && (
+                      <div>
+                        <span className="text-muted-foreground block">Size</span>
+                        <p className="font-medium">{employer.company_size}</p>
+                      </div>
                     )}
-                  </Button>
-                </>
-              )}
-              
-              {hasApplied && (
-                <Alert className="mt-4">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <AlertDescription>
-                    You have already applied for this position. The employer will review your application.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
+                    <div>
+                      <span className="text-muted-foreground block">Visa Support</span>
+                      <p className="font-medium">{job.visa_sponsorship ? 'Available' : 'Not Available'}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Job Description */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Job Description</CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-sm max-w-none">
-              <p className="text-muted-foreground whitespace-pre-wrap">{job.description}</p>
-            </CardContent>
-          </Card>
-
-          {/* Responsibilities */}
-          {job.responsibilities && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Responsibilities</CardTitle>
-              </CardHeader>
-              <CardContent className="prose prose-sm max-w-none">
-                <p className="text-muted-foreground whitespace-pre-wrap">{job.responsibilities}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Requirements */}
-          {job.requirements && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Requirements</CardTitle>
-              </CardHeader>
-              <CardContent className="prose prose-sm max-w-none">
-                <p className="text-muted-foreground whitespace-pre-wrap">{job.requirements}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Benefits */}
-          {job.benefits && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Benefits</CardTitle>
-              </CardHeader>
-              <CardContent className="prose prose-sm max-w-none">
-                <p className="text-muted-foreground whitespace-pre-wrap">{job.benefits}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Required Skills */}
-          {job.job_skills && job.job_skills.length > 0 && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Required Skills</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {job.job_skills.map((skill, index) => (
-                    <Badge key={index} variant="secondary">
-                      {skill.skill_name}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Company Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Company Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h4 className="font-semibold mb-2">SafeWork Global</h4>
-                <p className="text-muted-foreground text-sm">
-                  Leading workforce solutions provider connecting skilled workers with global opportunities.
-                </p>
-              </div>
-              
-              <Separator />
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Industry</span>
-                  <p className="font-medium">Manufacturing & Construction</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Size</span>
-                  <p className="font-medium">1000-5000 employees</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Founded</span>
-                  <p className="font-medium">2010</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Visa Sponsorship</span>
-                  <p className="font-medium">{job.visa_sponsorship ? 'Available' : 'Not Available'}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              {/* Job Details Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Job Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Job Type</span>
+                    <span className="font-medium">{job.job_type.replace('_', ' ')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Experience Level</span>
+                    <span className="font-medium">{job.experience_level}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Location</span>
+                    <span className="font-medium">{job.country}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Openings</span>
+                    <span className="font-medium">{job.openings} positions</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </main>
 
