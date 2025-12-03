@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import EmployerSidebar from "@/components/employer/EmployerSidebar";
 import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card } from "@/components/ui/card";
@@ -12,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { FileText, Star, User, Calendar, Search } from "lucide-react";
+import { FileText, Star, User, Calendar, Search, Eye } from "lucide-react";
 
 interface Application {
   id: string;
@@ -356,6 +357,12 @@ export default function ApplicationReview() {
                     >
                       <Star className="h-4 w-4 mr-2" />
                       Shortlist
+                    </Button>
+                    <Button variant="default" size="sm" asChild>
+                      <Link to={`/employer/applications/${app.id}`}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Full Profile
+                      </Link>
                     </Button>
                     <Dialog>
                       <DialogTrigger asChild>

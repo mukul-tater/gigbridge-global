@@ -48,6 +48,7 @@ import EmployerEscrow from "./pages/employer/EscrowPayments";
 import EmployerCompliance from "./pages/employer/ComplianceReports";
 import EmployerSavedSearches from "./pages/employer/SavedSearches";
 import ApplicationReview from "./pages/employer/ApplicationReview";
+import ApplicationDetail from "./pages/employer/ApplicationDetail";
 import WorkerShortlist from "./pages/employer/WorkerShortlist";
 import ManageFormalities from "./pages/employer/ManageFormalities";
 
@@ -214,6 +215,11 @@ const App = () => (
             <Route path="/employer/applications" element={
               <ProtectedRoute allowedRoles={["employer"]}>
                 <ApplicationReview />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/applications/:applicationId" element={
+              <ProtectedRoute allowedRoles={["employer"]}>
+                <ApplicationDetail />
               </ProtectedRoute>
             } />
             <Route path="/employer/shortlist" element={
