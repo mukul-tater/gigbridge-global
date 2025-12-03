@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { jobPostingSchema, type JobPostingFormData } from "@/lib/validations/job";
 import { useState } from "react";
 import { X, Plus } from "lucide-react";
+import { DESTINATION_COUNTRIES, CURRENCIES } from "@/lib/constants";
 
 export default function PostJob() {
   const { user } = useAuth();
@@ -242,11 +243,19 @@ export default function PostJob() {
                   </div>
                   <div>
                     <Label htmlFor="country">Country *</Label>
-                    <Input
-                      id="country"
-                      {...register("country")}
-                      placeholder="e.g. India"
-                    />
+                    <Select
+                      value={watch("country")}
+                      onValueChange={(value) => setValue("country", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select country" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-64">
+                        {DESTINATION_COUNTRIES.filter(c => c !== 'All Countries').map(country => (
+                          <SelectItem key={country} value={country}>{country}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     {errors.country && (
                       <p className="text-sm text-destructive mt-1">{errors.country.message}</p>
                     )}
@@ -307,14 +316,12 @@ export default function PostJob() {
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="INR">INR (₹)</SelectItem>
-                        <SelectItem value="USD">USD ($)</SelectItem>
-                        <SelectItem value="EUR">EUR (€)</SelectItem>
-                        <SelectItem value="GBP">GBP (£)</SelectItem>
-                        <SelectItem value="AED">AED (د.إ)</SelectItem>
-                        <SelectItem value="SAR">SAR (﷼)</SelectItem>
-                        <SelectItem value="QAR">QAR (ر.ق)</SelectItem>
+                      <SelectContent className="max-h-64">
+                        {CURRENCIES.map(curr => (
+                          <SelectItem key={curr.code} value={curr.code}>
+                            {curr.code} ({curr.symbol})
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

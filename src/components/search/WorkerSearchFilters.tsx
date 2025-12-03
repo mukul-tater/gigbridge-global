@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Search, Save, X, MapPin, DollarSign, Briefcase, Award } from 'lucide-react';
+import { NATIONALITIES, AVAILABILITY_OPTIONS, POPULAR_SKILLS } from '@/lib/constants';
 
 export interface WorkerFilters {
   keyword: string;
@@ -29,21 +30,6 @@ interface WorkerSearchFiltersProps {
   onSaveSearch: () => void;
   loading?: boolean;
 }
-
-const NATIONALITIES = [
-  'All Nationalities', 'India', 'Philippines', 'Bangladesh', 'Pakistan', 'Nepal',
-  'Sri Lanka', 'Indonesia', 'Egypt', 'Kenya', 'Nigeria', 'Ethiopia'
-];
-
-const AVAILABILITY_OPTIONS = [
-  'All', 'Immediately', 'Within 1 month', 'Within 2 months', 'Within 3 months', 'Notice period required'
-];
-
-const POPULAR_SKILLS = [
-  'Welding', 'Electrical', 'Plumbing', 'Construction', 'Manufacturing',
-  'Carpentry', 'Painting', 'Heavy Equipment', 'Safety Management', 'Quality Control',
-  'Masonry', 'HVAC', 'Scaffolding', 'Steel Fixing', 'Crane Operation'
-];
 
 export default function WorkerSearchFilters({
   filters,
@@ -106,7 +92,7 @@ export default function WorkerSearchFilters({
             <SelectTrigger id="nationality">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-card z-50">
+            <SelectContent className="bg-card z-50 max-h-64">
               {NATIONALITIES.map(nat => (
                 <SelectItem key={nat} value={nat}>{nat}</SelectItem>
               ))}

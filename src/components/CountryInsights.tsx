@@ -42,6 +42,66 @@ const CountryInsights = () => {
       culturalNote: "Multicultural environment, respect for Islamic customs"
     },
     {
+      name: "Saudi Arabia",
+      flag: "🇸🇦",
+      status: "Very High",
+      statusColor: "bg-red-50 text-red-700",
+      reason: "Vision 2030 mega projects & NEOM development",
+      avgSalary: "$2,500-3,500",
+      visaProcess: "Work visa via employer (2-4 months)",
+      languages: ["Arabic", "English"],
+      topJobs: ["Construction", "Oil & Gas", "Hospitality"],
+      culturalNote: "Conservative culture, respect for religious practices"
+    },
+    {
+      name: "Qatar",
+      flag: "🇶🇦",
+      status: "High Demand",
+      statusColor: "bg-orange-50 text-orange-700",
+      reason: "Post World Cup infrastructure development",
+      avgSalary: "$2,800-3,600",
+      visaProcess: "Work visa sponsored by employer (1-2 months)",
+      languages: ["Arabic", "English"],
+      topJobs: ["Construction", "Hospitality", "Manufacturing"],
+      culturalNote: "High standard of living, multicultural workforce"
+    },
+    {
+      name: "Singapore",
+      flag: "🇸🇬",
+      status: "High Demand",
+      statusColor: "bg-orange-50 text-orange-700",
+      reason: "Tech hub expansion & skilled trades shortage",
+      avgSalary: "$3,200-4,000",
+      visaProcess: "S Pass or Work Permit (2-4 weeks)",
+      languages: ["English", "Mandarin", "Malay"],
+      topJobs: ["Construction", "Manufacturing", "IT"],
+      culturalNote: "Efficiency-driven, multicultural society"
+    },
+    {
+      name: "Australia",
+      flag: "🇦🇺",
+      status: "High Demand",
+      statusColor: "bg-orange-50 text-orange-700",
+      reason: "Mining boom & construction skills gap",
+      avgSalary: "$4,000-5,500",
+      visaProcess: "Skilled Worker Visa (3-6 months)",
+      languages: ["English"],
+      topJobs: ["Mining", "Construction", "Healthcare"],
+      culturalNote: "Laid-back culture, strong worker rights"
+    },
+    {
+      name: "Canada",
+      flag: "🇨🇦",
+      status: "High Demand",
+      statusColor: "bg-orange-50 text-orange-700",
+      reason: "Skilled trades shortage & immigration-friendly",
+      avgSalary: "$3,500-4,800",
+      visaProcess: "Express Entry or LMIA (3-8 months)",
+      languages: ["English", "French"],
+      topJobs: ["Construction", "Welding", "Electrician"],
+      culturalNote: "Diverse, welcoming to immigrants"
+    },
+    {
       name: "Norway",
       flag: "🇳🇴",
       status: "Medium-High",
@@ -52,6 +112,18 @@ const CountryInsights = () => {
       languages: ["Norwegian", "English"],
       topJobs: ["Oil & Gas", "Renewable Energy", "Maritime"],
       culturalNote: "Egalitarian society, outdoor lifestyle important"
+    },
+    {
+      name: "Malaysia",
+      flag: "🇲🇾",
+      status: "Medium-High",
+      statusColor: "bg-yellow-50 text-yellow-700",
+      reason: "Manufacturing hub & infrastructure development",
+      avgSalary: "$1,500-2,500",
+      visaProcess: "Employment Pass (1-2 months)",
+      languages: ["Malay", "English", "Mandarin"],
+      topJobs: ["Manufacturing", "Construction", "Electronics"],
+      culturalNote: "Multicultural society, affordable living"
     }
   ];
 

@@ -5,6 +5,7 @@ import { Search, MapPin, Globe, TrendingUp } from "lucide-react";
 import heroImage from "@/assets/hero-workers.jpg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { DESTINATION_COUNTRIES, JOB_CATEGORIES } from "@/lib/constants";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -84,13 +85,10 @@ const HeroSection = () => {
                     <SelectTrigger className="pl-10 h-12">
                       <SelectValue placeholder="Country" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Japan">Japan</SelectItem>
-                      <SelectItem value="Germany">Germany</SelectItem>
-                      <SelectItem value="UAE">UAE</SelectItem>
-                      <SelectItem value="Saudi Arabia">Saudi Arabia</SelectItem>
-                      <SelectItem value="Qatar">Qatar</SelectItem>
-                      <SelectItem value="Singapore">Singapore</SelectItem>
+                    <SelectContent className="max-h-64">
+                      {DESTINATION_COUNTRIES.filter(c => c !== 'All Countries').slice(0, 25).map(country => (
+                        <SelectItem key={country} value={country}>{country}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -99,13 +97,10 @@ const HeroSection = () => {
                   <SelectTrigger className="h-12">
                     <SelectValue placeholder="Job Category" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="construction">Construction</SelectItem>
-                    <SelectItem value="electrical">Electrical</SelectItem>
-                    <SelectItem value="welding">Welding</SelectItem>
-                    <SelectItem value="plumbing">Plumbing</SelectItem>
-                    <SelectItem value="delivery">Delivery</SelectItem>
-                    <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                  <SelectContent className="max-h-64">
+                    {JOB_CATEGORIES.filter(c => c !== 'All Categories').map(category => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -128,7 +123,7 @@ const HeroSection = () => {
                 <div className="text-xs text-muted-foreground font-medium">Active Jobs</div>
               </div>
               <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
-                <div className="text-2xl md:text-3xl font-bold text-secondary mb-1">32</div>
+                <div className="text-2xl md:text-3xl font-bold text-secondary mb-1">50+</div>
                 <div className="text-xs text-muted-foreground font-medium">Countries</div>
               </div>
               <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
@@ -149,7 +144,7 @@ const HeroSection = () => {
                   <h3 className="font-bold text-foreground text-lg">Global Reach</h3>
                 </div>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Access opportunities in 32+ countries with the highest demand for skilled workers
+                  Access opportunities in 50+ countries with the highest demand for skilled workers
                 </p>
               </div>
 
