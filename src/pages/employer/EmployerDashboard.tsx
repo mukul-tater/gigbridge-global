@@ -3,13 +3,14 @@ import EmployerSidebar from "@/components/employer/EmployerSidebar";
 import EmployerHeader from "@/components/employer/EmployerHeader";
 import InteractiveChart from "@/components/InteractiveChart";
 import { Card } from "@/components/ui/card";
-import { Clock, CheckCircle, AlertCircle, Users } from "lucide-react";
+import { Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import BackgroundVerificationCard from "@/components/employer/BackgroundVerificationCard";
 import PaymentManagementCard from "@/components/employer/PaymentManagementCard";
 import AnalyticsSummaryCard from "@/components/employer/AnalyticsSummaryCard";
+import ShortlistedCandidatesCard from "@/components/employer/ShortlistedCandidatesCard";
 
 export default function EmployerDashboard() {
   const { profile } = useAuth();
@@ -17,6 +18,7 @@ export default function EmployerDashboard() {
   const [payments, setPayments] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [shortlistedWorkers, setShortlistedWorkers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,17 +29,27 @@ export default function EmployerDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [verificationsRes, paymentsRes, jobsRes, applicationsRes] = await Promise.all([
+      const [verificationsRes, paymentsRes, jobsRes, applicationsRes, shortlistRes] = await Promise.all([
         supabase.from('background_verifications').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
         supabase.from('payments').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
         supabase.from('jobs').select('*').eq('employer_id', profile?.id),
-        supabase.from('job_applications').select('*').eq('employer_id', profile?.id)
+        supabase.from('job_applications').select('*').eq('employer_id', profile?.id),
+        supabase.from('shortlisted_workers').select(`
+          id,
+          worker_id,
+          list_name,
+          notes,
+          rating,
+          created_at,
+          profiles!shortlisted_workers_worker_id_fkey(full_name, email, avatar_url)
+        `).eq('employer_id', profile?.id).order('created_at', { ascending: false }).limit(5)
       ]);
 
       setVerifications(verificationsRes.data || []);
       setPayments(paymentsRes.data || []);
       setJobs(jobsRes.data || []);
       setApplications(applicationsRes.data || []);
+      setShortlistedWorkers(shortlistRes.data || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -229,22 +241,7 @@ export default function EmployerDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Recent Applications</h2>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-start gap-3 pb-3 border-b last:border-0">
-                  <div className="bg-primary/10 p-2 rounded">
-                    <Users className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">Amit Kumar applied for Senior Welder</p>
-                    <p className="text-sm text-muted-foreground">5 years experience • 2 hours ago</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
+          <ShortlistedCandidatesCard workers={shortlistedWorkers} loading={loading} />
 
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Top Performing Jobs</h2>
