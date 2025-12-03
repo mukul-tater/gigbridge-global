@@ -49,21 +49,22 @@ export default function Jobs() {
 
   // Load jobs on mount and when search params change
   useEffect(() => {
-    const keyword = searchParams.get('keyword');
-    const location = searchParams.get('location');
-    const category = searchParams.get('category');
+    const keyword = searchParams.get('keyword') || '';
+    const country = searchParams.get('location') || 'All Countries'; // 'location' from homepage is actually country
+    const category = searchParams.get('category') || 'All Categories';
     
-    setFilters(prev => ({
-      ...prev,
-      keyword: keyword || '',
-      location: location || '',
-      jobCategory: category || 'All Categories'
-    }));
+    const newFilters: JobFilters = {
+      ...filters,
+      keyword,
+      country,
+      jobCategory: category
+    };
     
-    fetchJobs();
+    setFilters(newFilters);
+    fetchJobsWithFilters(newFilters);
   }, [searchParams]);
 
-  const fetchJobs = async () => {
+  const fetchJobsWithFilters = async (currentFilters: JobFilters) => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -92,7 +93,7 @@ export default function Jobs() {
         skills: job.job_skills?.map((s: any) => s.skill_name) || []
       }));
 
-      applyFilters(formattedJobs);
+      applyFiltersToJobs(formattedJobs, currentFilters);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast.error('Failed to load jobs');
@@ -102,44 +103,44 @@ export default function Jobs() {
     }
   };
 
-  const applyFilters = (jobsToFilter: Job[]) => {
+  const applyFiltersToJobs = (jobsToFilter: Job[], currentFilters: JobFilters) => {
     let filtered = [...jobsToFilter];
     
-    if (filters.keyword) {
+    if (currentFilters.keyword) {
       filtered = filtered.filter(job => 
-        job.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        job.description.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        job.company.toLowerCase().includes(filters.keyword.toLowerCase())
+        job.title.toLowerCase().includes(currentFilters.keyword.toLowerCase()) ||
+        job.description.toLowerCase().includes(currentFilters.keyword.toLowerCase()) ||
+        job.company.toLowerCase().includes(currentFilters.keyword.toLowerCase())
       );
     }
 
-    if (filters.location) {
+    if (currentFilters.location) {
       filtered = filtered.filter(job =>
-        job.location.toLowerCase().includes(filters.location.toLowerCase())
+        job.location.toLowerCase().includes(currentFilters.location.toLowerCase())
       );
     }
 
-    if (filters.country && filters.country !== 'All Countries') {
+    if (currentFilters.country && currentFilters.country !== 'All Countries') {
       filtered = filtered.filter(job =>
-        job.location.toLowerCase().includes(filters.country.toLowerCase())
+        job.location.toLowerCase().includes(currentFilters.country.toLowerCase())
       );
     }
 
-    if (filters.jobCategory && filters.jobCategory !== 'All Categories') {
+    if (currentFilters.jobCategory && currentFilters.jobCategory !== 'All Categories') {
       filtered = filtered.filter(job =>
-        job.category?.toLowerCase().includes(filters.jobCategory.toLowerCase()) ||
-        job.title.toLowerCase().includes(filters.jobCategory.toLowerCase()) ||
-        job.description.toLowerCase().includes(filters.jobCategory.toLowerCase())
+        job.category?.toLowerCase().includes(currentFilters.jobCategory.toLowerCase()) ||
+        job.title.toLowerCase().includes(currentFilters.jobCategory.toLowerCase()) ||
+        job.description.toLowerCase().includes(currentFilters.jobCategory.toLowerCase())
       );
     }
 
-    if (filters.visaSponsorship) {
+    if (currentFilters.visaSponsorship) {
       filtered = filtered.filter(job => job.visaSponsorship);
     }
 
-    if (filters.skills.length > 0) {
+    if (currentFilters.skills.length > 0) {
       filtered = filtered.filter(job =>
-        filters.skills.some(skill =>
+        currentFilters.skills.some(skill =>
           job.skills.some(jobSkill => 
             jobSkill.toLowerCase().includes(skill.toLowerCase())
           )
@@ -154,7 +155,7 @@ export default function Jobs() {
   };
 
   const handleSearch = () => {
-    fetchJobs();
+    fetchJobsWithFilters(filters);
   };
 
   const handleSaveSearch = async (name: string, alertsEnabled: boolean, alertFrequency: string) => {
