@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { 
-  MapPin, Building2, Briefcase, DollarSign, Clock, 
+  MapPin, Building2, Briefcase, Clock, 
   CheckCircle2, ArrowLeft, Users, Globe, Shield, Calendar,
   Share2, Bookmark
 } from 'lucide-react';
@@ -268,9 +268,12 @@ export default function JobDetail() {
                       <span>{job.location}, {job.country}</span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <DollarSign className="h-4 w-4 shrink-0" />
+                      <span className="font-bold text-primary">₹</span>
                       <span className="font-semibold text-foreground">
-                        {job.currency} {job.salary_min?.toLocaleString()} - {job.salary_max?.toLocaleString()}
+                        {job.currency === 'INR' 
+                          ? `₹${job.salary_min?.toLocaleString()} - ₹${job.salary_max?.toLocaleString()}`
+                          : `₹${(job.salary_min * 83)?.toLocaleString()} - ₹${(job.salary_max * 83)?.toLocaleString()}`
+                        }
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
@@ -364,8 +367,19 @@ export default function JobDetail() {
                   ) : (
                     <Button 
                       size="lg" 
-                      onClick={handleApply}
-                      disabled={hasApplied || applying || job.status !== 'ACTIVE' || !isAuthenticated}
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          toast({
+                            title: 'Login Required',
+                            description: 'Please login as a worker to apply for jobs',
+                            variant: 'destructive'
+                          });
+                          navigate('/auth');
+                          return;
+                        }
+                        handleApply();
+                      }}
+                      disabled={hasApplied || applying || job.status !== 'ACTIVE'}
                       className="w-full"
                     >
                       {hasApplied ? (

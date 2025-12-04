@@ -12,7 +12,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "I found my dream job in Japan through SafeWork. The visa process was smooth and the salary is exactly as promised. My family's life has completely changed!",
       placement: "Construction Manager",
-      salary: "$3,800/month"
+      salary: "₹3,00,000/month"
     },
     {
       name: "Maria Santos",
@@ -22,7 +22,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "Within 3 weeks of signing up, I had 5 job offers from Germany. The platform made it easy to compare opportunities and choose the best fit for my skills.",
       placement: "Solar Panel Installer",
-      salary: "$4,200/month"
+      salary: "₹3,30,000/month"
     },
     {
       name: "Ahmed Hassan",
@@ -32,7 +32,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "SafeWork Global connected me with a reputable company in Dubai. The accommodation and benefits are excellent. I recommend this to all skilled workers!",
       placement: "Pipeline Welder",
-      salary: "$3,500/month"
+      salary: "₹2,75,000/month"
     },
     {
       name: "Chen Wei",
@@ -42,7 +42,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "Fast hiring process with minimal paperwork. I started my job in Poland within 6 weeks. The platform's support team helped me every step of the way.",
       placement: "Assembly Line Lead",
-      salary: "$2,800/month"
+      salary: "₹2,20,000/month"
     }
   ];
 

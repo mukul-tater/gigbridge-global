@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, TrendingUp, Users, MapPin, DollarSign, Clock, AlertCircle } from "lucide-react";
+import { ArrowRight, TrendingUp, Users, MapPin, Clock, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CountryInsights = () => {
+  const navigate = useNavigate();
+  
   const countries = [
     {
       name: "Japan",
@@ -11,7 +14,7 @@ const CountryInsights = () => {
       status: "High Demand",
       statusColor: "bg-red-50 text-red-700",
       reason: "Aging workforce & infrastructure renewal",
-      avgSalary: "$3,500-4,200",
+      avgSalary: "₹2,75,000-3,30,000",
       visaProcess: "Work visa required (3-6 months)",
       languages: ["Japanese", "English (limited)"],
       topJobs: ["Construction", "Manufacturing", "Elderly Care"],
@@ -23,7 +26,7 @@ const CountryInsights = () => {
       status: "Very High",
       statusColor: "bg-red-50 text-red-700",
       reason: "Green energy transition & skilled labor shortage",
-      avgSalary: "$3,800-4,500",
+      avgSalary: "₹3,00,000-3,55,000",
       visaProcess: "EU Blue Card or work permit (2-4 months)",
       languages: ["German", "English"],
       topJobs: ["Renewable Energy", "Engineering", "Construction"],
@@ -35,7 +38,7 @@ const CountryInsights = () => {
       status: "High Demand",
       statusColor: "bg-orange-50 text-orange-700",
       reason: "Expo legacy projects & Vision 2071 development",
-      avgSalary: "$2,800-3,800",
+      avgSalary: "₹2,20,000-3,00,000",
       visaProcess: "Work visa sponsored by employer (1-3 months)",
       languages: ["Arabic", "English"],
       topJobs: ["Construction", "Hospitality", "Transportation"],
@@ -47,7 +50,7 @@ const CountryInsights = () => {
       status: "Very High",
       statusColor: "bg-red-50 text-red-700",
       reason: "Vision 2030 mega projects & NEOM development",
-      avgSalary: "$2,500-3,500",
+      avgSalary: "₹2,00,000-2,75,000",
       visaProcess: "Work visa via employer (2-4 months)",
       languages: ["Arabic", "English"],
       topJobs: ["Construction", "Oil & Gas", "Hospitality"],
@@ -59,7 +62,7 @@ const CountryInsights = () => {
       status: "High Demand",
       statusColor: "bg-orange-50 text-orange-700",
       reason: "Post World Cup infrastructure development",
-      avgSalary: "$2,800-3,600",
+      avgSalary: "₹2,20,000-2,85,000",
       visaProcess: "Work visa sponsored by employer (1-2 months)",
       languages: ["Arabic", "English"],
       topJobs: ["Construction", "Hospitality", "Manufacturing"],
@@ -71,7 +74,7 @@ const CountryInsights = () => {
       status: "High Demand",
       statusColor: "bg-orange-50 text-orange-700",
       reason: "Tech hub expansion & skilled trades shortage",
-      avgSalary: "$3,200-4,000",
+      avgSalary: "₹2,50,000-3,15,000",
       visaProcess: "S Pass or Work Permit (2-4 weeks)",
       languages: ["English", "Mandarin", "Malay"],
       topJobs: ["Construction", "Manufacturing", "IT"],
@@ -83,7 +86,7 @@ const CountryInsights = () => {
       status: "High Demand",
       statusColor: "bg-orange-50 text-orange-700",
       reason: "Mining boom & construction skills gap",
-      avgSalary: "$4,000-5,500",
+      avgSalary: "₹3,15,000-4,35,000",
       visaProcess: "Skilled Worker Visa (3-6 months)",
       languages: ["English"],
       topJobs: ["Mining", "Construction", "Healthcare"],
@@ -95,7 +98,7 @@ const CountryInsights = () => {
       status: "High Demand",
       statusColor: "bg-orange-50 text-orange-700",
       reason: "Skilled trades shortage & immigration-friendly",
-      avgSalary: "$3,500-4,800",
+      avgSalary: "₹2,75,000-3,80,000",
       visaProcess: "Express Entry or LMIA (3-8 months)",
       languages: ["English", "French"],
       topJobs: ["Construction", "Welding", "Electrician"],
@@ -107,7 +110,7 @@ const CountryInsights = () => {
       status: "Medium-High",
       statusColor: "bg-yellow-50 text-yellow-700",
       reason: "Oil industry & renewable energy expansion",
-      avgSalary: "$4,500-5,200",
+      avgSalary: "₹3,55,000-4,10,000",
       visaProcess: "Work permit required (2-6 months)",
       languages: ["Norwegian", "English"],
       topJobs: ["Oil & Gas", "Renewable Energy", "Maritime"],
@@ -119,13 +122,21 @@ const CountryInsights = () => {
       status: "Medium-High",
       statusColor: "bg-yellow-50 text-yellow-700",
       reason: "Manufacturing hub & infrastructure development",
-      avgSalary: "$1,500-2,500",
+      avgSalary: "₹1,20,000-2,00,000",
       visaProcess: "Employment Pass (1-2 months)",
       languages: ["Malay", "English", "Mandarin"],
       topJobs: ["Manufacturing", "Construction", "Electronics"],
       culturalNote: "Multicultural society, affordable living"
     }
   ];
+
+  const handleViewJobs = (countryName: string) => {
+    navigate(`/jobs?location=${encodeURIComponent(countryName)}`);
+  };
+
+  const handleExploreAll = () => {
+    navigate('/jobs');
+  };
 
   return (
     <section className="py-20 bg-muted/30">
@@ -142,7 +153,11 @@ const CountryInsights = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {countries.map((country, index) => (
-            <Card key={index} className="hover:shadow-lg transition-all duration-300">
+            <Card 
+              key={index} 
+              className="hover:shadow-lg transition-all duration-300 cursor-pointer"
+              onClick={() => handleViewJobs(country.name)}
+            >
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -169,7 +184,7 @@ const CountryInsights = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-success" />
+                    <span className="text-success font-bold">₹</span>
                     <div>
                       <div className="text-sm font-medium">Avg. Salary</div>
                       <div className="text-xs text-muted-foreground">{country.avgSalary}</div>
@@ -214,7 +229,14 @@ const CountryInsights = () => {
                   <p className="text-xs text-muted-foreground">{country.culturalNote}</p>
                 </div>
 
-                <Button variant="professional" className="w-full">
+                <Button 
+                  variant="professional" 
+                  className="w-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewJobs(country.name);
+                  }}
+                >
                   <MapPin className="h-4 w-4" />
                   View {country.name} Jobs
                 </Button>
@@ -224,7 +246,7 @@ const CountryInsights = () => {
         </div>
 
         <div className="text-center">
-          <Button variant="hero" size="lg">
+          <Button variant="hero" size="lg" onClick={handleExploreAll}>
             Explore All Country Insights
             <ArrowRight className="h-4 w-4" />
           </Button>

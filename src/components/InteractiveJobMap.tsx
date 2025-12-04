@@ -1,83 +1,96 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, DollarSign, Clock, TrendingUp, Zap, CheckCircle, Briefcase } from "lucide-react";
+import { MapPin, Clock, TrendingUp, Zap, CheckCircle, Briefcase } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const InteractiveJobMap = () => {
+  const navigate = useNavigate();
+  
   const regions = [
     {
       name: "Eastern Europe",
       countries: ["Poland", "Czech Republic", "Romania"],
       jobs: "15,400+",
-      avgSalary: "$2,200-3,200",
+      avgSalary: "₹1,75,000-2,50,000",
       easyHiring: true,
       hiringTime: "2-4 weeks",
       visaComplexity: "Simple",
       highlights: ["Fast work permits", "Minimal paperwork", "EU access"],
       topJobs: ["Manufacturing", "Logistics", "Construction"],
-      color: "from-green-500 to-emerald-600"
+      color: "from-green-500 to-emerald-600",
+      searchCountry: "Poland"
     },
     {
       name: "Middle East",
       countries: ["UAE", "Saudi Arabia", "Qatar"],
       jobs: "22,800+",
-      avgSalary: "$2,800-4,500",
+      avgSalary: "₹2,20,000-3,50,000",
       easyHiring: true,
       hiringTime: "1-3 weeks",
       visaComplexity: "Simple",
       highlights: ["Employer-sponsored visa", "Tax-free income", "Fast processing"],
       topJobs: ["Construction", "Hospitality", "Transportation"],
-      color: "from-amber-500 to-orange-600"
+      color: "from-amber-500 to-orange-600",
+      searchCountry: "United Arab Emirates"
     },
     {
       name: "Western Europe",
       countries: ["Germany", "Netherlands", "Belgium"],
       jobs: "18,900+",
-      avgSalary: "$3,500-4,800",
+      avgSalary: "₹2,75,000-3,80,000",
       easyHiring: false,
       hiringTime: "2-6 months",
       visaComplexity: "Moderate",
       highlights: ["High salaries", "Great benefits", "Quality of life"],
       topJobs: ["Renewable Energy", "Engineering", "Healthcare"],
-      color: "from-blue-500 to-indigo-600"
+      color: "from-blue-500 to-indigo-600",
+      searchCountry: "Germany"
     },
     {
       name: "East Asia",
       countries: ["Japan", "South Korea", "Singapore"],
       jobs: "16,200+",
-      avgSalary: "$3,200-4,500",
+      avgSalary: "₹2,50,000-3,50,000",
       easyHiring: false,
       hiringTime: "3-6 months",
       visaComplexity: "Complex",
       highlights: ["Career growth", "Cultural experience", "Modern facilities"],
       topJobs: ["Manufacturing", "Construction", "Technology"],
-      color: "from-purple-500 to-pink-600"
+      color: "from-purple-500 to-pink-600",
+      searchCountry: "Japan"
     },
     {
       name: "Scandinavia",
       countries: ["Norway", "Sweden", "Denmark"],
       jobs: "8,500+",
-      avgSalary: "$4,000-5,500",
+      avgSalary: "₹3,15,000-4,30,000",
       easyHiring: false,
       hiringTime: "2-6 months",
       visaComplexity: "Moderate",
       highlights: ["Highest salaries", "Work-life balance", "Social benefits"],
       topJobs: ["Oil & Gas", "Renewable Energy", "Maritime"],
-      color: "from-cyan-500 to-blue-600"
+      color: "from-cyan-500 to-blue-600",
+      searchCountry: "Norway"
     },
     {
       name: "Southeast Asia",
       countries: ["Malaysia", "Thailand", "Vietnam"],
       jobs: "12,300+",
-      avgSalary: "$1,800-2,800",
+      avgSalary: "₹1,40,000-2,20,000",
       easyHiring: true,
       hiringTime: "2-4 weeks",
       visaComplexity: "Simple",
       highlights: ["Low cost of living", "Quick hiring", "Growing markets"],
       topJobs: ["Manufacturing", "Hospitality", "Agriculture"],
-      color: "from-teal-500 to-green-600"
+      color: "from-teal-500 to-green-600",
+      searchCountry: "Malaysia"
     }
   ];
+
+  const handleExploreRegion = (searchCountry: string) => {
+    navigate(`/jobs?location=${encodeURIComponent(searchCountry)}`);
+  };
 
   return (
     <section className="py-20 bg-gradient-to-b from-muted/30 to-background">
@@ -105,9 +118,10 @@ const InteractiveJobMap = () => {
           {regions.map((region, index) => (
             <Card 
               key={index} 
-              className={`relative overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 ${
+              className={`relative overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 cursor-pointer ${
                 region.easyHiring ? 'border-success/50' : 'border-border'
               }`}
+              onClick={() => handleExploreRegion(region.searchCountry)}
             >
               {region.easyHiring && (
                 <div className="absolute top-3 right-3 z-10">
@@ -143,7 +157,7 @@ const InteractiveJobMap = () => {
                   </div>
                   <div className="bg-muted/50 p-3 rounded-lg">
                     <div className="flex items-center gap-1 text-success mb-1">
-                      <DollarSign className="h-3 w-3" />
+                      <span className="text-xs">₹</span>
                       <span className="text-xs font-medium">Avg Salary</span>
                     </div>
                     <div className="text-sm font-bold text-foreground">{region.avgSalary}</div>
@@ -191,7 +205,14 @@ const InteractiveJobMap = () => {
                   </div>
                 </div>
 
-                <Button variant="professional" className="w-full">
+                <Button 
+                  variant="professional" 
+                  className="w-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleExploreRegion(region.searchCountry);
+                  }}
+                >
                   <TrendingUp className="h-4 w-4" />
                   Explore {region.name} Jobs
                 </Button>
