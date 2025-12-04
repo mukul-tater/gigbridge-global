@@ -234,7 +234,7 @@ class SeedService {
       ];
 
       const jobTypes = ['FULL_TIME', 'CONTRACT', 'PART_TIME'];
-      const experienceLevels = ['ENTRY', 'MID', 'SENIOR', 'EXPERT'];
+      const experienceLevels = ['ENTRY', 'INTERMEDIATE', 'SENIOR', 'EXPERT'];
       
       const jobs = [];
       
@@ -246,13 +246,13 @@ class SeedService {
           const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
           const expLevel = experienceLevels[Math.floor(Math.random() * experienceLevels.length)];
           
-          const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'MID' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
+          const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'INTERMEDIATE' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
           const salaryVariation = Math.floor(Math.random() * 50000);
           
           jobs.push({
             title: `${title} - ${category.name}`,
             description: `We are seeking a skilled ${title} to join our ${category.name.toLowerCase()} team in ${location.country}. This position offers excellent opportunities for career growth and development in a dynamic work environment. Visa sponsorship available for qualified candidates.`,
-            requirements: `${expLevel === 'ENTRY' ? '1-2' : expLevel === 'MID' ? '3-5' : expLevel === 'SENIOR' ? '5-8' : '8+'} years of experience in ${category.name.toLowerCase()}\nRelevant certifications preferred\nStrong communication skills\nAbility to work in a team`,
+            requirements: `${expLevel === 'ENTRY' ? '1-2' : expLevel === 'INTERMEDIATE' ? '3-5' : expLevel === 'SENIOR' ? '5-8' : '8+'} years of experience in ${category.name.toLowerCase()}\nRelevant certifications preferred\nStrong communication skills\nAbility to work in a team`,
             responsibilities: `Perform ${category.name.toLowerCase()} tasks according to project specifications\nMaintain quality standards\nFollow safety protocols\nCollaborate with team members\nReport progress to supervisors`,
             benefits: `Competitive salary\nHealth insurance\nAccommodation provided\nAnnual flight tickets\nPaid vacation`,
             location: location.city,
@@ -282,13 +282,13 @@ class SeedService {
         const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
         const expLevel = experienceLevels[Math.floor(Math.random() * experienceLevels.length)];
         
-        const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'MID' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
+        const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'INTERMEDIATE' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
         const salaryVariation = Math.floor(Math.random() * 50000);
         
         jobs.push({
           title: `${title} - ${category.name}`,
           description: `We are seeking a skilled ${title} to join our ${category.name.toLowerCase()} team in ${location.country}. This position offers excellent opportunities for career growth and development in a dynamic work environment. Visa sponsorship available for qualified candidates.`,
-          requirements: `${expLevel === 'ENTRY' ? '1-2' : expLevel === 'MID' ? '3-5' : expLevel === 'SENIOR' ? '5-8' : '8+'} years of experience in ${category.name.toLowerCase()}\nRelevant certifications preferred\nStrong communication skills\nAbility to work in a team`,
+          requirements: `${expLevel === 'ENTRY' ? '1-2' : expLevel === 'INTERMEDIATE' ? '3-5' : expLevel === 'SENIOR' ? '5-8' : '8+'} years of experience in ${category.name.toLowerCase()}\nRelevant certifications preferred\nStrong communication skills\nAbility to work in a team`,
           responsibilities: `Perform ${category.name.toLowerCase()} tasks according to project specifications\nMaintain quality standards\nFollow safety protocols\nCollaborate with team members\nReport progress to supervisors`,
           benefits: `Competitive salary\nHealth insurance\nAccommodation provided\nAnnual flight tickets\nPaid vacation`,
           location: location.city,
