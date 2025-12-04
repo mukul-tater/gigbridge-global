@@ -132,6 +132,35 @@ class SeedService {
 
   async seedJobsData(employerId: string, jobCount: number = 100): Promise<SeedResult> {
     try {
+      // Ensure employer profile exists before creating jobs (foreign key requirement)
+      const { data: existingProfile } = await supabase
+        .from('employer_profiles')
+        .select('user_id')
+        .eq('user_id', employerId)
+        .maybeSingle();
+
+      if (!existingProfile) {
+        console.log(`Creating employer profile for ${employerId}...`);
+        const { error: profileError } = await supabase
+          .from('employer_profiles')
+          .insert({
+            user_id: employerId,
+            company_name: 'Demo Company',
+            industry: 'Construction',
+            company_size: '100-500'
+          });
+
+        if (profileError) {
+          console.error('Error creating employer profile:', profileError);
+          return {
+            success: false,
+            message: 'Failed to create employer profile for job creation',
+            errors: [profileError.message]
+          };
+        }
+        console.log('Employer profile created successfully');
+      }
+
       // Job categories with templates
       const categories = [
         {
@@ -326,101 +355,136 @@ class SeedService {
 
   async seedWorkerData(workerId: string): Promise<SeedResult> {
     try {
-      // Create worker profile
-      const { error: profileError } = await supabase
+      // Check if worker profile exists first
+      const { data: existingProfile } = await supabase
         .from('worker_profiles')
-        .insert({
-          user_id: workerId,
-          bio: 'Experienced blue-collar worker with expertise in various industrial and construction roles.',
-          years_of_experience: 8,
-          current_location: 'Mumbai, India',
-          nationality: 'Indian',
-          expected_salary_min: 2500,
-          expected_salary_max: 4000,
-          currency: 'USD',
-          availability: 'IMMEDIATE',
-          has_passport: true,
-          passport_number: 'A12345678',
-          has_visa: false,
-          languages: ['English', 'Hindi', 'Arabic'],
-          ecr_status: 'ECNR',
-          ecr_category: 'ECNR'
-        });
+        .select('user_id')
+        .eq('user_id', workerId)
+        .maybeSingle();
 
-      if (profileError) {
-        return {
-          success: false,
-          message: 'Failed to create worker profile',
-          errors: [profileError.message]
-        };
+      if (!existingProfile) {
+        // Create worker profile only if it doesn't exist
+        const { error: profileError } = await supabase
+          .from('worker_profiles')
+          .insert({
+            user_id: workerId,
+            bio: 'Experienced blue-collar worker with expertise in various industrial and construction roles.',
+            years_of_experience: 8,
+            current_location: 'Mumbai, India',
+            nationality: 'Indian',
+            expected_salary_min: 2500,
+            expected_salary_max: 4000,
+            currency: 'USD',
+            availability: 'IMMEDIATE',
+            has_passport: true,
+            passport_number: 'A12345678',
+            has_visa: false,
+            languages: ['English', 'Hindi', 'Arabic'],
+            ecr_status: 'ECNR',
+            ecr_category: 'ECNR'
+          });
+
+        if (profileError) {
+          return {
+            success: false,
+            message: 'Failed to create worker profile',
+            errors: [profileError.message]
+          };
+        }
+      } else {
+        console.log('Worker profile already exists, skipping creation...');
       }
 
-      // Add skills
-      const skills = [
-        { skill_name: 'Welding', proficiency_level: 'EXPERT', years_of_experience: 6 },
-        { skill_name: 'Electrical Work', proficiency_level: 'INTERMEDIATE', years_of_experience: 3 },
-        { skill_name: 'Construction', proficiency_level: 'ADVANCED', years_of_experience: 5 }
-      ];
-
-      const { error: skillsError } = await supabase
+      // Add skills (only if not already added)
+      const { data: existingSkills } = await supabase
         .from('worker_skills')
-        .insert(skills.map(s => ({ ...s, worker_id: workerId })));
+        .select('id')
+        .eq('worker_id', workerId)
+        .limit(1);
 
-      if (skillsError) {
-        console.error('Error creating skills:', skillsError);
+      if (!existingSkills || existingSkills.length === 0) {
+        const skills = [
+          { skill_name: 'Welding', proficiency_level: 'EXPERT', years_of_experience: 6 },
+          { skill_name: 'Electrical Work', proficiency_level: 'INTERMEDIATE', years_of_experience: 3 },
+          { skill_name: 'Construction', proficiency_level: 'ADVANCED', years_of_experience: 5 }
+        ];
+
+        const { error: skillsError } = await supabase
+          .from('worker_skills')
+          .insert(skills.map(s => ({ ...s, worker_id: workerId })));
+
+        if (skillsError) {
+          console.error('Error creating skills:', skillsError);
+        }
       }
 
-      // Add certifications
-      const certifications = [
-        {
-          certification_name: 'AWS D1.1 Welding Certification',
-          issuing_organization: 'American Welding Society',
-          issue_date: '2020-06-15',
-          verified: true
-        },
-        {
-          certification_name: 'OSHA Safety Training',
-          issuing_organization: 'OSHA',
-          issue_date: '2021-03-20',
-          verified: true
-        }
-      ];
-
-      const { error: certError } = await supabase
+      // Add certifications (only if not already added)
+      const { data: existingCerts } = await supabase
         .from('worker_certifications')
-        .insert(certifications.map(c => ({ ...c, worker_id: workerId })));
+        .select('id')
+        .eq('worker_id', workerId)
+        .limit(1);
 
-      if (certError) {
-        console.error('Error creating certifications:', certError);
+      if (!existingCerts || existingCerts.length === 0) {
+        const certifications = [
+          {
+            certification_name: 'AWS D1.1 Welding Certification',
+            issuing_organization: 'American Welding Society',
+            issue_date: '2020-06-15',
+            verified: true
+          },
+          {
+            certification_name: 'OSHA Safety Training',
+            issuing_organization: 'OSHA',
+            issue_date: '2021-03-20',
+            verified: true
+          }
+        ];
+
+        const { error: certError } = await supabase
+          .from('worker_certifications')
+          .insert(certifications.map(c => ({ ...c, worker_id: workerId })));
+
+        if (certError) {
+          console.error('Error creating certifications:', certError);
+        }
       }
 
-      // Add work experience
-      const experiences = [
-        {
-          company_name: 'Dubai Construction LLC',
-          job_title: 'Senior Welder',
-          location: 'Dubai, UAE',
-          start_date: '2019-01-15',
-          end_date: '2022-12-31',
-          is_current: false,
-          description: 'Performed structural welding on high-rise construction projects.'
-        },
-        {
-          company_name: 'Saudi Steel Industries',
-          job_title: 'Fabrication Welder',
-          location: 'Riyadh, Saudi Arabia',
-          start_date: '2023-02-01',
-          is_current: true,
-          description: 'Currently working on industrial fabrication projects.'
-        }
-      ];
-
-      const { error: expError } = await supabase
+      // Add work experience (only if not already added)
+      const { data: existingExp } = await supabase
         .from('work_experience')
-        .insert(experiences.map(e => ({ ...e, worker_id: workerId })));
+        .select('id')
+        .eq('worker_id', workerId)
+        .limit(1);
 
-      if (expError) {
-        console.error('Error creating work experience:', expError);
+      if (!existingExp || existingExp.length === 0) {
+        const experiences = [
+          {
+            company_name: 'Dubai Construction LLC',
+            job_title: 'Senior Welder',
+            location: 'Dubai, UAE',
+            start_date: '2019-01-15',
+            end_date: '2022-12-31',
+            is_current: false,
+            description: 'Performed structural welding on high-rise construction projects.'
+          },
+          {
+            company_name: 'Saudi Steel Industries',
+            job_title: 'Fabrication Welder',
+            location: 'Riyadh, Saudi Arabia',
+            start_date: '2023-02-01',
+            is_current: true,
+            description: 'Currently working on industrial fabrication projects.'
+          }
+        ];
+
+        const { error: expError } = await supabase
+          .from('work_experience')
+          .insert(experiences.map(e => ({ ...e, worker_id: workerId })));
+
+        if (expError) {
+          console.error('Error creating work experience:', expError);
+        }
       }
 
       return {
