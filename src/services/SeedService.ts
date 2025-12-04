@@ -479,16 +479,26 @@ class SeedService {
 
   async seedAllData(): Promise<SeedResult> {
     const errors: string[] = [];
+    const messages: string[] = [];
 
-    // Step 1: Create demo accounts
-    console.log('Step 1: Creating demo accounts...');
-    const accountsResult = await this.seedDemoAccounts();
-    if (!accountsResult.success) {
-      return accountsResult;
+    // Step 1: Check if accounts already exist, if not create them
+    console.log('Step 1: Checking/creating demo accounts...');
+    const alreadySeeded = await this.checkIfSeeded();
+    
+    if (alreadySeeded) {
+      console.log('Demo accounts already exist, skipping account creation...');
+      messages.push('Using existing demo accounts');
+    } else {
+      const accountsResult = await this.seedDemoAccounts();
+      if (accountsResult.success) {
+        messages.push('Demo accounts created');
+        // Wait for accounts to be fully created
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      } else {
+        // Even if some accounts fail, try to proceed with existing ones
+        console.log('Some accounts may have failed, proceeding with existing accounts...');
+      }
     }
-
-    // Wait for accounts to be fully created
-    await new Promise(resolve => setTimeout(resolve, 3000));
 
     // Step 2: Get employer IDs and seed jobs
     console.log('Step 2: Getting employer IDs and seeding jobs...');
@@ -499,6 +509,7 @@ class SeedService {
       console.log(`Found ${employerIds.length} employer accounts`);
       // Distribute jobs across all employers
       const jobsPerEmployer = Math.ceil(100 / employerIds.length);
+      let totalJobsCreated = 0;
       
       for (let i = 0; i < employerIds.length; i++) {
         const jobsToCreate = i === employerIds.length - 1 
@@ -506,38 +517,59 @@ class SeedService {
           : jobsPerEmployer;
         
         const jobsResult = await this.seedJobsData(employerIds[i], jobsToCreate);
-        if (!jobsResult.success) {
+        if (jobsResult.success) {
+          totalJobsCreated += jobsToCreate;
+        } else {
           errors.push(`Jobs for employer ${i + 1}: ${jobsResult.message}`);
         }
         
         // Small delay between employers
         await new Promise(resolve => setTimeout(resolve, 500));
       }
+      
+      if (totalJobsCreated > 0) {
+        messages.push(`${totalJobsCreated} jobs created across ${employerIds.length} employers`);
+      }
     }
 
-    // Step 3: Get worker ID and seed worker data
+    // Step 3: Get worker ID and seed worker data (skip if profile already exists)
     console.log('Step 3: Getting worker ID and seeding worker profile...');
     const workerId = await this.getWorkerUserId();
     if (!workerId) {
       errors.push('Could not find worker account');
     } else {
-      const workerResult = await this.seedWorkerData(workerId);
-      if (!workerResult.success) {
-        errors.push(`Worker: ${workerResult.message}`);
+      // Check if worker profile already exists
+      const { data: existingProfile } = await supabase
+        .from('worker_profiles')
+        .select('id')
+        .eq('user_id', workerId)
+        .maybeSingle();
+      
+      if (existingProfile) {
+        messages.push('Worker profile already exists');
+      } else {
+        const workerResult = await this.seedWorkerData(workerId);
+        if (workerResult.success) {
+          messages.push('Worker profile created');
+        } else {
+          errors.push(`Worker: ${workerResult.message}`);
+        }
       }
     }
+
+    const finalMessage = messages.join('. ') + (messages.length > 0 ? '.' : '');
 
     if (errors.length > 0) {
       return {
         success: false,
-        message: 'Some data failed to seed',
+        message: finalMessage || 'Some data failed to seed',
         errors
       };
     }
 
     return {
       success: true,
-      message: 'All demo data seeded successfully! Demo accounts, jobs, and worker profiles created.'
+      message: finalMessage || 'All demo data seeded successfully!'
     };
   }
 }
