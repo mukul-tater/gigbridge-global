@@ -58,6 +58,7 @@ import EmployerPayments from "./pages/employer/EmployerPayments";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import JobVerification from "./pages/admin/JobVerification";
+import EditJob from "./pages/admin/EditJob";
 import DocumentVerification from "./pages/admin/DocumentVerification";
 import ComplianceCheck from "./pages/admin/ComplianceCheck";
 import Reports from "./pages/admin/Reports";
@@ -259,6 +260,11 @@ const App = () => (
             <Route path="/admin/job-verification" element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <JobVerification />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/edit-job/:jobId" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <EditJob />
               </ProtectedRoute>
             } />
             <Route path="/admin/document-verification" element={

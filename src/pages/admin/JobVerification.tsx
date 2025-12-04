@@ -3,7 +3,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { Eye, CheckCircle, XCircle, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -178,6 +178,14 @@ export default function JobVerification() {
                     title="View details"
                   >
                     <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => navigate(`/admin/edit-job/${job.id}`)}
+                    title="Edit job"
+                  >
+                    <Pencil className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
