@@ -195,7 +195,20 @@ class SeedService {
         }
       ];
 
-      const locations = [
+      // Priority countries that MUST have jobs
+      const priorityLocations = [
+        { city: 'Muscat', country: 'Oman' },
+        { city: 'Salalah', country: 'Oman' },
+        { city: 'Sohar', country: 'Oman' },
+        { city: 'Tokyo', country: 'Japan' },
+        { city: 'Osaka', country: 'Japan' },
+        { city: 'Nagoya', country: 'Japan' },
+        { city: 'Moscow', country: 'Russia' },
+        { city: 'Saint Petersburg', country: 'Russia' },
+        { city: 'Kazan', country: 'Russia' },
+      ];
+
+      const otherLocations = [
         // Middle East
         { city: 'Dubai', country: 'United Arab Emirates' },
         { city: 'Abu Dhabi', country: 'United Arab Emirates' },
@@ -203,31 +216,17 @@ class SeedService {
         { city: 'Jeddah', country: 'Saudi Arabia' },
         { city: 'Doha', country: 'Qatar' },
         { city: 'Kuwait City', country: 'Kuwait' },
-        { city: 'Muscat', country: 'Oman' },
         { city: 'Manama', country: 'Bahrain' },
         // East Asia
-        { city: 'Tokyo', country: 'Japan' },
-        { city: 'Osaka', country: 'Japan' },
         { city: 'Seoul', country: 'South Korea' },
         { city: 'Singapore', country: 'Singapore' },
         // Western Europe
         { city: 'Berlin', country: 'Germany' },
         { city: 'Munich', country: 'Germany' },
         { city: 'Amsterdam', country: 'Netherlands' },
-        { city: 'Brussels', country: 'Belgium' },
         // Scandinavia
         { city: 'Oslo', country: 'Norway' },
-        { city: 'Bergen', country: 'Norway' },
         { city: 'Stockholm', country: 'Sweden' },
-        { city: 'Copenhagen', country: 'Denmark' },
-        // Eastern Europe
-        { city: 'Warsaw', country: 'Poland' },
-        { city: 'Prague', country: 'Czech Republic' },
-        { city: 'Bucharest', country: 'Romania' },
-        // Southeast Asia
-        { city: 'Kuala Lumpur', country: 'Malaysia' },
-        { city: 'Bangkok', country: 'Thailand' },
-        { city: 'Ho Chi Minh City', country: 'Vietnam' },
         // Others
         { city: 'Sydney', country: 'Australia' },
         { city: 'Toronto', country: 'Canada' },
@@ -239,15 +238,50 @@ class SeedService {
       
       const jobs = [];
       
-      // Generate jobs based on jobCount parameter
-      for (let i = 0; i < jobCount; i++) {
+      // First, create jobs for EACH category in EACH priority country (Oman, Japan, Russia)
+      // This ensures all categories have jobs in these specific countries
+      for (const category of categories) {
+        for (const location of priorityLocations) {
+          const title = category.titles[Math.floor(Math.random() * category.titles.length)];
+          const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
+          const expLevel = experienceLevels[Math.floor(Math.random() * experienceLevels.length)];
+          
+          const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'MID' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
+          const salaryVariation = Math.floor(Math.random() * 50000);
+          
+          jobs.push({
+            title: `${title} - ${category.name}`,
+            description: `We are seeking a skilled ${title} to join our ${category.name.toLowerCase()} team in ${location.country}. This position offers excellent opportunities for career growth and development in a dynamic work environment. Visa sponsorship available for qualified candidates.`,
+            requirements: `${expLevel === 'ENTRY' ? '1-2' : expLevel === 'MID' ? '3-5' : expLevel === 'SENIOR' ? '5-8' : '8+'} years of experience in ${category.name.toLowerCase()}\nRelevant certifications preferred\nStrong communication skills\nAbility to work in a team`,
+            responsibilities: `Perform ${category.name.toLowerCase()} tasks according to project specifications\nMaintain quality standards\nFollow safety protocols\nCollaborate with team members\nReport progress to supervisors`,
+            benefits: `Competitive salary\nHealth insurance\nAccommodation provided\nAnnual flight tickets\nPaid vacation`,
+            location: location.city,
+            country: location.country,
+            job_type: jobType,
+            experience_level: expLevel,
+            salary_min: baseSalary + salaryVariation,
+            salary_max: baseSalary + salaryVariation + 100000,
+            currency: 'INR',
+            openings: Math.floor(Math.random() * 10) + 1,
+            status: 'ACTIVE',
+            visa_sponsorship: true,
+            remote_allowed: false,
+            employer_id: employerId,
+            posted_at: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
+            expires_at: new Date(Date.now() + (30 + Math.floor(Math.random() * 60)) * 24 * 60 * 60 * 1000).toISOString()
+          });
+        }
+      }
+
+      // Then fill remaining jobs from other locations
+      const remainingJobCount = Math.max(0, jobCount - jobs.length);
+      for (let i = 0; i < remainingJobCount; i++) {
         const category = categories[i % categories.length];
         const title = category.titles[Math.floor(Math.random() * category.titles.length)];
-        const location = locations[i % locations.length];
+        const location = otherLocations[i % otherLocations.length];
         const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
         const expLevel = experienceLevels[Math.floor(Math.random() * experienceLevels.length)];
         
-        // Salary in INR (base ranges)
         const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'MID' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
         const salaryVariation = Math.floor(Math.random() * 50000);
         
@@ -257,7 +291,7 @@ class SeedService {
           requirements: `${expLevel === 'ENTRY' ? '1-2' : expLevel === 'MID' ? '3-5' : expLevel === 'SENIOR' ? '5-8' : '8+'} years of experience in ${category.name.toLowerCase()}\nRelevant certifications preferred\nStrong communication skills\nAbility to work in a team`,
           responsibilities: `Perform ${category.name.toLowerCase()} tasks according to project specifications\nMaintain quality standards\nFollow safety protocols\nCollaborate with team members\nReport progress to supervisors`,
           benefits: `Competitive salary\nHealth insurance\nAccommodation provided\nAnnual flight tickets\nPaid vacation`,
-          location: `${location.city}`,
+          location: location.city,
           country: location.country,
           job_type: jobType,
           experience_level: expLevel,
