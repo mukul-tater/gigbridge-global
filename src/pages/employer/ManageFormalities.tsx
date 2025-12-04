@@ -9,15 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import {
-  FileCheck, Plane, Shield, Heart, FileSignature, Calendar,
-  User, Briefcase, MapPin
+  FileCheck, Plane, Shield, Heart, FileSignature,
+  User, MapPin
 } from 'lucide-react';
 
 interface Formality {
@@ -37,16 +35,10 @@ interface Formality {
   flight_booking_status: string;
   completion_percentage: number;
   expected_joining_date: string | null;
-  job_applications: {
-    profiles: {
-      full_name: string | null;
-      email: string;
-    };
-    jobs: {
-      title: string;
-      location: string;
-    };
-  };
+  worker_name?: string;
+  worker_email?: string;
+  job_title?: string;
+  job_location?: string;
 }
 
 export default function ManageFormalities() {
@@ -56,6 +48,7 @@ export default function ManageFormalities() {
   const [loading, setLoading] = useState(true);
   const [selectedFormality, setSelectedFormality] = useState<Formality | null>(null);
   const [updateData, setUpdateData] = useState<any>({});
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -65,20 +58,53 @@ export default function ManageFormalities() {
 
   const fetchFormalities = async () => {
     try {
-      const { data, error } = await supabase
+      // First get all jobs for this employer
+      const { data: jobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id, title, location')
+        .eq('employer_id', user?.id);
+
+      if (jobsError) throw jobsError;
+
+      if (!jobs || jobs.length === 0) {
+        setFormalities([]);
+        setLoading(false);
+        return;
+      }
+
+      const jobIds = jobs.map(j => j.id);
+
+      // Get formalities for these jobs
+      const { data: formalitiesData, error: formalitiesError } = await supabase
         .from('job_formalities')
-        .select(`
-          *,
-          job_applications!inner (
-            profiles!job_applications_worker_id_fkey (full_name, email),
-            jobs!inner (title, location)
-          )
-        `)
-        .eq('job_applications.jobs.employer_id', user?.id)
+        .select('*')
+        .in('job_id', jobIds)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setFormalities((data as any) || []);
+      if (formalitiesError) throw formalitiesError;
+
+      // Fetch worker details for each formality
+      const formalitiesWithDetails = await Promise.all(
+        (formalitiesData || []).map(async (formality) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, email')
+            .eq('id', formality.worker_id)
+            .maybeSingle();
+
+          const job = jobs.find(j => j.id === formality.job_id);
+
+          return {
+            ...formality,
+            worker_name: profile?.full_name || 'Unknown',
+            worker_email: profile?.email || '',
+            job_title: job?.title || 'Unknown Position',
+            job_location: job?.location || ''
+          };
+        })
+      );
+
+      setFormalities(formalitiesWithDetails);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -92,36 +118,43 @@ export default function ManageFormalities() {
 
   const updateFormality = async (formalityId: string, updates: any) => {
     try {
-      // Calculate completion percentage
       const formality = formalities.find(f => f.id === formalityId);
       if (!formality) return;
 
+      // Calculate completion percentage
       let completedItems = 0;
       let totalItems = 0;
 
+      const currentVisa = updates.visa_status ?? formality.visa_status;
+      const currentEcr = updates.ecr_check_status ?? formality.ecr_check_status;
+      const currentMedical = updates.medical_exam_status ?? formality.medical_exam_status;
+      const currentPolice = updates.police_verification_status ?? formality.police_verification_status;
+      const currentContract = updates.contract_signed ?? formality.contract_signed;
+      const currentFlight = updates.flight_booking_status ?? formality.flight_booking_status;
+
       if (formality.visa_required) {
         totalItems++;
-        if (updates.visa_status === 'COMPLETED' || formality.visa_status === 'COMPLETED') completedItems++;
+        if (currentVisa === 'COMPLETED') completedItems++;
       }
       if (formality.ecr_check_required) {
         totalItems++;
-        if (updates.ecr_check_status === 'COMPLETED' || formality.ecr_check_status === 'COMPLETED') completedItems++;
+        if (currentEcr === 'COMPLETED') completedItems++;
       }
       if (formality.medical_exam_required) {
         totalItems++;
-        if (updates.medical_exam_status === 'COMPLETED' || formality.medical_exam_status === 'COMPLETED') completedItems++;
+        if (currentMedical === 'COMPLETED') completedItems++;
       }
       if (formality.police_verification_required) {
         totalItems++;
-        if (updates.police_verification_status === 'COMPLETED' || formality.police_verification_status === 'COMPLETED') completedItems++;
+        if (currentPolice === 'COMPLETED') completedItems++;
       }
       totalItems++; // Contract
-      if (updates.contract_signed || formality.contract_signed) completedItems++;
+      if (currentContract) completedItems++;
       
       totalItems++; // Flight
-      if (updates.flight_booking_status === 'COMPLETED' || formality.flight_booking_status === 'COMPLETED') completedItems++;
+      if (currentFlight === 'COMPLETED') completedItems++;
 
-      const percentage = Math.round((completedItems / totalItems) * 100);
+      const percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
       const { error } = await supabase
         .from('job_formalities')
@@ -140,6 +173,7 @@ export default function ManageFormalities() {
       });
 
       fetchFormalities();
+      setIsDialogOpen(false);
       setSelectedFormality(null);
       setUpdateData({});
     } catch (error: any) {
@@ -157,7 +191,7 @@ export default function ManageFormalities() {
         <EmployerHeader />
         <div className="flex flex-1">
           <EmployerSidebar />
-          <main className="p-6">
+          <main className="flex-1 p-6">
             <p>Loading formalities...</p>
           </main>
         </div>
@@ -170,7 +204,7 @@ export default function ManageFormalities() {
       <EmployerHeader />
       <div className="flex flex-1">
         <EmployerSidebar />
-        <main className="p-6">
+        <main className="flex-1 p-6">
           <div className="mb-6">
             <h1 className="text-3xl font-bold mb-2">Manage Post-Approval Formalities</h1>
             <p className="text-muted-foreground">
@@ -194,16 +228,16 @@ export default function ManageFormalities() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <CardTitle className="text-xl mb-2">
-                          {formality.job_applications.jobs.title}
+                          {formality.job_title}
                         </CardTitle>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <User className="h-4 w-4" />
-                            {formality.job_applications.profiles.full_name || formality.job_applications.profiles.email}
+                            {formality.worker_name}
                           </span>
                           <span className="flex items-center gap-1">
                             <MapPin className="h-4 w-4" />
-                            {formality.job_applications.jobs.location}
+                            {formality.job_location}
                           </span>
                         </div>
                       </div>
@@ -288,12 +322,19 @@ export default function ManageFormalities() {
                       </div>
                     </div>
 
-                    <Dialog>
+                    <Dialog open={isDialogOpen && selectedFormality?.id === formality.id} onOpenChange={(open) => {
+                      setIsDialogOpen(open);
+                      if (!open) {
+                        setSelectedFormality(null);
+                        setUpdateData({});
+                      }
+                    }}>
                       <DialogTrigger asChild>
                         <Button 
                           onClick={() => {
                             setSelectedFormality(formality);
                             setUpdateData({});
+                            setIsDialogOpen(true);
                           }}
                         >
                           Update Status
@@ -305,7 +346,7 @@ export default function ManageFormalities() {
                         </DialogHeader>
 
                         {selectedFormality && (
-                          <div className="space-y-4">
+                          <div className="space-y-4 mt-4">
                             {selectedFormality.visa_required && (
                               <div className="space-y-2">
                                 <Label>Visa Status</Label>
