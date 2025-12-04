@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { MapPin, Briefcase, DollarSign, Clock, Globe } from 'lucide-react';
+import { MapPin, Briefcase, Clock, Globe } from 'lucide-react';
 import JobSearchFilters, { type JobFilters } from '@/components/search/JobSearchFilters';
 import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -80,20 +80,26 @@ export default function Jobs() {
 
       if (error) throw error;
 
-      const formattedJobs: Job[] = (data || []).map((job: any) => ({
-        id: job.id,
-        slug: job.slug || job.id,
-        title: job.title,
-        company: job.employer_profiles?.company_name || 'Company',
-        location: `${job.location}, ${job.country}`,
-        salary: `${job.currency} ${(job.salary_min / 1000).toFixed(0)}K - ${(job.salary_max / 1000).toFixed(0)}K`,
-        type: job.job_type === 'FULL_TIME' ? 'Full-time' : job.job_type === 'PART_TIME' ? 'Part-time' : 'Contract',
-        category: job.title.split(' ')[0],
-        visaSponsorship: job.visa_sponsorship || false,
-        postedDate: new Date(job.posted_at).toLocaleDateString(),
-        description: job.description.substring(0, 150) + '...',
-        skills: job.job_skills?.map((s: any) => s.skill_name) || []
-      }));
+      const formattedJobs: Job[] = (data || []).map((job: any) => {
+        // Convert to INR if needed
+        const salaryMin = job.currency === 'INR' ? job.salary_min : job.salary_min * 83;
+        const salaryMax = job.currency === 'INR' ? job.salary_max : job.salary_max * 83;
+        
+        return {
+          id: job.id,
+          slug: job.slug || job.id,
+          title: job.title,
+          company: job.employer_profiles?.company_name || 'Company',
+          location: `${job.location}, ${job.country}`,
+          salary: `₹${(salaryMin / 1000).toFixed(0)}K - ₹${(salaryMax / 1000).toFixed(0)}K`,
+          type: job.job_type === 'FULL_TIME' ? 'Full-time' : job.job_type === 'PART_TIME' ? 'Part-time' : 'Contract',
+          category: job.title.split(' ')[0],
+          visaSponsorship: job.visa_sponsorship || false,
+          postedDate: new Date(job.posted_at).toLocaleDateString(),
+          description: job.description.substring(0, 150) + '...',
+          skills: job.job_skills?.map((s: any) => s.skill_name) || []
+        };
+      });
 
       applyFiltersToJobs(formattedJobs, currentFilters);
     } catch (error) {
@@ -268,7 +274,7 @@ export default function Jobs() {
                         {job.location}
                       </span>
                       <span className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
+                        <span className="font-bold">₹</span>
                         {job.salary}
                       </span>
                       <span className="flex items-center gap-1">
@@ -415,7 +421,7 @@ export default function Jobs() {
                     {job.location}
                   </span>
                   <span className="flex items-center gap-1">
-                    <DollarSign className="h-4 w-4" />
+                    <span className="font-bold">₹</span>
                     {job.salary}
                   </span>
                   <span className="flex items-center gap-1">

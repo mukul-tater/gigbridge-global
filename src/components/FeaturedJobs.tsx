@@ -63,10 +63,10 @@ export default function FeaturedJobs() {
   }, []);
 
   const formatSalary = (min: number, max: number, currency: string) => {
-    if (currency === 'INR') {
-      return `₹${(min / 1000).toFixed(0)}K - ₹${(max / 1000).toFixed(0)}K`;
-    }
-    return `$${(min / 1000).toFixed(0)}K - $${(max / 1000).toFixed(0)}K`;
+    // Always display in INR
+    const inrMin = currency === 'INR' ? min : min * 83; // Approx USD to INR
+    const inrMax = currency === 'INR' ? max : max * 83;
+    return `₹${(inrMin / 1000).toFixed(0)}K - ₹${(inrMax / 1000).toFixed(0)}K`;
   };
 
   const getJobTypeBadge = (type: string) => {
@@ -235,7 +235,7 @@ export default function FeaturedJobs() {
                     </div>
 
                     <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                      <DollarSign className="h-4 w-4" />
+                      <span className="text-base font-bold">₹</span>
                       {formatSalary(job.salary_min, job.salary_max, job.currency)}
                     </div>
 
