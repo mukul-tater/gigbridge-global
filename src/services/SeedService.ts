@@ -439,18 +439,48 @@ class SeedService {
 
   async getEmployerUserIds(): Promise<string[]> {
     try {
-      // Get all employer role user IDs
-      const { data: roleData, error: roleError } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', 'employer');
+      // Try to get employer IDs from profiles table using known demo emails
+      const employerEmails = ['employer@globalgigs.demo', 'employer2@globalgigs.demo'];
+      const employerIds: string[] = [];
 
-      if (roleError || !roleData || roleData.length === 0) {
-        console.error('Error getting employer user IDs:', roleError);
-        return [];
+      for (const email of employerEmails) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (data && !error) {
+          employerIds.push(data.id);
+        }
       }
 
-      return roleData.map(r => r.user_id);
+      // If no demo accounts found, try to get from employer_profiles table
+      if (employerIds.length === 0) {
+        const { data: epData, error: epError } = await supabase
+          .from('employer_profiles')
+          .select('user_id')
+          .limit(5);
+
+        if (epData && !epError) {
+          employerIds.push(...epData.map(ep => ep.user_id));
+        }
+      }
+
+      // If still none, try user_roles (might work if user is admin)
+      if (employerIds.length === 0) {
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('user_id')
+          .eq('role', 'employer');
+
+        if (roleData && !roleError) {
+          employerIds.push(...roleData.map(r => r.user_id));
+        }
+      }
+
+      console.log(`Found ${employerIds.length} employer accounts`);
+      return employerIds;
     } catch (error) {
       console.error('Error getting employer user IDs:', error);
       return [];
@@ -459,18 +489,30 @@ class SeedService {
 
   async getWorkerUserId(): Promise<string | null> {
     try {
+      // Try known demo worker email first
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', 'worker@globalgigs.demo')
         .maybeSingle();
 
-      if (error || !data) {
-        console.error('Error getting worker user ID:', error);
-        return null;
+      if (data && !error) {
+        return data.id;
       }
 
-      return data.id;
+      // Try to find any worker from worker_profiles
+      const { data: wpData, error: wpError } = await supabase
+        .from('worker_profiles')
+        .select('user_id')
+        .limit(1)
+        .maybeSingle();
+
+      if (wpData && !wpError) {
+        return wpData.user_id;
+      }
+
+      console.error('Error getting worker user ID:', error);
+      return null;
     } catch (error) {
       console.error('Error getting worker user ID:', error);
       return null;
@@ -502,9 +544,29 @@ class SeedService {
 
     // Step 2: Get employer IDs and seed jobs
     console.log('Step 2: Getting employer IDs and seeding jobs...');
-    const employerIds = await this.getEmployerUserIds();
+    let employerIds = await this.getEmployerUserIds();
+    
+    // If no employers found, try to get current user if they are an employer
     if (employerIds.length === 0) {
-      errors.push('Could not find any employer accounts');
+      console.log('No employers found via queries, checking current user...');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Check if current user has employer profile
+        const { data: empProfile } = await supabase
+          .from('employer_profiles')
+          .select('user_id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (empProfile) {
+          employerIds = [user.id];
+          console.log('Using current logged-in employer for seeding');
+        }
+      }
+    }
+    
+    if (employerIds.length === 0) {
+      errors.push('Could not find any employer accounts. Please log in as an employer to seed jobs, or create demo accounts first.');
     } else {
       console.log(`Found ${employerIds.length} employer accounts`);
       // Distribute jobs across all employers
