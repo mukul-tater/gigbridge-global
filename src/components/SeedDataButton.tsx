@@ -78,11 +78,14 @@ export default function SeedDataButton() {
         <div className="space-y-2">
           <h3 className="font-semibold text-sm">What will be created:</h3>
           <ul className="text-sm space-y-1 text-muted-foreground">
-            <li>• 6 demo user accounts (1 admin, 2 employers, 3 workers)</li>
-            <li>• 6 sample job postings with various categories</li>
-            <li>• Worker profiles with skills, certifications, and work experience</li>
-            <li>• Job skills and requirements</li>
+            <li>• 100 sample job postings across 30+ countries</li>
+            <li>• Jobs distributed across all job categories</li>
+            <li>• Job skills and requirements for each posting</li>
+            <li>• Worker profile data (if worker account exists)</li>
           </ul>
+          <p className="text-xs text-amber-600 mt-2">
+            Tip: Log in as an employer (employer@globalgigs.demo / Employer@2024!) before seeding for best results.
+          </p>
         </div>
 
         <Button 
