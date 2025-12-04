@@ -501,6 +501,109 @@ class SeedService {
     }
   }
 
+  async seedJobApplications(): Promise<SeedResult> {
+    try {
+      // Get all worker IDs
+      const workerEmails = ['worker@globalgigs.demo', 'worker2@globalgigs.demo', 'worker3@globalgigs.demo'];
+      const workerIds: string[] = [];
+
+      for (const email of workerEmails) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+        if (data) workerIds.push(data.id);
+      }
+
+      if (workerIds.length === 0) {
+        return { success: false, message: 'No worker accounts found for applications' };
+      }
+
+      // Get active jobs with their employer IDs
+      const { data: jobs, error: jobsError } = await supabase
+        .from('jobs')
+        .select('id, employer_id, title')
+        .eq('status', 'ACTIVE')
+        .limit(30);
+
+      if (jobsError || !jobs || jobs.length === 0) {
+        return { success: false, message: 'No active jobs found for applications' };
+      }
+
+      // Check if applications already exist
+      const { data: existingApps } = await supabase
+        .from('job_applications')
+        .select('id')
+        .in('worker_id', workerIds)
+        .limit(1);
+
+      if (existingApps && existingApps.length > 0) {
+        return { success: true, message: 'Job applications already exist' };
+      }
+
+      const statuses = ['PENDING', 'REVIEWING', 'SHORTLISTED', 'APPROVED', 'REJECTED'];
+      const applications = [];
+
+      // Create applications for each worker
+      for (let w = 0; w < workerIds.length; w++) {
+        const workerId = workerIds[w];
+        // Each worker applies to different jobs (5-8 applications each)
+        const numApps = 5 + Math.floor(Math.random() * 4);
+        const startIndex = w * 10;
+
+        for (let i = 0; i < numApps && (startIndex + i) < jobs.length; i++) {
+          const job = jobs[startIndex + i];
+          const status = statuses[Math.floor(Math.random() * statuses.length)];
+          const appliedDaysAgo = Math.floor(Math.random() * 30) + 1;
+
+          applications.push({
+            job_id: job.id,
+            worker_id: workerId,
+            employer_id: job.employer_id,
+            status,
+            cover_letter: `I am excited to apply for the ${job.title} position. With my extensive experience and skills, I believe I would be a valuable addition to your team. I am passionate about this field and eager to contribute to your organization's success.`,
+            applied_at: new Date(Date.now() - appliedDaysAgo * 24 * 60 * 60 * 1000).toISOString()
+          });
+        }
+      }
+
+      // Insert applications
+      const { data: insertedApps, error: insertError } = await supabase
+        .from('job_applications')
+        .insert(applications)
+        .select();
+
+      if (insertError) {
+        return { success: false, message: 'Failed to create applications', errors: [insertError.message] };
+      }
+
+      // Create status history for each application
+      if (insertedApps && insertedApps.length > 0) {
+        const statusHistory = insertedApps.map(app => ({
+          application_id: app.id,
+          status: app.status,
+          changed_by: app.employer_id,
+          notes: app.status === 'PENDING' ? 'Application submitted' : `Status updated to ${app.status}`
+        }));
+
+        await supabase.from('application_status_history').insert(statusHistory);
+      }
+
+      return {
+        success: true,
+        message: `Created ${applications.length} job applications for ${workerIds.length} workers`
+      };
+    } catch (error) {
+      console.error('Error seeding job applications:', error);
+      return {
+        success: false,
+        message: 'Failed to seed job applications',
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
   async getEmployerUserIds(): Promise<string[]> {
     try {
       // Try to get employer IDs from profiles table using known demo emails
@@ -681,6 +784,15 @@ class SeedService {
           errors.push(`Worker: ${workerResult.message}`);
         }
       }
+    }
+
+    // Step 4: Seed job applications for workers
+    console.log('Step 4: Seeding job applications...');
+    const applicationsResult = await this.seedJobApplications();
+    if (applicationsResult.success) {
+      messages.push(applicationsResult.message);
+    } else if (applicationsResult.errors) {
+      errors.push(`Applications: ${applicationsResult.message}`);
     }
 
     const finalMessage = messages.join('. ') + (messages.length > 0 ? '.' : '');

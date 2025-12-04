@@ -82,6 +82,7 @@ export default function SeedDataButton() {
             <li>• Jobs distributed across all job categories</li>
             <li>• Job skills and requirements for each posting</li>
             <li>• Worker profile data (if worker account exists)</li>
+            <li>• Job applications for workers to track</li>
           </ul>
           <p className="text-xs text-amber-600 mt-2">
             Tip: Log in as an employer (employer@globalgigs.demo / Employer@2024!) before seeding for best results.
