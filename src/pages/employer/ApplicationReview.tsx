@@ -386,37 +386,35 @@ export default function ApplicationReview() {
                       </Link>
                     </Button>
                     
-                    {/* Quick actions only for non-pending applications (already reviewed) */}
-                    {app.status !== 'PENDING' && (
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                          onClick={() => updateApplicationStatus(app.id, 'APPROVED')}
-                          disabled={app.status === 'APPROVED'}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => updateApplicationStatus(app.id, 'REJECTED')}
-                          disabled={app.status === 'REJECTED'}
-                        >
-                          Reject
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => addToShortlist(app.worker_id)}
-                        >
-                          <Star className="h-4 w-4 mr-1" />
-                          Shortlist
-                        </Button>
-                      </div>
-                    )}
+                    {/* Quick actions for all applications */}
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                        onClick={() => updateApplicationStatus(app.id, 'APPROVED')}
+                        disabled={app.status === 'APPROVED' || app.status === 'HIRED'}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => updateApplicationStatus(app.id, 'REJECTED')}
+                        disabled={app.status === 'REJECTED'}
+                      >
+                        Reject
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addToShortlist(app.worker_id)}
+                      >
+                        <Star className="h-4 w-4 mr-1" />
+                        Shortlist
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>
