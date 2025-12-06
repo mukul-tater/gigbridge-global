@@ -110,27 +110,42 @@ export default function InterviewScheduling() {
 
   const fetchApplications = async () => {
     try {
-      // Fetch applications that are pending or in review (for scheduling interviews)
-      const { data, error } = await supabase
+      // Fetch applications for this employer
+      const { data: apps, error } = await supabase
         .from('job_applications')
-        .select(`
-          id,
-          worker_id,
-          job_id,
-          profiles!job_applications_worker_id_fkey(full_name),
-          jobs!inner(title, employer_id)
-        `)
-        .eq('jobs.employer_id', user?.id)
+        .select('id, worker_id, job_id')
+        .eq('employer_id', user?.id)
         .in('status', ['PENDING', 'REVIEWING', 'SHORTLISTED']);
 
       if (error) throw error;
+      if (!apps || apps.length === 0) {
+        setApplications([]);
+        return;
+      }
 
-      const formattedApps = (data || []).map((app: any) => ({
+      // Fetch worker names
+      const workerIds = [...new Set(apps.map(a => a.worker_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', workerIds);
+
+      // Fetch job titles
+      const jobIds = [...new Set(apps.map(a => a.job_id))];
+      const { data: jobs } = await supabase
+        .from('jobs')
+        .select('id, title')
+        .in('id', jobIds);
+
+      const profileMap = new Map((profiles || []).map(p => [p.id, p.full_name]));
+      const jobMap = new Map((jobs || []).map(j => [j.id, j.title]));
+
+      const formattedApps = apps.map(app => ({
         id: app.id,
         worker_id: app.worker_id,
         job_id: app.job_id,
-        worker_name: app.profiles?.full_name || 'Unknown',
-        job_title: app.jobs?.title || 'Unknown'
+        worker_name: profileMap.get(app.worker_id) || 'Unknown',
+        job_title: jobMap.get(app.job_id) || 'Unknown'
       }));
 
       setApplications(formattedApps);

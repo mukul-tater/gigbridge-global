@@ -282,6 +282,71 @@ export type Database = {
         }
         Relationships: []
       }
+      interviews: {
+        Row: {
+          application_id: string
+          created_at: string | null
+          duration_minutes: number
+          employer_id: string
+          feedback: string | null
+          id: string
+          interview_mode: string
+          job_id: string
+          location: string | null
+          meeting_link: string | null
+          notes: string | null
+          scheduled_date: string
+          scheduled_time: string
+          status: string
+          updated_at: string | null
+          worker_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string | null
+          duration_minutes?: number
+          employer_id: string
+          feedback?: string | null
+          id?: string
+          interview_mode?: string
+          job_id: string
+          location?: string | null
+          meeting_link?: string | null
+          notes?: string | null
+          scheduled_date: string
+          scheduled_time: string
+          status?: string
+          updated_at?: string | null
+          worker_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string | null
+          duration_minutes?: number
+          employer_id?: string
+          feedback?: string | null
+          id?: string
+          interview_mode?: string
+          job_id?: string
+          location?: string | null
+          meeting_link?: string | null
+          notes?: string | null
+          scheduled_date?: string
+          scheduled_time?: string
+          status?: string
+          updated_at?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interviews_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_applications: {
         Row: {
           applied_at: string | null
@@ -627,6 +692,71 @@ export type Database = {
             columns: ["parent_message_id"]
             isOneToOne: false
             referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offers: {
+        Row: {
+          application_id: string
+          benefits: string[] | null
+          created_at: string | null
+          employer_id: string
+          expiry_date: string | null
+          id: string
+          job_id: string
+          notes: string | null
+          responded_at: string | null
+          salary_amount: number
+          salary_currency: string
+          sent_at: string | null
+          start_date: string
+          status: string
+          updated_at: string | null
+          worker_id: string
+        }
+        Insert: {
+          application_id: string
+          benefits?: string[] | null
+          created_at?: string | null
+          employer_id: string
+          expiry_date?: string | null
+          id?: string
+          job_id: string
+          notes?: string | null
+          responded_at?: string | null
+          salary_amount: number
+          salary_currency?: string
+          sent_at?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string | null
+          worker_id: string
+        }
+        Update: {
+          application_id?: string
+          benefits?: string[] | null
+          created_at?: string | null
+          employer_id?: string
+          expiry_date?: string | null
+          id?: string
+          job_id?: string
+          notes?: string | null
+          responded_at?: string | null
+          salary_amount?: number
+          salary_currency?: string
+          sent_at?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
             referencedColumns: ["id"]
           },
         ]
