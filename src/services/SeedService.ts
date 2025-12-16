@@ -10,42 +10,42 @@ export interface DemoAccount {
 
 export const DEMO_ACCOUNTS: DemoAccount[] = [
   {
-    email: 'admin@globalgigs.demo',
+    email: 'admin@safeworkglobal.demo',
     password: 'Admin@2024!',
     full_name: 'System Administrator',
     phone: '+1234567890',
     role: 'admin'
   },
   {
-    email: 'employer@globalgigs.demo',
+    email: 'employer@safeworkglobal.demo',
     password: 'Employer@2024!',
     full_name: 'James Wilson',
     phone: '+1234567891',
     role: 'employer'
   },
   {
-    email: 'worker@globalgigs.demo',
+    email: 'worker@safeworkglobal.demo',
     password: 'Worker@2024!',
     full_name: 'Maria Garcia',
     phone: '+1234567892',
     role: 'worker'
   },
   {
-    email: 'worker2@globalgigs.demo',
+    email: 'worker2@safeworkglobal.demo',
     password: 'Worker@2024!',
     full_name: 'Ahmed Hassan',
     phone: '+1234567893',
     role: 'worker'
   },
   {
-    email: 'worker3@globalgigs.demo',
+    email: 'worker3@safeworkglobal.demo',
     password: 'Worker@2024!',
     full_name: 'Li Wei',
     phone: '+1234567894',
     role: 'worker'
   },
   {
-    email: 'employer2@globalgigs.demo',
+    email: 'employer2@safeworkglobal.demo',
     password: 'Employer@2024!',
     full_name: 'Sarah Johnson',
     phone: '+1234567895',
@@ -65,7 +65,7 @@ class SeedService {
       const { data, error } = await supabase
         .from('profiles')
         .select('email')
-        .eq('email', 'admin@globalgigs.demo')
+        .eq('email', 'admin@safeworkglobal.demo')
         .maybeSingle();
       
       return !!data && !error;
@@ -538,7 +538,7 @@ class SeedService {
   async seedJobApplications(): Promise<SeedResult> {
     try {
       // Get all worker IDs
-      const workerEmails = ['worker@globalgigs.demo', 'worker2@globalgigs.demo', 'worker3@globalgigs.demo'];
+      const workerEmails = ['worker@safeworkglobal.demo', 'worker2@safeworkglobal.demo', 'worker3@safeworkglobal.demo'];
       const workerIds: string[] = [];
 
       for (const email of workerEmails) {
@@ -641,7 +641,7 @@ class SeedService {
   async getEmployerUserIds(): Promise<string[]> {
     try {
       // Try to get employer IDs from profiles table using known demo emails
-      const employerEmails = ['employer@globalgigs.demo', 'employer2@globalgigs.demo'];
+      const employerEmails = ['employer@safeworkglobal.demo', 'employer2@safeworkglobal.demo'];
       const employerIds: string[] = [];
 
       for (const email of employerEmails) {

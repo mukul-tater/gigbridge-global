@@ -46,7 +46,7 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <BriefcaseIcon className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">GlobalGigs</span>
+              <span className="text-xl font-bold text-foreground">SafeWorkGlobal</span>
             </Link>
 
             {/* Navigation - Desktop */}

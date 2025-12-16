@@ -11,7 +11,7 @@ Alternatively, in development mode, you'll see a floating "Seed Demo Data" butto
 ## Demo Accounts
 
 ### Admin Account
-- **Email**: `admin@globalgigs.demo`
+- **Email**: `admin@safeworkglobal.demo`
 - **Password**: `Admin@2024!`
 - **Role**: Administrator
 - **Access**: Full system access, user management, reports
@@ -19,32 +19,32 @@ Alternatively, in development mode, you'll see a floating "Seed Demo Data" butto
 ### Employer Accounts
 
 #### Primary Employer
-- **Email**: `employer@globalgigs.demo`
+- **Email**: `employer@safeworkglobal.demo`
 - **Password**: `Employer@2024!`
 - **Role**: Employer
 - **Access**: Post jobs, search workers, manage applications
 
 #### Secondary Employer
-- **Email**: `employer2@globalgigs.demo`
+- **Email**: `employer2@safeworkglobal.demo`
 - **Password**: `Employer@2024!`
 - **Role**: Employer
 
 ### Worker Accounts
 
 #### Worker 1 (Full Profile)
-- **Email**: `worker@globalgigs.demo`
+- **Email**: `worker@safeworkglobal.demo`
 - **Password**: `Worker@2024!`
 - **Role**: Worker
 - **Access**: Browse jobs, apply, manage profile
 - **Profile**: Complete with skills, certifications, and work experience
 
 #### Worker 2
-- **Email**: `worker2@globalgigs.demo`
+- **Email**: `worker2@safeworkglobal.demo`
 - **Password**: `Worker@2024!`
 - **Role**: Worker
 
 #### Worker 3
-- **Email**: `worker3@globalgigs.demo`
+- **Email**: `worker3@safeworkglobal.demo`
 - **Password**: `Worker@2024!`
 - **Role**: Worker
 

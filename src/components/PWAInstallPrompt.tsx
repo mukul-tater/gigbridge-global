@@ -82,7 +82,7 @@ export default function PWAInstallPrompt() {
                 <Smartphone className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg">Install GlobalGigs</CardTitle>
+                <CardTitle className="text-lg">Install SafeWorkGlobal</CardTitle>
                 <CardDescription className="text-sm">
                   {isIOS ? 'Add to Home Screen' : 'Install our app for a better experience'}
                 </CardDescription>

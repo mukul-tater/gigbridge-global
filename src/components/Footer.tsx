@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <BriefcaseIcon className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold">GlobalGigs</span>
+              <span className="text-xl font-bold">SafeWorkGlobal</span>
             </div>
             <p className="text-background/80 text-sm leading-relaxed">
               Connecting skilled workers with global opportunities. Your gateway to international careers in high-demand industries.
@@ -95,7 +95,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-background/20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <div className="text-background/60">
-            © 2024 GlobalGigs. All rights reserved.
+            © 2024 SafeWorkGlobal. All rights reserved.
           </div>
           <div className="flex gap-6">
             <a href="#" className="text-background/60 hover:text-background transition-colors">Privacy Policy</a>
