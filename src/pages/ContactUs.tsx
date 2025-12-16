@@ -52,7 +52,7 @@ export default function ContactUs() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-muted-foreground">support@globalgigs.com</p>
+                      <p className="text-muted-foreground">support@safeworkglobal.com</p>
                     </div>
                   </div>
 

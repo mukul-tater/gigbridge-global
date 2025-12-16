@@ -93,7 +93,7 @@ export default function InstallPWA() {
               </div>
               <CardTitle className="text-2xl">App Already Installed!</CardTitle>
               <CardDescription>
-                GlobalGigs is running as an installed app on your device
+                SafeWorkGlobal is running as an installed app on your device
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -106,7 +106,7 @@ export default function InstallPWA() {
           <>
             <div className="text-center mb-12">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                Install GlobalGigs App
+                Install SafeWorkGlobal App
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Get the full app experience with offline access, push notifications, and more
@@ -121,7 +121,7 @@ export default function InstallPWA() {
                 </CardTitle>
                 <CardDescription>
                   {canInstall 
-                    ? 'Follow the instructions below to install GlobalGigs on your device'
+                    ? 'Follow the instructions below to install SafeWorkGlobal on your device'
                     : 'Installation not available on this browser'
                   }
                 </CardDescription>
@@ -135,7 +135,7 @@ export default function InstallPWA() {
                         <li>Tap the <strong>Share</strong> button in Safari (square with up arrow)</li>
                         <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
                         <li>Tap <strong>"Add"</strong> in the top right corner</li>
-                        <li>The GlobalGigs app will appear on your home screen</li>
+                        <li>The SafeWorkGlobal app will appear on your home screen</li>
                       </ol>
                     </div>
                     <p className="text-sm text-muted-foreground">

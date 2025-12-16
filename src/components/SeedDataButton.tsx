@@ -85,7 +85,7 @@ export default function SeedDataButton() {
             <li>• Job applications for workers to track</li>
           </ul>
           <p className="text-xs text-amber-600 mt-2">
-            Tip: Log in as an employer (employer@globalgigs.demo / Employer@2024!) before seeding for best results.
+            Tip: Log in as an employer (employer@safeworkglobal.demo / Employer@2024!) before seeding for best results.
           </p>
         </div>
 

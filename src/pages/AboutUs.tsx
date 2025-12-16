@@ -11,7 +11,7 @@ export default function AboutUs() {
       <main className="flex-1">
         <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">About GlobalGigs</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">About SafeWorkGlobal</h1>
             <p className="text-xl text-center text-muted-foreground max-w-3xl mx-auto">
               Connecting skilled workers with opportunities across the globe
             </p>
@@ -24,7 +24,7 @@ export default function AboutUs() {
               <div>
                 <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
                 <p className="text-muted-foreground mb-4">
-                  GlobalGigs is dedicated to bridging the gap between skilled workers and employers worldwide. 
+                  SafeWorkGlobal is dedicated to bridging the gap between skilled workers and employers worldwide. 
                   We provide a secure, transparent platform that empowers workers to find meaningful employment 
                   while helping employers discover qualified talent.
                 </p>

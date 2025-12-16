@@ -31,7 +31,7 @@ export default function EmployerSidebar() {
     <>
       <Link to="/" className="flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity">
         <BriefcaseIcon className="h-6 w-6 text-primary" />
-        <span className="text-lg font-bold text-foreground">GlobalGigs</span>
+        <span className="text-lg font-bold text-foreground">SafeWorkGlobal</span>
       </Link>
       <h2 className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-4">Employer Portal</h2>
       <nav className="space-y-2">

@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['safework-global-logo.png', 'favicon.png'],
       manifest: {
-        name: 'GlobalGigs - International Job Platform',
-        short_name: 'GlobalGigs',
+        name: 'SafeWorkGlobal - International Job Platform',
+        short_name: 'SafeWorkGlobal',
         description: 'Connect with global employers seeking skilled workers worldwide',
         theme_color: '#6366f1',
         background_color: '#ffffff',
