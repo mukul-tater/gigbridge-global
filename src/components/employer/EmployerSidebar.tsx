@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark, Star, UserCheck, BriefcaseIcon, Menu, X } from "lucide-react";
+import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark, Star, UserCheck, Menu, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -30,7 +30,7 @@ export default function EmployerSidebar() {
   const SidebarContent = () => (
     <>
       <Link to="/" className="flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity">
-        <BriefcaseIcon className="h-6 w-6 text-primary" />
+        <img src="/safework-global-logo.png" alt="SafeWorkGlobal" className="h-6 w-6" />
         <span className="text-lg font-bold text-foreground">SafeWorkGlobal</span>
       </Link>
       <h2 className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-4">Employer Portal</h2>

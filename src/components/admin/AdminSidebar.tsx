@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, BriefcaseIcon, Menu, FileCheck } from "lucide-react";
+import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, Menu, FileCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -22,7 +22,7 @@ export default function AdminSidebar() {
   const SidebarContent = () => (
     <>
       <Link to="/" className="flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity">
-        <BriefcaseIcon className="h-6 w-6 text-primary" />
+        <img src="/safework-global-logo.png" alt="SafeWorkGlobal" className="h-6 w-6" />
         <span className="text-lg font-bold text-foreground">SafeWorkGlobal</span>
       </Link>
       <h2 className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-4">Admin Panel</h2>
