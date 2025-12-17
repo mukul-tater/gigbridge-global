@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Globe, TrendingUp } from "lucide-react";
+import { Search, MapPin, Globe, TrendingUp, ArrowRight, CheckCircle } from "lucide-react";
 import heroImage from "@/assets/hero-workers.jpg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -31,58 +31,69 @@ const HeroSection = () => {
     if (searchCategory) params.set('category', searchCategory);
     navigate(`/jobs?${params.toString()}`);
   };
+
+  const trustBadges = [
+    "Verified Employers",
+    "Secure Process",
+    "Visa Support"
+  ];
+
   return (
-    <section className="relative min-h-[700px] bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 overflow-hidden">
-      {/* Animated Background */}
+    <section className="relative min-h-[750px] lg:min-h-[800px] overflow-hidden bg-gradient-to-br from-primary/[0.03] via-background to-secondary/[0.03]">
+      {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImage} 
-          alt="Global gig workers connecting worldwide" 
-          className="w-full h-full object-cover opacity-15 animate-fade-in"
+          alt="Global workers connecting worldwide" 
+          className="w-full h-full object-cover opacity-[0.08]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-secondary/20 to-accent/30"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/80 to-background"></div>
       </div>
 
-      {/* Floating Elements */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-40 h-40 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      {/* Decorative Elements */}
+      <div className="absolute top-32 left-[10%] w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse-soft"></div>
+      <div className="absolute bottom-32 right-[10%] w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-pulse-soft animation-delay-500"></div>
 
       <div className="container mx-auto px-4 lg:px-6 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center min-h-[700px] gap-12">
+        <div className="flex flex-col lg:flex-row items-center min-h-[750px] lg:min-h-[800px] gap-12 lg:gap-16 py-12">
+          
           {/* Left Content */}
-          <div className="flex-1 text-center lg:text-left animate-fade-in">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-success/20 to-success/10 text-success px-4 py-2 rounded-full text-sm font-medium mb-6 border border-success/20 shadow-lg">
-              <TrendingUp className="h-4 w-4 animate-pulse" />
-              <span className="font-semibold">Over 50,000 international opportunities</span>
+          <div className="flex-1 text-center lg:text-left pt-8 lg:pt-0">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full text-sm font-medium mb-8 border border-success/20 animate-fade-in">
+              <TrendingUp className="h-4 w-4" />
+              <span>Over 50,000 global opportunities</span>
             </div>
             
-            <h1 className="text-4xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-              Find Your Next 
-              <span className="block lg:inline bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-pulse"> Global Career </span>
+            {/* Heading */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold font-heading text-foreground mb-6 leading-[1.1] tracking-tight animate-fade-in animation-delay-150">
+              Find Your Next
+              <span className="block text-gradient">Global Career</span>
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl">
-              Connect with employers worldwide seeking skilled workers. From construction in Japan to delivery services in Europe - your next career move awaits.
+            {/* Subheading */}
+            <p className="text-lg lg:text-xl text-muted-foreground mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed animate-fade-in animation-delay-300">
+              Connect with employers worldwide seeking skilled workers. From construction to healthcare - your next career move awaits.
             </p>
 
             {/* Search Form */}
-            <div className="bg-card p-4 md:p-6 rounded-2xl shadow-lg border border-border max-w-2xl mx-auto lg:mx-0">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-4">
+            <div className="bg-card p-4 lg:p-6 rounded-2xl shadow-elevated border border-border max-w-2xl mx-auto lg:mx-0 animate-fade-in animation-delay-500">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 mb-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
                     placeholder="Job title or skill" 
-                    className="pl-10 h-12"
+                    className="pl-10 h-12 bg-background border-border focus:border-primary"
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   />
                 </div>
                 
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <MapPin className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
                   <Select value={searchLocation} onValueChange={setSearchLocation}>
-                    <SelectTrigger className="pl-10 h-12">
+                    <SelectTrigger className="pl-10 h-12 bg-background border-border">
                       <SelectValue placeholder="Country" />
                     </SelectTrigger>
                     <SelectContent className="max-h-64">
@@ -94,8 +105,8 @@ const HeroSection = () => {
                 </div>
 
                 <Select value={searchCategory} onValueChange={setSearchCategory}>
-                  <SelectTrigger className="h-12">
-                    <SelectValue placeholder="Job Category" />
+                  <SelectTrigger className="h-12 bg-background border-border sm:col-span-2 lg:col-span-1">
+                    <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent className="max-h-64">
                     {JOB_CATEGORIES.filter(c => c !== 'All Categories').map(category => (
@@ -108,69 +119,84 @@ const HeroSection = () => {
               <Button 
                 size="xl" 
                 variant="hero" 
-                className="w-full"
+                className="w-full gap-2"
                 onClick={handleSearch}
               >
-                <Search className="h-5 w-5" />
-                Search Global Jobs
+                Search Jobs
+                <ArrowRight className="h-5 w-5" />
               </Button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 md:gap-6 mt-6 md:mt-8 max-w-lg mx-auto lg:mx-0">
-              <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
-                <div className="text-2xl md:text-3xl font-bold text-primary mb-1">50K+</div>
-                <div className="text-xs text-muted-foreground font-medium">Active Jobs</div>
-              </div>
-              <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
-                <div className="text-2xl md:text-3xl font-bold text-secondary mb-1">50+</div>
-                <div className="text-xs text-muted-foreground font-medium">Countries</div>
-              </div>
-              <div className="text-center p-3 md:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:scale-105 transition-transform">
-                <div className="text-2xl md:text-3xl font-bold text-success mb-1">98%</div>
-                <div className="text-xs text-muted-foreground font-medium">Success Rate</div>
-              </div>
+            {/* Trust Badges */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-8 animate-fade-in animation-delay-500">
+              {trustBadges.map((badge) => (
+                <div key={badge} className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <span>{badge}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Content - Feature Cards */}
-          <div className="flex-1 lg:max-w-md animate-fade-in delay-300">
+          {/* Right Content - Stats & Feature Cards */}
+          <div className="flex-1 w-full lg:max-w-md xl:max-w-lg">
+            {/* Stats Row */}
+            <div className="grid grid-cols-3 gap-3 mb-6 animate-fade-in animation-delay-300">
+              {[
+                { value: "50K+", label: "Active Jobs", color: "text-primary" },
+                { value: "50+", label: "Countries", color: "text-secondary" },
+                { value: "98%", label: "Success Rate", color: "text-success" },
+              ].map((stat) => (
+                <div 
+                  key={stat.label}
+                  className="text-center p-4 rounded-xl bg-card border border-border shadow-xs hover:shadow-sm transition-shadow"
+                >
+                  <div className={`text-2xl lg:text-3xl font-bold font-heading ${stat.color} mb-1`}>
+                    {stat.value}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-medium">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Feature Cards */}
             <div className="space-y-4">
-              <div className="bg-card/80 backdrop-blur-sm p-6 rounded-xl border border-border shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-gradient-to-br from-primary/20 to-primary/10 p-3 rounded-xl">
-                    <Globe className="h-6 w-6 text-primary" />
+              {[
+                {
+                  icon: Globe,
+                  title: "Global Reach",
+                  description: "Access opportunities in 50+ countries with high demand for skilled workers",
+                  color: "primary"
+                },
+                {
+                  icon: MapPin,
+                  title: "Fast Track Hiring",
+                  description: "Countries with 1-4 week hiring times and simplified visa processes",
+                  color: "secondary"
+                },
+                {
+                  icon: TrendingUp,
+                  title: "Verified Opportunities",
+                  description: "Every job verified with transparent salaries and real employer reviews",
+                  color: "success"
+                }
+              ].map((feature, index) => (
+                <div 
+                  key={feature.title}
+                  className={`card-professional p-5 hover:border-${feature.color}/30 animate-fade-in`}
+                  style={{ animationDelay: `${400 + index * 100}ms` }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`p-3 rounded-xl bg-${feature.color}/10 shrink-0`}>
+                      <feature.icon className={`h-5 w-5 text-${feature.color}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold font-heading text-foreground mb-1">{feature.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-foreground text-lg">Global Reach</h3>
                 </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Access opportunities in 50+ countries with the highest demand for skilled workers
-                </p>
-              </div>
-
-              <div className="bg-card/80 backdrop-blur-sm p-6 rounded-xl border border-border shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-gradient-to-br from-secondary/20 to-secondary/10 p-3 rounded-xl">
-                    <MapPin className="h-6 w-6 text-secondary" />
-                  </div>
-                  <h3 className="font-bold text-foreground text-lg">Fast Track Hiring</h3>
-                </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Countries with 1-4 week hiring times and simplified visa processes
-                </p>
-              </div>
-
-              <div className="bg-card/80 backdrop-blur-sm p-6 rounded-xl border border-border shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-gradient-to-br from-success/20 to-success/10 p-3 rounded-xl">
-                    <TrendingUp className="h-6 w-6 text-success" />
-                  </div>
-                  <h3 className="font-bold text-foreground text-lg">Verified Opportunities</h3>
-                </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Every job verified with transparent salaries and real employer reviews
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -178,14 +204,14 @@ const HeroSection = () => {
 
       {/* Sticky Mobile Search Bar */}
       {isSticky && (
-        <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-card border-b border-border shadow-lg animate-in slide-in-from-top-2 duration-300">
+        <div className="md:hidden fixed top-16 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-b border-border shadow-sm animate-fade-in">
           <div className="container mx-auto px-4 py-3">
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="Search jobs..." 
-                  className="pl-10 h-10"
+                  className="pl-10 h-10 bg-background"
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
