@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, Search, Globe, User, BriefcaseIcon, Bell, X, LogOut } from "lucide-react";
+import { Menu, Search, Globe, User, Bell, X, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,7 +45,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <BriefcaseIcon className="h-8 w-8 text-primary" />
+              <img src="/safework-global-logo.png" alt="SafeWorkGlobal" className="h-8 w-8" />
               <span className="text-xl font-bold text-foreground">SafeWorkGlobal</span>
             </Link>
 

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BriefcaseIcon, Mail, Phone, MapPin, Globe, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Globe, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 const Footer = () => {
   return <footer className="bg-foreground text-background py-16">
@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <BriefcaseIcon className="h-8 w-8 text-primary" />
+              <img src="/safework-global-logo.png" alt="SafeWorkGlobal" className="h-8 w-8" />
               <span className="text-xl font-bold">SafeWorkGlobal</span>
             </div>
             <p className="text-background/80 text-sm leading-relaxed">
