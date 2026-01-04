@@ -137,23 +137,14 @@ const InteractiveJobMap = () => {
                 }`}
                 onClick={() => handleExploreRegion(region.searchCountry)}
               >
-                {/* Fast hiring badge */}
-                {region.easyHiring && (
-                  <div className="absolute top-4 right-4 z-10">
-                    <Badge className="bg-success text-success-foreground shadow-lg">
-                      <Zap className="h-3 w-3 mr-1" />
-                      Fast Hiring
-                    </Badge>
-                  </div>
-                )}
                 
                 {/* Gradient accent */}
                 <div className={`h-1.5 bg-gradient-to-r ${region.gradient}`} />
                 
                 <CardContent className="p-6">
                   {/* Header */}
-                  <div className="flex items-start justify-between mb-5">
-                    <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 pr-3">
                       <h3 className="text-xl font-bold font-heading text-foreground mb-1.5 group-hover:text-primary transition-colors">
                         {region.name}
                       </h3>
@@ -161,10 +152,20 @@ const InteractiveJobMap = () => {
                         {region.countries.join(" • ")}
                       </p>
                     </div>
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${region.gradient} group-hover:scale-110 transition-transform`}>
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${region.gradient} group-hover:scale-110 transition-transform flex-shrink-0`}>
                       <MapPin className="h-5 w-5 text-white" />
                     </div>
                   </div>
+                  
+                  {/* Fast hiring badge */}
+                  {region.easyHiring && (
+                    <div className="mb-4">
+                      <Badge className="bg-success text-success-foreground shadow-lg animate-pulse">
+                        <Zap className="h-3 w-3 mr-1 animate-bounce" />
+                        Fast Hiring
+                      </Badge>
+                    </div>
+                  )}
 
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-3 mb-5">
