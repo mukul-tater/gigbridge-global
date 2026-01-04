@@ -169,11 +169,11 @@ export default function WorkerProfile() {
 
   if (!user || !profile || loading) {
     return (
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-background w-full">
         <WorkerSidebar />
         <div className="flex-1 flex flex-col">
           <WorkerHeader />
-          <main className="flex-1 p-8">
+          <main className="flex-1 p-4 md:p-8">
             <ProfileSkeleton />
           </main>
         </div>
@@ -182,14 +182,14 @@ export default function WorkerProfile() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <WorkerSidebar />
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold mb-8">My Profile</h1>
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">My Profile</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-4 md:space-y-6">
           {/* Avatar Section */}
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Profile Picture</h2>
@@ -363,7 +363,7 @@ export default function WorkerProfile() {
 
               <div>
                 <Label>Expected Salary Range (USD/month)</Label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Input
                       type="number"

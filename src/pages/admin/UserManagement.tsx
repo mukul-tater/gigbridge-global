@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminHeader from "@/components/admin/AdminHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -129,40 +130,45 @@ export default function UserManagement() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-background w-full">
         <AdminSidebar />
-        <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold mb-8">User Management</h1>
-          <p className="text-muted-foreground">Loading users...</p>
-        </main>
+        <div className="flex-1 flex flex-col">
+          <AdminHeader />
+          <main className="flex-1 p-4 md:p-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">User Management</h1>
+            <p className="text-muted-foreground">Loading users...</p>
+          </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <AdminSidebar />
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">User Management</h1>
+      <div className="flex-1 flex flex-col">
+        <AdminHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">User Management</h1>
 
-        <div className="space-y-4">
-          {users.map((user) => (
-            <Card key={user.id} className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold">{user.full_name || "No Name"}</h3>
-                    <Badge variant={user.role === "worker" ? "default" : "secondary"}>
-                      {user.role}
-                    </Badge>
-                    <Badge variant={user.is_banned ? "destructive" : "default"}>
-                      {user.is_banned ? "Banned" : "Active"}
-                    </Badge>
+          <div className="space-y-4">
+            {users.map((user) => (
+              <Card key={user.id} className="p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="text-lg md:text-xl font-bold truncate">{user.full_name || "No Name"}</h3>
+                      <Badge variant={user.role === "worker" ? "default" : "secondary"}>
+                        {user.role}
+                      </Badge>
+                      <Badge variant={user.is_banned ? "destructive" : "default"}>
+                        {user.is_banned ? "Banned" : "Active"}
+                      </Badge>
+                    </div>
+                    <p className="text-muted-foreground mb-2 text-sm truncate">{user.email}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">Joined {user.joined}</p>
                   </div>
-                  <p className="text-muted-foreground mb-2">{user.email}</p>
-                  <p className="text-sm text-muted-foreground">Joined {user.joined}</p>
-                </div>
-                <div className="flex gap-2">
+                  <div className="flex gap-2 shrink-0">
                   {user.is_banned ? (
                     <Button
                       variant="outline"
@@ -182,12 +188,13 @@ export default function UserManagement() {
                       <Ban className="h-4 w-4" />
                     </Button>
                   )}
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </main>
+              </Card>
+            ))}
+          </div>
+        </main>
+      </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>

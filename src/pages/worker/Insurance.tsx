@@ -1,4 +1,5 @@
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,13 +63,15 @@ export default function Insurance() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Insurance & Remittance</h1>
-          <p className="text-muted-foreground">Manage your insurance policy and send money home</p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Insurance & Remittance</h1>
+            <p className="text-muted-foreground text-sm md:text-base">Manage your insurance policy and send money home</p>
+          </div>
 
         <Tabs defaultValue="insurance" className="space-y-6">
           <TabsList>
@@ -211,7 +214,8 @@ export default function Insurance() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

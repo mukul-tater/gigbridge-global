@@ -27,11 +27,11 @@ export default function EmployerHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center justify-between px-6">
-        <h1 className="text-xl font-semibold">Employer Portal</h1>
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center justify-between px-4 md:px-6">
+        <h1 className="text-lg md:text-xl font-semibold ml-14 md:ml-0">Employer Portal</h1>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 md:gap-4">
           <NotificationDrawer />
 
         <DropdownMenu>

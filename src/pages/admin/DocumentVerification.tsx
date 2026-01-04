@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminHeader from "@/components/admin/AdminHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -158,13 +159,15 @@ export default function DocumentVerification() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <AdminSidebar />
-      <div className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Document Verification</h1>
-          <p className="text-muted-foreground">Review and verify worker documents</p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <AdminHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Document Verification</h1>
+            <p className="text-muted-foreground text-sm md:text-base">Review and verify worker documents</p>
+          </div>
 
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="flex-1 relative">
@@ -356,6 +359,7 @@ export default function DocumentVerification() {
             ))}
           </div>
         )}
+        </main>
       </div>
     </div>
   );

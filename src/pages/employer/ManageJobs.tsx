@@ -155,13 +155,13 @@ export default function ManageJobs() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <EmployerHeader />
-        <div className="flex flex-1">
-          <EmployerSidebar />
-          <main className="flex-1 p-8">
-            <div className="flex items-center justify-between mb-8">
-              <h1 className="text-3xl font-bold">Manage Jobs</h1>
+      <div className="flex min-h-screen bg-background w-full">
+        <EmployerSidebar />
+        <div className="flex-1 flex flex-col">
+          <EmployerHeader />
+          <main className="flex-1 p-4 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-3xl font-bold">Manage Jobs</h1>
             </div>
             <JobListSkeleton count={4} />
           </main>
@@ -171,14 +171,14 @@ export default function ManageJobs() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Manage Jobs</h1>
-          <Button onClick={() => navigate("/employer/post-job")}>
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold">Manage Jobs</h1>
+          <Button onClick={() => navigate("/employer/post-job")} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Post New Job
           </Button>
@@ -199,12 +199,12 @@ export default function ManageJobs() {
         ) : (
           <div className="space-y-4">
             {jobs.map((job) => (
-              <Card key={job.id} className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-2">{job.title}</h3>
+              <Card key={job.id} className="p-4 md:p-6">
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg md:text-xl font-bold mb-2 truncate">{job.title}</h3>
                     
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-3">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mb-3">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
                         {job.location}, {job.country}
@@ -240,7 +240,7 @@ export default function ManageJobs() {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-row lg:flex-col gap-2">
                     <Select
                       value={job.status}
                       onValueChange={(value) => updateJobStatus(job.id, value)}

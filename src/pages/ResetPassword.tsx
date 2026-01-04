@@ -97,8 +97,8 @@ export default function ResetPassword() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4 pb-24 md:pb-8">
+        <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardContent className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </CardContent>
@@ -109,8 +109,8 @@ export default function ResetPassword() {
 
   if (!isValidSession && !checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4 pb-24 md:pb-8">
+        <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="text-center">
             <KeyRound className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
             <CardTitle>Invalid or Expired Link</CardTitle>
@@ -133,8 +133,8 @@ export default function ResetPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4 pb-24 md:pb-8">
+        <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="text-center">
             <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-2" />
             <CardTitle>Password Updated!</CardTitle>
@@ -148,8 +148,8 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4 pb-20 md:pb-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4 pb-24 md:pb-8 pt-8">
+      <Card className="w-full max-w-md shadow-xl border-border/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Set New Password</CardTitle>
           <CardDescription>Enter your new password below</CardDescription>

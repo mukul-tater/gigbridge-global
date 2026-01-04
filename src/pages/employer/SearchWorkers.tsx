@@ -279,21 +279,21 @@ export default function SearchWorkers() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Find Skilled Workers</h1>
-          <p className="text-muted-foreground">
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Skilled Workers</h1>
+          <p className="text-muted-foreground text-sm md:text-base">
             Search and connect with qualified workers from around the world
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-[350px_1fr] gap-6">
+        <div className="grid lg:grid-cols-[350px_1fr] gap-4 md:gap-6">
           {/* Filters Sidebar */}
-          <aside>
+          <aside className="order-2 lg:order-1">
             <WorkerSearchFilters
               filters={filters}
               onFiltersChange={setFilters}
@@ -312,12 +312,12 @@ export default function SearchWorkers() {
           </aside>
 
           {/* Worker Listings */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">
+          <div className="space-y-4 order-1 lg:order-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h2 className="text-lg md:text-xl font-semibold">
                 {workers.length} Workers Found
               </h2>
-              <select className="border rounded-md px-3 py-2 text-sm bg-card">
+              <select className="border rounded-md px-3 py-2 text-sm bg-card w-full sm:w-auto">
                 <option>Sort by: Best Match</option>
                 <option>Sort by: Experience (High to Low)</option>
                 <option>Sort by: Rating</option>
@@ -337,20 +337,20 @@ export default function SearchWorkers() {
               </Card>
             ) : (
               workers.map((worker) => (
-                <Card key={worker.id} className="p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex gap-6">
-                    <Avatar className="h-20 w-20">
+                <Card key={worker.id} className="p-4 md:p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
+                    <Avatar className="h-16 w-16 md:h-20 md:w-20 shrink-0">
                       <AvatarImage src={worker.avatar_url || ''} />
-                      <AvatarFallback className="text-2xl">
+                      <AvatarFallback className="text-xl md:text-2xl">
                         {worker.full_name?.split(' ').map(n => n[0]).join('') || 'W'}
                       </AvatarFallback>
                     </Avatar>
 
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="text-xl font-semibold mb-1">{worker.full_name || 'Worker'}</h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-start mb-3 gap-2">
+                        <div className="min-w-0">
+                          <h3 className="text-lg md:text-xl font-semibold mb-1 truncate">{worker.full_name || 'Worker'}</h3>
+                          <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground">
                             {worker.nationality && (
                               <span className="flex items-center gap-1">
                                 <Globe className="h-4 w-4" />
@@ -367,7 +367,7 @@ export default function SearchWorkers() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 mb-4 text-xs md:text-sm">
                         <div>
                           <p className="text-muted-foreground">Experience</p>
                           <p className="font-semibold flex items-center gap-1">
@@ -406,27 +406,29 @@ export default function SearchWorkers() {
                         )}
                       </div>
 
-                      <div className="flex gap-3">
+                      <div className="flex flex-wrap gap-2 md:gap-3">
                         <Link to={`/worker-profile/${worker.id}`}>
-                          <Button>View Profile</Button>
+                          <Button size="sm" className="text-xs md:text-sm">View Profile</Button>
                         </Link>
-                        <Button variant="outline">
-                          <Mail className="h-4 w-4 mr-2" />
+                        <Button variant="outline" size="sm" className="text-xs md:text-sm">
+                          <Mail className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                           Contact
                         </Button>
                         <Button 
                           variant={shortlistedIds.has(worker.id) ? "default" : "outline"}
+                          size="sm"
+                          className="text-xs md:text-sm"
                           onClick={() => handleShortlist(worker.id)}
                           disabled={shortlistingId === worker.id}
                         >
                           {shortlistedIds.has(worker.id) ? (
                             <>
-                              <Check className="h-4 w-4 mr-2" />
+                              <Check className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                               Shortlisted
                             </>
                           ) : (
                             <>
-                              <Star className="h-4 w-4 mr-2" />
+                              <Star className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                               Shortlist
                             </>
                           )}
@@ -439,13 +441,13 @@ export default function SearchWorkers() {
             )}
           </div>
         </div>
-      </main>
+        </main>
 
-      <SavedSearchDialog
-        open={showSaveDialog}
-        onOpenChange={setShowSaveDialog}
-        onSave={handleSaveSearch}
-      />
+        <SavedSearchDialog
+          open={showSaveDialog}
+          onOpenChange={setShowSaveDialog}
+          onSave={handleSaveSearch}
+        />
       </div>
     </div>
   );
