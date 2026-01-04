@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, TrendingUp, Users, MapPin, Clock, AlertCircle } from "lucide-react";
+import { ArrowRight, TrendingUp, Users, MapPin, Clock, AlertCircle, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const CountryInsights = () => {
@@ -12,121 +12,67 @@ const CountryInsights = () => {
       name: "Japan",
       flag: "🇯🇵",
       status: "High Demand",
-      statusColor: "bg-red-50 text-red-700",
+      statusColor: "bg-destructive/10 text-destructive",
       reason: "Aging workforce & infrastructure renewal",
-      avgSalary: "₹2,75,000-3,30,000",
-      visaProcess: "Work visa required (3-6 months)",
-      languages: ["Japanese", "English (limited)"],
-      topJobs: ["Construction", "Manufacturing", "Elderly Care"],
-      culturalNote: "Emphasis on punctuality and respect for hierarchy"
+      avgSalary: "₹2.75-3.30L",
+      visaProcess: "Work visa (3-6 months)",
+      languages: ["Japanese", "English"],
+      topJobs: ["Construction", "Manufacturing", "Elderly Care"]
     },
     {
       name: "Germany",
       flag: "🇩🇪",
       status: "Very High",
-      statusColor: "bg-red-50 text-red-700",
+      statusColor: "bg-destructive/10 text-destructive",
       reason: "Green energy transition & skilled labor shortage",
-      avgSalary: "₹3,00,000-3,55,000",
-      visaProcess: "EU Blue Card or work permit (2-4 months)",
+      avgSalary: "₹3.00-3.55L",
+      visaProcess: "EU Blue Card (2-4 months)",
       languages: ["German", "English"],
-      topJobs: ["Renewable Energy", "Engineering", "Construction"],
-      culturalNote: "Direct communication style, work-life balance important"
+      topJobs: ["Renewable Energy", "Engineering", "Construction"]
     },
     {
-      name: "United Arab Emirates",
+      name: "UAE",
       flag: "🇦🇪",
       status: "High Demand",
-      statusColor: "bg-orange-50 text-orange-700",
+      statusColor: "bg-warning/10 text-warning",
       reason: "Expo legacy projects & Vision 2071 development",
-      avgSalary: "₹2,20,000-3,00,000",
-      visaProcess: "Work visa sponsored by employer (1-3 months)",
+      avgSalary: "₹2.20-3.00L",
+      visaProcess: "Employer sponsored (1-3 months)",
       languages: ["Arabic", "English"],
-      topJobs: ["Construction", "Hospitality", "Transportation"],
-      culturalNote: "Multicultural environment, respect for Islamic customs"
+      topJobs: ["Construction", "Hospitality", "Transportation"]
     },
     {
       name: "Saudi Arabia",
       flag: "🇸🇦",
       status: "Very High",
-      statusColor: "bg-red-50 text-red-700",
+      statusColor: "bg-destructive/10 text-destructive",
       reason: "Vision 2030 mega projects & NEOM development",
-      avgSalary: "₹2,00,000-2,75,000",
-      visaProcess: "Work visa via employer (2-4 months)",
+      avgSalary: "₹2.00-2.75L",
+      visaProcess: "Work visa (2-4 months)",
       languages: ["Arabic", "English"],
-      topJobs: ["Construction", "Oil & Gas", "Hospitality"],
-      culturalNote: "Conservative culture, respect for religious practices"
-    },
-    {
-      name: "Qatar",
-      flag: "🇶🇦",
-      status: "High Demand",
-      statusColor: "bg-orange-50 text-orange-700",
-      reason: "Post World Cup infrastructure development",
-      avgSalary: "₹2,20,000-2,85,000",
-      visaProcess: "Work visa sponsored by employer (1-2 months)",
-      languages: ["Arabic", "English"],
-      topJobs: ["Construction", "Hospitality", "Manufacturing"],
-      culturalNote: "High standard of living, multicultural workforce"
+      topJobs: ["Construction", "Oil & Gas", "Hospitality"]
     },
     {
       name: "Singapore",
       flag: "🇸🇬",
       status: "High Demand",
-      statusColor: "bg-orange-50 text-orange-700",
+      statusColor: "bg-warning/10 text-warning",
       reason: "Tech hub expansion & skilled trades shortage",
-      avgSalary: "₹2,50,000-3,15,000",
-      visaProcess: "S Pass or Work Permit (2-4 weeks)",
+      avgSalary: "₹2.50-3.15L",
+      visaProcess: "S Pass (2-4 weeks)",
       languages: ["English", "Mandarin", "Malay"],
-      topJobs: ["Construction", "Manufacturing", "IT"],
-      culturalNote: "Efficiency-driven, multicultural society"
+      topJobs: ["Construction", "Manufacturing", "IT"]
     },
     {
       name: "Australia",
       flag: "🇦🇺",
       status: "High Demand",
-      statusColor: "bg-orange-50 text-orange-700",
+      statusColor: "bg-warning/10 text-warning",
       reason: "Mining boom & construction skills gap",
-      avgSalary: "₹3,15,000-4,35,000",
+      avgSalary: "₹3.15-4.35L",
       visaProcess: "Skilled Worker Visa (3-6 months)",
       languages: ["English"],
-      topJobs: ["Mining", "Construction", "Healthcare"],
-      culturalNote: "Laid-back culture, strong worker rights"
-    },
-    {
-      name: "Canada",
-      flag: "🇨🇦",
-      status: "High Demand",
-      statusColor: "bg-orange-50 text-orange-700",
-      reason: "Skilled trades shortage & immigration-friendly",
-      avgSalary: "₹2,75,000-3,80,000",
-      visaProcess: "Express Entry or LMIA (3-8 months)",
-      languages: ["English", "French"],
-      topJobs: ["Construction", "Welding", "Electrician"],
-      culturalNote: "Diverse, welcoming to immigrants"
-    },
-    {
-      name: "Norway",
-      flag: "🇳🇴",
-      status: "Medium-High",
-      statusColor: "bg-yellow-50 text-yellow-700",
-      reason: "Oil industry & renewable energy expansion",
-      avgSalary: "₹3,55,000-4,10,000",
-      visaProcess: "Work permit required (2-6 months)",
-      languages: ["Norwegian", "English"],
-      topJobs: ["Oil & Gas", "Renewable Energy", "Maritime"],
-      culturalNote: "Egalitarian society, outdoor lifestyle important"
-    },
-    {
-      name: "Malaysia",
-      flag: "🇲🇾",
-      status: "Medium-High",
-      statusColor: "bg-yellow-50 text-yellow-700",
-      reason: "Manufacturing hub & infrastructure development",
-      avgSalary: "₹1,20,000-2,00,000",
-      visaProcess: "Employment Pass (1-2 months)",
-      languages: ["Malay", "English", "Mandarin"],
-      topJobs: ["Manufacturing", "Construction", "Electronics"],
-      culturalNote: "Multicultural society, affordable living"
+      topJobs: ["Mining", "Construction", "Healthcare"]
     }
   ];
 
@@ -134,121 +80,131 @@ const CountryInsights = () => {
     navigate(`/jobs?location=${encodeURIComponent(countryName)}`);
   };
 
-  const handleExploreAll = () => {
-    navigate('/jobs');
-  };
-
   return (
-    <section className="py-20 bg-muted/30">
-      <div className="container mx-auto px-4 lg:px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Country Labor Market Insights
+    <section className="py-20 lg:py-32 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-background" />
+      
+      <div className="container mx-auto px-4 lg:px-6 relative z-10">
+        {/* Header */}
+        <div className="text-center mb-12 lg:mb-16 max-w-3xl mx-auto">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-primary/10 text-primary mb-4">
+            <Globe className="h-3.5 w-3.5" />
+            Market Intelligence
+          </span>
+          <h2 className="text-3xl lg:text-5xl font-bold font-heading mb-5 tracking-tight">
+            Country <span className="text-gradient">Insights</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Strategic insights into countries with the highest demand for skilled workers, 
-            including visa requirements and cultural guidance
+          <p className="text-lg text-muted-foreground">
+            Strategic insights into countries with the highest demand for skilled workers
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        {/* Countries Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mb-12">
           {countries.map((country, index) => (
-            <Card 
-              key={index} 
-              className="hover:shadow-lg transition-all duration-300 cursor-pointer"
-              onClick={() => handleViewJobs(country.name)}
+            <div
+              key={index}
+              className="group opacity-0 animate-fade-in-up"
+              style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'forwards' }}
             >
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{country.flag}</span>
-                    <div>
-                      <CardTitle className="text-xl">{country.name}</CardTitle>
-                      <Badge className={`${country.statusColor} mt-1`}>
-                        {country.status}
-                      </Badge>
+              <Card 
+                className="h-full bg-card border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-xl cursor-pointer overflow-hidden"
+                onClick={() => handleViewJobs(country.name)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-4xl">{country.flag}</span>
+                      <div>
+                        <CardTitle className="text-lg font-heading group-hover:text-primary transition-colors">
+                          {country.name}
+                        </CardTitle>
+                        <Badge className={`${country.statusColor} mt-1 text-xs`}>
+                          {country.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    <TrendingUp className="h-5 w-5 text-success" />
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  {/* Why high demand */}
+                  <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <AlertCircle className="h-3.5 w-3.5 text-primary" />
+                      <span className="font-medium text-foreground text-xs">Why High Demand?</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{country.reason}</p>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-success font-bold text-sm">₹</span>
+                      <div>
+                        <div className="text-xs font-medium text-foreground">{country.avgSalary}</div>
+                        <div className="text-[10px] text-muted-foreground">Avg. Salary</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-3.5 w-3.5 text-primary" />
+                      <div>
+                        <div className="text-xs font-medium text-foreground line-clamp-1">{country.visaProcess}</div>
+                        <div className="text-[10px] text-muted-foreground">Visa Process</div>
+                      </div>
                     </div>
                   </div>
-                  <TrendingUp className="h-5 w-5 text-success" />
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <div className="bg-primary/5 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertCircle className="h-4 w-4 text-primary" />
-                    <span className="font-medium text-foreground">Why High Demand?</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{country.reason}</p>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-success font-bold">₹</span>
-                    <div>
-                      <div className="text-sm font-medium">Avg. Salary</div>
-                      <div className="text-xs text-muted-foreground">{country.avgSalary}</div>
+                  {/* Top Jobs */}
+                  <div>
+                    <div className="text-xs font-medium mb-2 flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5" />
+                      Top Categories
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {country.topJobs.map((job, jobIndex) => (
+                        <Badge key={jobIndex} variant="secondary" className="text-xs bg-muted">
+                          {job}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <div>
-                      <div className="text-sm font-medium">Visa Process</div>
-                      <div className="text-xs text-muted-foreground">{country.visaProcess}</div>
-                    </div>
-                  </div>
-                </div>
 
-                <div>
-                  <div className="text-sm font-medium mb-2 flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Top Job Categories
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {country.topJobs.map((job, jobIndex) => (
-                      <Badge key={jobIndex} variant="secondary" className="text-xs">
-                        {job}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-sm font-medium mb-2">Languages</div>
-                  <div className="flex gap-2">
+                  {/* Languages */}
+                  <div className="flex gap-1.5">
                     {country.languages.map((lang, langIndex) => (
                       <Badge key={langIndex} variant="outline" className="text-xs">
                         {lang}
                       </Badge>
                     ))}
                   </div>
-                </div>
 
-                <div className="bg-accent/50 p-3 rounded-lg">
-                  <div className="text-sm font-medium mb-1">Cultural Insight</div>
-                  <p className="text-xs text-muted-foreground">{country.culturalNote}</p>
-                </div>
-
-                <Button 
-                  variant="professional" 
-                  className="w-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewJobs(country.name);
-                  }}
-                >
-                  <MapPin className="h-4 w-4" />
-                  View {country.name} Jobs
-                </Button>
-              </CardContent>
-            </Card>
+                  <Button 
+                    className="w-full rounded-xl gap-2 group/btn"
+                    variant="outline"
+                    onClick={(e) => { e.stopPropagation(); handleViewJobs(country.name); }}
+                  >
+                    <MapPin className="h-4 w-4" />
+                    View {country.name} Jobs
+                    <ArrowRight className="h-4 w-4 ml-auto group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           ))}
         </div>
 
+        {/* CTA */}
         <div className="text-center">
-          <Button variant="hero" size="lg" onClick={handleExploreAll}>
-            Explore All Country Insights
-            <ArrowRight className="h-4 w-4" />
+          <Button 
+            size="lg" 
+            className="rounded-xl px-8 gap-2 shadow-primary hover:shadow-hover transition-all"
+            onClick={() => navigate('/jobs')}
+          >
+            Explore All Countries
+            <ArrowRight className="h-5 w-5" />
           </Button>
         </div>
       </div>

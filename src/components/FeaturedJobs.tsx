@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Building2, Briefcase, DollarSign, Clock, ArrowRight, Bookmark, Share2, Zap } from 'lucide-react';
+import { MapPin, Building2, Briefcase, DollarSign, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -63,8 +63,7 @@ export default function FeaturedJobs() {
   }, []);
 
   const formatSalary = (min: number, max: number, currency: string) => {
-    // Always display in INR
-    const inrMin = currency === 'INR' ? min : min * 83; // Approx USD to INR
+    const inrMin = currency === 'INR' ? min : min * 83;
     const inrMax = currency === 'INR' ? max : max * 83;
     return `₹${(inrMin / 1000).toFixed(0)}K - ₹${(inrMax / 1000).toFixed(0)}K`;
   };
@@ -82,23 +81,17 @@ export default function FeaturedJobs() {
     const days = Math.floor((Date.now() - new Date(dateString).getTime()) / (1000 * 60 * 60 * 24));
     if (days === 0) return 'Today';
     if (days === 1) return 'Yesterday';
-    return `${days} days ago`;
+    return `${days}d ago`;
   };
 
   const handleSaveJob = (jobId: string) => {
     const newSavedJobs = new Set(savedJobs);
     if (newSavedJobs.has(jobId)) {
       newSavedJobs.delete(jobId);
-      toast({
-        title: "Job removed",
-        description: "Job removed from your saved list",
-      });
+      toast({ title: "Job removed", description: "Job removed from your saved list" });
     } else {
       newSavedJobs.add(jobId);
-      toast({
-        title: "Job saved!",
-        description: "Job added to your saved list",
-      });
+      toast({ title: "Job saved!", description: "Job added to your saved list" });
     }
     setSavedJobs(newSavedJobs);
   };
@@ -113,29 +106,19 @@ export default function FeaturedJobs() {
     if (navigator.share) {
       try {
         await navigator.share(shareData);
-        toast({
-          title: "Shared successfully!",
-          description: "Job has been shared",
-        });
+        toast({ title: "Shared successfully!", description: "Job has been shared" });
       } catch (err) {
         console.log('Share cancelled');
       }
     } else {
       navigator.clipboard.writeText(shareData.url);
-      toast({
-        title: "Link copied!",
-        description: "Job link copied to clipboard",
-      });
+      toast({ title: "Link copied!", description: "Job link copied to clipboard" });
     }
   };
 
   const handleQuickApply = (jobSlug: string) => {
     if (!isAuthenticated) {
-      toast({
-        title: "Login required",
-        description: "Please login to apply for jobs",
-        variant: "destructive"
-      });
+      toast({ title: "Login required", description: "Please login to apply for jobs", variant: "destructive" });
       navigate('/auth');
       return;
     }
@@ -144,11 +127,13 @@ export default function FeaturedJobs() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-background" id="jobs">
+      <section className="py-20 lg:py-32 bg-background" id="jobs">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading featured jobs...</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+              <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+            </div>
+            <p className="text-muted-foreground">Loading featured jobs...</p>
           </div>
         </div>
       </section>
@@ -156,11 +141,20 @@ export default function FeaturedJobs() {
   }
 
   return (
-    <section className="py-16 bg-background" id="jobs">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Featured Opportunities
+    <section className="py-20 lg:py-32 relative overflow-hidden" id="jobs">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-background" />
+      <div className="absolute inset-0 bg-mesh opacity-20" />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Header */}
+        <div className="text-center mb-12 lg:mb-16">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-secondary/10 text-secondary mb-4">
+            <Sparkles className="h-3.5 w-3.5" />
+            Hot Opportunities
+          </span>
+          <h2 className="text-3xl lg:text-5xl font-bold font-heading text-foreground mb-4 tracking-tight">
+            Featured <span className="text-gradient">Opportunities</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Browse our latest job openings from verified employers worldwide
@@ -169,115 +163,115 @@ export default function FeaturedJobs() {
 
         {jobs.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading jobs...</p>
+            <p className="text-muted-foreground">No jobs available at the moment.</p>
           </div>
         ) : (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {jobs.map((job) => (
-                <Card 
-                  key={job.id} 
-                  className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mb-12">
+              {jobs.map((job, index) => (
+                <div
+                  key={job.id}
+                  className="group opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                 >
-                  {/* Quick Action Buttons */}
-                  <div className="absolute top-3 right-3 z-10 flex gap-2">
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSaveJob(job.id);
-                      }}
-                    >
-                      <Bookmark 
-                        className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-current' : ''}`} 
-                      />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleShareJob(job);
-                      }}
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
-                      <Badge variant={getJobTypeBadge(job.job_type)}>
-                        {job.job_type.replace('_', ' ')}
-                      </Badge>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4 mr-1" />
-                        {getDaysAgo(job.posted_at)}
-                      </div>
-                    </div>
-                    <CardTitle className="text-xl">{job.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-2 mt-2">
-                      <Building2 className="h-4 w-4" />
-                      {job.employer_profiles?.company_name || 'Company'}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {job.description}
-                    </p>
+                  <Card 
+                    className="h-full relative overflow-hidden bg-card border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                    onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
+                  >
+                    {/* Gradient accent line */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
                     
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
-                      {job.location}, {job.country}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                      <span className="text-base font-bold">₹</span>
-                      {formatSalary(job.salary_min, job.salary_max, job.currency)}
-                    </div>
-
-                    {job.visa_sponsorship && (
-                      <Badge variant="secondary" className="w-fit">
-                        <Zap className="h-3 w-3 mr-1" />
-                        Visa Sponsorship
-                      </Badge>
-                    )}
-
-                    {job.job_skills && job.job_skills.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {job.job_skills.slice(0, 3).map((skill, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {skill.skill_name}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <Button 
-                        className="w-full" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleQuickApply(job.slug || job.id);
-                        }}
+                    {/* Quick Action Buttons */}
+                    <div className="absolute top-4 right-4 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform bg-card/90 backdrop-blur-sm"
+                        onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}
                       >
-                        <ArrowRight className="mr-2 h-4 w-4" />
-                        View & Apply
+                        <Bookmark className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-current text-primary' : ''}`} />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform bg-card/90 backdrop-blur-sm"
+                        onClick={(e) => { e.stopPropagation(); handleShareJob(job); }}
+                      >
+                        <Share2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between mb-3">
+                        <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium">
+                          {job.job_type.replace('_', ' ')}
+                        </Badge>
+                        <span className="flex items-center text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {getDaysAgo(job.posted_at)}
+                        </span>
+                      </div>
+                      <CardTitle className="text-lg lg:text-xl font-heading line-clamp-1 group-hover:text-primary transition-colors">
+                        {job.title}
+                      </CardTitle>
+                      <CardDescription className="flex items-center gap-2 mt-1">
+                        <Building2 className="h-4 w-4" />
+                        <span className="truncate">{job.employer_profiles?.company_name || 'Company'}</span>
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-3">
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {job.description}
+                      </p>
+                      
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{job.location}, {job.country}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-primary">
+                          {formatSalary(job.salary_min, job.salary_max, job.currency)}
+                        </span>
+                        <span className="text-xs text-muted-foreground">/month</span>
+                      </div>
+
+                      {job.visa_sponsorship && (
+                        <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
+                          <Zap className="h-3 w-3 mr-1" />
+                          Visa Sponsorship
+                        </Badge>
+                      )}
+
+                      {job.job_skills && job.job_skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {job.job_skills.slice(0, 3).map((skill, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs bg-muted/50">
+                              {skill.skill_name}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      <Button 
+                        className="w-full mt-2 group/btn rounded-xl"
+                        onClick={(e) => { e.stopPropagation(); handleQuickApply(job.slug || job.id); }}
+                      >
+                        View & Apply
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
               ))}
             </div>
 
             <div className="text-center">
               <Link to="/jobs">
-                <Button size="lg" variant="hero">
+                <Button size="lg" className="rounded-xl px-8 gap-2 shadow-primary hover:shadow-hover transition-all">
                   View All Jobs
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
             </div>
