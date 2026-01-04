@@ -4,6 +4,7 @@ type NotificationType =
   | 'application_submitted' 
   | 'application_status_changed' 
   | 'offer_received' 
+  | 'offer_response'
   | 'message_received' 
   | 'interview_scheduled';
 
@@ -153,6 +154,32 @@ export async function notifyInterviewScheduled(
       meetingLink,
       location,
       dashboardUrl: `${window.location.origin}/worker/applications`
+    }
+  });
+}
+
+export async function notifyOfferResponse(
+  employerEmail: string,
+  employerName: string,
+  workerName: string,
+  jobTitle: string,
+  salary: string,
+  startDate: string,
+  accepted: boolean,
+  reason?: string
+) {
+  return sendEmailNotification({
+    type: 'offer_response',
+    recipientEmail: employerEmail,
+    recipientName: employerName,
+    data: {
+      workerName,
+      jobTitle,
+      salary,
+      startDate,
+      accepted,
+      reason,
+      dashboardUrl: `${window.location.origin}/employer/offers`
     }
   });
 }

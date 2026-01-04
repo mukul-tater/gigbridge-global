@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface EmailNotificationRequest {
-  type: 'application_submitted' | 'application_status_changed' | 'offer_received' | 'message_received' | 'interview_scheduled';
+  type: 'application_submitted' | 'application_status_changed' | 'offer_received' | 'offer_response' | 'message_received' | 'interview_scheduled';
   recipientEmail: string;
   recipientName: string;
   data: Record<string, any>;
@@ -143,6 +143,42 @@ const EMAIL_TEMPLATES: Record<string, { subject: string; getHtml: (data: any, na
             Please be prepared and join on time. Good luck!
           </p>
           <a href="${data.dashboardUrl}" style="display: inline-block; background: #7c3aed; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin-top: 20px;">View Details</a>
+        </div>
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
+          © 2024 SafeWork Global. All rights reserved.
+        </p>
+      </div>
+    `
+  },
+  offer_response: {
+    subject: 'Offer Response Update - SafeWork Global',
+    getHtml: (data, name) => `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, ${data.accepted ? '#059669' : '#dc2626'} 0%, ${data.accepted ? '#0891b2' : '#9f1239'} 100%); padding: 30px; border-radius: 12px 12px 0 0;">
+          <h1 style="color: white; margin: 0;">${data.accepted ? '✅ Offer Accepted!' : '❌ Offer Declined'}</h1>
+        </div>
+        <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 12px 12px;">
+          <h2 style="color: #1f2937;">Hi ${name},</h2>
+          <p style="color: #4b5563; line-height: 1.6;">
+            ${data.accepted 
+              ? `Great news! <strong>${data.workerName}</strong> has accepted your job offer!`
+              : `<strong>${data.workerName}</strong> has declined your job offer.`
+            }
+          </p>
+          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid ${data.accepted ? '#059669' : '#dc2626'};">
+            <p style="margin: 0; color: #1f2937; font-size: 18px; font-weight: bold;">${data.jobTitle}</p>
+            <p style="margin: 10px 0 0; color: #6b7280;"><strong>Candidate:</strong> ${data.workerName}</p>
+            <p style="margin: 10px 0 0; color: #6b7280;"><strong>Salary:</strong> ${data.salary}</p>
+            <p style="margin: 10px 0 0; color: #6b7280;"><strong>Start Date:</strong> ${data.startDate}</p>
+            ${data.reason ? `<p style="margin: 15px 0 0; color: #6b7280; font-style: italic;"><strong>Reason:</strong> ${data.reason}</p>` : ''}
+          </div>
+          <p style="color: #4b5563; line-height: 1.6;">
+            ${data.accepted 
+              ? 'You can now proceed with the onboarding process and complete the necessary formalities.'
+              : 'You may want to consider other candidates for this position.'
+            }
+          </p>
+          <a href="${data.dashboardUrl}" style="display: inline-block; background: ${data.accepted ? '#059669' : '#2563eb'}; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin-top: 20px;">${data.accepted ? 'Start Onboarding' : 'View Other Candidates'}</a>
         </div>
         <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
           © 2024 SafeWork Global. All rights reserved.

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { notifyOfferResponse } from '@/services/NotificationService';
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
 import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
@@ -135,7 +136,38 @@ export default function WorkerOffers() {
 
       if (formalitiesError) {
         console.error('Failed to create formalities record:', formalitiesError);
-        // Don't throw - this is not critical
+      }
+
+      // Send email notification to employer
+      try {
+        const { data: employerProfile } = await supabase
+          .from('profiles')
+          .select('email, full_name')
+          .eq('id', selectedOffer.employer_id)
+          .maybeSingle();
+
+        const { data: workerProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user?.id)
+          .maybeSingle();
+
+        if (employerProfile?.email) {
+          const salary = formatCurrency(selectedOffer.salary_amount, selectedOffer.salary_currency);
+          const startDate = format(new Date(selectedOffer.start_date), 'MMM dd, yyyy');
+          
+          await notifyOfferResponse(
+            employerProfile.email,
+            employerProfile.full_name || 'Employer',
+            workerProfile?.full_name || 'Candidate',
+            selectedOffer.job_title || 'Position',
+            salary,
+            startDate,
+            true
+          );
+        }
+      } catch (notifyError) {
+        console.error('Failed to send notification:', notifyError);
       }
 
       toast.success('Congratulations! You have accepted the offer');
@@ -177,6 +209,39 @@ export default function WorkerOffers() {
         .eq('id', selectedOffer.application_id);
 
       if (appError) throw appError;
+
+      // Send email notification to employer
+      try {
+        const { data: employerProfile } = await supabase
+          .from('profiles')
+          .select('email, full_name')
+          .eq('id', selectedOffer.employer_id)
+          .maybeSingle();
+
+        const { data: workerProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user?.id)
+          .maybeSingle();
+
+        if (employerProfile?.email) {
+          const salary = formatCurrency(selectedOffer.salary_amount, selectedOffer.salary_currency);
+          const startDate = format(new Date(selectedOffer.start_date), 'MMM dd, yyyy');
+          
+          await notifyOfferResponse(
+            employerProfile.email,
+            employerProfile.full_name || 'Employer',
+            workerProfile?.full_name || 'Candidate',
+            selectedOffer.job_title || 'Position',
+            salary,
+            startDate,
+            false,
+            rejectReason || undefined
+          );
+        }
+      } catch (notifyError) {
+        console.error('Failed to send notification:', notifyError);
+      }
 
       toast.success('Offer declined');
       setIsRejectDialogOpen(false);
