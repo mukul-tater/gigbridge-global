@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
+import { NotificationCenter } from '@/components/NotificationCenter';
 
 export default function EmployerHeader() {
   const { user, profile, logout } = useAuth();
@@ -29,6 +30,9 @@ export default function EmployerHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-6">
         <h1 className="text-xl font-semibold">Employer Portal</h1>
+
+        <div className="flex items-center gap-2">
+          <NotificationCenter />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -52,6 +56,7 @@ export default function EmployerHeader() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
       </div>
     </header>
   );

@@ -138,20 +138,34 @@ export default function WorkerOffers() {
         console.error('Failed to create formalities record:', formalitiesError);
       }
 
-      // Send email notification to employer
+      // Create in-app notification for employer
       try {
+        const { data: workerProfile } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', user?.id)
+          .maybeSingle();
+
         const { data: employerProfile } = await supabase
           .from('profiles')
           .select('email, full_name')
           .eq('id', selectedOffer.employer_id)
           .maybeSingle();
 
-        const { data: workerProfile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', user?.id)
-          .maybeSingle();
+        // Insert in-app notification
+        await supabase.from('notifications').insert({
+          user_id: selectedOffer.employer_id,
+          type: 'offer_accepted',
+          title: 'Offer Accepted!',
+          message: `${workerProfile?.full_name || 'A candidate'} has accepted your offer for ${selectedOffer.job_title}`,
+          data: {
+            offer_id: selectedOffer.id,
+            job_id: selectedOffer.job_id,
+            worker_name: workerProfile?.full_name
+          }
+        });
 
+        // Also send email notification
         if (employerProfile?.email) {
           const salary = formatCurrency(selectedOffer.salary_amount, selectedOffer.salary_currency);
           const startDate = format(new Date(selectedOffer.start_date), 'MMM dd, yyyy');
@@ -210,20 +224,35 @@ export default function WorkerOffers() {
 
       if (appError) throw appError;
 
-      // Send email notification to employer
+      // Create in-app notification for employer
       try {
+        const { data: workerProfile } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', user?.id)
+          .maybeSingle();
+
         const { data: employerProfile } = await supabase
           .from('profiles')
           .select('email, full_name')
           .eq('id', selectedOffer.employer_id)
           .maybeSingle();
 
-        const { data: workerProfile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', user?.id)
-          .maybeSingle();
+        // Insert in-app notification
+        await supabase.from('notifications').insert({
+          user_id: selectedOffer.employer_id,
+          type: 'offer_rejected',
+          title: 'Offer Declined',
+          message: `${workerProfile?.full_name || 'A candidate'} has declined your offer for ${selectedOffer.job_title}${rejectReason ? `. Reason: ${rejectReason}` : ''}`,
+          data: {
+            offer_id: selectedOffer.id,
+            job_id: selectedOffer.job_id,
+            worker_name: workerProfile?.full_name,
+            reason: rejectReason || null
+          }
+        });
 
+        // Also send email notification
         if (employerProfile?.email) {
           const salary = formatCurrency(selectedOffer.salary_amount, selectedOffer.salary_currency);
           const startDate = format(new Date(selectedOffer.start_date), 'MMM dd, yyyy');
