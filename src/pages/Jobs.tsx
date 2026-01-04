@@ -195,24 +195,93 @@ export default function Jobs() {
     }
   };
 
+  // Job Card Component for reuse
+  const JobCard = ({ job }: { job: Job }) => (
+    <Card 
+      className="p-4 md:p-6 hover:shadow-lg transition-all duration-200 cursor-pointer border-border/50 hover:border-primary/30"
+      onClick={() => navigate(`/jobs/${job.slug}`)}
+    >
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1 line-clamp-1">{job.title}</h3>
+          <p className="text-muted-foreground text-sm">{job.company}</p>
+        </div>
+        {job.visaSponsorship && (
+          <Badge className="bg-success/10 text-success border-success/20 self-start shrink-0 text-xs">
+            <Globe className="h-3 w-3 mr-1" />
+            <span className="hidden xs:inline sm:hidden md:inline">Visa Sponsorship</span>
+            <span className="xs:hidden sm:inline md:hidden">Visa</span>
+          </Badge>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-x-3 gap-y-1.5 mb-3 text-xs sm:text-sm text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate max-w-[140px] sm:max-w-[200px]">{job.location}</span>
+        </span>
+        <span className="flex items-center gap-1 font-medium text-foreground">
+          {job.salary}
+        </span>
+        <span className="flex items-center gap-1">
+          <Briefcase className="h-3.5 w-3.5" />
+          {job.type}
+        </span>
+        <span className="flex items-center gap-1">
+          <Clock className="h-3.5 w-3.5" />
+          {job.postedDate}
+        </span>
+      </div>
+
+      <p className="text-muted-foreground mb-3 text-sm line-clamp-2">{job.description}</p>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-1.5">
+          {job.skills.slice(0, 3).map(skill => (
+            <Badge key={skill} variant="outline" className="text-xs">{skill}</Badge>
+          ))}
+          {job.skills.length > 3 && (
+            <Badge variant="outline" className="text-xs">+{job.skills.length - 3}</Badge>
+          )}
+        </div>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button 
+            className="flex-1 sm:flex-none h-9 text-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isAuthenticated) {
+                toast.error('Please login to apply for jobs');
+                navigate('/auth');
+              } else {
+                navigate(`/jobs/${job.slug}`);
+              }
+            }}
+          >
+            View & Apply
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+
   // Worker Portal Layout
   if (role === 'worker') {
     return (
       <div className="flex min-h-screen bg-background">
         <WorkerSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           <WorkerHeader />
-          <main className="flex-1 p-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Find Your Next Global Opportunity</h1>
-              <p className="text-muted-foreground">
+          <main className="flex-1 p-4 md:p-6 lg:p-8 pb-20 md:pb-8 overflow-x-hidden">
+            <div className="mb-5 md:mb-8">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 md:mb-2">Find Your Next Global Opportunity</h1>
+              <p className="text-sm md:text-base text-muted-foreground">
                 Browse thousands of international job opportunities with visa sponsorship
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-[350px_1fr] gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] xl:grid-cols-[340px_1fr] gap-4 lg:gap-6">
               {/* Filters Sidebar */}
-              <aside>
+              <aside className="order-2 lg:order-1">
                 <JobSearchFilters
                   filters={filters}
                   onFiltersChange={setFilters}
@@ -221,7 +290,7 @@ export default function Jobs() {
                   loading={loading}
                 />
                 
-                <Card className="mt-4 p-4">
+                <Card className="mt-4 p-4 hidden lg:block">
                   <Link to="/worker/saved-searches">
                     <Button variant="outline" className="w-full">
                       View Saved Searches
@@ -231,102 +300,40 @@ export default function Jobs() {
               </aside>
 
               {/* Job Listings */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">
+              <div className="space-y-3 md:space-y-4 order-1 lg:order-2">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">
+                  <h2 className="text-base sm:text-lg md:text-xl font-semibold">
                     {jobs.length} Jobs Found
                   </h2>
-                  <select className="border rounded-md px-3 py-2 text-sm bg-card">
-                    <option>Sort by: Most Recent</option>
-                    <option>Sort by: Salary (High to Low)</option>
-                    <option>Sort by: Salary (Low to High)</option>
-                    <option>Sort by: Relevance</option>
+                  <select className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto">
+                    <option>Most Recent</option>
+                    <option>Salary (High to Low)</option>
+                    <option>Salary (Low to High)</option>
                   </select>
                 </div>
 
                 {loading ? (
-                  <Card className="p-12 text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Loading jobs...</p>
+                  <Card className="p-8 md:p-12 text-center">
+                    <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground text-sm md:text-base">Loading jobs...</p>
                   </Card>
                 ) : (
                   <>
                     {jobs.map((job) => (
-                  <Card 
-                    key={job.id} 
-                    className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => navigate(`/jobs/${job.slug}`)}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
-                        <p className="text-muted-foreground">{job.company}</p>
-                      </div>
-                      {job.visaSponsorship && (
-                        <Badge className="bg-success text-success-foreground">
-                          <Globe className="h-3 w-3 mr-1" />
-                          Visa Sponsorship
-                        </Badge>
-                      )}
-                    </div>
+                      <JobCard key={job.id} job={job} />
+                    ))}
 
-                    <div className="flex flex-wrap gap-4 mb-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {job.location}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="font-bold">₹</span>
-                        {job.salary}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Briefcase className="h-4 w-4" />
-                        {job.type}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {job.postedDate}
-                      </span>
-                    </div>
-
-                    <p className="text-muted-foreground mb-4">{job.description}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
-                        {job.skills.slice(0, 3).map(skill => (
-                          <Badge key={skill} variant="outline">{skill}</Badge>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <Link to={`/jobs/${job.slug}`}>
-                          <Button variant="outline">View Details</Button>
-                        </Link>
-                        <Button onClick={() => {
-                          if (!isAuthenticated) {
-                            toast.error('Please login as a worker to apply for jobs');
-                            navigate('/auth');
-                          } else {
-                            navigate(`/jobs/${job.slug}`);
-                          }
-                        }}>
-                          Apply Now
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-
-                {jobs.length === 0 && (
-                  <Card className="p-12 text-center">
-                    <Briefcase className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">No Jobs Found</h3>
-                    <p className="text-muted-foreground">
-                      Try adjusting your filters to see more results
-                    </p>
-                  </Card>
+                    {jobs.length === 0 && (
+                      <Card className="p-8 md:p-12 text-center">
+                        <Briefcase className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg md:text-xl font-semibold mb-2">No Jobs Found</h3>
+                        <p className="text-muted-foreground text-sm md:text-base">
+                          Try adjusting your filters to see more results
+                        </p>
+                      </Card>
+                    )}
+                  </>
                 )}
-              </>
-            )}
               </div>
             </div>
           </main>
@@ -370,7 +377,7 @@ export default function Jobs() {
 
   // Default Public Layout
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <SEOHead
         title="International Jobs | Find Global Opportunities | SafeWorkGlobal"
         description="Browse 50,000+ international job opportunities for skilled workers in construction, electrical, welding, and more. Visa sponsorship available across 15+ countries."
@@ -382,17 +389,17 @@ export default function Jobs() {
       <Header />
       <MobileBottomNav />
       
-      <main className="container mx-auto px-4 py-8 mt-16">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Find Your Next Global Opportunity</h1>
-          <p className="text-muted-foreground">
+      <main className="container mx-auto px-4 py-5 md:py-8">
+        <header className="mb-5 md:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 md:mb-2">Find Your Next Global Opportunity</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             Browse thousands of international job opportunities with visa sponsorship
           </p>
         </header>
 
-        <div className="grid lg:grid-cols-[350px_1fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] xl:grid-cols-[340px_1fr] gap-4 lg:gap-6">
           {/* Filters Sidebar */}
-          <aside>
+          <aside className="order-2 lg:order-1">
             <JobSearchFilters
               filters={filters}
               onFiltersChange={setFilters}
@@ -402,7 +409,7 @@ export default function Jobs() {
             />
             
             {user && (
-              <Card className="mt-4 p-4">
+              <Card className="mt-4 p-4 hidden lg:block">
                 <Link to="/worker/saved-searches">
                   <Button variant="outline" className="w-full">
                     View Saved Searches
@@ -413,97 +420,40 @@ export default function Jobs() {
           </aside>
 
           {/* Job Listings */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">
+          <div className="space-y-3 md:space-y-4 order-1 lg:order-2">
+            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">
+              <h2 className="text-base sm:text-lg md:text-xl font-semibold">
                 {jobs.length} Jobs Found
               </h2>
-              <select className="border rounded-md px-3 py-2 text-sm bg-card">
-                <option>Sort by: Most Recent</option>
-                <option>Sort by: Salary (High to Low)</option>
-                <option>Sort by: Salary (Low to High)</option>
-                <option>Sort by: Relevance</option>
+              <select className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto">
+                <option>Most Recent</option>
+                <option>Salary (High to Low)</option>
+                <option>Salary (Low to High)</option>
               </select>
             </div>
 
             {loading ? (
-              <Card className="p-12 text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Loading jobs...</p>
+              <Card className="p-8 md:p-12 text-center">
+                <div className="animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-muted-foreground text-sm md:text-base">Loading jobs...</p>
               </Card>
             ) : (
               <>
                 {jobs.map((job) => (
-              <Card 
-                key={job.id} 
-                className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/jobs/${job.slug}`)}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
-                    <p className="text-muted-foreground">{job.company}</p>
-                  </div>
-                  {job.visaSponsorship && (
-                    <Badge className="bg-success text-success-foreground">
-                      <Globe className="h-3 w-3 mr-1" />
-                      Visa Sponsorship
-                    </Badge>
-                  )}
-                </div>
+                  <JobCard key={job.id} job={job} />
+                ))}
 
-                <div className="flex flex-wrap gap-4 mb-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {job.location}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="font-bold">₹</span>
-                    {job.salary}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Briefcase className="h-4 w-4" />
-                    {job.type}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {job.postedDate}
-                  </span>
-                </div>
-
-                <p className="text-muted-foreground mb-4">{job.description}</p>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-2">
-                    {job.skills.slice(0, 3).map(skill => (
-                      <Badge key={skill} variant="outline">{skill}</Badge>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/jobs/${job.slug}`);
-                      }}
-                    >
-                      View & Apply
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-
-            {jobs.length === 0 && (
-              <Card className="p-12 text-center">
-                <Briefcase className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No jobs found</h3>
-                <p className="text-muted-foreground">
-                  Try adjusting your filters or search criteria
-                </p>
-              </Card>
+                {jobs.length === 0 && (
+                  <Card className="p-8 md:p-12 text-center">
+                    <Briefcase className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg md:text-xl font-semibold mb-2">No jobs found</h3>
+                    <p className="text-muted-foreground text-sm md:text-base">
+                      Try adjusting your filters or search criteria
+                    </p>
+                  </Card>
+                )}
+              </>
             )}
-          </>
-        )}
           </div>
         </div>
       </main>
