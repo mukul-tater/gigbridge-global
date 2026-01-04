@@ -107,12 +107,12 @@ export default function WorkerApplications() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-background w-full">
         <WorkerSidebar />
         <div className="flex-1 flex flex-col">
           <WorkerHeader />
-          <main className="flex-1 p-8">
-            <h1 className="text-3xl font-bold mb-8">My Applications</h1>
+          <main className="flex-1 p-4 md:p-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">My Applications</h1>
             <ApplicationListSkeleton count={4} />
           </main>
         </div>
@@ -121,12 +121,12 @@ export default function WorkerApplications() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <WorkerSidebar />
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold mb-8">My Applications</h1>
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">My Applications</h1>
 
           {applications.length === 0 ? (
             <Card className="p-12 text-center">
@@ -139,10 +139,10 @@ export default function WorkerApplications() {
           ) : (
           <div className="space-y-4">
               {applications.map((app) => (
-                <Card key={app.id} className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-2">
+                <Card key={app.id} className="p-4 md:p-6">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg md:text-xl font-bold mb-2 truncate">
                         {app.job?.title || "Job Position"}
                       </h3>
                       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
@@ -180,7 +180,7 @@ export default function WorkerApplications() {
                         </span>
                       </div>
                     </div>
-                    <Button variant="outline" asChild>
+                    <Button variant="outline" asChild className="w-full md:w-auto shrink-0">
                       <Link to={`/worker/applications/${app.id}`}>
                         <Eye className="h-4 w-4 mr-2" />
                         View Details

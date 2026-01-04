@@ -152,10 +152,10 @@ export default function EmployerDashboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background w-full">
-        <EmployerHeader />
-        <div className="flex flex-1">
-          <EmployerSidebar />
+      <div className="flex min-h-screen bg-background w-full">
+        <EmployerSidebar />
+        <div className="flex-1 flex flex-col">
+          <EmployerHeader />
           <main className="flex-1 p-4 md:p-8">
             <DashboardSkeleton />
           </main>
@@ -183,10 +183,10 @@ export default function EmployerDashboard() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-background w-full">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
         <OnboardingStepper />
         
@@ -350,7 +350,7 @@ export default function EmployerDashboard() {
             </div>
           </Card>
         </div>
-      </main>
+        </main>
       </div>
     </div>
   );

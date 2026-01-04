@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminHeader from "@/components/admin/AdminHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -139,38 +140,43 @@ export default function JobVerification() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-background w-full">
         <AdminSidebar />
-        <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold mb-8">Job Verification & Management</h1>
-          <p className="text-muted-foreground">Loading jobs...</p>
-        </main>
+        <div className="flex-1 flex flex-col">
+          <AdminHeader />
+          <main className="flex-1 p-4 md:p-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Job Verification & Management</h1>
+            <p className="text-muted-foreground">Loading jobs...</p>
+          </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <AdminSidebar />
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">Job Verification & Management</h1>
+      <div className="flex-1 flex flex-col">
+        <AdminHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Job Verification & Management</h1>
 
-        <div className="space-y-4">
-          {jobs.map((job) => (
-            <Card key={job.id} className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold">{job.title}</h3>
-                    <Badge variant={getStatusColor(job.status)}>{job.status}</Badge>
+          <div className="space-y-4">
+            {jobs.map((job) => (
+              <Card key={job.id} className="p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="text-lg md:text-xl font-bold truncate">{job.title}</h3>
+                      <Badge variant={getStatusColor(job.status)}>{job.status}</Badge>
+                    </div>
+                    <p className="text-muted-foreground mb-1 text-sm truncate">{job.company_name}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1">{job.location}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      Posted {job.posted_at ? new Date(job.posted_at).toLocaleDateString() : "Draft"}
+                    </p>
                   </div>
-                  <p className="text-muted-foreground mb-1">{job.company_name}</p>
-                  <p className="text-sm text-muted-foreground mb-1">{job.location}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Posted {job.posted_at ? new Date(job.posted_at).toLocaleDateString() : "Draft"}
-                  </p>
-                </div>
-                <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2 shrink-0">
                   <Button
                     variant="outline"
                     size="icon"
@@ -215,12 +221,13 @@ export default function JobVerification() {
                       </Button>
                     </>
                   ) : null}
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </main>
+              </Card>
+            ))}
+          </div>
+        </main>
+      </div>
 
       <AlertDialog open={!!deleteJobId} onOpenChange={() => setDeleteJobId(null)}>
         <AlertDialogContent>

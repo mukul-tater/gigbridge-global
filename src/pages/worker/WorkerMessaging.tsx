@@ -5,12 +5,12 @@ import { MessageSquare } from "lucide-react";
 
 export default function WorkerMessaging() {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <WorkerSidebar />
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="flex-1 p-8">
-          <h1 className="text-3xl font-bold mb-8">Messages</h1>
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Messages</h1>
 
           <Card className="p-12 text-center">
             <MessageSquare className="h-16 w-16 text-muted-foreground mx-auto mb-4" />

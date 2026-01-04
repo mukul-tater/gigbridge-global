@@ -144,12 +144,12 @@ export default function PostJob() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">Post a New Job</h1>
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Post a New Job</h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6">
@@ -229,7 +229,7 @@ export default function PostJob() {
                 <CardTitle>Job Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="location">Location *</Label>
                     <Input
@@ -262,7 +262,7 @@ export default function PostJob() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="job_type">Job Type *</Label>
                     <Select
@@ -306,7 +306,7 @@ export default function PostJob() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="currency">Currency *</Label>
                     <Select
@@ -351,7 +351,7 @@ export default function PostJob() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="openings">Number of Openings *</Label>
                     <Input
