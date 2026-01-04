@@ -112,8 +112,8 @@ const InteractiveJobMap = () => {
             Discover opportunities with salary insights and hiring timelines
           </p>
           <div className="flex justify-center gap-3 flex-wrap">
-            <Badge className="bg-success text-success-foreground border-success/20 px-3 py-1.5 shadow-sm">
-              <Zap className="h-3 w-3 mr-1.5" />
+            <Badge className="bg-success text-success-foreground border-success/20 px-3 py-1.5 shadow-sm animate-pulse">
+              <Zap className="h-3 w-3 mr-1.5 animate-bounce" />
               Fast Hiring: 1-4 weeks
             </Badge>
             <Badge className="bg-warning text-warning-foreground border-warning/20 px-3 py-1.5 shadow-sm">

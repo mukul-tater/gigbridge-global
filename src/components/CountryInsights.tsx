@@ -120,12 +120,12 @@ const CountryInsights = () => {
                         <CardTitle className="text-lg font-heading group-hover:text-primary transition-colors">
                           {country.name}
                         </CardTitle>
-                        <Badge className={`${country.statusColor} mt-1 text-xs`}>
+                        <Badge className={`${country.statusColor} mt-1 text-xs ${country.status.includes('Very High') || country.status.includes('High') ? 'animate-pulse shadow-lg' : ''}`}>
                           {country.status}
                         </Badge>
                       </div>
                     </div>
-                    <TrendingUp className="h-5 w-5 text-success" />
+                    <TrendingUp className={`h-5 w-5 text-success ${country.status.includes('Very High') ? 'animate-bounce' : ''}`} />
                   </div>
                 </CardHeader>
                 
