@@ -1283,6 +1283,29 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_worker_profile_for_employer: {
+        Args: { p_worker_id: string }
+        Returns: {
+          availability: string
+          bio: string
+          created_at: string
+          currency: string
+          current_location: string
+          ecr_category: string
+          ecr_status: string
+          expected_salary_max: number
+          expected_salary_min: number
+          has_passport: boolean
+          has_visa: boolean
+          id: string
+          languages: string[]
+          nationality: string
+          updated_at: string
+          user_id: string
+          visa_countries: string[]
+          years_of_experience: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
