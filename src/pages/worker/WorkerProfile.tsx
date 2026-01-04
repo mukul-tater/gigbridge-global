@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
 import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
@@ -11,14 +11,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import AvatarUpload from "@/components/AvatarUpload";
+import WorkerVideoUpload from "@/components/worker/WorkerVideoUpload";
 import { workerProfileSchema, type WorkerProfileFormData } from "@/lib/validations/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+
+interface WorkerVideo {
+  id: string;
+  title: string;
+  description: string | null;
+  video_url: string;
+  thumbnail_url: string | null;
+  duration: number | null;
+  skills_demonstrated: string[] | null;
+  views_count: number | null;
+  created_at: string | null;
+}
 
 export default function WorkerProfile() {
   const { user, profile, refreshProfile } = useAuth();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [videos, setVideos] = useState<WorkerVideo[]>([]);
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<WorkerProfileFormData>({
     resolver: zodResolver(workerProfileSchema),
@@ -36,6 +50,20 @@ export default function WorkerProfile() {
       expected_salary_max: 0,
     }
   });
+
+  const fetchVideos = useCallback(async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('worker_videos')
+      .select('*')
+      .eq('worker_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setVideos(data);
+    }
+  }, [user]);
 
   useEffect(() => {
     const loadWorkerProfile = async () => {
@@ -85,7 +113,8 @@ export default function WorkerProfile() {
     };
 
     loadWorkerProfile();
-  }, [user, profile, setValue]);
+    fetchVideos();
+  }, [user, profile, setValue, fetchVideos]);
 
   const onSubmit = async (data: WorkerProfileFormData) => {
     if (!user) return;
@@ -164,6 +193,13 @@ export default function WorkerProfile() {
               fallbackText={profile.full_name?.[0] || 'W'}
             />
           </Card>
+
+          {/* Video Portfolio */}
+          <WorkerVideoUpload
+            workerId={user.id}
+            videos={videos}
+            onVideosChange={fetchVideos}
+          />
 
           {/* Personal Information */}
           <Card className="p-6">
