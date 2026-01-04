@@ -141,7 +141,7 @@ const InteractiveJobMap = () => {
                 {/* Gradient accent */}
                 <div className={`h-1.5 bg-gradient-to-r ${region.gradient}`} />
                 
-                <CardContent className="p-6">
+                <CardContent className="p-6 flex flex-col h-full">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 pr-3">
@@ -226,8 +226,11 @@ const InteractiveJobMap = () => {
                     </div>
                   </div>
 
+                  {/* Spacer to push button to bottom */}
+                  <div className="flex-1" />
+
                   <Button 
-                    className="w-full rounded-xl group/btn flex items-center justify-center gap-2"
+                    className="w-full rounded-xl group/btn flex items-center justify-center gap-2 mt-auto"
                     onClick={(e) => { e.stopPropagation(); handleExploreRegion(region.searchCountry); }}
                   >
                     <span>Explore {region.name}</span>

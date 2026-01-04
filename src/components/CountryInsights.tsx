@@ -109,7 +109,7 @@ const CountryInsights = () => {
               style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'forwards' }}
             >
               <Card 
-                className="h-full bg-card border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-xl cursor-pointer overflow-hidden"
+                className="h-full bg-card border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-xl cursor-pointer overflow-hidden flex flex-col"
                 onClick={() => handleViewJobs(country.name)}
               >
                 <CardHeader className="pb-3">
@@ -129,7 +129,7 @@ const CountryInsights = () => {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="space-y-4">
+                <CardContent className="flex-1 flex flex-col space-y-4">
                   {/* Why high demand */}
                   <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
                     <div className="flex items-center gap-2 mb-1.5">
@@ -181,8 +181,11 @@ const CountryInsights = () => {
                     ))}
                   </div>
 
+                  {/* Spacer to push button to bottom */}
+                  <div className="flex-1" />
+
                   <Button 
-                    className="w-full rounded-xl group/btn flex items-center justify-center gap-2"
+                    className="w-full rounded-xl group/btn flex items-center justify-center gap-2 mt-auto"
                     variant="outline"
                     onClick={(e) => { e.stopPropagation(); handleViewJobs(country.name); }}
                   >
