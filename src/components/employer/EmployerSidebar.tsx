@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark, Star, UserCheck, Menu, X } from "lucide-react";
+import { LayoutDashboard, Building2, PlusCircle, Briefcase, Users, MessageSquare, CreditCard, Calendar, FileSignature, Shield, FileCheck, User, Bookmark, Star, UserCheck, Menu, X, History } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -21,6 +21,7 @@ export default function EmployerSidebar() {
     { path: "/employer/shortlist", icon: Star, label: "Shortlist" },
     { path: "/employer/formalities", icon: FileCheck, label: "Post-Approval Formalities" },
     { path: "/employer/contracts", icon: FileSignature, label: "Contract Management" },
+    { path: "/employer/contract-history", icon: History, label: "Contract History" },
     { path: "/employer/interviews", icon: Calendar, label: "Interview Scheduling" },
     { path: "/employer/offers", icon: FileSignature, label: "Offer Management" },
     { path: "/employer/escrow", icon: Shield, label: "Escrow & Payments" },
