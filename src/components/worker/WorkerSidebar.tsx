@@ -16,6 +16,7 @@ export default function WorkerSidebar() {
     { path: "/worker/saved-searches", icon: Bookmark, label: "Saved Searches" },
     { path: "/worker/applications", icon: FileText, label: "Applications" },
     { path: "/worker/application-tracking", icon: FileCheck, label: "Track Applications" },
+    { path: "/worker/offers", icon: FileSignature, label: "Job Offers" },
     { path: "/worker/training", icon: GraduationCap, label: "Training & PDOT" },
     { path: "/worker/contracts", icon: FileSignature, label: "Contracts" },
     { path: "/worker/travel", icon: Plane, label: "Travel & Visa" },

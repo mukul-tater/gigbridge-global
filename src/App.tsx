@@ -34,6 +34,7 @@ import WorkerTravelStatus from "./pages/worker/TravelStatus";
 import WorkerInsurance from "./pages/worker/Insurance";
 import WorkerSavedSearches from "./pages/worker/SavedSearches";
 import WorkerPublicProfile from "./pages/worker/WorkerPublicProfile";
+import WorkerOffers from "./pages/worker/WorkerOffers";
 import SeedData from "./pages/SeedData";
 
 // Employer Pages
@@ -157,6 +158,11 @@ const App = () => (
             <Route path="/worker/saved-searches" element={
               <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerSavedSearches />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/offers" element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <WorkerOffers />
               </ProtectedRoute>
             } />
 
