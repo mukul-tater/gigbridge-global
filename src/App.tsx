@@ -60,6 +60,7 @@ import ManageFormalities from "./pages/employer/ManageFormalities";
 import EmployerPayments from "./pages/employer/EmployerPayments";
 import ContractManagement from "./pages/employer/ContractManagement";
 import EmployerContractHistory from "./pages/employer/ContractHistory";
+import EmployerReports from "./pages/employer/EmployerReports";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -283,7 +284,11 @@ const App = () => (
                 <EmployerContractHistory />
               </ProtectedRoute>
             } />
-
+            <Route path="/employer/reports" element={
+              <ProtectedRoute allowedRoles={["employer"]}>
+                <EmployerReports />
+              </ProtectedRoute>
+            } />
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={
               <ProtectedRoute allowedRoles={["admin"]}>
