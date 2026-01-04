@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import ContractVersionHistory from "@/components/ContractVersionHistory";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface Contract {
   id: string;
@@ -207,11 +209,14 @@ export default function Contracts() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Contracts & Offer Letters</h1>
-          <p className="text-muted-foreground">View and manage your employment contracts</p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Contracts & Offer Letters</h1>
+            <p className="text-muted-foreground">View and manage your employment contracts</p>
+          </div>
 
         {contracts.length === 0 ? (
           <Card className="p-8 text-center">
@@ -483,7 +488,8 @@ export default function Contracts() {
             )}
           </DialogContent>
         </Dialog>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

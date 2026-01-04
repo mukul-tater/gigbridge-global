@@ -1,7 +1,9 @@
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plane, MapPin, Calendar, FileCheck, AlertCircle } from "lucide-react";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function TravelStatus() {
   const travelInfo = {
@@ -50,11 +52,14 @@ export default function TravelStatus() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Travel & Visa Status</h1>
-          <p className="text-muted-foreground">Track your visa application and travel details</p>
-        </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Travel & Visa Status</h1>
+            <p className="text-muted-foreground">Track your visa application and travel details</p>
+          </div>
 
         <div className="space-y-6 max-w-4xl">
           {/* Visa Status */}
@@ -200,7 +205,8 @@ export default function TravelStatus() {
             </div>
           </Card>
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

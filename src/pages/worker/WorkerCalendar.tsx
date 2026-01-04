@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
+import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface Interview {
   id: string;
@@ -111,12 +113,15 @@ export default function WorkerCalendar() {
   return (
     <div className="flex min-h-screen bg-background">
       <WorkerSidebar />
-      <main className="flex-1 p-4 md:p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-6">
-            <Calendar className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl md:text-3xl font-bold">Calendar</h1>
-          </div>
+      <div className="flex-1 flex flex-col">
+        <WorkerHeader />
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <Calendar className="h-8 w-8 text-primary" />
+              <h1 className="text-2xl md:text-3xl font-bold">Calendar</h1>
+            </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Calendar Grid */}
@@ -295,8 +300,9 @@ export default function WorkerCalendar() {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </main>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import AvatarUpload from "@/components/AvatarUpload";
 import { employerProfileSchema, type EmployerProfileFormData } from "@/lib/validations/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function EmployerProfile() {
   const { user, profile, refreshProfile } = useAuth();
@@ -134,12 +135,13 @@ export default function EmployerProfile() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">Employer Profile</h1>
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
+        <main className="flex-1 p-4 md:p-8">
+        <PortalBreadcrumb />
+        <h1 className="text-2xl md:text-3xl font-bold mb-8">Employer Profile</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
           {/* Avatar Section */}

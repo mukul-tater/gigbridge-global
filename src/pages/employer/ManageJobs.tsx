@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { Briefcase, Plus, Eye, Trash2, MapPin, Users, Calendar } from "lucide-react";
 import { JobListSkeleton } from "@/components/ui/page-skeleton";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface Job {
   id: string;
@@ -176,6 +177,7 @@ export default function ManageJobs() {
       <div className="flex-1 flex flex-col">
         <EmployerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+        <PortalBreadcrumb />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold">Manage Jobs</h1>
           <Button onClick={() => navigate("/employer/post-job")} className="w-full sm:w-auto">

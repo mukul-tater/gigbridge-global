@@ -16,6 +16,7 @@ import { workerProfileSchema, type WorkerProfileFormData } from "@/lib/validatio
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ProfileSkeleton } from "@/components/ui/page-skeleton";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface WorkerVideo {
   id: string;
@@ -187,6 +188,7 @@ export default function WorkerProfile() {
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <PortalBreadcrumb />
           <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">My Profile</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-4 md:space-y-6">

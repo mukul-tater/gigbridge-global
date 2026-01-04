@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 interface Interview {
   id: string;
   scheduled_date: string;
@@ -269,8 +270,9 @@ export default function WorkerInterviews() {
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
         <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
           <div className="mb-8">
-            <h1 className="text-3xl font-bold">My Interviews</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">My Interviews</h1>
             <p className="text-muted-foreground mt-1">
               View and manage your scheduled interviews
             </p>

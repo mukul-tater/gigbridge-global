@@ -12,6 +12,7 @@ import JobJourneyProgressCard from "@/components/worker/JobJourneyProgressCard";
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 import { Link } from "react-router-dom";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 import { formatDistanceToNow } from "date-fns";
 
 interface RecentActivity {
@@ -144,6 +145,7 @@ export default function WorkerDashboard() {
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+          <PortalBreadcrumb />
           <OnboardingStepper />
           
           <div className="mb-6 md:mb-8">

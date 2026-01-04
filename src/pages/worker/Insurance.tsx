@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Shield, Send, Download, ArrowRight, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function Insurance() {
   const insurancePolicy = {
@@ -68,6 +69,7 @@ export default function Insurance() {
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <PortalBreadcrumb />
           <div className="mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Insurance & Remittance</h1>
             <p className="text-muted-foreground text-sm md:text-base">Manage your insurance policy and send money home</p>

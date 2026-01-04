@@ -3,6 +3,7 @@ import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DollarSign } from "lucide-react";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function EmployerPayments() {
   const payments = [
@@ -12,11 +13,13 @@ export default function EmployerPayments() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8">Payments</h1>
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
+          <h1 className="text-2xl md:text-3xl font-bold mb-8">Payments</h1>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Card className="p-6">

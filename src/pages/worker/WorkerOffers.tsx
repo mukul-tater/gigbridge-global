@@ -14,6 +14,7 @@ import { FileSignature, CheckCircle2, XCircle, Clock, Building2, MapPin, Calenda
 import { toast } from "sonner";
 import { format, isPast } from 'date-fns';
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface Offer {
   id: string;
@@ -372,6 +373,7 @@ export default function WorkerOffers() {
       <div className="flex flex-1">
         <WorkerSidebar />
         <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Job Offers</h1>
             <p className="text-muted-foreground">Review and respond to job offers from employers</p>

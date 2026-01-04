@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface WorkerDocument {
   id: string;
@@ -179,9 +180,10 @@ export default function WorkerDocuments() {
       <WorkerSidebar />
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold">My Documents</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">My Documents</h1>
             <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
               <DialogTrigger asChild>
                 <Button>

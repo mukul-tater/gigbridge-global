@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import { WorkerListSkeleton } from '@/components/ui/page-skeleton';
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface Worker {
   id: string;
@@ -284,6 +285,7 @@ export default function SearchWorkers() {
       <div className="flex-1 flex flex-col">
         <EmployerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+        <PortalBreadcrumb />
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Skilled Workers</h1>
           <p className="text-muted-foreground text-sm md:text-base">

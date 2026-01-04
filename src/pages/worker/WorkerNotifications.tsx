@@ -2,6 +2,7 @@ import WorkerSidebar from "@/components/worker/WorkerSidebar";
 import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Bell, Briefcase, MessageSquare, CheckCircle } from "lucide-react";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function WorkerNotifications() {
   const notifications = [
@@ -40,6 +41,7 @@ export default function WorkerNotifications() {
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <PortalBreadcrumb />
           <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Notifications</h1>
 
           <div className="space-y-4 max-w-3xl">
