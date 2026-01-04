@@ -258,12 +258,12 @@ export default function FeaturedJobs() {
                         </Button>
                       </div>
 
-                      <CardHeader className="pb-3 pr-28">
-                        <div className="flex items-center justify-between mb-3">
+                      <CardHeader className="pb-3 pt-14">
+                        <div className="flex items-center gap-2 mb-3">
                           <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium">
                             {job.job_type.replace('_', ' ')}
                           </Badge>
-                          <span className="flex items-center text-xs text-muted-foreground">
+                          <span className="flex items-center text-xs text-muted-foreground ml-auto">
                             <Clock className="h-3 w-3 mr-1" />
                             {getDaysAgo(job.posted_at)}
                           </span>
