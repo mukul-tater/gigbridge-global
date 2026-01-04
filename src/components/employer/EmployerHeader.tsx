@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
-import { NotificationCenter } from '@/components/NotificationCenter';
+import { NotificationDrawer } from '@/components/NotificationDrawer';
 
 export default function EmployerHeader() {
   const { user, profile, logout } = useAuth();
@@ -32,7 +32,7 @@ export default function EmployerHeader() {
         <h1 className="text-xl font-semibold">Employer Portal</h1>
 
         <div className="flex items-center gap-2">
-          <NotificationCenter />
+          <NotificationDrawer />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
