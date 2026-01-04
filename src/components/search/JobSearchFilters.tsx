@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,8 +7,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Search, Save, X, MapPin, DollarSign, Briefcase, Globe } from 'lucide-react';
+import { Search, Save, X, MapPin, DollarSign, Briefcase, Globe, Loader2 } from 'lucide-react';
 import { DESTINATION_COUNTRIES, JOB_CATEGORIES, EXPERIENCE_LEVELS, POPULAR_SKILLS } from '@/lib/constants';
+import { useDebounce } from '@/hooks/use-debounce';
 
 export interface JobFilters {
   keyword: string;
@@ -38,6 +39,23 @@ export default function JobSearchFilters({
   loading = false
 }: JobSearchFiltersProps) {
   const [skillInput, setSkillInput] = useState('');
+  const [localKeyword, setLocalKeyword] = useState(filters.keyword);
+  const [localLocation, setLocalLocation] = useState(filters.location);
+  
+  // Debounce keyword and location for auto-search
+  const debouncedKeyword = useDebounce(localKeyword, 400);
+  const debouncedLocation = useDebounce(localLocation, 400);
+  
+  // Sync debounced values back to filters and trigger search
+  useEffect(() => {
+    if (debouncedKeyword !== filters.keyword || debouncedLocation !== filters.location) {
+      onFiltersChange({ 
+        ...filters, 
+        keyword: debouncedKeyword,
+        location: debouncedLocation 
+      });
+    }
+  }, [debouncedKeyword, debouncedLocation]);
 
   const handleAddSkill = (skill: string) => {
     if (skill && !filters.skills.includes(skill)) {
@@ -72,12 +90,18 @@ export default function JobSearchFilters({
           <Search className="h-4 w-4 inline mr-2" />
           Job Title or Keywords
         </Label>
-        <Input
-          id="keyword"
-          placeholder="e.g., Welding Engineer, Construction Supervisor"
-          value={filters.keyword}
-          onChange={(e) => onFiltersChange({ ...filters, keyword: e.target.value })}
-        />
+        <div className="relative">
+          <Input
+            id="keyword"
+            placeholder="e.g., Welding Engineer, Construction Supervisor"
+            value={localKeyword}
+            onChange={(e) => setLocalKeyword(e.target.value)}
+            className="pr-8"
+          />
+          {loading && localKeyword && (
+            <Loader2 className="h-4 w-4 absolute right-3 top-3 animate-spin text-muted-foreground" />
+          )}
+        </div>
       </div>
 
       {/* Location & Country */}
@@ -110,8 +134,8 @@ export default function JobSearchFilters({
           <Input
             id="location"
             placeholder="e.g., Dubai, Riyadh"
-            value={filters.location}
-            onChange={(e) => onFiltersChange({ ...filters, location: e.target.value })}
+            value={localLocation}
+            onChange={(e) => setLocalLocation(e.target.value)}
           />
         </div>
       </div>
