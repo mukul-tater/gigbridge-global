@@ -4,9 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Building2, Briefcase, DollarSign, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles } from 'lucide-react';
+import { MapPin, Building2, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles, GitCompare, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import JobComparisonDrawer from './JobComparisonDrawer';
 
 interface FeaturedJob {
   id: string;
@@ -35,6 +36,8 @@ export default function FeaturedJobs() {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<FeaturedJob[]>([]);
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
+  const [compareJobs, setCompareJobs] = useState<FeaturedJob[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -125,6 +128,34 @@ export default function FeaturedJobs() {
     navigate(`/jobs/${jobSlug}`);
   };
 
+  const handleCompareToggle = (job: FeaturedJob) => {
+    const isSelected = compareJobs.some(j => j.id === job.id);
+    if (isSelected) {
+      setCompareJobs(compareJobs.filter(j => j.id !== job.id));
+      toast({ title: "Removed from comparison", description: `${job.title} removed` });
+    } else {
+      if (compareJobs.length >= 4) {
+        toast({ 
+          title: "Maximum reached", 
+          description: "You can compare up to 4 jobs at a time",
+          variant: "destructive"
+        });
+        return;
+      }
+      setCompareJobs([...compareJobs, job]);
+      toast({ title: "Added to comparison", description: `${job.title} added` });
+    }
+  };
+
+  const handleRemoveFromCompare = (jobId: string) => {
+    setCompareJobs(compareJobs.filter(j => j.id !== jobId));
+  };
+
+  const handleClearCompare = () => {
+    setCompareJobs([]);
+    setCompareOpen(false);
+  };
+
   if (loading) {
     return (
       <section className="py-20 lg:py-32 bg-background" id="jobs">
@@ -168,105 +199,132 @@ export default function FeaturedJobs() {
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mb-12">
-              {jobs.map((job, index) => (
-                <div
-                  key={job.id}
-                  className="group opacity-0 animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
-                >
-                  <Card 
-                    className="h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border border-border hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer flex flex-col"
-                    onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
+              {jobs.map((job, index) => {
+                const isComparing = compareJobs.some(j => j.id === job.id);
+                return (
+                  <div
+                    key={job.id}
+                    className="group opacity-0 animate-fade-in-up"
+                    style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                   >
-                    {/* Gradient accent line */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    {/* Quick Action Buttons - Always visible */}
-                    <div className="absolute top-4 right-4 z-10 flex gap-2">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all"
-                        onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}
-                      >
-                        <Bookmark className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-primary text-primary' : ''}`} />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-secondary hover:text-secondary-foreground hover:scale-110 transition-all"
-                        onClick={(e) => { e.stopPropagation(); handleShareJob(job); }}
-                      >
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <CardHeader className="pb-3 pr-24">
-                      <div className="flex items-center justify-between mb-3">
-                        <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium">
-                          {job.job_type.replace('_', ' ')}
-                        </Badge>
-                        <span className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {getDaysAgo(job.posted_at)}
-                        </span>
-                      </div>
-                      <CardTitle className="text-lg lg:text-xl font-heading line-clamp-1 group-hover:text-primary transition-colors pr-2">
-                        {job.title}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-1">
-                        <Building2 className="h-4 w-4 shrink-0" />
-                        <span className="truncate">{job.employer_profiles?.company_name || 'Company'}</span>
-                      </CardDescription>
-                    </CardHeader>
-                    
-                    <CardContent className="flex-1 flex flex-col space-y-3">
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {job.description}
-                      </p>
+                    <Card 
+                      className={`h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer flex flex-col ${
+                        isComparing 
+                          ? 'border-primary ring-2 ring-primary/20' 
+                          : 'border-border hover:border-primary/40'
+                      }`}
+                      onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
+                    >
+                      {/* Gradient accent line */}
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
                       
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 shrink-0" />
-                        <span className="truncate">{job.location}, {job.country}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-primary">
-                          {formatSalary(job.salary_min, job.salary_max, job.currency)}
-                        </span>
-                        <span className="text-xs text-muted-foreground">/month</span>
-                      </div>
-
-                      {job.visa_sponsorship && (
-                        <Badge variant="secondary" className="bg-success/10 text-success border-success/20 w-fit">
-                          <Zap className="h-3 w-3 mr-1" />
-                          Visa Sponsorship
-                        </Badge>
-                      )}
-
-                      {job.job_skills && job.job_skills.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {job.job_skills.slice(0, 3).map((skill, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs bg-muted/50">
-                              {skill.skill_name}
-                            </Badge>
-                          ))}
+                      {/* Compare indicator */}
+                      {isComparing && (
+                        <div className="absolute top-0 left-0 bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded-br-lg">
+                          Comparing
                         </div>
                       )}
-
-                      <div className="flex-1" />
                       
-                      <Button 
-                        className="w-full mt-auto group/btn rounded-xl"
-                        onClick={(e) => { e.stopPropagation(); handleQuickApply(job.slug || job.id); }}
-                      >
-                        View & Apply
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
+                      {/* Quick Action Buttons - Always visible */}
+                      <div className="absolute top-4 right-4 z-10 flex gap-2">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className={`h-9 w-9 rounded-full backdrop-blur-sm border shadow-lg transition-all ${
+                            isComparing 
+                              ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' 
+                              : 'bg-background/90 border-border hover:bg-info hover:text-info-foreground hover:scale-110'
+                          }`}
+                          onClick={(e) => { e.stopPropagation(); handleCompareToggle(job); }}
+                          title={isComparing ? 'Remove from compare' : 'Add to compare'}
+                        >
+                          <GitCompare className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all"
+                          onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}
+                        >
+                          <Bookmark className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-primary text-primary' : ''}`} />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-secondary hover:text-secondary-foreground hover:scale-110 transition-all"
+                          onClick={(e) => { e.stopPropagation(); handleShareJob(job); }}
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <CardHeader className="pb-3 pr-28">
+                        <div className="flex items-center justify-between mb-3">
+                          <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium">
+                            {job.job_type.replace('_', ' ')}
+                          </Badge>
+                          <span className="flex items-center text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {getDaysAgo(job.posted_at)}
+                          </span>
+                        </div>
+                        <CardTitle className="text-lg lg:text-xl font-heading line-clamp-1 group-hover:text-primary transition-colors pr-2">
+                          {job.title}
+                        </CardTitle>
+                        <CardDescription className="flex items-center gap-2 mt-1">
+                          <Building2 className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{job.employer_profiles?.company_name || 'Company'}</span>
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent className="flex-1 flex flex-col space-y-3">
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {job.description}
+                        </p>
+                        
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{job.location}, {job.country}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold text-primary">
+                            {formatSalary(job.salary_min, job.salary_max, job.currency)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">/month</span>
+                        </div>
+
+                        {job.visa_sponsorship && (
+                          <Badge variant="secondary" className="bg-success/10 text-success border-success/20 w-fit">
+                            <Zap className="h-3 w-3 mr-1" />
+                            Visa Sponsorship
+                          </Badge>
+                        )}
+
+                        {job.job_skills && job.job_skills.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {job.job_skills.slice(0, 3).map((skill, idx) => (
+                              <Badge key={idx} variant="outline" className="text-xs bg-muted/50">
+                                {skill.skill_name}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex-1" />
+                        
+                        <Button 
+                          className="w-full mt-auto group/btn rounded-xl"
+                          onClick={(e) => { e.stopPropagation(); handleQuickApply(job.slug || job.id); }}
+                        >
+                          View & Apply
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="text-center">
@@ -280,6 +338,66 @@ export default function FeaturedJobs() {
           </>
         )}
       </div>
+
+      {/* Floating Compare Bar */}
+      {compareJobs.length > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up">
+          <div className="bg-card/95 backdrop-blur-lg border border-border rounded-2xl shadow-2xl p-4 flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <GitCompare className="h-5 w-5 text-primary" />
+              <span className="font-medium text-sm">
+                {compareJobs.length} job{compareJobs.length !== 1 ? 's' : ''} selected
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {compareJobs.slice(0, 3).map((job) => (
+                <div
+                  key={job.id}
+                  className="flex items-center gap-1 bg-muted rounded-full px-3 py-1 text-xs"
+                >
+                  <span className="truncate max-w-[80px]">{job.title}</span>
+                  <button
+                    onClick={() => handleRemoveFromCompare(job.id)}
+                    className="hover:text-destructive transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+              {compareJobs.length > 3 && (
+                <span className="text-xs text-muted-foreground">+{compareJobs.length - 3} more</span>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearCompare}
+              >
+                Clear
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setCompareOpen(true)}
+                disabled={compareJobs.length < 2}
+              >
+                Compare Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Comparison Drawer */}
+      <JobComparisonDrawer
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        jobs={compareJobs}
+        onRemoveJob={handleRemoveFromCompare}
+        onClearAll={handleClearCompare}
+      />
     </section>
   );
 }
