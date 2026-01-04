@@ -33,6 +33,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import ContractVersionHistory from "@/components/ContractVersionHistory";
 
 interface ContractRecord {
   id: string;
@@ -402,6 +403,11 @@ export default function ContractManagement() {
                   </div>
 
                   <div className="flex gap-2 md:flex-col">
+                    <ContractVersionHistory
+                      formalityId={contract.id}
+                      isEmployer={true}
+                      onVersionUploaded={fetchContracts}
+                    />
                     {!contract.contractSent && (
                       <Button onClick={() => openSendDialog(contract)}>
                         <Send className="h-4 w-4 mr-2" />

@@ -178,6 +178,47 @@ export type Database = {
         }
         Relationships: []
       }
+      contract_versions: {
+        Row: {
+          change_summary: string | null
+          contract_url: string
+          created_at: string
+          formality_id: string
+          id: string
+          is_current: boolean | null
+          uploaded_by: string
+          version_number: number
+        }
+        Insert: {
+          change_summary?: string | null
+          contract_url: string
+          created_at?: string
+          formality_id: string
+          id?: string
+          is_current?: boolean | null
+          uploaded_by: string
+          version_number?: number
+        }
+        Update: {
+          change_summary?: string | null
+          contract_url?: string
+          created_at?: string
+          formality_id?: string
+          id?: string
+          is_current?: boolean | null
+          uploaded_by?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_versions_formality_id_fkey"
+            columns: ["formality_id"]
+            isOneToOne: false
+            referencedRelation: "job_formalities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disputes: {
         Row: {
           admin_notes: string | null
