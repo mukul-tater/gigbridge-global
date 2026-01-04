@@ -11,6 +11,8 @@ import BackgroundVerificationCard from "@/components/employer/BackgroundVerifica
 import PaymentManagementCard from "@/components/employer/PaymentManagementCard";
 import AnalyticsSummaryCard from "@/components/employer/AnalyticsSummaryCard";
 import ShortlistedCandidatesCard from "@/components/employer/ShortlistedCandidatesCard";
+import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
+import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 
 export default function EmployerDashboard() {
   const { profile } = useAuth();
@@ -82,14 +84,14 @@ export default function EmployerDashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <EmployerSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
-          </div>
-        </main>
+      <div className="flex flex-col min-h-screen bg-background w-full">
+        <EmployerHeader />
+        <div className="flex flex-1">
+          <EmployerSidebar />
+          <main className="flex-1 p-4 md:p-8">
+            <DashboardSkeleton />
+          </main>
+        </div>
       </div>
     );
   }
@@ -132,6 +134,8 @@ export default function EmployerDashboard() {
       <div className="flex flex-1">
         <EmployerSidebar />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+        <OnboardingStepper />
+        
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Employer'}!</h1>
           <p className="text-muted-foreground text-sm md:text-base">Manage your job postings and find talent</p>

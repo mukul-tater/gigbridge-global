@@ -196,6 +196,13 @@
     @apply leading-relaxed;
     text-wrap: pretty;
   }
+
+  /* Improved Mobile Form Styling */
+  @media (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+  }
 }
 
 @layer components {
@@ -236,6 +243,29 @@
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
+  }
+
+  /* Mobile-First Card Improvements */
+  @media (max-width: 640px) {
+    .card-professional {
+      @apply rounded-lg;
+    }
+  }
+
+  /* Mobile Bottom Safe Area */
+  .mobile-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+
+  /* Touch-Friendly List Items */
+  .touch-list-item {
+    @apply py-4 px-4 -mx-4 active:bg-muted/50 transition-colors;
+  }
+
+  /* Mobile Drawer Improvements */
+  .mobile-drawer {
+    @apply fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
   }
 }
 

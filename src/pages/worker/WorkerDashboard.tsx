@@ -9,6 +9,8 @@ import DocumentVerificationCard from "@/components/worker/DocumentVerificationCa
 import ECRStatusCard from "@/components/worker/ECRStatusCard";
 import ProfileProgressCard from "@/components/worker/ProfileProgressCard";
 import JobJourneyProgressCard from "@/components/worker/JobJourneyProgressCard";
+import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
+import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 
 export default function WorkerDashboard() {
   const { profile } = useAuth();
@@ -72,11 +74,8 @@ export default function WorkerDashboard() {
         <WorkerSidebar />
         <div className="flex-1 flex flex-col">
           <WorkerHeader />
-          <main className="flex-1 p-8 flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
-            </div>
+          <main className="flex-1 p-4 md:p-8">
+            <DashboardSkeleton />
           </main>
         </div>
       </div>
@@ -89,6 +88,8 @@ export default function WorkerDashboard() {
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+          <OnboardingStepper />
+          
           <div className="mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Worker'}!</h1>
             <p className="text-muted-foreground text-sm md:text-base">Here's an overview of your activity</p>
