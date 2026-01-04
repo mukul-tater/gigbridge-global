@@ -175,7 +175,7 @@ export default function FeaturedJobs() {
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                 >
                   <Card 
-                    className="h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border border-border hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer"
+                    className="h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border border-border hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer flex flex-col"
                     onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
                   >
                     {/* Gradient accent line */}
@@ -220,7 +220,7 @@ export default function FeaturedJobs() {
                       </CardDescription>
                     </CardHeader>
                     
-                    <CardContent className="space-y-3">
+                    <CardContent className="flex-1 flex flex-col space-y-3">
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {job.description}
                       </p>
@@ -238,7 +238,7 @@ export default function FeaturedJobs() {
                       </div>
 
                       {job.visa_sponsorship && (
-                        <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
+                        <Badge variant="secondary" className="bg-success/10 text-success border-success/20 w-fit">
                           <Zap className="h-3 w-3 mr-1" />
                           Visa Sponsorship
                         </Badge>
@@ -254,8 +254,10 @@ export default function FeaturedJobs() {
                         </div>
                       )}
 
+                      <div className="flex-1" />
+                      
                       <Button 
-                        className="w-full mt-2 group/btn rounded-xl"
+                        className="w-full mt-auto group/btn rounded-xl"
                         onClick={(e) => { e.stopPropagation(); handleQuickApply(job.slug || job.id); }}
                       >
                         View & Apply
