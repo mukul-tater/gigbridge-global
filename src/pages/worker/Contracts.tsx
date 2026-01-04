@@ -1,12 +1,35 @@
+import { useState } from "react";
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileSignature, Download, Eye, CheckCircle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { FileSignature, Download, Eye, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
+interface Contract {
+  id: number;
+  title: string;
+  employer: string;
+  salary: string;
+  duration: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  signedAt: string | null;
+  documentUrl: string;
+}
+
 export default function Contracts() {
-  const contracts = [
+  const [contracts, setContracts] = useState<Contract[]>([
     {
       id: 1,
       title: "Construction Worker - Abu Dhabi",
@@ -43,7 +66,12 @@ export default function Contracts() {
       signedAt: "2023-05-15",
       documentUrl: "#",
     },
-  ];
+  ]);
+
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [signingDialogOpen, setSigningDialogOpen] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -62,8 +90,33 @@ export default function Contracts() {
     }
   };
 
-  const handleSign = (contractTitle: string) => {
-    toast.success(`Contract signed: ${contractTitle}`);
+  const openSigningDialog = (contract: Contract) => {
+    setSelectedContract(contract);
+    setTermsAccepted(false);
+    setSigningDialogOpen(true);
+  };
+
+  const handleSign = async () => {
+    if (!selectedContract || !termsAccepted) return;
+
+    setIsSigning(true);
+    
+    // Simulate signing process
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const signedDate = new Date().toISOString().split('T')[0];
+    
+    setContracts(prev => 
+      prev.map(c => 
+        c.id === selectedContract.id 
+          ? { ...c, status: "ACTIVE", signedAt: signedDate }
+          : c
+      )
+    );
+    
+    setIsSigning(false);
+    setSigningDialogOpen(false);
+    toast.success(`Contract signed successfully: ${selectedContract.title}`);
   };
 
   const handleDownload = (contractTitle: string) => {
@@ -131,7 +184,7 @@ export default function Contracts() {
                       Download
                     </Button>
                     {contract.status === "SENT" && (
-                      <Button onClick={() => handleSign(contract.title)}>
+                      <Button onClick={() => openSigningDialog(contract)}>
                         <FileSignature className="h-4 w-4 mr-2" />
                         Sign Contract
                       </Button>
@@ -142,6 +195,94 @@ export default function Contracts() {
             </Card>
           ))}
         </div>
+
+        {/* Contract Signing Dialog */}
+        <Dialog open={signingDialogOpen} onOpenChange={setSigningDialogOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Sign Employment Contract</DialogTitle>
+              <DialogDescription>
+                Review the contract details below and sign to accept the terms.
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedContract && (
+              <div className="space-y-4">
+                <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Position</p>
+                    <p className="font-medium">{selectedContract.title}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Employer</p>
+                    <p className="font-medium">{selectedContract.employer}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Salary</p>
+                      <p className="font-medium">{selectedContract.salary}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Duration</p>
+                      <p className="font-medium">{selectedContract.duration}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Start Date</p>
+                      <p className="font-medium">{selectedContract.startDate}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">End Date</p>
+                      <p className="font-medium">{selectedContract.endDate}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-4 bg-muted/20">
+                  <p className="text-sm text-muted-foreground mb-2">Contract Preview (Placeholder)</p>
+                  <div className="h-32 border-2 border-dashed border-muted rounded flex items-center justify-center text-muted-foreground text-sm">
+                    Full contract document would be displayed here
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="terms"
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  />
+                  <label htmlFor="terms" className="text-sm leading-tight cursor-pointer">
+                    I have read and agree to the terms and conditions of this employment contract. 
+                    I understand that this is a legally binding agreement.
+                  </label>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSigningDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSign} 
+                disabled={!termsAccepted || isSigning}
+              >
+                {isSigning ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Signing...
+                  </>
+                ) : (
+                  <>
+                    <FileSignature className="h-4 w-4 mr-2" />
+                    Sign Contract
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
