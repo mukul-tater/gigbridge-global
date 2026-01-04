@@ -53,22 +53,37 @@ export default function WorkerInterviews() {
       // Fetch interviews for the worker
       const { data: interviewsData, error } = await supabase
         .from("interviews")
-        .select(`
-          *,
-          jobs:job_id (title, employer_id),
-          employer_profiles:employer_id (company_name),
-          profiles:employer_id (full_name)
-        `)
+        .select("*")
         .eq("worker_id", user?.id)
         .order("scheduled_date", { ascending: true });
 
       if (error) throw error;
 
+      // Fetch related data separately since no FK relationships exist
+      const jobIds = [...new Set((interviewsData || []).map(i => i.job_id))];
+      const employerIds = [...new Set((interviewsData || []).map(i => i.employer_id))];
+
+      const [jobsResult, employerProfilesResult, profilesResult] = await Promise.all([
+        jobIds.length > 0 
+          ? supabase.from("jobs").select("id, title").in("id", jobIds)
+          : { data: [] },
+        employerIds.length > 0
+          ? supabase.from("employer_profiles").select("user_id, company_name").in("user_id", employerIds)
+          : { data: [] },
+        employerIds.length > 0
+          ? supabase.from("profiles").select("id, full_name").in("id", employerIds)
+          : { data: [] },
+      ]);
+
+      const jobsMap = new Map((jobsResult.data || []).map(j => [j.id, j]));
+      const employerProfilesMap = new Map((employerProfilesResult.data || []).map(e => [e.user_id, e]));
+      const profilesMap = new Map((profilesResult.data || []).map(p => [p.id, p]));
+
       const formattedInterviews = (interviewsData || []).map((interview: any) => ({
         ...interview,
-        job_title: interview.jobs?.title || "Unknown Job",
-        company_name: interview.employer_profiles?.company_name || "Unknown Company",
-        employer_name: interview.profiles?.full_name || "Unknown",
+        job_title: jobsMap.get(interview.job_id)?.title || "Unknown Job",
+        company_name: employerProfilesMap.get(interview.employer_id)?.company_name || "Unknown Company",
+        employer_name: profilesMap.get(interview.employer_id)?.full_name || "Unknown",
       }));
 
       setInterviews(formattedInterviews);
