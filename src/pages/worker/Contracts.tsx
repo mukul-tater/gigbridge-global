@@ -12,10 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileSignature, Download, Eye, CheckCircle, Loader2, ExternalLink } from "lucide-react";
+import { FileSignature, Download, Eye, CheckCircle, Loader2, ExternalLink, History } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import ContractVersionHistory from "@/components/ContractVersionHistory";
 
 interface Contract {
   id: string;
@@ -258,7 +259,7 @@ export default function Contracts() {
                       </div>
                     )}
 
-                    <div className="flex gap-3 mt-4">
+                    <div className="flex flex-wrap gap-3 mt-4">
                       <Button variant="outline" onClick={() => openPreviewDialog(contract)}>
                         <Eye className="h-4 w-4 mr-2" />
                         View Contract
@@ -269,6 +270,10 @@ export default function Contracts() {
                           Download
                         </Button>
                       )}
+                      <ContractVersionHistory
+                        formalityId={contract.id}
+                        isEmployer={false}
+                      />
                       {contract.status === "SENT" && (
                         <Button onClick={() => openSigningDialog(contract)}>
                           <FileSignature className="h-4 w-4 mr-2" />
