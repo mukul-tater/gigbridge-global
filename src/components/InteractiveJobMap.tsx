@@ -226,11 +226,11 @@ const InteractiveJobMap = () => {
                   </div>
 
                   <Button 
-                    className="w-full rounded-xl gap-2 group/btn"
+                    className="w-full rounded-xl group/btn flex items-center justify-center gap-2"
                     onClick={(e) => { e.stopPropagation(); handleExploreRegion(region.searchCountry); }}
                   >
-                    Explore {region.name}
-                    <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <span>Explore {region.name}</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </CardContent>
               </Card>
