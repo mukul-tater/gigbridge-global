@@ -120,7 +120,7 @@ const CountryInsights = () => {
                         <CardTitle className="text-lg font-heading group-hover:text-primary transition-colors">
                           {country.name}
                         </CardTitle>
-                        <Badge className={`${country.statusColor} mt-1 text-xs ${country.status.includes('Very High') || country.status.includes('High') ? 'animate-pulse shadow-lg' : ''}`}>
+                        <Badge className={`${country.statusColor} mt-1 text-xs hover:opacity-80 transition-opacity`}>
                           {country.status}
                         </Badge>
                       </div>
@@ -165,7 +165,7 @@ const CountryInsights = () => {
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {country.topJobs.map((job, jobIndex) => (
-                        <Badge key={jobIndex} variant="secondary" className="text-xs bg-muted">
+                        <Badge key={jobIndex} variant="secondary" className="text-xs bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors">
                           {job}
                         </Badge>
                       ))}
@@ -175,7 +175,7 @@ const CountryInsights = () => {
                   {/* Languages */}
                   <div className="flex gap-1.5">
                     {country.languages.map((lang, langIndex) => (
-                      <Badge key={langIndex} variant="outline" className="text-xs">
+                      <Badge key={langIndex} variant="outline" className="text-xs hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors">
                         {lang}
                       </Badge>
                     ))}
