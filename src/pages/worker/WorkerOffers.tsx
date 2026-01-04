@@ -153,7 +153,7 @@ export default function WorkerOffers() {
           .maybeSingle();
 
         // Insert in-app notification
-        await supabase.from('notifications').insert({
+        const notificationData = {
           user_id: selectedOffer.employer_id,
           type: 'offer_accepted',
           title: 'Offer Accepted!',
@@ -163,7 +163,23 @@ export default function WorkerOffers() {
             job_id: selectedOffer.job_id,
             worker_name: workerProfile?.full_name
           }
-        });
+        };
+        const { data: notification } = await supabase.from('notifications').insert(notificationData).select().single();
+
+        // Trigger push notification
+        try {
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              userId: selectedOffer.employer_id,
+              title: notificationData.title,
+              message: notificationData.message,
+              url: '/employer/offers',
+              notificationId: notification?.id
+            }
+          });
+        } catch (pushError) {
+          console.log('Push notification skipped:', pushError);
+        }
 
         // Also send email notification
         if (employerProfile?.email) {
@@ -239,7 +255,7 @@ export default function WorkerOffers() {
           .maybeSingle();
 
         // Insert in-app notification
-        await supabase.from('notifications').insert({
+        const notificationData = {
           user_id: selectedOffer.employer_id,
           type: 'offer_rejected',
           title: 'Offer Declined',
@@ -250,7 +266,23 @@ export default function WorkerOffers() {
             worker_name: workerProfile?.full_name,
             reason: rejectReason || null
           }
-        });
+        };
+        const { data: notification } = await supabase.from('notifications').insert(notificationData).select().single();
+
+        // Trigger push notification
+        try {
+          await supabase.functions.invoke('send-push-notification', {
+            body: {
+              userId: selectedOffer.employer_id,
+              title: notificationData.title,
+              message: notificationData.message,
+              url: '/employer/offers',
+              notificationId: notification?.id
+            }
+          });
+        } catch (pushError) {
+          console.log('Push notification skipped:', pushError);
+        }
 
         // Also send email notification
         if (employerProfile?.email) {

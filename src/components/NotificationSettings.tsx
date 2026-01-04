@@ -5,10 +5,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Mail, MessageSquare, Smartphone, Clock, Volume2 } from "lucide-react";
+import { Bell, Mail, MessageSquare, Smartphone, Clock, Volume2, BellRing } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
+
+// VAPID public key - generate with: npx web-push generate-vapid-keys
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
 
 const NotificationSettings = () => {
+  const { isSupported, isSubscribed, isLoading: pushLoading, subscribe, unsubscribe } = usePushNotifications();
+  
   const [settings, setSettings] = useState({
     emailAlerts: true,
     smsAlerts: false,
@@ -120,6 +126,31 @@ const NotificationSettings = () => {
                 onCheckedChange={(value) => handleSettingChange('soundEnabled', value)}
               />
             </div>
+
+            {isSupported && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <BellRing className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <span className="font-medium">Push Notifications</span>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified even when the browser is closed
+                    </p>
+                  </div>
+                </div>
+                <Switch 
+                  checked={isSubscribed}
+                  disabled={pushLoading || !VAPID_PUBLIC_KEY}
+                  onCheckedChange={async (checked) => {
+                    if (checked) {
+                      await subscribe(VAPID_PUBLIC_KEY);
+                    } else {
+                      await unsubscribe();
+                    }
+                  }}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
 
