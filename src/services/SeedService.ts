@@ -720,6 +720,172 @@ class SeedService {
     }
   }
 
+  async seedNotifications(): Promise<SeedResult> {
+    try {
+      // Get all demo user IDs
+      const workerEmails = ['worker@safeworkglobal.demo', 'worker2@safeworkglobal.demo', 'worker3@safeworkglobal.demo'];
+      const employerEmails = ['employer@safeworkglobal.demo', 'employer2@safeworkglobal.demo'];
+      const adminEmails = ['admin@safeworkglobal.demo'];
+
+      const notifications: Array<{
+        user_id: string;
+        type: string;
+        title: string;
+        message: string;
+        is_read: boolean;
+        data: Record<string, string | number | boolean | null>;
+        created_at: string;
+      }> = [];
+
+      // Helper to get user ID by email
+      const getUserIdByEmail = async (email: string): Promise<string | null> => {
+        const { data } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+        return data?.id || null;
+      };
+
+      // Worker notification templates
+      const workerNotificationTemplates = [
+        { type: 'application_update', title: 'Application Status Updated', message: 'Your application for Senior Welder position has been reviewed. Check the status now!' },
+        { type: 'interview_scheduled', title: 'Interview Scheduled', message: 'Congratulations! An interview has been scheduled for your application to TIG Welder - Welding in Dubai.' },
+        { type: 'offer_received', title: 'New Job Offer!', message: 'You have received a job offer for the Industrial Electrician position. Review the offer details.' },
+        { type: 'document_verified', title: 'Document Verified', message: 'Your passport document has been verified successfully.' },
+        { type: 'job_alert', title: 'New Job Match Found', message: '5 new jobs matching your skills have been posted in Oman. Check them out!' },
+        { type: 'message', title: 'New Message', message: 'You have a new message from Demo Company regarding your application.' },
+        { type: 'profile_reminder', title: 'Complete Your Profile', message: 'Add your certifications to improve your profile visibility by 30%.' },
+        { type: 'visa_update', title: 'Visa Processing Update', message: 'Your visa application for UAE has been submitted for processing.' },
+      ];
+
+      // Employer notification templates
+      const employerNotificationTemplates = [
+        { type: 'new_application', title: 'New Application Received', message: 'A new candidate has applied for your Senior Welder position. Review their profile now.' },
+        { type: 'interview_reminder', title: 'Interview Tomorrow', message: 'Reminder: You have an interview scheduled tomorrow with Maria Garcia for the Electrician role.' },
+        { type: 'application_update', title: 'Candidate Accepted Offer', message: 'Great news! Ahmed Hassan has accepted your job offer for the Pipeline Welder position.' },
+        { type: 'job_expiring', title: 'Job Posting Expiring Soon', message: 'Your job posting for Construction Manager will expire in 3 days. Renew now to keep receiving applications.' },
+        { type: 'verification_complete', title: 'Background Verification Complete', message: 'Background verification for Li Wei has been completed successfully.' },
+        { type: 'shortlist_update', title: 'Shortlist Updated', message: 'You have 3 new candidates matching your criteria for the Welding positions.' },
+        { type: 'payment_reminder', title: 'Payment Pending', message: 'Your escrow payment of $2,500 for the upcoming contract is pending confirmation.' },
+        { type: 'message', title: 'New Message from Candidate', message: 'Maria Garcia has sent you a message regarding the interview schedule.' },
+      ];
+
+      // Admin notification templates
+      const adminNotificationTemplates = [
+        { type: 'document_review', title: 'Document Pending Review', message: '15 worker documents are pending verification. Review them to maintain compliance.' },
+        { type: 'dispute_filed', title: 'New Dispute Filed', message: 'A new payment dispute has been filed and requires your attention.' },
+        { type: 'compliance_alert', title: 'Compliance Alert', message: 'Monthly compliance report is ready for review. 2 employers require re-verification.' },
+        { type: 'user_report', title: 'User Reported', message: 'A user has been reported for suspicious activity. Investigation required.' },
+        { type: 'system_alert', title: 'System Health Check', message: 'Weekly system health check completed. All services are running smoothly.' },
+        { type: 'job_verification', title: 'Jobs Pending Verification', message: '8 new job postings are pending verification before going live.' },
+        { type: 'kyc_pending', title: 'KYC Verification Pending', message: '5 employers have pending KYC verification. Complete review within 48 hours.' },
+        { type: 'flagged_content', title: 'Content Flagged', message: 'A message has been flagged for review due to potential policy violation.' },
+      ];
+
+      // Generate notifications for workers
+      for (const email of workerEmails) {
+        const userId = await getUserIdByEmail(email);
+        if (userId) {
+          const numNotifications = 5 + Math.floor(Math.random() * 4); // 5-8 notifications
+          for (let i = 0; i < numNotifications; i++) {
+            const template = workerNotificationTemplates[i % workerNotificationTemplates.length];
+            const daysAgo = Math.floor(Math.random() * 14); // Within last 2 weeks
+            const hoursAgo = Math.floor(Math.random() * 24);
+            notifications.push({
+              user_id: userId,
+              type: template.type,
+              title: template.title,
+              message: template.message,
+              is_read: Math.random() > 0.6, // 40% unread
+              data: {},
+              created_at: new Date(Date.now() - (daysAgo * 24 + hoursAgo) * 60 * 60 * 1000).toISOString()
+            });
+          }
+        }
+      }
+
+      // Generate notifications for employers
+      for (const email of employerEmails) {
+        const userId = await getUserIdByEmail(email);
+        if (userId) {
+          const numNotifications = 6 + Math.floor(Math.random() * 4); // 6-9 notifications
+          for (let i = 0; i < numNotifications; i++) {
+            const template = employerNotificationTemplates[i % employerNotificationTemplates.length];
+            const daysAgo = Math.floor(Math.random() * 14);
+            const hoursAgo = Math.floor(Math.random() * 24);
+            notifications.push({
+              user_id: userId,
+              type: template.type,
+              title: template.title,
+              message: template.message,
+              is_read: Math.random() > 0.5, // 50% unread
+              data: {},
+              created_at: new Date(Date.now() - (daysAgo * 24 + hoursAgo) * 60 * 60 * 1000).toISOString()
+            });
+          }
+        }
+      }
+
+      // Generate notifications for admins
+      for (const email of adminEmails) {
+        const userId = await getUserIdByEmail(email);
+        if (userId) {
+          const numNotifications = 8 + Math.floor(Math.random() * 4); // 8-11 notifications
+          for (let i = 0; i < numNotifications; i++) {
+            const template = adminNotificationTemplates[i % adminNotificationTemplates.length];
+            const daysAgo = Math.floor(Math.random() * 7); // Within last week
+            const hoursAgo = Math.floor(Math.random() * 24);
+            notifications.push({
+              user_id: userId,
+              type: template.type,
+              title: template.title,
+              message: template.message,
+              is_read: Math.random() > 0.7, // 30% unread
+              data: {},
+              created_at: new Date(Date.now() - (daysAgo * 24 + hoursAgo) * 60 * 60 * 1000).toISOString()
+            });
+          }
+        }
+      }
+
+      if (notifications.length === 0) {
+        return {
+          success: false,
+          message: 'No users found to create notifications for'
+        };
+      }
+
+      console.log(`Inserting ${notifications.length} notifications...`);
+
+      // Insert notifications in batches
+      const batchSize = 20;
+      for (let i = 0; i < notifications.length; i += batchSize) {
+        const batch = notifications.slice(i, i + batchSize);
+        const { error } = await supabase
+          .from('notifications')
+          .insert(batch);
+
+        if (error) {
+          console.error('Error inserting notifications batch:', error);
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      return {
+        success: true,
+        message: `Created ${notifications.length} demo notifications`
+      };
+    } catch (error) {
+      console.error('Error seeding notifications:', error);
+      return {
+        success: false,
+        message: 'Failed to seed notifications',
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
   async seedAllData(): Promise<SeedResult> {
     const errors: string[] = [];
     const messages: string[] = [];
@@ -827,6 +993,15 @@ class SeedService {
       messages.push(applicationsResult.message);
     } else if (applicationsResult.errors) {
       errors.push(`Applications: ${applicationsResult.message}`);
+    }
+
+    // Step 5: Seed notifications for all users
+    console.log('Step 5: Seeding notifications...');
+    const notificationsResult = await this.seedNotifications();
+    if (notificationsResult.success) {
+      messages.push(notificationsResult.message);
+    } else if (notificationsResult.errors) {
+      errors.push(`Notifications: ${notificationsResult.message}`);
     }
 
     const finalMessage = messages.join('. ') + (messages.length > 0 ? '.' : '');

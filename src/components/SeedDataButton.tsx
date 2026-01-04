@@ -83,6 +83,7 @@ export default function SeedDataButton() {
             <li>• Job skills and requirements for each posting</li>
             <li>• Worker profile data (if worker account exists)</li>
             <li>• Job applications for workers to track</li>
+            <li>• Sample notifications for all user types (worker, employer, admin)</li>
           </ul>
           <p className="text-xs text-amber-600 mt-2">
             Tip: Log in as an employer (employer@safeworkglobal.demo / Employer@2024!) before seeding for best results.
