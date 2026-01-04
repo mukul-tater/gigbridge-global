@@ -15,6 +15,7 @@ import WorkerVideoUpload from "@/components/worker/WorkerVideoUpload";
 import { workerProfileSchema, type WorkerProfileFormData } from "@/lib/validations/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { ProfileSkeleton } from "@/components/ui/page-skeleton";
 
 interface WorkerVideo {
   id: string;
@@ -168,8 +169,14 @@ export default function WorkerProfile() {
 
   if (!user || !profile || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex min-h-screen bg-background">
+        <WorkerSidebar />
+        <div className="flex-1 flex flex-col">
+          <WorkerHeader />
+          <main className="flex-1 p-8">
+            <ProfileSkeleton />
+          </main>
+        </div>
       </div>
     );
   }

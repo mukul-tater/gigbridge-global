@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { WorkerListSkeleton } from '@/components/ui/page-skeleton';
 
 interface Worker {
   id: string;
@@ -324,108 +325,9 @@ export default function SearchWorkers() {
               </select>
             </div>
 
-            {workers.map((worker) => (
-              <Card key={worker.id} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex gap-6">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={worker.avatar_url || ''} />
-                    <AvatarFallback className="text-2xl">
-                      {worker.full_name?.split(' ').map(n => n[0]).join('') || 'W'}
-                    </AvatarFallback>
-                  </Avatar>
-
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="text-xl font-semibold mb-1">{worker.full_name || 'Worker'}</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          {worker.nationality && (
-                            <span className="flex items-center gap-1">
-                              <Globe className="h-4 w-4" />
-                              {worker.nationality}
-                            </span>
-                          )}
-                          {worker.current_location && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              {worker.current_location}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Experience</p>
-                        <p className="font-semibold flex items-center gap-1">
-                          <Award className="h-4 w-4" />
-                          {worker.years_of_experience || 0} years
-                        </p>
-                      </div>
-                      {worker.availability && (
-                        <div>
-                          <p className="text-muted-foreground">Availability</p>
-                          <p className="font-semibold">{worker.availability}</p>
-                        </div>
-                      )}
-                      {worker.expected_salary_min && worker.expected_salary_max && (
-                        <div>
-                          <p className="text-muted-foreground">Expected Salary</p>
-                          <p className="font-semibold">
-                            {worker.currency} {worker.expected_salary_min.toLocaleString()} - {worker.expected_salary_max.toLocaleString()}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {worker.skills.slice(0, 5).map((skill, idx) => (
-                        <Badge key={idx} variant="outline">{skill.skill_name}</Badge>
-                      ))}
-                      {worker.skills.length > 5 && (
-                        <Badge variant="secondary">+{worker.skills.length - 5} more</Badge>
-                      )}
-                      {worker.has_passport && (
-                        <Badge variant="secondary">Valid Passport</Badge>
-                      )}
-                      {worker.has_visa && (
-                        <Badge className="bg-success text-success-foreground">Work Visa</Badge>
-                      )}
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Link to={`/worker-profile/${worker.id}`}>
-                        <Button>View Profile</Button>
-                      </Link>
-                      <Button variant="outline">
-                        <Mail className="h-4 w-4 mr-2" />
-                        Contact
-                      </Button>
-                      <Button 
-                        variant={shortlistedIds.has(worker.id) ? "default" : "outline"}
-                        onClick={() => handleShortlist(worker.id)}
-                        disabled={shortlistingId === worker.id}
-                      >
-                        {shortlistedIds.has(worker.id) ? (
-                          <>
-                            <Check className="h-4 w-4 mr-2" />
-                            Shortlisted
-                          </>
-                        ) : (
-                          <>
-                            <Star className="h-4 w-4 mr-2" />
-                            Shortlist
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-
-            {workers.length === 0 && (
+            {loading ? (
+              <WorkerListSkeleton count={4} />
+            ) : workers.length === 0 ? (
               <Card className="p-12 text-center">
                 <Globe className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No workers found</h3>
@@ -433,6 +335,107 @@ export default function SearchWorkers() {
                   Try adjusting your filters or search criteria
                 </p>
               </Card>
+            ) : (
+              workers.map((worker) => (
+                <Card key={worker.id} className="p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex gap-6">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={worker.avatar_url || ''} />
+                      <AvatarFallback className="text-2xl">
+                        {worker.full_name?.split(' ').map(n => n[0]).join('') || 'W'}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h3 className="text-xl font-semibold mb-1">{worker.full_name || 'Worker'}</h3>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            {worker.nationality && (
+                              <span className="flex items-center gap-1">
+                                <Globe className="h-4 w-4" />
+                                {worker.nationality}
+                              </span>
+                            )}
+                            {worker.current_location && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" />
+                                {worker.current_location}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Experience</p>
+                          <p className="font-semibold flex items-center gap-1">
+                            <Award className="h-4 w-4" />
+                            {worker.years_of_experience || 0} years
+                          </p>
+                        </div>
+                        {worker.availability && (
+                          <div>
+                            <p className="text-muted-foreground">Availability</p>
+                            <p className="font-semibold">{worker.availability}</p>
+                          </div>
+                        )}
+                        {worker.expected_salary_min && worker.expected_salary_max && (
+                          <div>
+                            <p className="text-muted-foreground">Expected Salary</p>
+                            <p className="font-semibold">
+                              {worker.currency} {worker.expected_salary_min.toLocaleString()} - {worker.expected_salary_max.toLocaleString()}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {worker.skills.slice(0, 5).map((skill, idx) => (
+                          <Badge key={idx} variant="outline">{skill.skill_name}</Badge>
+                        ))}
+                        {worker.skills.length > 5 && (
+                          <Badge variant="secondary">+{worker.skills.length - 5} more</Badge>
+                        )}
+                        {worker.has_passport && (
+                          <Badge variant="secondary">Valid Passport</Badge>
+                        )}
+                        {worker.has_visa && (
+                          <Badge className="bg-success text-success-foreground">Work Visa</Badge>
+                        )}
+                      </div>
+
+                      <div className="flex gap-3">
+                        <Link to={`/worker-profile/${worker.id}`}>
+                          <Button>View Profile</Button>
+                        </Link>
+                        <Button variant="outline">
+                          <Mail className="h-4 w-4 mr-2" />
+                          Contact
+                        </Button>
+                        <Button 
+                          variant={shortlistedIds.has(worker.id) ? "default" : "outline"}
+                          onClick={() => handleShortlist(worker.id)}
+                          disabled={shortlistingId === worker.id}
+                        >
+                          {shortlistedIds.has(worker.id) ? (
+                            <>
+                              <Check className="h-4 w-4 mr-2" />
+                              Shortlisted
+                            </>
+                          ) : (
+                            <>
+                              <Star className="h-4 w-4 mr-2" />
+                              Shortlist
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))
             )}
           </div>
         </div>

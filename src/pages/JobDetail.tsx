@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { JobDetailSkeleton } from '@/components/ui/page-skeleton';
 
 interface JobData {
   id: string;
@@ -263,11 +264,7 @@ export default function JobDetail() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="pt-20 pb-12">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-          </div>
+          <JobDetailSkeleton />
         </main>
         <Footer />
       </div>

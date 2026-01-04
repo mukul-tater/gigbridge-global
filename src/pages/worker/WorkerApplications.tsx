@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { ApplicationListSkeleton } from "@/components/ui/page-skeleton";
 
 interface JobData {
   title: string;
@@ -111,7 +112,8 @@ export default function WorkerApplications() {
         <div className="flex-1 flex flex-col">
           <WorkerHeader />
           <main className="flex-1 p-8">
-            <div className="text-center">Loading applications...</div>
+            <h1 className="text-3xl font-bold mb-8">My Applications</h1>
+            <ApplicationListSkeleton count={4} />
           </main>
         </div>
       </div>
