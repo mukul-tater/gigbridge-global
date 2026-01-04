@@ -49,7 +49,7 @@ export default function WorkerCalendar() {
         .from("interviews")
         .select("*")
         .eq("worker_id", user?.id)
-        .in("status", ["scheduled", "confirmed"]);
+        .in("status", ["SCHEDULED", "CONFIRMED", "scheduled", "confirmed"]);
 
       if (error) throw error;
 
