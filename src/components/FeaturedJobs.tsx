@@ -175,26 +175,26 @@ export default function FeaturedJobs() {
                   style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                 >
                   <Card 
-                    className="h-full relative overflow-hidden bg-card border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                    className="h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border border-border hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer"
                     onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
                   >
                     {/* Gradient accent line */}
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
                     
-                    {/* Quick Action Buttons */}
-                    <div className="absolute top-4 right-4 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Quick Action Buttons - Always visible */}
+                    <div className="absolute top-4 right-4 z-10 flex gap-2">
                       <Button
                         size="icon"
-                        variant="secondary"
-                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform bg-card/90 backdrop-blur-sm"
+                        variant="ghost"
+                        className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all"
                         onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}
                       >
-                        <Bookmark className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-current text-primary' : ''}`} />
+                        <Bookmark className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-primary text-primary' : ''}`} />
                       </Button>
                       <Button
                         size="icon"
-                        variant="secondary"
-                        className="h-8 w-8 rounded-full shadow-md hover:scale-110 transition-transform bg-card/90 backdrop-blur-sm"
+                        variant="ghost"
+                        className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-secondary hover:text-secondary-foreground hover:scale-110 transition-all"
                         onClick={(e) => { e.stopPropagation(); handleShareJob(job); }}
                       >
                         <Share2 className="h-4 w-4" />
