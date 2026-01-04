@@ -59,7 +59,8 @@ export default function JobDetail() {
   const [hasApplied, setHasApplied] = useState(false);
   const [applying, setApplying] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [isSaved, setIsSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   useEffect(() => {
     const loadData = async () => {
       if (!slug) return;
@@ -98,7 +99,7 @@ export default function JobDetail() {
           setEmployer(employerData);
         }
 
-        // Check if user has already applied
+        // Check if user has already applied and if job is saved
         if (user) {
           const { data: application } = await supabase
             .from('job_applications')
@@ -108,6 +109,16 @@ export default function JobDetail() {
             .maybeSingle();
 
           setHasApplied(!!application);
+
+          // Check if job is saved
+          const { data: savedJob } = await supabase
+            .from('saved_jobs')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('job_id', jobData.id)
+            .maybeSingle();
+
+          setIsSaved(!!savedJob);
         }
       } catch (error) {
         console.error('Error loading job:', error);
@@ -185,6 +196,65 @@ export default function JobDetail() {
         title: 'Link Copied',
         description: 'Job link has been copied to clipboard',
       });
+    }
+  };
+
+  const handleSave = async () => {
+    if (!isAuthenticated) {
+      toast({
+        title: 'Login Required',
+        description: 'Please login to save jobs',
+        variant: 'destructive'
+      });
+      navigate('/auth');
+      return;
+    }
+
+    if (!user || !job) return;
+
+    setSaving(true);
+
+    try {
+      if (isSaved) {
+        // Unsave the job
+        const { error } = await supabase
+          .from('saved_jobs')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('job_id', job.id);
+
+        if (error) throw error;
+
+        setIsSaved(false);
+        toast({
+          title: 'Job Removed',
+          description: 'Job removed from your saved list',
+        });
+      } else {
+        // Save the job
+        const { error } = await supabase
+          .from('saved_jobs')
+          .insert({
+            user_id: user.id,
+            job_id: job.id
+          });
+
+        if (error) throw error;
+
+        setIsSaved(true);
+        toast({
+          title: 'Job Saved',
+          description: 'Job added to your saved list',
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to save job',
+        variant: 'destructive'
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -458,9 +528,14 @@ export default function JobDetail() {
                       <Share2 className="h-4 w-4 mr-2" />
                       Share
                     </Button>
-                    <Button variant="outline" className="flex-1">
-                      <Bookmark className="h-4 w-4 mr-2" />
-                      Save
+                    <Button 
+                      variant="outline" 
+                      className={`flex-1 ${isSaved ? 'bg-primary/10 border-primary text-primary' : ''}`}
+                      onClick={handleSave}
+                      disabled={saving}
+                    >
+                      <Bookmark className={`h-4 w-4 mr-2 ${isSaved ? 'fill-current' : ''}`} />
+                      {saving ? 'Saving...' : isSaved ? 'Saved' : 'Save'}
                     </Button>
                   </div>
                 </CardContent>
