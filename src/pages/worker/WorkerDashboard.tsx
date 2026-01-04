@@ -11,6 +11,27 @@ import ProfileProgressCard from "@/components/worker/ProfileProgressCard";
 import JobJourneyProgressCard from "@/components/worker/JobJourneyProgressCard";
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
+import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
+
+interface RecentActivity {
+  id: string;
+  type: 'application' | 'message' | 'notification';
+  title: string;
+  subtitle: string;
+  timestamp: string;
+}
+
+interface RecommendedJob {
+  id: string;
+  title: string;
+  location: string;
+  country: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  currency: string;
+  experience_level: string;
+}
 
 export default function WorkerDashboard() {
   const { profile } = useAuth();
@@ -21,6 +42,8 @@ export default function WorkerDashboard() {
   const [certifications, setCertifications] = useState([]);
   const [applications, setApplications] = useState([]);
   const [jobFormalities, setJobFormalities] = useState([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [recommendedJobs, setRecommendedJobs] = useState<RecommendedJob[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,13 +54,16 @@ export default function WorkerDashboard() {
 
   const fetchWorkerData = async () => {
     try {
-      const [docsRes, profileRes, skillsRes, expRes, certsRes, appsRes, formalitiesRes] = await Promise.all([
+      const [docsRes, profileRes, skillsRes, expRes, certsRes, appsRes, formalitiesRes, notificationsRes, jobsRes] = await Promise.all([
         supabase.from('worker_documents').select('*').eq('worker_id', profile?.id),
         supabase.from('worker_profiles').select('*').eq('user_id', profile?.id).single(),
         supabase.from('worker_skills').select('*').eq('worker_id', profile?.id),
         supabase.from('work_experience').select('*').eq('worker_id', profile?.id),
         supabase.from('worker_certifications').select('*').eq('worker_id', profile?.id),
-        supabase.from('job_applications').select('*').eq('worker_id', profile?.id),
+        supabase.from('job_applications').select(`
+          *,
+          jobs:job_id (title, location, country)
+        `).eq('worker_id', profile?.id).order('applied_at', { ascending: false }).limit(5),
         supabase
           .from('job_formalities')
           .select(`
@@ -48,7 +74,9 @@ export default function WorkerDashboard() {
               country
             )
           `)
-          .eq('worker_id', profile?.id)
+          .eq('worker_id', profile?.id),
+        supabase.from('notifications').select('*').eq('user_id', profile?.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('jobs').select('*').eq('status', 'ACTIVE').order('created_at', { ascending: false }).limit(3)
       ]);
 
       setDocuments(docsRes.data || []);
@@ -58,6 +86,34 @@ export default function WorkerDashboard() {
       setCertifications(certsRes.data || []);
       setApplications(appsRes.data || []);
       setJobFormalities(formalitiesRes.data || []);
+      setRecommendedJobs(jobsRes.data || []);
+
+      // Build recent activity from applications and notifications
+      const activities: RecentActivity[] = [];
+      
+      (appsRes.data || []).forEach((app: any) => {
+        activities.push({
+          id: `app-${app.id}`,
+          type: 'application',
+          title: `Applied to ${app.jobs?.title || 'Position'}`,
+          subtitle: `${app.jobs?.location || ''} • ${formatDistanceToNow(new Date(app.applied_at), { addSuffix: true })}`,
+          timestamp: app.applied_at
+        });
+      });
+
+      (notificationsRes.data || []).forEach((notif: any) => {
+        activities.push({
+          id: `notif-${notif.id}`,
+          type: 'notification',
+          title: notif.title,
+          subtitle: `${notif.message.substring(0, 50)}${notif.message.length > 50 ? '...' : ''} • ${formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}`,
+          timestamp: notif.created_at
+        });
+      });
+
+      // Sort by timestamp and take first 5
+      activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      setRecentActivity(activities.slice(0, 5));
     } catch (error) {
       console.error('Error fetching worker data:', error);
     } finally {
@@ -161,54 +217,51 @@ export default function WorkerDashboard() {
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
             <div className="space-y-4">
-              <div className="flex items-start gap-3 pb-3 border-b">
-                <div className="bg-primary/10 p-2 rounded">
-                  <FileText className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">Applied to Welder Position</p>
-                  <p className="text-sm text-muted-foreground">ShreeFab Industries • 2 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 pb-3 border-b">
-                <div className="bg-primary/10 p-2 rounded">
-                  <MessageSquare className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">New message from NorthWorks</p>
-                  <p className="text-sm text-muted-foreground">Interview invitation • 5 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="bg-primary/10 p-2 rounded">
-                  <Briefcase className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">Profile viewed by employer</p>
-                  <p className="text-sm text-muted-foreground">Construction Ltd • 1 day ago</p>
-                </div>
-              </div>
+              {recentActivity.length > 0 ? (
+                recentActivity.map((activity, index) => (
+                  <div key={activity.id} className={`flex items-start gap-3 ${index < recentActivity.length - 1 ? 'pb-3 border-b' : ''}`}>
+                    <div className="bg-primary/10 p-2 rounded">
+                      {activity.type === 'application' ? (
+                        <Briefcase className="h-4 w-4 text-primary" />
+                      ) : activity.type === 'message' ? (
+                        <MessageSquare className="h-4 w-4 text-primary" />
+                      ) : (
+                        <FileText className="h-4 w-4 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{activity.title}</p>
+                      <p className="text-sm text-muted-foreground">{activity.subtitle}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center py-4">No recent activity</p>
+              )}
             </div>
           </Card>
 
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Recommended Jobs</h2>
             <div className="space-y-4">
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h3 className="font-semibold mb-1">Senior Welder</h3>
-                <p className="text-sm text-muted-foreground mb-2">Dubai, UAE • $25-30/hr</p>
-                <p className="text-sm">5+ years experience required</p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h3 className="font-semibold mb-1">Electrician</h3>
-                <p className="text-sm text-muted-foreground mb-2">Qatar • $22-28/hr</p>
-                <p className="text-sm">Industrial experience preferred</p>
-              </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h3 className="font-semibold mb-1">Construction Supervisor</h3>
-                <p className="text-sm text-muted-foreground mb-2">Saudi Arabia • $30-35/hr</p>
-                <p className="text-sm">Leadership experience required</p>
-              </div>
+              {recommendedJobs.length > 0 ? (
+                recommendedJobs.map((job) => (
+                  <Link key={job.id} to={`/jobs/${job.id}`} className="block">
+                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                      <h3 className="font-semibold mb-1">{job.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {job.location}, {job.country}
+                        {job.salary_min && job.salary_max && (
+                          <> • {job.currency} {job.salary_min.toLocaleString()} - {job.salary_max.toLocaleString()}</>
+                        )}
+                      </p>
+                      <p className="text-sm">{job.experience_level} experience</p>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center py-4">No jobs available</p>
+              )}
             </div>
           </Card>
         </div>
