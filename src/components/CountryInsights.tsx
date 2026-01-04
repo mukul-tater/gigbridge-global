@@ -182,13 +182,13 @@ const CountryInsights = () => {
                   </div>
 
                   <Button 
-                    className="w-full rounded-xl gap-2 group/btn"
+                    className="w-full rounded-xl group/btn flex items-center justify-center gap-2"
                     variant="outline"
                     onClick={(e) => { e.stopPropagation(); handleViewJobs(country.name); }}
                   >
-                    <MapPin className="h-4 w-4" />
-                    View {country.name} Jobs
-                    <ArrowRight className="h-4 w-4 ml-auto group-hover/btn:translate-x-1 transition-transform" />
+                    <MapPin className="h-4 w-4 shrink-0" />
+                    <span>View {country.name} Jobs</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 ml-auto group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </CardContent>
               </Card>
@@ -200,11 +200,11 @@ const CountryInsights = () => {
         <div className="text-center">
           <Button 
             size="lg" 
-            className="rounded-xl px-8 gap-2 shadow-primary hover:shadow-hover transition-all"
+            className="rounded-xl px-8 shadow-primary hover:shadow-hover transition-all flex items-center justify-center gap-2"
             onClick={() => navigate('/jobs')}
           >
-            Explore All Countries
-            <ArrowRight className="h-5 w-5" />
+            <span>Explore All Countries</span>
+            <ArrowRight className="h-5 w-5 shrink-0" />
           </Button>
         </div>
       </div>
