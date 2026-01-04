@@ -371,3 +371,5 @@ export function NotificationDrawer() {
     </Drawer>
   );
 }
+
+export default NotificationDrawer;
