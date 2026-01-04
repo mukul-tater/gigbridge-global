@@ -99,7 +99,7 @@ const JobCategories = () => {
           {categories.map((category, index) => (
             <Card 
               key={index} 
-              className="group hover:shadow-lg transition-all duration-300 border-border cursor-pointer flex flex-col"
+              className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-border cursor-pointer flex flex-col"
               onClick={() => handleCategoryClick(category.title)}
             >
               <CardContent className="p-6 flex flex-col flex-1">

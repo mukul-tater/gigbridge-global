@@ -132,7 +132,7 @@ const InteractiveJobMap = () => {
               style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
             >
               <Card 
-                className={`h-full relative overflow-hidden bg-card border-2 transition-all duration-500 hover:shadow-xl cursor-pointer ${
+                className={`h-full relative overflow-hidden bg-card border-2 transition-all duration-500 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${
                   region.easyHiring ? 'border-success/30 hover:border-success/50' : 'border-border/50 hover:border-primary/30'
                 }`}
                 onClick={() => handleExploreRegion(region.searchCountry)}
