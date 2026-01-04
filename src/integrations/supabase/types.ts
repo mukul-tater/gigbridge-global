@@ -1038,6 +1038,42 @@ export type Database = {
         }
         Relationships: []
       }
+      training_courses: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          duration_hours: number | null
+          id: string
+          is_active: boolean | null
+          is_mandatory: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_mandatory?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_mandatory?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_moderation: {
         Row: {
           action: string
@@ -1337,6 +1373,53 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "worker_profiles"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      worker_training_enrollments: {
+        Row: {
+          certificate_url: string | null
+          completed_at: string | null
+          course_id: string
+          created_at: string
+          id: string
+          progress: number
+          started_at: string | null
+          status: string
+          updated_at: string
+          worker_id: string
+        }
+        Insert: {
+          certificate_url?: string | null
+          completed_at?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          progress?: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          worker_id: string
+        }
+        Update: {
+          certificate_url?: string | null
+          completed_at?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          progress?: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_training_enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "training_courses"
+            referencedColumns: ["id"]
           },
         ]
       }
