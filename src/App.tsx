@@ -35,6 +35,7 @@ import WorkerInsurance from "./pages/worker/Insurance";
 import WorkerSavedSearches from "./pages/worker/SavedSearches";
 import WorkerPublicProfile from "./pages/worker/WorkerPublicProfile";
 import WorkerOffers from "./pages/worker/WorkerOffers";
+import WorkerInterviews from "./pages/worker/WorkerInterviews";
 import SeedData from "./pages/SeedData";
 
 // Employer Pages
@@ -163,6 +164,11 @@ const App = () => (
             <Route path="/worker/offers" element={
               <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerOffers />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/interviews" element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <WorkerInterviews />
               </ProtectedRoute>
             } />
 
