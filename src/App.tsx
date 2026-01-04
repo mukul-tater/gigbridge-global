@@ -37,6 +37,7 @@ import WorkerPublicProfile from "./pages/worker/WorkerPublicProfile";
 import WorkerOffers from "./pages/worker/WorkerOffers";
 import WorkerInterviews from "./pages/worker/WorkerInterviews";
 import WorkerCalendar from "./pages/worker/WorkerCalendar";
+import WorkerContractHistory from "./pages/worker/ContractHistory";
 import SeedData from "./pages/SeedData";
 
 // Employer Pages
@@ -58,6 +59,7 @@ import WorkerShortlist from "./pages/employer/WorkerShortlist";
 import ManageFormalities from "./pages/employer/ManageFormalities";
 import EmployerPayments from "./pages/employer/EmployerPayments";
 import ContractManagement from "./pages/employer/ContractManagement";
+import EmployerContractHistory from "./pages/employer/ContractHistory";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -178,6 +180,11 @@ const App = () => (
                 <WorkerCalendar />
               </ProtectedRoute>
             } />
+            <Route path="/worker/contract-history" element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <WorkerContractHistory />
+              </ProtectedRoute>
+            } />
 
             {/* Employer Routes */}
             <Route path="/employer/dashboard" element={
@@ -269,6 +276,11 @@ const App = () => (
             <Route path="/employer/contracts" element={
               <ProtectedRoute allowedRoles={["employer"]}>
                 <ContractManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/employer/contract-history" element={
+              <ProtectedRoute allowedRoles={["employer"]}>
+                <EmployerContractHistory />
               </ProtectedRoute>
             } />
 
