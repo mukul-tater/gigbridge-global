@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileSignature, Download, Eye, CheckCircle, Loader2 } from "lucide-react";
+import { FileSignature, Download, Eye, CheckCircle, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +38,7 @@ export default function Contracts() {
   const [loading, setLoading] = useState(true);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [signingDialogOpen, setSigningDialogOpen] = useState(false);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
 
@@ -137,6 +138,11 @@ export default function Contracts() {
     setSelectedContract(contract);
     setTermsAccepted(false);
     setSigningDialogOpen(true);
+  };
+
+  const openPreviewDialog = (contract: Contract) => {
+    setSelectedContract(contract);
+    setPreviewDialogOpen(true);
   };
 
   const handleSign = async () => {
@@ -253,14 +259,16 @@ export default function Contracts() {
                     )}
 
                     <div className="flex gap-3 mt-4">
-                      <Button variant="outline" onClick={() => handleDownload(contract)}>
+                      <Button variant="outline" onClick={() => openPreviewDialog(contract)}>
                         <Eye className="h-4 w-4 mr-2" />
                         View Contract
                       </Button>
-                      <Button variant="outline" onClick={() => handleDownload(contract)}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
+                      {contract.contractUrl && (
+                        <Button variant="outline" onClick={() => handleDownload(contract)}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      )}
                       {contract.status === "SENT" && (
                         <Button onClick={() => openSigningDialog(contract)}>
                           <FileSignature className="h-4 w-4 mr-2" />
@@ -314,12 +322,33 @@ export default function Contracts() {
                   )}
                 </div>
 
-                <div className="border rounded-lg p-4 bg-muted/20">
-                  <p className="text-sm text-muted-foreground mb-2">Contract Preview (Placeholder)</p>
-                  <div className="h-32 border-2 border-dashed border-muted rounded flex items-center justify-center text-muted-foreground text-sm">
-                    Full contract document would be displayed here
+                {selectedContract?.contractUrl ? (
+                  <div className="border rounded-lg overflow-hidden bg-muted/20">
+                    <div className="flex items-center justify-between p-2 bg-muted/50 border-b">
+                      <p className="text-sm font-medium">Contract Document</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => window.open(selectedContract.contractUrl!, "_blank")}
+                      >
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        Open in New Tab
+                      </Button>
+                    </div>
+                    <iframe
+                      src={`${selectedContract.contractUrl}#toolbar=0`}
+                      className="w-full h-48 border-0"
+                      title="Contract Preview"
+                    />
                   </div>
-                </div>
+                ) : (
+                  <div className="border rounded-lg p-4 bg-muted/20">
+                    <p className="text-sm text-muted-foreground mb-2">Contract Document</p>
+                    <div className="h-32 border-2 border-dashed border-muted rounded flex items-center justify-center text-muted-foreground text-sm">
+                      Contract document not yet uploaded by employer
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex items-start space-x-3">
                   <Checkbox
@@ -353,6 +382,76 @@ export default function Contracts() {
                 )}
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Contract Preview Dialog */}
+        <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle>Contract Document</DialogTitle>
+              <DialogDescription>
+                {selectedContract?.title} - {selectedContract?.employer}
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedContract && (
+              <div className="space-y-4">
+                {selectedContract.contractUrl ? (
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="flex items-center justify-between p-3 bg-muted/50 border-b">
+                      <div className="flex items-center gap-2">
+                        <FileSignature className="h-5 w-5 text-primary" />
+                        <span className="font-medium">{selectedContract.title}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(selectedContract.contractUrl!, "_blank")}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          Open in New Tab
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(selectedContract)}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                    <iframe
+                      src={selectedContract.contractUrl}
+                      className="w-full h-[60vh] border-0"
+                      title="Contract Document"
+                    />
+                  </div>
+                ) : (
+                  <div className="border rounded-lg p-8 bg-muted/20 text-center">
+                    <FileSignature className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="font-medium mb-2">Contract Document Not Available</h3>
+                    <p className="text-sm text-muted-foreground">
+                      The employer has not uploaded the contract document yet.
+                    </p>
+                  </div>
+                )}
+
+                {selectedContract.status === "SENT" && (
+                  <div className="flex justify-end">
+                    <Button onClick={() => {
+                      setPreviewDialogOpen(false);
+                      openSigningDialog(selectedContract);
+                    }}>
+                      <FileSignature className="h-4 w-4 mr-2" />
+                      Proceed to Sign
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </main>
