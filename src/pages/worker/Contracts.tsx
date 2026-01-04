@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileSignature, Download, Eye, CheckCircle, Loader2, ExternalLink, History } from "lucide-react";
+import { FileSignature, Download, Eye, CheckCircle, Loader2, ExternalLink, History, CalendarClock, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,6 +31,7 @@ interface Contract {
   contractUrl: string | null;
   contractSent: boolean;
   contractSigned: boolean;
+  contractExpiryDate: string | null;
 }
 
 export default function Contracts() {
@@ -61,6 +62,7 @@ export default function Contracts() {
           contract_signed_date,
           contract_url,
           expected_joining_date,
+          contract_expiry_date,
           jobs (
             id,
             title,
@@ -106,6 +108,7 @@ export default function Contracts() {
           contractUrl: item.contract_url,
           contractSent: item.contract_sent || false,
           contractSigned: item.contract_signed || false,
+          contractExpiryDate: item.contract_expiry_date,
         };
       });
 
@@ -256,6 +259,27 @@ export default function Contracts() {
                       <div className="flex items-center gap-2 mt-4 text-sm text-green-600">
                         <CheckCircle className="h-4 w-4" />
                         <span>Signed on {new Date(contract.signedAt).toLocaleDateString()}</span>
+                      </div>
+                    )}
+
+                    {contract.status === "SENT" && contract.contractExpiryDate && (
+                      <div className={`flex items-center gap-2 mt-4 text-sm ${
+                        new Date(contract.contractExpiryDate) < new Date() 
+                          ? "text-destructive" 
+                          : new Date(contract.contractExpiryDate) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                            ? "text-amber-600"
+                            : "text-muted-foreground"
+                      }`}>
+                        {new Date(contract.contractExpiryDate) < new Date() ? (
+                          <AlertTriangle className="h-4 w-4" />
+                        ) : (
+                          <CalendarClock className="h-4 w-4" />
+                        )}
+                        <span>
+                          {new Date(contract.contractExpiryDate) < new Date() 
+                            ? `Contract expired on ${new Date(contract.contractExpiryDate).toLocaleDateString()}`
+                            : `Sign before ${new Date(contract.contractExpiryDate).toLocaleDateString()}`}
+                        </span>
                       </div>
                     )}
 

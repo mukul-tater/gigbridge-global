@@ -29,7 +29,10 @@ import {
   FileText,
   User,
   Building2,
+  CalendarClock,
+  AlertTriangle,
 } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -49,6 +52,7 @@ interface ContractRecord {
   contractSignedDate: string | null;
   contractUrl: string | null;
   expectedJoiningDate: string | null;
+  contractExpiryDate: string | null;
   createdAt: string;
 }
 
@@ -61,6 +65,7 @@ export default function ContractManagement() {
   const [sendingDialogOpen, setSendingDialogOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState<ContractRecord | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [expiryDate, setExpiryDate] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -99,6 +104,7 @@ export default function ContractManagement() {
           contract_signed_date,
           contract_url,
           expected_joining_date,
+          contract_expiry_date,
           created_at,
           jobs (
             id,
@@ -151,6 +157,7 @@ export default function ContractManagement() {
           contractSignedDate: item.contract_signed_date,
           contractUrl: item.contract_url,
           expectedJoiningDate: item.expected_joining_date,
+          contractExpiryDate: item.contract_expiry_date,
           createdAt: item.created_at,
         };
       });
@@ -176,6 +183,10 @@ export default function ContractManagement() {
 
   const openSendDialog = (contract: ContractRecord) => {
     setSelectedContract(contract);
+    // Set default expiry date to 7 days from now
+    const defaultExpiry = new Date();
+    defaultExpiry.setDate(defaultExpiry.getDate() + 7);
+    setExpiryDate(defaultExpiry.toISOString().split('T')[0]);
     setSendingDialogOpen(true);
   };
 
@@ -189,6 +200,8 @@ export default function ContractManagement() {
         .from("job_formalities")
         .update({
           contract_sent: true,
+          contract_expiry_date: expiryDate || null,
+          contract_reminder_sent: false,
         })
         .eq("id", selectedContract.id);
 
@@ -399,6 +412,27 @@ export default function ContractManagement() {
                           </span>
                         </div>
                       )}
+
+                      {contract.contractSent && !contract.contractSigned && contract.contractExpiryDate && (
+                        <div className={`flex items-center gap-2 mt-4 text-sm ${
+                          new Date(contract.contractExpiryDate) < new Date() 
+                            ? "text-destructive" 
+                            : new Date(contract.contractExpiryDate) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                              ? "text-amber-600"
+                              : "text-muted-foreground"
+                        }`}>
+                          {new Date(contract.contractExpiryDate) < new Date() ? (
+                            <AlertTriangle className="h-4 w-4" />
+                          ) : (
+                            <CalendarClock className="h-4 w-4" />
+                          )}
+                          <span>
+                            {new Date(contract.contractExpiryDate) < new Date() 
+                              ? `Expired on ${new Date(contract.contractExpiryDate).toLocaleDateString()}`
+                              : `Expires on ${new Date(contract.contractExpiryDate).toLocaleDateString()}`}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -464,6 +498,20 @@ export default function ContractManagement() {
                       </p>
                     </div>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="expiry-date">Contract Expiry Date</Label>
+                  <Input
+                    id="expiry-date"
+                    type="date"
+                    value={expiryDate}
+                    onChange={(e) => setExpiryDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Workers will receive reminders as the expiry date approaches.
+                  </p>
                 </div>
 
                 <p className="text-sm text-muted-foreground">
