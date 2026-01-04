@@ -109,7 +109,7 @@ const CountryInsights = () => {
               style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'forwards' }}
             >
               <Card 
-                className="h-full bg-card border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-xl cursor-pointer overflow-hidden flex flex-col"
+                className="h-full bg-card border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-xl hover:scale-[1.02] cursor-pointer overflow-hidden flex flex-col"
                 onClick={() => handleViewJobs(country.name)}
               >
                 <CardHeader className="pb-3">
