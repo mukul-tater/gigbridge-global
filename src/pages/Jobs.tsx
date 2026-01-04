@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import WorkerSidebar from '@/components/worker/WorkerSidebar';
 import WorkerHeader from '@/components/worker/WorkerHeader';
+import SEOHead from '@/components/SEOHead';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+
 interface Job {
   id: string;
   slug: string;
@@ -339,19 +341,54 @@ export default function Jobs() {
     );
   }
 
+  // Structured data for job listings
+  const jobListingStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "International Jobs - SafeWorkGlobal",
+    "description": "Browse thousands of international job opportunities with visa sponsorship",
+    "numberOfItems": jobs.length,
+    "itemListElement": jobs.slice(0, 10).map((job, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "JobPosting",
+        "title": job.title,
+        "description": job.description,
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": job.company
+        },
+        "jobLocation": {
+          "@type": "Place",
+          "address": job.location
+        },
+        "employmentType": job.type
+      }
+    }))
+  };
+
   // Default Public Layout
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <SEOHead
+        title="International Jobs | Find Global Opportunities | SafeWorkGlobal"
+        description="Browse 50,000+ international job opportunities for skilled workers in construction, electrical, welding, and more. Visa sponsorship available across 15+ countries."
+        keywords="international jobs, overseas jobs, visa sponsorship jobs, construction jobs abroad, welding jobs overseas, skilled worker jobs, gulf jobs, middle east jobs"
+        canonicalUrl={`${window.location.origin}/jobs`}
+        ogType="website"
+        structuredData={jobListingStructuredData}
+      />
       <Header />
       <MobileBottomNav />
       
       <main className="container mx-auto px-4 py-8 mt-16">
-        <div className="mb-8">
+        <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Find Your Next Global Opportunity</h1>
           <p className="text-muted-foreground">
             Browse thousands of international job opportunities with visa sponsorship
           </p>
-        </div>
+        </header>
 
         <div className="grid lg:grid-cols-[350px_1fr] gap-6">
           {/* Filters Sidebar */}

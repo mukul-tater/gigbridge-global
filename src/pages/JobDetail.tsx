@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -221,8 +222,54 @@ export default function JobDetail() {
 
   const companyName = employer?.company_name || 'SafeWork Global';
 
+  // Structured data for job posting
+  const jobStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    "title": job.title,
+    "description": job.description,
+    "datePosted": job.posted_at,
+    "validThrough": new Date(new Date(job.posted_at).setMonth(new Date(job.posted_at).getMonth() + 3)).toISOString(),
+    "employmentType": job.job_type.replace('_', ' '),
+    "hiringOrganization": {
+      "@type": "Organization",
+      "name": companyName,
+      "description": employer?.bio || undefined
+    },
+    "jobLocation": {
+      "@type": "Place",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": job.location,
+        "addressCountry": job.country
+      }
+    },
+    "baseSalary": {
+      "@type": "MonetaryAmount",
+      "currency": job.currency,
+      "value": {
+        "@type": "QuantitativeValue",
+        "minValue": job.salary_min,
+        "maxValue": job.salary_max,
+        "unitText": "MONTH"
+      }
+    },
+    "experienceRequirements": job.experience_level,
+    "qualifications": job.requirements || undefined,
+    "responsibilities": job.responsibilities || undefined,
+    "skills": job.job_skills?.map(s => s.skill_name).join(', ') || undefined
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title={`${job.title} at ${companyName} | SafeWorkGlobal`}
+        description={`Apply for ${job.title} in ${job.location}, ${job.country}. ${job.visa_sponsorship ? 'Visa sponsorship available.' : ''} Salary: ${job.currency} ${job.salary_min}-${job.salary_max}/month.`}
+        keywords={`${job.title}, ${job.location} jobs, ${job.country} jobs, ${companyName} careers, ${job.job_skills?.map(s => s.skill_name).join(', ')}`}
+        canonicalUrl={`${window.location.origin}/jobs/${job.slug}`}
+        ogType="article"
+        structuredData={jobStructuredData}
+      />
       <Header />
       
       <main className="pt-20 pb-12">
