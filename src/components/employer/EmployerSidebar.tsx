@@ -20,6 +20,7 @@ export default function EmployerSidebar() {
     { path: "/employer/applications", icon: UserCheck, label: "Applications" },
     { path: "/employer/shortlist", icon: Star, label: "Shortlist" },
     { path: "/employer/formalities", icon: FileCheck, label: "Post-Approval Formalities" },
+    { path: "/employer/contracts", icon: FileSignature, label: "Contract Management" },
     { path: "/employer/interviews", icon: Calendar, label: "Interview Scheduling" },
     { path: "/employer/offers", icon: FileSignature, label: "Offer Management" },
     { path: "/employer/escrow", icon: Shield, label: "Escrow & Payments" },
