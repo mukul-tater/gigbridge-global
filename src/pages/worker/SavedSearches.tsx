@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface SavedSearch {
   id: string;
@@ -118,9 +119,10 @@ export default function SavedSearches() {
       <WorkerSidebar />
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Saved Searches</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Saved Searches</h1>
             <p className="text-muted-foreground">
               Manage your saved job searches and alerts
             </p>

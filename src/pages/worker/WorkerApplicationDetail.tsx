@@ -22,6 +22,7 @@ import {
   FileText,
   Building2
 } from "lucide-react";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface ApplicationData {
   id: string;
@@ -203,7 +204,8 @@ export default function WorkerApplicationDetail() {
       <WorkerSidebar />
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
           <Button variant="ghost" asChild className="mb-6">
             <Link to="/worker/applications">
               <ArrowLeft className="h-4 w-4 mr-2" />

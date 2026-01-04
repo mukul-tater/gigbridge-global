@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface TrainingCourse {
   id: string;
@@ -178,9 +179,10 @@ export default function Training() {
       <WorkerSidebar />
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Training & Pre-Departure Orientation</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Training & Pre-Departure Orientation</h1>
             <p className="text-muted-foreground">Complete required training programs before departure</p>
           </div>
 

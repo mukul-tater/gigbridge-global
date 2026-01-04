@@ -17,6 +17,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from "recharts";
 import { format, subMonths, startOfMonth, differenceInDays } from 'date-fns';
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface EmployerStats {
   totalJobs: number;
@@ -293,11 +294,12 @@ export default function EmployerReports() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+          <PortalBreadcrumb />
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">Reports & Analytics</h1>

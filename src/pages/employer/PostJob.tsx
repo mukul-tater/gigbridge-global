@@ -18,6 +18,7 @@ import { jobPostingSchema, type JobPostingFormData } from "@/lib/validations/job
 import { useState } from "react";
 import { X, Plus } from "lucide-react";
 import { DESTINATION_COUNTRIES, CURRENCIES } from "@/lib/constants";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function PostJob() {
   const { user } = useAuth();
@@ -149,6 +150,7 @@ export default function PostJob() {
       <div className="flex-1 flex flex-col">
         <EmployerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+        <PortalBreadcrumb />
         <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Post a New Job</h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>

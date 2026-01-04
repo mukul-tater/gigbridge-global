@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { History } from "lucide-react";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function ContractHistory() {
   const { user } = useAuth();
@@ -43,8 +44,9 @@ export default function ContractHistory() {
       <WorkerSidebar />
       <div className="flex-1">
         <WorkerHeader />
-        <main className="p-4 md:p-6 pt-16 md:pt-6">
-          <Card>
+          <main className="flex-1 p-4 md:p-6">
+            <PortalBreadcrumb />
+            <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <History className="h-5 w-5" />

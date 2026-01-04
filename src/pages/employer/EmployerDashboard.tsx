@@ -13,6 +13,7 @@ import AnalyticsSummaryCard from "@/components/employer/AnalyticsSummaryCard";
 import ShortlistedCandidatesCard from "@/components/employer/ShortlistedCandidatesCard";
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function EmployerDashboard() {
   const { profile } = useAuth();
@@ -188,6 +189,7 @@ export default function EmployerDashboard() {
       <div className="flex-1 flex flex-col">
         <EmployerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+        <PortalBreadcrumb />
         <OnboardingStepper />
         
         <div className="mb-6 md:mb-8">

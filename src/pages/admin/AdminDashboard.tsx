@@ -27,6 +27,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminDashboardSkeleton } from "@/components/ui/page-skeleton";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface DashboardStats {
   totalUsers: number;
@@ -262,6 +263,7 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col">
         <AdminHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+        <PortalBreadcrumb />
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground text-sm md:text-base">

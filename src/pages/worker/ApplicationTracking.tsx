@@ -17,6 +17,7 @@ import {
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface Application {
   id: string;
@@ -168,13 +169,14 @@ export default function ApplicationTracking() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background w-full">
       <WorkerSidebar />
-      <div className="flex-1 ml-64">
+      <div className="flex-1 flex flex-col">
         <WorkerHeader />
-        <main className="p-6">
+        <main className="flex-1 p-4 md:p-8">
+          <PortalBreadcrumb />
           <div className="mb-6">
-            <h1 className="text-3xl font-bold mb-2">Application Tracking</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Application Tracking</h1>
             <p className="text-muted-foreground">
               Track your job applications and post-approval formalities
             </p>

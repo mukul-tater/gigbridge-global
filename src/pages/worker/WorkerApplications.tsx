@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ApplicationListSkeleton } from "@/components/ui/page-skeleton";
+import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 interface JobData {
   title: string;
@@ -126,6 +127,7 @@ export default function WorkerApplications() {
       <div className="flex-1 flex flex-col">
         <WorkerHeader />
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <PortalBreadcrumb />
           <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">My Applications</h1>
 
           {applications.length === 0 ? (
