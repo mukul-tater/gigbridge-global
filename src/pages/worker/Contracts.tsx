@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import WorkerSidebar from "@/components/worker/WorkerSidebar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,64 +14,107 @@ import {
 } from "@/components/ui/dialog";
 import { FileSignature, Download, Eye, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Contract {
-  id: number;
+  id: string;
   title: string;
   employer: string;
   salary: string;
-  duration: string;
-  startDate: string;
-  endDate: string;
+  location: string;
+  country: string;
+  startDate: string | null;
   status: string;
   signedAt: string | null;
-  documentUrl: string;
+  contractUrl: string | null;
+  contractSent: boolean;
+  contractSigned: boolean;
 }
 
 export default function Contracts() {
-  const [contracts, setContracts] = useState<Contract[]>([
-    {
-      id: 1,
-      title: "Construction Worker - Abu Dhabi",
-      employer: "Al Habtoor Group",
-      salary: "2500 USD/month",
-      duration: "24 months",
-      startDate: "2024-02-01",
-      endDate: "2026-02-01",
-      status: "ACTIVE",
-      signedAt: "2024-01-20",
-      documentUrl: "#",
-    },
-    {
-      id: 2,
-      title: "Welder - Qatar Industrial Project",
-      employer: "Qatar Steel Company",
-      salary: "3000 USD/month",
-      duration: "36 months",
-      startDate: "2024-03-15",
-      endDate: "2027-03-15",
-      status: "SENT",
-      signedAt: null,
-      documentUrl: "#",
-    },
-    {
-      id: 3,
-      title: "Electrician - Dubai Metro Extension",
-      employer: "Dubai Metro Corporation",
-      salary: "2800 USD/month",
-      duration: "18 months",
-      startDate: "2023-06-01",
-      endDate: "2024-12-01",
-      status: "COMPLETED",
-      signedAt: "2023-05-15",
-      documentUrl: "#",
-    },
-  ]);
-
+  const { user } = useAuth();
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [signingDialogOpen, setSigningDialogOpen] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchContracts();
+    }
+  }, [user]);
+
+  const fetchContracts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("job_formalities")
+        .select(`
+          id,
+          contract_sent,
+          contract_signed,
+          contract_signed_date,
+          contract_url,
+          expected_joining_date,
+          jobs (
+            id,
+            title,
+            location,
+            country,
+            salary_min,
+            salary_max,
+            currency,
+            employer_profiles (
+              company_name
+            )
+          )
+        `)
+        .eq("worker_id", user?.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const formattedContracts: Contract[] = (data || []).map((item) => {
+        const job = item.jobs as any;
+        const employer = job?.employer_profiles;
+        const salaryRange = job?.salary_min && job?.salary_max 
+          ? `${job.salary_min} - ${job.salary_max} ${job.currency}/month`
+          : "Not specified";
+
+        let status = "DRAFT";
+        if (item.contract_signed) {
+          status = "ACTIVE";
+        } else if (item.contract_sent) {
+          status = "SENT";
+        }
+
+        return {
+          id: item.id,
+          title: job?.title || "Unknown Position",
+          employer: employer?.company_name || "Unknown Employer",
+          salary: salaryRange,
+          location: job?.location || "",
+          country: job?.country || "",
+          startDate: item.expected_joining_date,
+          status,
+          signedAt: item.contract_signed_date,
+          contractUrl: item.contract_url,
+          contractSent: item.contract_sent || false,
+          contractSigned: item.contract_signed || false,
+        };
+      });
+
+      setContracts(formattedContracts);
+    } catch (error) {
+      console.error("Error fetching contracts:", error);
+      toast.error("Failed to load contracts");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -100,28 +143,56 @@ export default function Contracts() {
     if (!selectedContract || !termsAccepted) return;
 
     setIsSigning(true);
-    
-    // Simulate signing process
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const signedDate = new Date().toISOString().split('T')[0];
-    
-    setContracts(prev => 
-      prev.map(c => 
-        c.id === selectedContract.id 
-          ? { ...c, status: "ACTIVE", signedAt: signedDate }
-          : c
-      )
-    );
-    
-    setIsSigning(false);
-    setSigningDialogOpen(false);
-    toast.success(`Contract signed successfully: ${selectedContract.title}`);
+
+    try {
+      const signedDate = new Date().toISOString();
+
+      const { error } = await supabase
+        .from("job_formalities")
+        .update({
+          contract_signed: true,
+          contract_signed_date: signedDate,
+        })
+        .eq("id", selectedContract.id);
+
+      if (error) throw error;
+
+      setContracts((prev) =>
+        prev.map((c) =>
+          c.id === selectedContract.id
+            ? { ...c, status: "ACTIVE", signedAt: signedDate.split("T")[0], contractSigned: true }
+            : c
+        )
+      );
+
+      setSigningDialogOpen(false);
+      toast.success(`Contract signed successfully: ${selectedContract.title}`);
+    } catch (error) {
+      console.error("Error signing contract:", error);
+      toast.error("Failed to sign contract");
+    } finally {
+      setIsSigning(false);
+    }
   };
 
-  const handleDownload = (contractTitle: string) => {
-    toast.success(`Downloading: ${contractTitle}`);
+  const handleDownload = (contract: Contract) => {
+    if (contract.contractUrl) {
+      window.open(contract.contractUrl, "_blank");
+    } else {
+      toast.info("Contract document not available yet");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <WorkerSidebar />
+        <main className="flex-1 p-8 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -132,69 +203,77 @@ export default function Contracts() {
           <p className="text-muted-foreground">View and manage your employment contracts</p>
         </div>
 
-        <div className="grid gap-6">
-          {contracts.map((contract) => (
-            <Card key={contract.id} className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <FileSignature className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">{contract.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">{contract.employer}</p>
-                    </div>
-                    {getStatusBadge(contract.status)}
+        {contracts.length === 0 ? (
+          <Card className="p-8 text-center">
+            <FileSignature className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">No Contracts Yet</h3>
+            <p className="text-muted-foreground">
+              Contracts will appear here once your job applications are approved.
+            </p>
+          </Card>
+        ) : (
+          <div className="grid gap-6">
+            {contracts.map((contract) => (
+              <Card key={contract.id} className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="bg-primary/10 p-3 rounded-lg">
+                    <FileSignature className="h-6 w-6 text-primary" />
                   </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="font-semibold text-lg mb-1">{contract.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-2">{contract.employer}</p>
+                      </div>
+                      {getStatusBadge(contract.status)}
+                    </div>
 
-                  <div className="grid md:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Salary</p>
-                      <p className="font-medium">{contract.salary}</p>
+                    <div className="grid md:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Salary</p>
+                        <p className="font-medium">{contract.salary}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Location</p>
+                        <p className="font-medium">{contract.location}, {contract.country}</p>
+                      </div>
+                      {contract.startDate && (
+                        <div>
+                          <p className="text-sm text-muted-foreground">Expected Start Date</p>
+                          <p className="font-medium">{contract.startDate}</p>
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Duration</p>
-                      <p className="font-medium">{contract.duration}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Start Date</p>
-                      <p className="font-medium">{contract.startDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">End Date</p>
-                      <p className="font-medium">{contract.endDate}</p>
-                    </div>
-                  </div>
 
-                  {contract.signedAt && (
-                    <div className="flex items-center gap-2 mt-4 text-sm text-green-600">
-                      <CheckCircle className="h-4 w-4" />
-                      <span>Signed on {contract.signedAt}</span>
-                    </div>
-                  )}
-
-                  <div className="flex gap-3 mt-4">
-                    <Button variant="outline" onClick={() => handleDownload(contract.title)}>
-                      <Eye className="h-4 w-4 mr-2" />
-                      View Contract
-                    </Button>
-                    <Button variant="outline" onClick={() => handleDownload(contract.title)}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                    {contract.status === "SENT" && (
-                      <Button onClick={() => openSigningDialog(contract)}>
-                        <FileSignature className="h-4 w-4 mr-2" />
-                        Sign Contract
-                      </Button>
+                    {contract.signedAt && (
+                      <div className="flex items-center gap-2 mt-4 text-sm text-green-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Signed on {new Date(contract.signedAt).toLocaleDateString()}</span>
+                      </div>
                     )}
+
+                    <div className="flex gap-3 mt-4">
+                      <Button variant="outline" onClick={() => handleDownload(contract)}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Contract
+                      </Button>
+                      <Button variant="outline" onClick={() => handleDownload(contract)}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
+                      {contract.status === "SENT" && (
+                        <Button onClick={() => openSigningDialog(contract)}>
+                          <FileSignature className="h-4 w-4 mr-2" />
+                          Sign Contract
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Contract Signing Dialog */}
         <Dialog open={signingDialogOpen} onOpenChange={setSigningDialogOpen}>
@@ -223,20 +302,16 @@ export default function Contracts() {
                       <p className="font-medium">{selectedContract.salary}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Duration</p>
-                      <p className="font-medium">{selectedContract.duration}</p>
+                      <p className="text-sm text-muted-foreground">Location</p>
+                      <p className="font-medium">{selectedContract.location}</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  {selectedContract.startDate && (
                     <div>
-                      <p className="text-sm text-muted-foreground">Start Date</p>
+                      <p className="text-sm text-muted-foreground">Expected Start Date</p>
                       <p className="font-medium">{selectedContract.startDate}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">End Date</p>
-                      <p className="font-medium">{selectedContract.endDate}</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="border rounded-lg p-4 bg-muted/20">
@@ -253,7 +328,7 @@ export default function Contracts() {
                     onCheckedChange={(checked) => setTermsAccepted(checked === true)}
                   />
                   <label htmlFor="terms" className="text-sm leading-tight cursor-pointer">
-                    I have read and agree to the terms and conditions of this employment contract. 
+                    I have read and agree to the terms and conditions of this employment contract.
                     I understand that this is a legally binding agreement.
                   </label>
                 </div>
@@ -264,10 +339,7 @@ export default function Contracts() {
               <Button variant="outline" onClick={() => setSigningDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button 
-                onClick={handleSign} 
-                disabled={!termsAccepted || isSigning}
-              >
+              <Button onClick={handleSign} disabled={!termsAccepted || isSigning}>
                 {isSigning ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
