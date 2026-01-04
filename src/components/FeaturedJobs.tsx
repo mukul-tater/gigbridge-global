@@ -183,7 +183,11 @@ export default function FeaturedJobs() {
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
                       
                       {/* Quick Action Buttons - Always visible */}
-                      <div className="absolute top-4 right-4 z-10 flex gap-2">
+                      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+                        <span className="flex items-center text-xs text-muted-foreground bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full border border-border shadow-sm">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {getDaysAgo(job.posted_at)}
+                        </span>
                         <Button
                           size="icon"
                           variant="ghost"
@@ -207,10 +211,6 @@ export default function FeaturedJobs() {
                           <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium">
                             {job.job_type.replace('_', ' ')}
                           </Badge>
-                          <span className="flex items-center text-xs text-muted-foreground ml-auto">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {getDaysAgo(job.posted_at)}
-                          </span>
                         </div>
                         <CardTitle className="text-lg lg:text-xl font-heading line-clamp-1 group-hover:text-primary transition-colors pr-2">
                           {job.title}
