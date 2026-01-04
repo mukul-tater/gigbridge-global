@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import NotificationDrawer from "@/components/NotificationDrawer";
 
-export default function WorkerHeader() {
+export default function AdminHeader() {
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -30,11 +30,7 @@ export default function WorkerHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">Worker Portal</h2>
-        </div>
-
+      <div className="flex h-16 items-center justify-end px-4 md:px-6">
         <div className="flex items-center gap-4">
           <NotificationDrawer />
           
@@ -42,9 +38,9 @@ export default function WorkerHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "User"} />
+                  <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Admin"} />
                   <AvatarFallback className="bg-primary text-primary-foreground">
-                    {profile?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "W"}
+                    {profile?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "A"}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -52,14 +48,14 @@ export default function WorkerHeader() {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{profile?.full_name || "Worker"}</p>
+                  <p className="text-sm font-medium leading-none">{profile?.full_name || "Admin"}</p>
                   <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/worker/profile")}>
+              <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
                 <User className="mr-2 h-4 w-4" />
-                <span>My Profile</span>
+                <span>Dashboard</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">

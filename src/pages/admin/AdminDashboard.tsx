@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminHeader from "@/components/admin/AdminHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, 
@@ -257,7 +258,9 @@ export default function AdminDashboard() {
   return (
     <div className="flex min-h-screen bg-background w-full">
       <AdminSidebar />
-      <main className="flex-1 p-4 md:p-8 overflow-x-hidden md:pl-8 pl-16">
+      <div className="flex-1 flex flex-col">
+        <AdminHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground text-sm md:text-base">
@@ -582,7 +585,8 @@ export default function AdminDashboard() {
           />
           <MessageMonitoringCard messages={messages} />
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
