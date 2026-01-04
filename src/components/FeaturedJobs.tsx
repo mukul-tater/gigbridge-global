@@ -4,10 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Building2, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles, GitCompare, X } from 'lucide-react';
+import { MapPin, Building2, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import JobComparisonDrawer from './JobComparisonDrawer';
 
 interface FeaturedJob {
   id: string;
@@ -36,8 +35,6 @@ export default function FeaturedJobs() {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<FeaturedJob[]>([]);
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
-  const [compareJobs, setCompareJobs] = useState<FeaturedJob[]>([]);
-  const [compareOpen, setCompareOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -128,34 +125,6 @@ export default function FeaturedJobs() {
     navigate(`/jobs/${jobSlug}`);
   };
 
-  const handleCompareToggle = (job: FeaturedJob) => {
-    const isSelected = compareJobs.some(j => j.id === job.id);
-    if (isSelected) {
-      setCompareJobs(compareJobs.filter(j => j.id !== job.id));
-      toast({ title: "Removed from comparison", description: `${job.title} removed` });
-    } else {
-      if (compareJobs.length >= 4) {
-        toast({ 
-          title: "Maximum reached", 
-          description: "You can compare up to 4 jobs at a time",
-          variant: "destructive"
-        });
-        return;
-      }
-      setCompareJobs([...compareJobs, job]);
-      toast({ title: "Added to comparison", description: `${job.title} added` });
-    }
-  };
-
-  const handleRemoveFromCompare = (jobId: string) => {
-    setCompareJobs(compareJobs.filter(j => j.id !== jobId));
-  };
-
-  const handleClearCompare = () => {
-    setCompareJobs([]);
-    setCompareOpen(false);
-  };
-
   if (loading) {
     return (
       <section className="py-20 lg:py-32 bg-background" id="jobs">
@@ -200,7 +169,6 @@ export default function FeaturedJobs() {
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mb-12">
               {jobs.map((job, index) => {
-                const isComparing = compareJobs.some(j => j.id === job.id);
                 return (
                   <div
                     key={job.id}
@@ -208,38 +176,14 @@ export default function FeaturedJobs() {
                     style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                   >
                     <Card 
-                      className={`h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer flex flex-col ${
-                        isComparing 
-                          ? 'border-primary ring-2 ring-primary/20' 
-                          : 'border-border hover:border-primary/40'
-                      }`}
+                      className="h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border border-border hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer flex flex-col"
                       onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
                     >
                       {/* Gradient accent line */}
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
                       
-                      {/* Compare indicator */}
-                      {isComparing && (
-                        <div className="absolute top-0 left-0 bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded-br-lg">
-                          Comparing
-                        </div>
-                      )}
-                      
                       {/* Quick Action Buttons - Always visible */}
                       <div className="absolute top-4 right-4 z-10 flex gap-2">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className={`h-9 w-9 rounded-full backdrop-blur-sm border shadow-lg transition-all ${
-                            isComparing 
-                              ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' 
-                              : 'bg-background/90 border-border hover:bg-info hover:text-info-foreground hover:scale-110'
-                          }`}
-                          onClick={(e) => { e.stopPropagation(); handleCompareToggle(job); }}
-                          title={isComparing ? 'Remove from compare' : 'Add to compare'}
-                        >
-                          <GitCompare className="h-4 w-4" />
-                        </Button>
                         <Button
                           size="icon"
                           variant="ghost"
@@ -339,65 +283,6 @@ export default function FeaturedJobs() {
         )}
       </div>
 
-      {/* Floating Compare Bar */}
-      {compareJobs.length > 0 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up">
-          <div className="bg-card/95 backdrop-blur-lg border border-border rounded-2xl shadow-2xl p-4 flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <GitCompare className="h-5 w-5 text-primary" />
-              <span className="font-medium text-sm">
-                {compareJobs.length} job{compareJobs.length !== 1 ? 's' : ''} selected
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {compareJobs.slice(0, 3).map((job) => (
-                <div
-                  key={job.id}
-                  className="flex items-center gap-1 bg-muted rounded-full px-3 py-1 text-xs"
-                >
-                  <span className="truncate max-w-[80px]">{job.title}</span>
-                  <button
-                    onClick={() => handleRemoveFromCompare(job.id)}
-                    className="hover:text-destructive transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
-              {compareJobs.length > 3 && (
-                <span className="text-xs text-muted-foreground">+{compareJobs.length - 3} more</span>
-              )}
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearCompare}
-              >
-                Clear
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => setCompareOpen(true)}
-                disabled={compareJobs.length < 2}
-              >
-                Compare Now
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Comparison Drawer */}
-      <JobComparisonDrawer
-        open={compareOpen}
-        onOpenChange={setCompareOpen}
-        jobs={compareJobs}
-        onRemoveJob={handleRemoveFromCompare}
-        onClearAll={handleClearCompare}
-      />
     </section>
   );
 }
