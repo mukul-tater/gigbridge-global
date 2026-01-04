@@ -5,13 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Video, Phone, MapPin, Building2, Briefcase, User } from "lucide-react";
+import { Calendar, Clock, Video, Phone, MapPin, Building2, Briefcase, User, Download, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO, isAfter } from "date-fns";
 import LoadingSpinner from "@/components/LoadingSpinner";
-
+import { generateGoogleCalendarUrl, downloadICSFile } from "@/lib/calendar-utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 interface Interview {
   id: string;
   scheduled_date: string;
@@ -112,6 +118,36 @@ export default function WorkerInterviews() {
     (i) => i.status === "COMPLETED" || !isAfter(parseISO(i.scheduled_date), now)
   );
 
+  const handleAddToGoogleCalendar = (interview: Interview) => {
+    const url = generateGoogleCalendarUrl({
+      title: `Interview: ${interview.job_title} at ${interview.company_name}`,
+      description: `Interview for ${interview.job_title} position at ${interview.company_name}.\n\nMode: ${interview.interview_mode}\n${interview.meeting_link ? `Meeting Link: ${interview.meeting_link}` : ""}${interview.notes ? `\n\nNotes: ${interview.notes}` : ""}`,
+      location: interview.interview_mode === "IN_PERSON" ? interview.location || "" : interview.meeting_link || "",
+      startDate: interview.scheduled_date,
+      startTime: interview.scheduled_time,
+      durationMinutes: interview.duration_minutes,
+    });
+    window.open(url, "_blank");
+  };
+
+  const handleDownloadICS = (interview: Interview) => {
+    downloadICSFile(
+      {
+        title: `Interview: ${interview.job_title} at ${interview.company_name}`,
+        description: `Interview for ${interview.job_title} position at ${interview.company_name}.\n\nMode: ${interview.interview_mode}\n${interview.meeting_link ? `Meeting Link: ${interview.meeting_link}` : ""}${interview.notes ? `\n\nNotes: ${interview.notes}` : ""}`,
+        location: interview.interview_mode === "IN_PERSON" ? interview.location || "" : interview.meeting_link || "",
+        startDate: interview.scheduled_date,
+        startTime: interview.scheduled_time,
+        durationMinutes: interview.duration_minutes,
+      },
+      `interview-${interview.job_title?.replace(/\s+/g, "-").toLowerCase()}.ics`
+    );
+    toast({
+      title: "Downloaded",
+      description: "Calendar file downloaded. Open it to add to Outlook or Apple Calendar.",
+    });
+  };
+
   const renderInterviewCard = (interview: Interview) => (
     <Card key={interview.id} className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -150,14 +186,37 @@ export default function WorkerInterviews() {
           </div>
         )}
 
-        {interview.interview_mode === "VIDEO" && interview.meeting_link && interview.status === "SCHEDULED" && (
-          <Button asChild className="w-full">
-            <a href={interview.meeting_link} target="_blank" rel="noopener noreferrer">
-              <Video className="h-4 w-4 mr-2" />
-              Join Meeting
-            </a>
-          </Button>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {interview.interview_mode === "VIDEO" && interview.meeting_link && interview.status === "SCHEDULED" && (
+            <Button asChild size="sm">
+              <a href={interview.meeting_link} target="_blank" rel="noopener noreferrer">
+                <Video className="h-4 w-4 mr-2" />
+                Join Meeting
+              </a>
+            </Button>
+          )}
+
+          {interview.status === "SCHEDULED" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Add to Calendar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => handleAddToGoogleCalendar(interview)}>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Google Calendar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownloadICS(interview)}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Outlook / Apple Calendar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
 
         {interview.notes && (
           <div className="bg-muted p-3 rounded-md">
