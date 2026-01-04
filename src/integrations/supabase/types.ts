@@ -433,6 +433,8 @@ export type Database = {
           application_id: string
           arrival_date: string | null
           completion_percentage: number | null
+          contract_expiry_date: string | null
+          contract_reminder_sent: boolean | null
           contract_sent: boolean | null
           contract_signed: boolean | null
           contract_signed_date: string | null
@@ -472,6 +474,8 @@ export type Database = {
           application_id: string
           arrival_date?: string | null
           completion_percentage?: number | null
+          contract_expiry_date?: string | null
+          contract_reminder_sent?: boolean | null
           contract_sent?: boolean | null
           contract_signed?: boolean | null
           contract_signed_date?: string | null
@@ -511,6 +515,8 @@ export type Database = {
           application_id?: string
           arrival_date?: string | null
           completion_percentage?: number | null
+          contract_expiry_date?: string | null
+          contract_reminder_sent?: boolean | null
           contract_sent?: boolean | null
           contract_signed?: boolean | null
           contract_signed_date?: string | null

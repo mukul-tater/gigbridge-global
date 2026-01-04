@@ -1,1 +1,13 @@
 project_id = "etpiadoqryvtlpmiuxia"
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.send-push-notification]
+verify_jwt = false
+
+[functions.upload]
+verify_jwt = false
+
+[functions.contract-expiry-reminder]
+verify_jwt = false
