@@ -112,11 +112,11 @@ const InteractiveJobMap = () => {
             Discover opportunities with salary insights and hiring timelines
           </p>
           <div className="flex justify-center gap-3 flex-wrap">
-            <Badge className="bg-success text-success-foreground border-success/20 px-3 py-1.5 shadow-sm animate-pulse">
-              <Zap className="h-3 w-3 mr-1.5 animate-bounce" />
+            <Badge className="bg-success text-white border-0 px-3 py-1.5 shadow-md">
+              <Zap className="h-3 w-3 mr-1.5" />
               Fast Hiring: 1-4 weeks
             </Badge>
-            <Badge className="bg-warning text-warning-foreground border-warning/20 px-3 py-1.5 shadow-sm">
+            <Badge className="bg-warning text-white border-0 px-3 py-1.5 shadow-md">
               <Clock className="h-3 w-3 mr-1.5" />
               Moderate: 2-6 months
             </Badge>
@@ -160,8 +160,8 @@ const InteractiveJobMap = () => {
                   {/* Fast hiring badge */}
                   {region.easyHiring && (
                     <div className="mb-4">
-                      <Badge className="bg-success text-success-foreground shadow-lg animate-pulse">
-                        <Zap className="h-3 w-3 mr-1 animate-bounce" />
+                      <Badge className="bg-success text-white border-0 shadow-md">
+                        <Zap className="h-3 w-3 mr-1" />
                         Fast Hiring
                       </Badge>
                     </div>
@@ -219,7 +219,7 @@ const InteractiveJobMap = () => {
                   <div className="mb-5">
                     <div className="flex flex-wrap gap-1.5">
                       {region.topJobs.map((job, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs bg-muted">
+                        <Badge key={idx} variant="secondary" className="text-xs bg-secondary text-secondary-foreground">
                           {job}
                         </Badge>
                       ))}
