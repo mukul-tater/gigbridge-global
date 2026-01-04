@@ -26,6 +26,7 @@ import { useSwipe } from "@/hooks/use-swipe";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminDashboardSkeleton } from "@/components/ui/page-skeleton";
 
 interface DashboardStats {
   totalUsers: number;
@@ -245,12 +246,12 @@ export default function AdminDashboard() {
     return (
       <div className="flex min-h-screen bg-background">
         <AdminSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
-          </div>
-        </main>
+        <div className="flex-1 flex flex-col">
+          <AdminHeader />
+          <main className="flex-1 p-4 md:p-8">
+            <AdminDashboardSkeleton />
+          </main>
+        </div>
       </div>
     );
   }

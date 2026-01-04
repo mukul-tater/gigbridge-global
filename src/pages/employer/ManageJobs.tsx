@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { Briefcase, Plus, Eye, Trash2, MapPin, Users, Calendar } from "lucide-react";
+import { JobListSkeleton } from "@/components/ui/page-skeleton";
 
 interface Job {
   id: string;
@@ -159,7 +160,10 @@ export default function ManageJobs() {
         <div className="flex flex-1">
           <EmployerSidebar />
           <main className="flex-1 p-8">
-            <div className="text-center">Loading jobs...</div>
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-3xl font-bold">Manage Jobs</h1>
+            </div>
+            <JobListSkeleton count={4} />
           </main>
         </div>
       </div>
