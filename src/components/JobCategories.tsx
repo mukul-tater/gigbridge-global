@@ -99,10 +99,10 @@ const JobCategories = () => {
           {categories.map((category, index) => (
             <Card 
               key={index} 
-              className="group hover:shadow-lg transition-all duration-300 border-border cursor-pointer"
+              className="group hover:shadow-lg transition-all duration-300 border-border cursor-pointer flex flex-col"
               onClick={() => handleCategoryClick(category.title)}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-6 flex flex-col flex-1">
                 <div className="flex items-center gap-4 mb-4">
                   {typeof category.icon === 'string' && !category.icon.startsWith('/') && category.icon.length <= 2 ? (
                     <div className="text-3xl">{category.icon}</div>
@@ -137,9 +137,12 @@ const JobCategories = () => {
                   </div>
                 </div>
 
+                {/* Spacer to push button to bottom */}
+                <div className="flex-1" />
+
                 <Button 
                   variant="professional" 
-                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground flex items-center justify-center gap-2"
+                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground flex items-center justify-center gap-2 mt-auto"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleCategoryClick(category.title);
