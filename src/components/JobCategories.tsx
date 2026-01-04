@@ -139,14 +139,14 @@ const JobCategories = () => {
 
                 <Button 
                   variant="professional" 
-                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground"
+                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground flex items-center justify-center gap-2"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleCategoryClick(category.title);
                   }}
                 >
-                  View {category.title} Jobs
-                  <ArrowRight className="h-4 w-4" />
+                  <span>View {category.title} Jobs</span>
+                  <ArrowRight className="h-4 w-4 shrink-0" />
                 </Button>
               </CardContent>
             </Card>
@@ -155,9 +155,9 @@ const JobCategories = () => {
 
         <div className="text-center">
           <Link to="/job-categories">
-            <Button variant="outline" size="lg">
-              View All Categories
-              <ArrowRight className="h-4 w-4" />
+            <Button variant="outline" size="lg" className="flex items-center justify-center gap-2">
+              <span>View All Categories</span>
+              <ArrowRight className="h-4 w-4 shrink-0" />
             </Button>
           </Link>
         </div>
