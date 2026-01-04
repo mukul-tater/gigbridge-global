@@ -183,15 +183,15 @@ export default function FeaturedJobs() {
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
                       
                       {/* Job Type Badge - Top Left */}
-                      <div className="absolute top-4 left-4 z-10">
-                        <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium shadow-sm">
+                      <div className="absolute top-4 left-4 z-10 flex items-center h-9">
+                        <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium shadow-sm h-7 flex items-center">
                           {job.job_type.replace('_', ' ')}
                         </Badge>
                       </div>
                       
                       {/* Quick Action Buttons - Top Right */}
-                      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-                        <span className="flex items-center text-xs text-muted-foreground bg-background/90 backdrop-blur-sm px-2 py-1 rounded-full border border-border shadow-sm">
+                      <div className="absolute top-4 right-4 z-10 flex items-center gap-2 h-9">
+                        <span className="flex items-center text-xs text-muted-foreground bg-background/90 backdrop-blur-sm px-2.5 h-7 rounded-full border border-border shadow-sm">
                           <Clock className="h-3 w-3 mr-1" />
                           {getDaysAgo(job.posted_at)}
                         </span>
