@@ -201,7 +201,7 @@ export default function FeaturedJobs() {
                       </Button>
                     </div>
 
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-3 pr-24">
                       <div className="flex items-center justify-between mb-3">
                         <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium">
                           {job.job_type.replace('_', ' ')}
@@ -211,11 +211,11 @@ export default function FeaturedJobs() {
                           {getDaysAgo(job.posted_at)}
                         </span>
                       </div>
-                      <CardTitle className="text-lg lg:text-xl font-heading line-clamp-1 group-hover:text-primary transition-colors">
+                      <CardTitle className="text-lg lg:text-xl font-heading line-clamp-1 group-hover:text-primary transition-colors pr-2">
                         {job.title}
                       </CardTitle>
                       <CardDescription className="flex items-center gap-2 mt-1">
-                        <Building2 className="h-4 w-4" />
+                        <Building2 className="h-4 w-4 shrink-0" />
                         <span className="truncate">{job.employer_profiles?.company_name || 'Company'}</span>
                       </CardDescription>
                     </CardHeader>
