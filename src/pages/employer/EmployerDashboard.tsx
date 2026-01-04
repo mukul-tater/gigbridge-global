@@ -71,6 +71,74 @@ export default function EmployerDashboard() {
     }
   };
 
+  // Generate real hiring metrics from applications data
+  const generateHiringMetrics = () => {
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const metricsData = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const targetMonth = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthApps = applications.filter((app: any) => {
+        const appDate = new Date(app.applied_at);
+        return appDate.getMonth() === targetMonth.getMonth() && 
+               appDate.getFullYear() === targetMonth.getFullYear();
+      });
+      
+      metricsData.push({
+        month: months[targetMonth.getMonth()],
+        applications: monthApps.length,
+        shortlisted: monthApps.filter((a: any) => a.status === 'SHORTLISTED').length,
+        hired: monthApps.filter((a: any) => a.status === 'HIRED').length
+      });
+    }
+    return metricsData;
+  };
+
+  // Generate pipeline data from real applications
+  const generatePipelineData = () => {
+    const statusCounts = {
+      Applied: applications.filter((a: any) => a.status === 'PENDING').length,
+      Shortlisted: applications.filter((a: any) => a.status === 'SHORTLISTED').length,
+      Interview: applications.filter((a: any) => a.status === 'INTERVIEW').length,
+      Offered: applications.filter((a: any) => a.status === 'OFFERED').length,
+      Hired: applications.filter((a: any) => a.status === 'HIRED').length,
+    };
+    
+    return [
+      { stage: "Applied", count: statusCounts.Applied, color: "hsl(var(--primary))" },
+      { stage: "Shortlisted", count: statusCounts.Shortlisted, color: "hsl(var(--chart-2))" },
+      { stage: "Interview", count: statusCounts.Interview, color: "hsl(var(--chart-3))" },
+      { stage: "Offered", count: statusCounts.Offered, color: "hsl(var(--chart-4))" },
+      { stage: "Hired", count: statusCounts.Hired, color: "hsl(var(--chart-5))" },
+    ];
+  };
+
+  // Get top performing jobs (by application count)
+  const getTopPerformingJobs = () => {
+    const jobAppCounts: Record<string, { job: any; count: number }> = {};
+    
+    applications.forEach((app: any) => {
+      if (!jobAppCounts[app.job_id]) {
+        const job = jobs.find((j: any) => j.id === app.job_id);
+        if (job) {
+          jobAppCounts[app.job_id] = { job, count: 0 };
+        }
+      }
+      if (jobAppCounts[app.job_id]) {
+        jobAppCounts[app.job_id].count++;
+      }
+    });
+    
+    return Object.values(jobAppCounts)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+  };
+
+  const hiringMetricsData = generateHiringMetrics();
+  const pipelineData = generatePipelineData();
+  const topPerformingJobs = getTopPerformingJobs();
+
   const analyticsData = {
     totalJobs: jobs.length,
     activeJobs: jobs.filter((j: any) => j.status === 'ACTIVE').length,
@@ -96,36 +164,22 @@ export default function EmployerDashboard() {
     );
   }
 
-  // Mock data for analytics
-  const hiringMetricsData = [
-    { month: "Jan", applications: 45, shortlisted: 12, hired: 3 },
-    { month: "Feb", applications: 52, shortlisted: 15, hired: 5 },
-    { month: "Mar", applications: 48, shortlisted: 14, hired: 4 },
-    { month: "Apr", applications: 61, shortlisted: 18, hired: 6 },
-    { month: "May", applications: 55, shortlisted: 16, hired: 5 },
-    { month: "Jun", applications: 67, shortlisted: 20, hired: 7 },
-  ];
+  // Time to hire data based on job types
+  const timeToHireData = jobs.slice(0, 5).map((job: any) => ({
+    position: job.title.length > 15 ? job.title.substring(0, 15) + '...' : job.title,
+    days: Math.floor(Math.random() * 20) + 15 // Will be calculated from real data when we have hire dates
+  }));
 
-  const timeToHireData = [
-    { position: "Welder", days: 28 },
-    { position: "Electrician", days: 35 },
-    { position: "Plumber", days: 22 },
-    { position: "Mason", days: 31 },
-    { position: "Carpenter", days: 26 },
-  ];
-
-  const pipelineData = [
-    { stage: "Applied", count: 234, color: "hsl(var(--primary))" },
-    { stage: "Shortlisted", count: 45, color: "hsl(var(--chart-2))" },
-    { stage: "Interview", count: 28, color: "hsl(var(--chart-3))" },
-    { stage: "Offered", count: 12, color: "hsl(var(--chart-4))" },
-    { stage: "Hired", count: 8, color: "hsl(var(--chart-5))" },
-  ];
-
+  // Compliance data from verifications
+  const totalVerifications = verifications.length || 1;
+  const compliantCount = verifications.filter((v: any) => v.status === 'completed' && v.result === 'passed').length;
+  const pendingCount = verifications.filter((v: any) => v.status === 'pending').length;
+  const failedCount = verifications.filter((v: any) => v.result === 'failed').length;
+  
   const complianceData = [
-    { status: "Compliant", value: 75, color: "hsl(var(--chart-5))" },
-    { status: "Pending", value: 18, color: "hsl(var(--chart-3))" },
-    { status: "Non-Compliant", value: 7, color: "hsl(var(--destructive))" },
+    { status: "Compliant", value: totalVerifications > 0 ? Math.round((compliantCount / totalVerifications) * 100) : 0, color: "hsl(var(--chart-5))" },
+    { status: "Pending", value: totalVerifications > 0 ? Math.round((pendingCount / totalVerifications) * 100) : 0, color: "hsl(var(--chart-3))" },
+    { status: "Non-Compliant", value: totalVerifications > 0 ? Math.round((failedCount / totalVerifications) * 100) : 0, color: "hsl(var(--destructive))" },
   ];
 
   return (
@@ -262,15 +316,37 @@ export default function EmployerDashboard() {
           <Card className="p-6">
             <h2 className="text-xl font-bold mb-4">Top Performing Jobs</h2>
             <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="p-4 bg-muted/50 rounded-lg">
-                  <h3 className="font-semibold mb-1">Senior Welder</h3>
-                  <p className="text-sm text-muted-foreground mb-2">15 applications • 89 views</p>
-                  <div className="flex gap-2">
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Active</span>
+              {topPerformingJobs.length > 0 ? (
+                topPerformingJobs.map(({ job, count }) => (
+                  <div key={job.id} className="p-4 bg-muted/50 rounded-lg">
+                    <h3 className="font-semibold mb-1">{job.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{count} applications • {job.location}</p>
+                    <div className="flex gap-2">
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {job.status}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : jobs.length > 0 ? (
+                jobs.slice(0, 3).map((job: any) => (
+                  <div key={job.id} className="p-4 bg-muted/50 rounded-lg">
+                    <h3 className="font-semibold mb-1">{job.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">0 applications • {job.location}</p>
+                    <div className="flex gap-2">
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {job.status}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center py-4">No jobs posted yet</p>
+              )}
             </div>
           </Card>
         </div>

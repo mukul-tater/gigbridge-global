@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MapPin, Award, Star, Globe, Mail } from 'lucide-react';
+import { MapPin, Award, Globe, Mail, Star, Check } from 'lucide-react';
 import WorkerSearchFilters, { type WorkerFilters } from '@/components/search/WorkerSearchFilters';
 import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,10 +46,73 @@ export default function SearchWorkers() {
   const [loading, setLoading] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [workers, setWorkers] = useState<Worker[]>([]);
+  const [shortlistedIds, setShortlistedIds] = useState<Set<string>>(new Set());
+  const [shortlistingId, setShortlistingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadWorkers();
-  }, []);
+    if (user) {
+      loadShortlistedWorkers();
+    }
+  }, [user]);
+
+  const loadShortlistedWorkers = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('shortlisted_workers')
+      .select('worker_id')
+      .eq('employer_id', user.id);
+    
+    if (data) {
+      setShortlistedIds(new Set(data.map(s => s.worker_id)));
+    }
+  };
+
+  const handleShortlist = async (workerId: string) => {
+    if (!user) {
+      toast.error('Please log in to shortlist workers');
+      return;
+    }
+
+    setShortlistingId(workerId);
+    const isCurrentlyShortlisted = shortlistedIds.has(workerId);
+
+    try {
+      if (isCurrentlyShortlisted) {
+        const { error } = await supabase
+          .from('shortlisted_workers')
+          .delete()
+          .eq('employer_id', user.id)
+          .eq('worker_id', workerId);
+        
+        if (error) throw error;
+        
+        setShortlistedIds(prev => {
+          const next = new Set(prev);
+          next.delete(workerId);
+          return next;
+        });
+        toast.success('Worker removed from shortlist');
+      } else {
+        const { error } = await supabase
+          .from('shortlisted_workers')
+          .insert({
+            employer_id: user.id,
+            worker_id: workerId
+          });
+        
+        if (error) throw error;
+        
+        setShortlistedIds(prev => new Set(prev).add(workerId));
+        toast.success('Worker added to shortlist');
+      }
+    } catch (error) {
+      console.error('Error updating shortlist:', error);
+      toast.error('Failed to update shortlist');
+    } finally {
+      setShortlistingId(null);
+    }
+  };
 
   const loadWorkers = async () => {
     try {
@@ -339,7 +402,23 @@ export default function SearchWorkers() {
                         <Mail className="h-4 w-4 mr-2" />
                         Contact
                       </Button>
-                      <Button variant="outline">Shortlist</Button>
+                      <Button 
+                        variant={shortlistedIds.has(worker.id) ? "default" : "outline"}
+                        onClick={() => handleShortlist(worker.id)}
+                        disabled={shortlistingId === worker.id}
+                      >
+                        {shortlistedIds.has(worker.id) ? (
+                          <>
+                            <Check className="h-4 w-4 mr-2" />
+                            Shortlisted
+                          </>
+                        ) : (
+                          <>
+                            <Star className="h-4 w-4 mr-2" />
+                            Shortlist
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </div>
                 </div>
