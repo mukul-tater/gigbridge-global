@@ -22,14 +22,20 @@ interface Job {
   title: string;
   company: string;
   location: string;
+  country: string;
   salary: string;
+  salaryMin: number;
+  salaryMax: number;
   type: string;
   category: string;
   visaSponsorship: boolean;
   postedDate: string;
+  postedAt: Date;
   description: string;
   skills: string[];
 }
+
+type SortOption = 'recent' | 'salary-high' | 'salary-low' | 'country-asc' | 'country-desc';
 
 export default function Jobs() {
   const { user, role, isAuthenticated } = useAuth();
@@ -49,6 +55,7 @@ export default function Jobs() {
   const [loading, setLoading] = useState(true);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [sortOption, setSortOption] = useState<SortOption>('recent');
 
   // Load jobs on mount and when search params change
   useEffect(() => {
@@ -84,8 +91,8 @@ export default function Jobs() {
 
       const formattedJobs: Job[] = (data || []).map((job: any) => {
         // Convert to INR if needed
-        const salaryMin = job.currency === 'INR' ? job.salary_min : job.salary_min * 83;
-        const salaryMax = job.currency === 'INR' ? job.salary_max : job.salary_max * 83;
+        const salaryMinVal = job.currency === 'INR' ? job.salary_min : job.salary_min * 83;
+        const salaryMaxVal = job.currency === 'INR' ? job.salary_max : job.salary_max * 83;
         
         return {
           id: job.id,
@@ -93,11 +100,15 @@ export default function Jobs() {
           title: job.title,
           company: job.employer_profiles?.company_name || 'Company',
           location: `${job.location}, ${job.country}`,
-          salary: `₹${(salaryMin / 1000).toFixed(0)}K - ₹${(salaryMax / 1000).toFixed(0)}K`,
+          country: job.country,
+          salary: `₹${(salaryMinVal / 1000).toFixed(0)}K - ₹${(salaryMaxVal / 1000).toFixed(0)}K`,
+          salaryMin: salaryMinVal || 0,
+          salaryMax: salaryMaxVal || 0,
           type: job.job_type === 'FULL_TIME' ? 'Full-time' : job.job_type === 'PART_TIME' ? 'Part-time' : 'Contract',
           category: job.title.split(' ')[0],
           visaSponsorship: job.visa_sponsorship || false,
           postedDate: new Date(job.posted_at).toLocaleDateString(),
+          postedAt: new Date(job.posted_at),
           description: job.description.substring(0, 150) + '...',
           skills: job.job_skills?.map((s: any) => s.skill_name) || []
         };
@@ -113,7 +124,25 @@ export default function Jobs() {
     }
   };
 
-  const applyFiltersToJobs = (jobsToFilter: Job[], currentFilters: JobFilters) => {
+  const sortJobs = (jobsToSort: Job[], sort: SortOption): Job[] => {
+    const sorted = [...jobsToSort];
+    switch (sort) {
+      case 'recent':
+        return sorted.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+      case 'salary-high':
+        return sorted.sort((a, b) => b.salaryMax - a.salaryMax);
+      case 'salary-low':
+        return sorted.sort((a, b) => a.salaryMin - b.salaryMin);
+      case 'country-asc':
+        return sorted.sort((a, b) => a.country.localeCompare(b.country));
+      case 'country-desc':
+        return sorted.sort((a, b) => b.country.localeCompare(a.country));
+      default:
+        return sorted;
+    }
+  };
+
+  const applyFiltersToJobs = (jobsToFilter: Job[], currentFilters: JobFilters, sort: SortOption = sortOption) => {
     let filtered = [...jobsToFilter];
     
     if (currentFilters.keyword) {
@@ -158,10 +187,18 @@ export default function Jobs() {
       );
     }
 
-    setJobs(filtered);
+    // Apply sorting
+    const sortedJobs = sortJobs(filtered, sort);
+    setJobs(sortedJobs);
     if (!loading) {
-      toast.success(`Found ${filtered.length} jobs matching your criteria`);
+      toast.success(`Found ${sortedJobs.length} jobs matching your criteria`);
     }
+  };
+
+  const handleSortChange = (newSort: SortOption) => {
+    setSortOption(newSort);
+    const sortedJobs = sortJobs(jobs, newSort);
+    setJobs(sortedJobs);
   };
 
   const handleSearch = () => {
@@ -305,10 +342,16 @@ export default function Jobs() {
                   <h2 className="text-base sm:text-lg md:text-xl font-semibold">
                     {jobs.length} Jobs Found
                   </h2>
-                  <select className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto">
-                    <option>Most Recent</option>
-                    <option>Salary (High to Low)</option>
-                    <option>Salary (Low to High)</option>
+                  <select 
+                    className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto"
+                    value={sortOption}
+                    onChange={(e) => handleSortChange(e.target.value as SortOption)}
+                  >
+                    <option value="recent">Most Recent</option>
+                    <option value="salary-high">Salary (High to Low)</option>
+                    <option value="salary-low">Salary (Low to High)</option>
+                    <option value="country-asc">Country (A-Z)</option>
+                    <option value="country-desc">Country (Z-A)</option>
                   </select>
                 </div>
 
@@ -425,10 +468,16 @@ export default function Jobs() {
               <h2 className="text-base sm:text-lg md:text-xl font-semibold">
                 {jobs.length} Jobs Found
               </h2>
-              <select className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto">
-                <option>Most Recent</option>
-                <option>Salary (High to Low)</option>
-                <option>Salary (Low to High)</option>
+              <select 
+                className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto"
+                value={sortOption}
+                onChange={(e) => handleSortChange(e.target.value as SortOption)}
+              >
+                <option value="recent">Most Recent</option>
+                <option value="salary-high">Salary (High to Low)</option>
+                <option value="salary-low">Salary (Low to High)</option>
+                <option value="country-asc">Country (A-Z)</option>
+                <option value="country-desc">Country (Z-A)</option>
               </select>
             </div>
 
