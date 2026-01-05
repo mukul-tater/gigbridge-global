@@ -68,9 +68,14 @@ import UserManagement from "./pages/admin/UserManagement";
 import JobVerification from "./pages/admin/JobVerification";
 import EditJob from "./pages/admin/EditJob";
 import DocumentVerification from "./pages/admin/DocumentVerification";
+import IDVerification from "./pages/admin/IDVerification";
+import ECRManagement from "./pages/admin/ECRManagement";
 import ComplianceCheck from "./pages/admin/ComplianceCheck";
 import Reports from "./pages/admin/Reports";
 import DisputeResolution from "./pages/admin/DisputeResolution";
+
+// Worker Verification
+import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
 
 const queryClient = new QueryClient();
 
@@ -184,6 +189,11 @@ const App = () => (
             <Route path="/worker/contract-history" element={
               <ProtectedRoute allowedRoles={["worker"]}>
                 <WorkerContractHistory />
+              </ProtectedRoute>
+            } />
+            <Route path="/worker/verification" element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <WorkerVerificationStatus />
               </ProtectedRoute>
             } />
 
@@ -313,6 +323,16 @@ const App = () => (
             <Route path="/admin/document-verification" element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <DocumentVerification />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/id-verification" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <IDVerification />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/ecr-management" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <ECRManagement />
               </ProtectedRoute>
             } />
             <Route path="/admin/compliance" element={
