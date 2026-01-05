@@ -17,6 +17,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import VerificationBadge, { calculateVerificationLevel, VerificationLevel } from '@/components/worker/VerificationBadge';
 
 interface WorkerProfile {
   user_id: string;
@@ -32,6 +33,7 @@ interface WorkerProfile {
   has_visa: boolean;
   visa_countries: string[] | null;
   languages: string[] | null;
+  ecr_status: string | null;
 }
 
 interface Profile {
@@ -103,8 +105,10 @@ export default function WorkerPublicProfile() {
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [allDocuments, setAllDocuments] = useState<Document[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
   const [isShortlisted, setIsShortlisted] = useState(false);
+  const [verificationLevel, setVerificationLevel] = useState<VerificationLevel>('not_verified');
 
   useEffect(() => {
     if (id) {
@@ -160,14 +164,17 @@ export default function WorkerPublicProfile() {
         .eq('worker_id', id);
       setSkills(skillsData || []);
 
-      // Fetch documents (only verified ones for employers)
-      const { data: docsData } = await supabase
+      // Fetch all documents for verification level calculation
+      const { data: allDocsData } = await supabase
         .from('worker_documents')
         .select('*')
         .eq('worker_id', id)
-        .eq('verification_status', 'verified')
         .order('uploaded_at', { ascending: false });
-      setDocuments(docsData || []);
+      setAllDocuments(allDocsData || []);
+      
+      // Filter verified documents for display
+      const verifiedDocs = (allDocsData || []).filter(d => d.verification_status === 'verified');
+      setDocuments(verifiedDocs);
 
       // Fetch videos
       const { data: videosData } = await supabase
@@ -176,6 +183,18 @@ export default function WorkerPublicProfile() {
         .eq('worker_id', id)
         .order('created_at', { ascending: false });
       setVideos(videosData || []);
+      
+      // Calculate verification level
+      const hasIdDoc = (allDocsData || []).some(
+        d => (d.document_type === 'passport' || d.document_type === 'id_card') && 
+             d.verification_status === 'verified'
+      );
+      const verifiedCount = verifiedDocs.length;
+      const hasPassport = workerData?.has_passport || false;
+      const ecrStatus = workerData?.ecr_status || 'not_checked';
+      
+      const level = calculateVerificationLevel(hasIdDoc, verifiedCount, hasPassport, ecrStatus);
+      setVerificationLevel(level);
 
     } catch (error) {
       console.error('Error loading worker data:', error);
@@ -337,7 +356,20 @@ export default function WorkerPublicProfile() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h1 className="text-3xl font-bold mb-2">{profile.full_name || 'Worker Profile'}</h1>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h1 className="text-3xl font-bold">{profile.full_name || 'Worker Profile'}</h1>
+                        <VerificationBadge
+                          level={verificationLevel}
+                          idVerified={allDocuments.some(d => 
+                            (d.document_type === 'passport' || d.document_type === 'id_card') && 
+                            d.verification_status === 'verified'
+                          )}
+                          documentsVerified={documents.length}
+                          totalDocuments={allDocuments.length}
+                          ecrStatus={workerProfile?.ecr_status || undefined}
+                          size="md"
+                        />
+                      </div>
                       <div className="flex flex-wrap gap-4 text-muted-foreground">
                         {workerProfile?.nationality && (
                           <span className="flex items-center gap-1">
