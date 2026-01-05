@@ -19,6 +19,7 @@ import {
   BookmarkPlus, CalendarPlus, MessageSquare
 } from 'lucide-react';
 import { format } from 'date-fns';
+import VerificationBadge, { calculateVerificationLevel, VerificationLevel } from '@/components/worker/VerificationBadge';
 
 interface ApplicationData {
   id: string;
@@ -135,6 +136,7 @@ export default function ApplicationDetail() {
   const [notes, setNotes] = useState('');
   const [isShortlisted, setIsShortlisted] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
+  const [verificationLevel, setVerificationLevel] = useState<VerificationLevel>('not_verified');
 
   useEffect(() => {
     if (applicationId) {
@@ -194,6 +196,19 @@ export default function ApplicationDetail() {
       if (docsRes.data) setDocuments(docsRes.data);
       if (videosRes.data) setVideos(videosRes.data);
       setIsShortlisted(!!shortlistRes.data);
+      
+      // Calculate verification level
+      const docs = docsRes.data || [];
+      const hasIdDoc = docs.some(
+        (d: Document) => (d.document_type === 'passport' || d.document_type === 'id_card') && 
+             d.verification_status === 'verified'
+      );
+      const verifiedCount = docs.filter((d: Document) => d.verification_status === 'verified').length;
+      const hasPassport = workerProfileRes.data?.has_passport || false;
+      const ecrStatus = workerProfileRes.data?.ecr_status || 'not_checked';
+      
+      const level = calculateVerificationLevel(hasIdDoc, verifiedCount, hasPassport, ecrStatus);
+      setVerificationLevel(level);
 
     } catch (error) {
       console.error('Error loading application:', error);
@@ -515,7 +530,20 @@ export default function ApplicationDetail() {
                       <div className="flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                           <div>
-                            <h2 className="text-xl font-semibold">{profile.full_name || 'Worker'}</h2>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h2 className="text-xl font-semibold">{profile.full_name || 'Worker'}</h2>
+                              <VerificationBadge
+                                level={verificationLevel}
+                                idVerified={documents.some(d => 
+                                  (d.document_type === 'passport' || d.document_type === 'id_card') && 
+                                  d.verification_status === 'verified'
+                                )}
+                                documentsVerified={documents.filter(d => d.verification_status === 'verified').length}
+                                totalDocuments={documents.length}
+                                ecrStatus={workerProfile?.ecr_status || undefined}
+                                size="sm"
+                              />
+                            </div>
                             <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-1">
                               {workerProfile?.nationality && (
                                 <span className="flex items-center gap-1">
