@@ -17,6 +17,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ProfileSkeleton } from "@/components/ui/page-skeleton";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface WorkerVideo {
   id: string;
@@ -30,11 +37,18 @@ interface WorkerVideo {
   created_at: string | null;
 }
 
+const NATIONALITIES = [
+  'India', 'Bangladesh', 'Pakistan', 'Nepal', 'Sri Lanka', 'Philippines',
+  'Indonesia', 'Vietnam', 'Thailand', 'Myanmar', 'Malaysia', 'Egypt',
+  'Nigeria', 'Kenya', 'Ethiopia', 'Other'
+];
+
 export default function WorkerProfile() {
   const { user, profile, refreshProfile } = useAuth();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [videos, setVideos] = useState<WorkerVideo[]>([]);
+  const [nationality, setNationality] = useState<string>("");
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<WorkerProfileFormData>({
     resolver: zodResolver(workerProfileSchema),
@@ -96,6 +110,7 @@ export default function WorkerProfile() {
           setValue('passport_number', workerProfile.passport_number || '');
           setValue('expected_salary_min', workerProfile.expected_salary_min || 0);
           setValue('expected_salary_max', workerProfile.expected_salary_max || 0);
+          setNationality(workerProfile.nationality || '');
           
           // Map languages array to skills field (Primary Skills)
           setValue('skills', workerProfile.languages?.join(', ') || '');
@@ -148,6 +163,8 @@ export default function WorkerProfile() {
           languages: data.skills ? data.skills.split(',').map(s => s.trim()) : null,
           ecr_category: data.visa_type || null,
           visa_countries: data.preferred_countries ? data.preferred_countries.split(',').map(c => c.trim()) : null,
+          nationality: nationality || null,
+          has_passport: !!data.passport_number,
         }, {
           onConflict: 'user_id'
         });
@@ -249,6 +266,23 @@ export default function WorkerProfile() {
                 {errors.phone && (
                   <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>
                 )}
+              </div>
+
+              <div>
+                <Label htmlFor="nationality">Nationality *</Label>
+                <Select value={nationality} onValueChange={setNationality}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your nationality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {NATIONALITIES.map(nat => (
+                      <SelectItem key={nat} value={nat}>{nat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Required for ECR status determination
+                </p>
               </div>
 
               <div>

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, User, Briefcase, FileText, MessageSquare, Upload, Bell, GraduationCap, FileSignature, Plane, Shield, Bookmark, Menu, X, FileCheck, CalendarCheck, Calendar, History } from "lucide-react";
+import { LayoutDashboard, User, Briefcase, FileText, MessageSquare, Upload, Bell, GraduationCap, FileSignature, Plane, Shield, Bookmark, Menu, X, FileCheck, CalendarCheck, Calendar, History, BadgeCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -12,6 +12,7 @@ export default function WorkerSidebar() {
   const navItems = [
     { path: "/worker/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/worker/profile", icon: User, label: "Profile" },
+    { path: "/worker/verification", icon: BadgeCheck, label: "Verification Status" },
     { path: "/jobs", icon: Briefcase, label: "Job Search" },
     { path: "/worker/saved-searches", icon: Bookmark, label: "Saved Searches" },
     { path: "/worker/applications", icon: FileText, label: "Applications" },
