@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Briefcase, Plus, Eye, Trash2, MapPin, Users, Calendar } from "lucide-react";
+import { Briefcase, Plus, Eye, Trash2, MapPin, Users, Calendar, FileText } from "lucide-react";
 import { JobListSkeleton } from "@/components/ui/page-skeleton";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
@@ -37,6 +37,7 @@ export default function ManageJobs() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [applicationCounts, setApplicationCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,6 +56,23 @@ export default function ManageJobs() {
 
       if (error) throw error;
       setJobs(data || []);
+
+      // Fetch application counts for all jobs
+      if (data && data.length > 0) {
+        const jobIds = data.map(job => job.id);
+        const { data: applications, error: appError } = await supabase
+          .from("job_applications")
+          .select("job_id")
+          .in("job_id", jobIds);
+
+        if (!appError && applications) {
+          const counts: Record<string, number> = {};
+          applications.forEach(app => {
+            counts[app.job_id] = (counts[app.job_id] || 0) + 1;
+          });
+          setApplicationCounts(counts);
+        }
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -229,6 +247,13 @@ export default function ManageJobs() {
                         <Users className="h-4 w-4 flex-shrink-0" />
                         {job.openings} {job.openings === 1 ? "opening" : "openings"}
                       </span>
+                      <Badge 
+                        variant={applicationCounts[job.id] > 0 ? "default" : "secondary"}
+                        className="flex items-center gap-1"
+                      >
+                        <FileText className="h-3 w-3" />
+                        {applicationCounts[job.id] || 0} {(applicationCounts[job.id] || 0) === 1 ? "application" : "applications"}
+                      </Badge>
                     </div>
                     
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
