@@ -208,11 +208,11 @@ export default function ApplicationReview() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <EmployerHeader />
-        <div className="flex flex-1">
-          <EmployerSidebar />
-          <main className="flex-1 p-8">
+      <div className="flex min-h-screen bg-background w-full">
+        <EmployerSidebar />
+        <div className="flex-1 flex flex-col">
+          <EmployerHeader />
+          <main className="flex-1 p-4 md:p-8">
             <div className="text-center">Loading applications...</div>
           </main>
         </div>
@@ -221,44 +221,44 @@ export default function ApplicationReview() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Application Review</h1>
-        </div>
-
-        <div className="mb-6 flex gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+    <div className="flex min-h-screen bg-background w-full">
+      <EmployerSidebar />
+      <div className="flex-1 flex flex-col">
+        <EmployerHeader />
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold">Application Review</h1>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Applications</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="REVIEWING">Reviewing</SelectItem>
-              <SelectItem value="APPROVED">Approved</SelectItem>
-              <SelectItem value="SHORTLISTED">Shortlisted</SelectItem>
-              <SelectItem value="INTERVIEWED">Interviewed</SelectItem>
-              <SelectItem value="OFFERED">Offered</SelectItem>
-              <SelectItem value="HIRED">Hired</SelectItem>
-              <SelectItem value="REJECTED">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+
+          <div className="mb-6 flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Applications</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="REVIEWING">Reviewing</SelectItem>
+                <SelectItem value="APPROVED">Approved</SelectItem>
+                <SelectItem value="SHORTLISTED">Shortlisted</SelectItem>
+                <SelectItem value="INTERVIEWED">Interviewed</SelectItem>
+                <SelectItem value="OFFERED">Offered</SelectItem>
+                <SelectItem value="HIRED">Hired</SelectItem>
+                <SelectItem value="REJECTED">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
         {filteredApplications.length === 0 ? (
           <Card className="p-12 text-center">
@@ -273,18 +273,18 @@ export default function ApplicationReview() {
         ) : (
           <div className="space-y-4">
             {filteredApplications.map((app) => (
-              <Card key={app.id} className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex gap-4 flex-1">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Card key={app.id} className="p-4 md:p-6">
+                <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+                  <div className="flex gap-3 md:gap-4 flex-1 min-w-0">
+                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                       {app.profiles?.avatar_url ? (
-                        <img src={app.profiles.avatar_url} alt="" className="h-12 w-12 rounded-full object-cover" />
+                        <img src={app.profiles.avatar_url} alt="" className="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover" />
                       ) : (
-                        <User className="h-6 w-6 text-primary" />
+                        <User className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                       )}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
                         <Badge variant="outline" className="text-xs">
                           {app.job?.title || "Job Position"}
                         </Badge>
@@ -292,13 +292,13 @@ export default function ApplicationReview() {
                           {getStatusLabel(app.status)}
                         </Badge>
                       </div>
-                      <h3 className="text-xl font-bold mb-1">
+                      <h3 className="text-lg md:text-xl font-bold mb-1 truncate">
                         {app.profiles?.full_name || "Applicant"}
                       </h3>
                       
                       {/* Contact Info */}
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
-                        <span>{app.profiles?.email}</span>
+                      <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mb-3">
+                        <span className="truncate max-w-[200px]">{app.profiles?.email}</span>
                         {app.profiles?.phone && (
                           <span className="flex items-center gap-1">
                             <Phone className="h-3 w-3" />
@@ -309,11 +309,11 @@ export default function ApplicationReview() {
 
                       {/* Worker Details */}
                       {app.worker_profile && (
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3">
                           {app.worker_profile.years_of_experience && (
                             <Badge variant="secondary" className="text-xs">
                               <Briefcase className="h-3 w-3 mr-1" />
-                              {app.worker_profile.years_of_experience} yrs experience
+                              {app.worker_profile.years_of_experience} yrs
                             </Badge>
                           )}
                           {app.worker_profile.nationality && (
@@ -323,13 +323,13 @@ export default function ApplicationReview() {
                             </Badge>
                           )}
                           {app.worker_profile.current_location && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" className="text-xs hidden sm:flex">
                               <MapPin className="h-3 w-3 mr-1" />
                               {app.worker_profile.current_location}
                             </Badge>
                           )}
                           {app.worker_profile.availability && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" className="text-xs hidden md:flex">
                               {app.worker_profile.availability}
                             </Badge>
                           )}
@@ -339,33 +339,23 @@ export default function ApplicationReview() {
                       {/* Skills */}
                       {app.skills && app.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-3">
-                          <Award className="h-4 w-4 text-muted-foreground mr-1" />
-                          {app.skills.slice(0, 5).map((skill, idx) => (
+                          <Award className="h-4 w-4 text-muted-foreground mr-1 flex-shrink-0" />
+                          {app.skills.slice(0, 3).map((skill, idx) => (
                             <Badge key={idx} variant="outline" className="text-xs">
                               {skill.skill_name}
-                              {skill.proficiency_level && (
-                                <span className="ml-1 text-muted-foreground">• {skill.proficiency_level}</span>
-                              )}
                             </Badge>
                           ))}
-                          {app.skills.length > 5 && (
+                          {app.skills.length > 3 && (
                             <Badge variant="outline" className="text-xs">
-                              +{app.skills.length - 5} more
+                              +{app.skills.length - 3} more
                             </Badge>
                           )}
                         </div>
                       )}
 
-                      {/* Languages */}
-                      {app.worker_profile?.languages && app.worker_profile.languages.length > 0 && (
-                        <p className="text-xs text-muted-foreground mb-3">
-                          <span className="font-medium">Languages:</span> {app.worker_profile.languages.join(", ")}
-                        </p>
-                      )}
-
-                      {/* Cover Letter Preview */}
+                      {/* Cover Letter Preview - Hidden on mobile */}
                       {app.cover_letter && (
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2 italic">
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2 italic hidden sm:block">
                           "{app.cover_letter}"
                         </p>
                       )}
@@ -377,21 +367,21 @@ export default function ApplicationReview() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    {/* Primary action - View Full Application */}
-                    <Button variant="default" size="sm" asChild>
+                  
+                  {/* Actions - Stack on mobile */}
+                  <div className="flex flex-col gap-2 w-full lg:w-auto">
+                    <Button variant="default" size="sm" asChild className="w-full lg:w-auto">
                       <Link to={`/employer/applications/${app.id}`}>
                         <Eye className="h-4 w-4 mr-2" />
-                        Review Application
+                        Review
                       </Link>
                     </Button>
                     
-                    {/* Quick actions for all applications */}
                     <div className="flex flex-wrap gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                        className="flex-1 lg:flex-none text-green-600 hover:text-green-700 hover:bg-green-50"
                         onClick={() => updateApplicationStatus(app.id, 'APPROVED')}
                         disabled={app.status === 'APPROVED' || app.status === 'HIRED'}
                       >
@@ -400,7 +390,7 @@ export default function ApplicationReview() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="flex-1 lg:flex-none text-red-600 hover:text-red-700 hover:bg-red-50"
                         onClick={() => updateApplicationStatus(app.id, 'REJECTED')}
                         disabled={app.status === 'REJECTED'}
                       >
@@ -409,6 +399,7 @@ export default function ApplicationReview() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="flex-1 lg:flex-none"
                         onClick={() => addToShortlist(app.worker_id)}
                       >
                         <Star className="h-4 w-4 mr-1" />
@@ -421,7 +412,7 @@ export default function ApplicationReview() {
             ))}
           </div>
         )}
-      </main>
+        </main>
       </div>
     </div>
   );
