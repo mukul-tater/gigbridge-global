@@ -18,6 +18,7 @@ interface AuthContextType {
   profile: Profile | null;
   role: AppRole | null;
   isAuthenticated: boolean;
+  isEmailVerified: boolean;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (data: {
@@ -179,6 +180,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const isEmailVerified = !!user?.email_confirmed_at;
+
   return (
     <AuthContext.Provider
       value={{
@@ -187,6 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile,
         role,
         isAuthenticated: !!session,
+        isEmailVerified,
         loading,
         login,
         signup,

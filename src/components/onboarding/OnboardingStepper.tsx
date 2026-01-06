@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { 
   User, FileText, Briefcase, GraduationCap, Building2, 
-  CheckCircle2, ChevronRight, X 
+  CheckCircle2, ChevronRight, X, Mail 
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +25,7 @@ interface OnboardingStepperProps {
 }
 
 export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps) {
-  const { user, role, profile } = useAuth();
+  const { user, role, profile, isEmailVerified } = useAuth();
   const navigate = useNavigate();
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,12 +35,22 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
     if (user && role) {
       checkOnboardingProgress();
     }
-  }, [user, role, profile]);
+  }, [user, role, profile, isEmailVerified]);
 
   const checkOnboardingProgress = async () => {
     if (!user) return;
 
     try {
+      // Email verification step (applies to all roles)
+      const emailStep: OnboardingStep = {
+        id: 'email',
+        title: 'Verify Email',
+        description: 'Confirm your email address',
+        icon: <Mail className="h-5 w-5" />,
+        route: '/verify-email',
+        completed: isEmailVerified
+      };
+
       if (role === 'worker') {
         const [profileRes, docsRes, skillsRes, expRes] = await Promise.all([
           supabase.from('worker_profiles').select('*').eq('user_id', user.id).maybeSingle(),
@@ -57,6 +67,7 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
         const hasExp = (expRes.data?.length || 0) > 0;
 
         setSteps([
+          emailStep,
           {
             id: 'basic',
             title: 'Complete Basic Profile',
@@ -102,6 +113,7 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
         const hasJobs = (jobsRes.data?.length || 0) > 0;
 
         setSteps([
+          emailStep,
           {
             id: 'basic',
             title: 'Complete Your Profile',
