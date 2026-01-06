@@ -35,7 +35,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
@@ -47,7 +47,7 @@ export default function Auth() {
     const result = await login(loginEmail, loginPassword);
     
     if (result.success) {
-      navigate('/');
+      navigate('/dashboard');
     } else {
       setError(result.error || 'Login failed');
     }
