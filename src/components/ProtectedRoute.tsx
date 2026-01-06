@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { isAuthenticated, role, loading } = useAuth();
+  const { isAuthenticated, isEmailVerified, role, loading } = useAuth();
 
   if (loading) {
     return (
@@ -22,6 +22,11 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
 
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Redirect to email verification if not verified
+  if (!isEmailVerified) {
+    return <Navigate to="/verify-email" replace />;
   }
 
   if (allowedRoles && role && !allowedRoles.includes(role)) {

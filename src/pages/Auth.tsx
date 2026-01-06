@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, signup, isAuthenticated } = useAuth();
+  const { login, signup, isAuthenticated, isEmailVerified } = useAuth();
   const [activeTab, setActiveTab] = useState<'login' | 'signup' | 'forgot'>('login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,9 +35,13 @@ export default function Auth() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      if (!isEmailVerified) {
+        navigate('/verify-email');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isEmailVerified, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +51,7 @@ export default function Auth() {
     const result = await login(loginEmail, loginPassword);
     
     if (result.success) {
-      navigate('/dashboard');
+      // Navigation will be handled by useEffect based on email verification status
     } else {
       setError(result.error || 'Login failed');
     }
@@ -82,10 +86,9 @@ export default function Auth() {
     });
 
     if (result.success) {
-      // Show success message
-      setError('');
-      setActiveTab('login');
-      alert('Account created successfully! You can now login.');
+      // Redirect to email verification pending page
+      navigate('/verify-email');
+      toast.success('Account created! Please check your email to verify your account.');
     } else {
       setError(result.error || 'Signup failed');
     }

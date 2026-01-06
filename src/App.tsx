@@ -18,6 +18,7 @@ import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import InstallPWA from "./pages/InstallPWA";
 import ResetPassword from "./pages/ResetPassword";
+import EmailVerificationPending from "./pages/EmailVerificationPending";
 
 // Worker Pages
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
@@ -92,6 +93,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<EmailVerificationPending />} />
             <Route path="/install" element={<InstallPWA />} />
             <Route path="/seed-data" element={<SeedData />} />
             <Route path="/jobs" element={<Jobs />} />
