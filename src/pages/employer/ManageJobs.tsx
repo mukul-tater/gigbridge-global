@@ -202,52 +202,60 @@ export default function ManageJobs() {
           <div className="space-y-4">
             {jobs.map((job) => (
               <Card key={job.id} className="p-4 md:p-6">
-                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg md:text-xl font-bold mb-2 truncate">{job.title}</h3>
-                    
-                    <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mb-3">
+                <div className="flex flex-col gap-4">
+                  {/* Header with title and status */}
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <Badge variant={getStatusColor(job.status)}>
+                          {getStatusLabel(job.status)}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {job.job_type.replace("_", " ")}
+                        </Badge>
+                      </div>
+                      <h3 className="text-lg md:text-xl font-bold truncate">{job.title}</h3>
+                    </div>
+                  </div>
+                  
+                  {/* Job details */}
+                  <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                       <span className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {job.location}, {job.country}
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{job.location}, {job.country}</span>
                       </span>
                       <span className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
+                        <Users className="h-4 w-4 flex-shrink-0" />
                         {job.openings} {job.openings === 1 ? "opening" : "openings"}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                      <span className="font-medium text-foreground">
+                        {formatSalary(job.salary_min, job.salary_max, job.currency)}
                       </span>
                       {job.posted_at && (
                         <span className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
+                          <Calendar className="h-4 w-4 flex-shrink-0" />
                           Posted {format(new Date(job.posted_at), "MMM d, yyyy")}
                         </span>
                       )}
+                      {job.expires_at && (
+                        <span className="text-xs">
+                          Expires: {format(new Date(job.expires_at), "MMM d, yyyy")}
+                        </span>
+                      )}
                     </div>
-
-                    <div className="flex items-center gap-3 mb-3">
-                      <Badge variant={getStatusColor(job.status)}>
-                        {getStatusLabel(job.status)}
-                      </Badge>
-                      <span className="text-sm font-medium">
-                        {job.job_type.replace("_", " ")}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {formatSalary(job.salary_min, job.salary_max, job.currency)}
-                      </span>
-                    </div>
-
-                    {job.expires_at && (
-                      <p className="text-sm text-muted-foreground">
-                        Expires: {format(new Date(job.expires_at), "MMM d, yyyy")}
-                      </p>
-                    )}
                   </div>
 
-                  <div className="flex flex-row lg:flex-col gap-2">
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t">
                     <Select
                       value={job.status}
                       onValueChange={(value) => updateJobStatus(job.id, value)}
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-full sm:w-[140px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -258,37 +266,40 @@ export default function ManageJobs() {
                       </SelectContent>
                     </Select>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      View
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 sm:flex-none"
+                        onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
+                      </Button>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Job</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete this job? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => deleteJob(job.id)}>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm" className="flex-1 sm:flex-none">
+                            <Trash2 className="h-4 w-4 mr-2" />
                             Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="mx-4 max-w-[calc(100vw-2rem)]">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Job</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete this job? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                            <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+                            <AlertDialogAction className="w-full sm:w-auto" onClick={() => deleteJob(job.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </div>
               </Card>
