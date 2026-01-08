@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, Menu, FileCheck, CreditCard, Plane } from "lucide-react";
+import { LayoutDashboard, Users, CheckCircle, Shield, BarChart3, AlertTriangle, Menu, FileCheck, CreditCard, Plane, Mail } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -20,6 +20,7 @@ export default function AdminSidebar() {
     { path: "/admin/compliance", icon: Shield, label: "Compliance Check" },
     { path: "/admin/reports", icon: BarChart3, label: "Reports & Analytics" },
     { path: "/admin/disputes", icon: AlertTriangle, label: "Dispute Resolution" },
+    { path: "/admin/contact-submissions", icon: Mail, label: "Contact Submissions" },
   ];
 
   const SidebarContent = () => (
