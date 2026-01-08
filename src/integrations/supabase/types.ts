@@ -851,12 +851,19 @@ export type Database = {
           currency: string
           description: string | null
           employer_id: string
+          escrow_status: string | null
+          gross_amount: number | null
           id: string
           job_id: string | null
           metadata: Json | null
+          net_amount: number | null
           paid_at: string | null
           payment_method: string | null
           payment_type: string
+          platform_fee: number | null
+          platform_fee_percentage: number | null
+          released_at: string | null
+          released_by: string | null
           status: string
           transaction_id: string | null
           updated_at: string | null
@@ -868,12 +875,19 @@ export type Database = {
           currency?: string
           description?: string | null
           employer_id: string
+          escrow_status?: string | null
+          gross_amount?: number | null
           id?: string
           job_id?: string | null
           metadata?: Json | null
+          net_amount?: number | null
           paid_at?: string | null
           payment_method?: string | null
           payment_type: string
+          platform_fee?: number | null
+          platform_fee_percentage?: number | null
+          released_at?: string | null
+          released_by?: string | null
           status?: string
           transaction_id?: string | null
           updated_at?: string | null
@@ -885,12 +899,19 @@ export type Database = {
           currency?: string
           description?: string | null
           employer_id?: string
+          escrow_status?: string | null
+          gross_amount?: number | null
           id?: string
           job_id?: string | null
           metadata?: Json | null
+          net_amount?: number | null
           paid_at?: string | null
           payment_method?: string | null
           payment_type?: string
+          platform_fee?: number | null
+          platform_fee_percentage?: number | null
+          released_at?: string | null
+          released_by?: string | null
           status?: string
           transaction_id?: string | null
           updated_at?: string | null
