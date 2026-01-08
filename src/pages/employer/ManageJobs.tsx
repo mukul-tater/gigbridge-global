@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Briefcase, Plus, Eye, Trash2, MapPin, Users, Calendar, FileText } from "lucide-react";
+import { Briefcase, Plus, Eye, Trash2, MapPin, Users, Calendar, FileText, Pencil } from "lucide-react";
 import { JobListSkeleton } from "@/components/ui/page-skeleton";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
@@ -300,6 +300,16 @@ export default function ManageJobs() {
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         View
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 sm:flex-none"
+                        onClick={() => navigate(`/admin/jobs/${job.id}/edit`)}
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit
                       </Button>
 
                       <AlertDialog>
