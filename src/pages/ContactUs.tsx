@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-
 export default function ContactUs() {
   const [formData, setFormData] = useState({
     name: "",
@@ -15,15 +14,17 @@ export default function ContactUs() {
     subject: "",
     message: ""
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast.success("Message sent! We'll get back to you soon.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: ""
+    });
   };
-
-  return (
-    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
+  return <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
       <MobileBottomNav />
       <main className="flex-1">
@@ -52,7 +53,7 @@ export default function ContactUs() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-muted-foreground">support@safeworkglobal.com</p>
+                      <p className="text-muted-foreground">mukultater@gmail.com</p>
                     </div>
                   </div>
 
@@ -62,7 +63,7 @@ export default function ContactUs() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Phone</h3>
-                      <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                      <p className="text-muted-foreground">+91-9950085843</p>
                     </div>
                   </div>
 
@@ -73,8 +74,8 @@ export default function ContactUs() {
                     <div>
                       <h3 className="font-semibold mb-1">Office</h3>
                       <p className="text-muted-foreground">
-                        123 Business Street<br />
-                        New York, NY 10001
+                        ​Udaipur,<br />
+                        ​Rajasthan,IN
                       </p>
                     </div>
                   </div>
@@ -87,50 +88,40 @@ export default function ContactUs() {
                     <label htmlFor="name" className="block text-sm font-medium mb-2">
                       Name
                     </label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                    />
+                    <Input id="name" value={formData.name} onChange={e => setFormData({
+                    ...formData,
+                    name: e.target.value
+                  })} required />
                   </div>
 
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium mb-2">
                       Email
                     </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      required
-                    />
+                    <Input id="email" type="email" value={formData.email} onChange={e => setFormData({
+                    ...formData,
+                    email: e.target.value
+                  })} required />
                   </div>
 
                   <div>
                     <label htmlFor="subject" className="block text-sm font-medium mb-2">
                       Subject
                     </label>
-                    <Input
-                      id="subject"
-                      value={formData.subject}
-                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      required
-                    />
+                    <Input id="subject" value={formData.subject} onChange={e => setFormData({
+                    ...formData,
+                    subject: e.target.value
+                  })} required />
                   </div>
 
                   <div>
                     <label htmlFor="message" className="block text-sm font-medium mb-2">
                       Message
                     </label>
-                    <Textarea
-                      id="message"
-                      rows={5}
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      required
-                    />
+                    <Textarea id="message" rows={5} value={formData.message} onChange={e => setFormData({
+                    ...formData,
+                    message: e.target.value
+                  })} required />
                   </div>
 
                   <Button type="submit" className="w-full">
@@ -143,6 +134,5 @@ export default function ContactUs() {
         </section>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 }
