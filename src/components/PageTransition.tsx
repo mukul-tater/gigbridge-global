@@ -1,36 +1,47 @@
-import { useEffect, useState } from "react";
+import { motion, AnimatePresence, Transition, Variants } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
 
 interface PageTransitionProps {
   children: React.ReactNode;
 }
 
+const pageVariants: Variants = {
+  initial: {
+    opacity: 0,
+    y: 8,
+  },
+  in: {
+    opacity: 1,
+    y: 0,
+  },
+  out: {
+    opacity: 0,
+    y: -8,
+  },
+};
+
+const pageTransition: Transition = {
+  type: "tween",
+  ease: "easeInOut",
+  duration: 0.2,
+};
+
 export default function PageTransition({ children }: PageTransitionProps) {
   const location = useLocation();
-  const [displayLocation, setDisplayLocation] = useState(location);
-  const [transitionStage, setTransitionStage] = useState("fadeIn");
-
-  useEffect(() => {
-    if (location !== displayLocation) {
-      setTransitionStage("fadeOut");
-    }
-  }, [location, displayLocation]);
 
   return (
-    <div
-      className={cn(
-        "transition-opacity duration-300",
-        transitionStage === "fadeOut" ? "opacity-0" : "opacity-100"
-      )}
-      onTransitionEnd={() => {
-        if (transitionStage === "fadeOut") {
-          setTransitionStage("fadeIn");
-          setDisplayLocation(location);
-        }
-      }}
-    >
-      {children}
-    </div>
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+        className="min-h-screen"
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   );
 }
