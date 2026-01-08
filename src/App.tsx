@@ -75,6 +75,7 @@ import ECRManagement from "./pages/admin/ECRManagement";
 import ComplianceCheck from "./pages/admin/ComplianceCheck";
 import Reports from "./pages/admin/Reports";
 import DisputeResolution from "./pages/admin/DisputeResolution";
+import ContactSubmissions from "./pages/admin/ContactSubmissions";
 
 // Worker Verification
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
@@ -356,6 +357,11 @@ const App = () => (
             <Route path="/admin/disputes" element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <DisputeResolution />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/contact-submissions" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <ContactSubmissions />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
