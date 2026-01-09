@@ -76,6 +76,7 @@ import ComplianceCheck from "./pages/admin/ComplianceCheck";
 import Reports from "./pages/admin/Reports";
 import DisputeResolution from "./pages/admin/DisputeResolution";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
+import InvestorDashboard from "./pages/admin/InvestorDashboard";
 
 // Worker Verification
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
@@ -362,6 +363,11 @@ const App = () => (
             <Route path="/admin/contact-submissions" element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <ContactSubmissions />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/investor-dashboard" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <InvestorDashboard />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
