@@ -77,6 +77,7 @@ import Reports from "./pages/admin/Reports";
 import DisputeResolution from "./pages/admin/DisputeResolution";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import InvestorDashboard from "./pages/admin/InvestorDashboard";
+import InvestorRelations from "./pages/InvestorRelations";
 
 // Worker Verification
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
@@ -104,6 +105,7 @@ const App = () => (
             <Route path="/job-categories" element={<JobCategories />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />
+            <Route path="/investors" element={<InvestorRelations />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
