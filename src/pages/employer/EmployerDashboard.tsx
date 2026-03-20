@@ -13,26 +13,54 @@ import ShortlistedCandidatesCard from "@/components/employer/ShortlistedCandidat
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import type { NavGroup } from "@/components/layout/DashboardSidebar";
 
-const employerNavItems = [
-  { path: "/employer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { path: "/employer/profile", icon: User, label: "My Profile" },
-  { path: "/employer/company", icon: Building2, label: "Company Profile & KYC" },
-  { path: "/employer/post-job", icon: PlusCircle, label: "Post a Job" },
-  { path: "/employer/manage-jobs", icon: Briefcase, label: "Manage Jobs" },
-  { path: "/employer/search-workers", icon: Users, label: "Search Workers" },
-  { path: "/employer/saved-searches", icon: Bookmark, label: "Saved Searches" },
-  { path: "/employer/applications", icon: UserCheck, label: "Applications" },
-  { path: "/employer/shortlist", icon: Star, label: "Shortlist" },
-  { path: "/employer/formalities", icon: FileCheck, label: "Post-Approval Formalities" },
-  { path: "/employer/contracts", icon: FileSignature, label: "Contract Management" },
-  { path: "/employer/contract-history", icon: History, label: "Contract History" },
-  { path: "/employer/interviews", icon: Calendar, label: "Interview Scheduling" },
-  { path: "/employer/offers", icon: FileSignature, label: "Offer Management" },
-  { path: "/employer/escrow", icon: Shield, label: "Escrow & Payments" },
-  { path: "/employer/compliance", icon: FileCheck, label: "Compliance Reports" },
-  { path: "/employer/reports", icon: BarChart3, label: "Reports & Analytics" },
-  { path: "/employer/messaging", icon: MessageSquare, label: "Messages" },
+const employerNavGroups: NavGroup[] = [
+  {
+    label: "Overview",
+    defaultOpen: true,
+    items: [
+      { path: "/employer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+      { path: "/employer/profile", icon: User, label: "My Profile" },
+      { path: "/employer/company", icon: Building2, label: "Company & KYC" },
+    ],
+  },
+  {
+    label: "Jobs & Hiring",
+    defaultOpen: true,
+    items: [
+      { path: "/employer/post-job", icon: PlusCircle, label: "Post a Job" },
+      { path: "/employer/manage-jobs", icon: Briefcase, label: "Manage Jobs" },
+      { path: "/employer/search-workers", icon: Users, label: "Search Workers" },
+      { path: "/employer/saved-searches", icon: Bookmark, label: "Saved Searches" },
+    ],
+  },
+  {
+    label: "Applications",
+    items: [
+      { path: "/employer/applications", icon: UserCheck, label: "Applications" },
+      { path: "/employer/shortlist", icon: Star, label: "Shortlist" },
+      { path: "/employer/interviews", icon: Calendar, label: "Interviews" },
+      { path: "/employer/offers", icon: FileSignature, label: "Offers" },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { path: "/employer/formalities", icon: FileCheck, label: "Formalities" },
+      { path: "/employer/contracts", icon: FileSignature, label: "Contracts" },
+      { path: "/employer/contract-history", icon: History, label: "Contract History" },
+      { path: "/employer/escrow", icon: Shield, label: "Payments" },
+    ],
+  },
+  {
+    label: "Reports",
+    items: [
+      { path: "/employer/compliance", icon: FileCheck, label: "Compliance" },
+      { path: "/employer/reports", icon: BarChart3, label: "Analytics" },
+      { path: "/employer/messaging", icon: MessageSquare, label: "Messages" },
+    ],
+  },
 ];
 
 const employerProfileMenu = [
@@ -142,7 +170,7 @@ export default function EmployerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout navItems={employerNavItems} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
         <DashboardSkeleton />
       </DashboardLayout>
     );
@@ -165,28 +193,25 @@ export default function EmployerDashboard() {
   ];
 
   return (
-    <DashboardLayout navItems={employerNavItems} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
       <PortalBreadcrumb />
       <OnboardingStepper />
 
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Employer'}!</h1>
-        <p className="text-muted-foreground text-sm md:text-base">Manage your job postings and find talent</p>
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome back, {profile?.full_name || 'Employer'}!</h1>
+        <p className="text-muted-foreground text-sm">Manage your job postings and find talent</p>
       </div>
 
       <AnalyticsSummaryCard data={analyticsData} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 my-6 md:my-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-6">
         <BackgroundVerificationCard verifications={verifications} onRefresh={fetchDashboardData} />
         <PaymentManagementCard payments={payments} />
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
-        <Card className="p-6">
-          <InteractiveChart
-            title="Hiring Metrics"
-            type="line"
-            data={hiringMetricsData}
+      <div className="grid lg:grid-cols-2 gap-4 mb-6">
+        <Card className="p-5">
+          <InteractiveChart title="Hiring Metrics" type="line" data={hiringMetricsData}
             dataKeys={[
               { key: 'applications', color: 'hsl(var(--primary))', name: 'Applications' },
               { key: 'shortlisted', color: 'hsl(var(--chart-2))', name: 'Shortlisted' },
@@ -194,40 +219,34 @@ export default function EmployerDashboard() {
             ]}
           />
         </Card>
-        <Card className="p-6">
-          <InteractiveChart
-            title="Time to Hire by Position"
-            type="bar"
+        <Card className="p-5">
+          <InteractiveChart title="Time to Hire" type="bar"
             data={timeToHireData.map(item => ({ month: item.position, days: item.days }))}
-            dataKeys={[{ key: 'days', color: 'hsl(var(--chart-3))', name: 'Days to Hire' }]}
+            dataKeys={[{ key: 'days', color: 'hsl(var(--chart-3))', name: 'Days' }]}
           />
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-        <Card className="p-6">
-          <h2 className="text-xl font-bold mb-4">Candidate Pipeline</h2>
-          <ResponsiveContainer width="100%" height={300}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <Card className="p-5">
+          <h2 className="text-lg font-bold mb-3">Candidate Pipeline</h2>
+          <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={pipelineData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="count" label>
-                {pipelineData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
+              <Pie data={pipelineData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={5} dataKey="count" label>
+                {pipelineData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
               </Pie>
               <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
             </PieChart>
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-6">
-          <h2 className="text-xl font-bold mb-4">Compliance Status</h2>
+        <Card className="p-5">
+          <h2 className="text-lg font-bold mb-3">Compliance Status</h2>
           <div className="flex items-center justify-between">
-            <ResponsiveContainer width="60%" height={250}>
+            <ResponsiveContainer width="55%" height={220}>
               <PieChart>
-                <Pie data={complianceData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value">
-                  {complianceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
+                <Pie data={complianceData} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={5} dataKey="value">
+                  {complianceData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
                 </Pie>
                 <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
               </PieChart>
@@ -244,53 +263,49 @@ export default function EmployerDashboard() {
               ))}
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            <div className="p-3 bg-muted/50 rounded-lg text-center">
-              <CheckCircle className="h-5 w-5 text-success mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Compliant</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="p-2.5 bg-muted/50 rounded-lg text-center">
+              <CheckCircle className="h-4 w-4 text-success mx-auto mb-1" />
+              <p className="text-[10px] text-muted-foreground">Compliant</p>
               <p className="text-sm font-bold">{compliantCount}</p>
             </div>
-            <div className="p-3 bg-muted/50 rounded-lg text-center">
-              <Clock className="h-5 w-5 text-warning mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Pending</p>
+            <div className="p-2.5 bg-muted/50 rounded-lg text-center">
+              <Clock className="h-4 w-4 text-warning mx-auto mb-1" />
+              <p className="text-[10px] text-muted-foreground">Pending</p>
               <p className="text-sm font-bold">{pendingCount}</p>
             </div>
-            <div className="p-3 bg-muted/50 rounded-lg text-center">
-              <AlertCircle className="h-5 w-5 text-destructive mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Issues</p>
+            <div className="p-2.5 bg-muted/50 rounded-lg text-center">
+              <AlertCircle className="h-4 w-4 text-destructive mx-auto mb-1" />
+              <p className="text-[10px] text-muted-foreground">Issues</p>
               <p className="text-sm font-bold">{failedCount}</p>
             </div>
           </div>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ShortlistedCandidatesCard workers={shortlistedWorkers} loading={loading} />
-        <Card className="p-6">
-          <h2 className="text-xl font-bold mb-4">Top Performing Jobs</h2>
-          <div className="space-y-4">
-            {topPerformingJobs.length > 0 ? (
-              topPerformingJobs.map(({ job, count }) => (
-                <div key={job.id} className="p-4 bg-muted/50 rounded-lg">
-                  <h3 className="font-semibold mb-1">{job.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{count} applications • {job.location}</p>
-                  <span className={`text-xs px-2 py-1 rounded ${job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                    {job.status}
-                  </span>
-                </div>
-              ))
-            ) : jobs.length > 0 ? (
-              jobs.slice(0, 3).map((job: any) => (
-                <div key={job.id} className="p-4 bg-muted/50 rounded-lg">
-                  <h3 className="font-semibold mb-1">{job.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">0 applications • {job.location}</p>
-                  <span className={`text-xs px-2 py-1 rounded ${job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                    {job.status}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-muted-foreground text-center py-4">No jobs posted yet</p>
+        <Card className="p-5">
+          <h2 className="text-lg font-bold mb-3">Top Performing Jobs</h2>
+          <div className="space-y-3">
+            {topPerformingJobs.length > 0 ? topPerformingJobs.map(({ job, count }) => (
+              <div key={job.id} className="p-3 bg-muted/50 rounded-lg">
+                <h3 className="font-semibold text-sm mb-1 truncate">{job.title}</h3>
+                <p className="text-xs text-muted-foreground mb-1">{count} applications • {job.location}</p>
+                <span className={`text-xs px-2 py-0.5 rounded ${job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  {job.status}
+                </span>
+              </div>
+            )) : jobs.length > 0 ? jobs.slice(0, 3).map((job: any) => (
+              <div key={job.id} className="p-3 bg-muted/50 rounded-lg">
+                <h3 className="font-semibold text-sm mb-1 truncate">{job.title}</h3>
+                <p className="text-xs text-muted-foreground mb-1">0 applications • {job.location}</p>
+                <span className={`text-xs px-2 py-0.5 rounded ${job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  {job.status}
+                </span>
+              </div>
+            )) : (
+              <p className="text-muted-foreground text-center py-6 text-sm">No jobs posted yet</p>
             )}
           </div>
         </Card>
