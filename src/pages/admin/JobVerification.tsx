@@ -216,7 +216,6 @@ export default function JobVerification() {
               </Card>
             ))}
           </div>
-        </DashboardLayout>
 
       <AlertDialog open={!!deleteJobId} onOpenChange={() => setDeleteJobId(null)}>
         <AlertDialogContent>
