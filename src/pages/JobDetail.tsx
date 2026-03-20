@@ -364,7 +364,7 @@ export default function JobDetail() {
                     <Badge variant="outline">{job.job_type.replace('_', ' ')}</Badge>
                     <Badge variant="outline">{job.experience_level}</Badge>
                     {job.visa_sponsorship && (
-                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                      <Badge className="bg-success/10 text-success border-success/20">
                         <Shield className="h-3 w-3 mr-1" />
                         Visa Sponsorship
                       </Badge>
