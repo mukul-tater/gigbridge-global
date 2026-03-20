@@ -414,7 +414,7 @@ export default function Jobs() {
 
   // Default Public Layout
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <SEOHead
         title="International Jobs | Find Global Opportunities | SafeWorkGlobal"
         description="Browse 50,000+ international job opportunities for skilled workers in construction, electrical, welding, and more. Visa sponsorship available across 15+ countries."
