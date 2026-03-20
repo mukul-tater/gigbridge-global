@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_profiles: {
+        Row: {
+          agency_name: string | null
+          bio: string | null
+          commission_rate: number | null
+          created_at: string | null
+          id: string
+          license_number: string | null
+          regions_covered: string[] | null
+          total_placements: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          agency_name?: string | null
+          bio?: string | null
+          commission_rate?: number | null
+          created_at?: string | null
+          id?: string
+          license_number?: string | null
+          regions_covered?: string[] | null
+          total_placements?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          agency_name?: string | null
+          bio?: string | null
+          commission_rate?: number | null
+          created_at?: string | null
+          id?: string
+          license_number?: string | null
+          regions_covered?: string[] | null
+          total_placements?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       application_status_history: {
         Row: {
           application_id: string
@@ -1594,7 +1633,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "employer" | "worker"
+      app_role: "admin" | "employer" | "worker" | "agent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1722,7 +1761,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "employer", "worker"],
+      app_role: ["admin", "employer", "worker", "agent"],
     },
   },
 } as const
