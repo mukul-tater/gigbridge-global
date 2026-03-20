@@ -183,7 +183,6 @@ export default function UserManagement() {
               </Card>
             ))}
           </div>
-        </DashboardLayout>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
