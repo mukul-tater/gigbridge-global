@@ -687,6 +687,7 @@ export type Database = {
           remote_allowed: boolean | null
           requirements: string | null
           responsibilities: string | null
+          salary_display: string | null
           salary_max: number | null
           salary_min: number | null
           slug: string | null
@@ -712,6 +713,7 @@ export type Database = {
           remote_allowed?: boolean | null
           requirements?: string | null
           responsibilities?: string | null
+          salary_display?: string | null
           salary_max?: number | null
           salary_min?: number | null
           slug?: string | null
@@ -737,6 +739,7 @@ export type Database = {
           remote_allowed?: boolean | null
           requirements?: string | null
           responsibilities?: string | null
+          salary_display?: string | null
           salary_max?: number | null
           salary_min?: number | null
           slug?: string | null
