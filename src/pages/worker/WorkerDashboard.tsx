@@ -248,7 +248,7 @@ export default function WorkerDashboard() {
                     <p className="text-sm text-muted-foreground mb-2">
                       {job.location}, {job.country}
                       {job.salary_min && job.salary_max && (
-                        <> • {job.currency} {job.salary_min.toLocaleString()} - {job.salary_max.toLocaleString()}</>
+                        <> • ₹{(job.currency === 'INR' ? job.salary_min : job.salary_min * 83).toLocaleString()} - ₹{(job.currency === 'INR' ? job.salary_max : job.salary_max * 83).toLocaleString()}</>
                       )}
                     </p>
                     <p className="text-sm">{job.experience_level} experience</p>
