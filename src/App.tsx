@@ -78,6 +78,7 @@ import DisputeResolution from "./pages/admin/DisputeResolution";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import InvestorDashboard from "./pages/admin/InvestorDashboard";
 import InvestorRelations from "./pages/InvestorRelations";
+import AgentDashboard from "./pages/agent/AgentDashboard";
 
 // Worker Verification
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
