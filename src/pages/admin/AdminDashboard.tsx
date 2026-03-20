@@ -5,6 +5,7 @@ import {
   Users, Briefcase, AlertTriangle, CheckCircle, Building2, UserCheck, FileText, TrendingUp,
   DollarSign, Clock, Globe, Shield, LayoutDashboard, FileCheck, CreditCard, Plane, Mail, BarChart3
 } from "lucide-react";
+import type { NavGroup } from "@/components/layout/DashboardSidebar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import DisputeManagementCard from "@/components/admin/DisputeManagementCard";
