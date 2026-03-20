@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Building2, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles } from 'lucide-react';
@@ -17,9 +17,9 @@ interface FeaturedJob {
   country: string;
   salary_min: number;
   salary_max: number;
-    currency: string;
-    salary_display?: string | null;
-    job_type: string;
+  currency: string;
+  salary_display?: string | null;
+  job_type: string;
   visa_sponsorship: boolean;
   posted_at: string;
   employer_profiles?: {
@@ -128,7 +128,7 @@ export default function FeaturedJobs() {
 
   if (loading) {
     return (
-      <section className="py-20 lg:py-32 bg-background" id="jobs">
+      <section className="py-16 lg:py-24 bg-background" id="jobs">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
@@ -142,22 +142,21 @@ export default function FeaturedJobs() {
   }
 
   return (
-    <section className="py-20 lg:py-32 relative overflow-hidden" id="jobs">
+    <section className="py-16 lg:py-24 relative overflow-hidden" id="jobs">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-background" />
-      <div className="absolute inset-0 bg-mesh opacity-20" />
-      
-      <div className="container mx-auto px-4 relative z-10">
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12 lg:mb-16">
+        <div className="text-center mb-10 lg:mb-14">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-secondary/10 text-secondary mb-4">
             <Sparkles className="h-3.5 w-3.5" />
             Hot Opportunities
           </span>
-          <h2 className="text-3xl lg:text-5xl font-bold font-heading text-foreground mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-foreground mb-3 tracking-tight">
             Featured <span className="text-gradient">Opportunities</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Browse our latest job openings from verified employers worldwide
           </p>
         </div>
@@ -168,110 +167,113 @@ export default function FeaturedJobs() {
           </div>
         ) : (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 mb-12">
-              {jobs.map((job, index) => {
-                return (
-                  <div
-                    key={job.id}
-                    className="group opacity-0 animate-fade-in-up"
-                    style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 mb-10 lg:mb-12">
+              {jobs.map((job, index) => (
+                <div
+                  key={job.id}
+                  className="group opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+                >
+                  <Card
+                    className="h-full relative overflow-hidden bg-card border border-border hover:border-primary/40 transition-all duration-300 hover:shadow-lg cursor-pointer flex flex-col"
+                    onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
                   >
-                    <Card 
-                      className="h-full relative overflow-hidden bg-card/80 backdrop-blur-sm border border-border hover:border-primary/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 cursor-pointer flex flex-col"
-                      onClick={() => navigate(`/jobs/${job.slug || job.id}`)}
-                    >
-                      {/* Gradient accent line */}
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-0 group-hover:opacity-100 transition-opacity" />
-                      
-                      {/* Job Type Badge - Top Left */}
-                      <div className="absolute top-4 left-4 z-10 flex items-center h-9">
-                        <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium shadow-sm h-7 flex items-center">
-                          {job.job_type.replace('_', ' ')}
-                        </Badge>
-                      </div>
-                      
-                      {/* Quick Action Buttons - Top Right */}
-                      <div className="absolute top-4 right-4 z-10 flex items-center gap-2 h-9">
-                        <span className="flex items-center text-xs text-muted-foreground bg-background/90 backdrop-blur-sm px-2.5 h-7 rounded-full border border-border shadow-sm">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {getDaysAgo(job.posted_at)}
-                        </span>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all"
-                          onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}
-                        >
-                          <Bookmark className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-primary text-primary' : ''}`} />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm border border-border shadow-lg hover:bg-secondary hover:text-secondary-foreground hover:scale-110 transition-all"
-                          onClick={(e) => { e.stopPropagation(); handleShareJob(job); }}
-                        >
-                          <Share2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    {/* Gradient accent line */}
+                    <div className="h-1 bg-gradient-to-r from-primary via-secondary to-info opacity-60 group-hover:opacity-100 transition-opacity" />
 
-                      <CardHeader className="pb-3 pt-14">
-                        <CardTitle className="text-lg lg:text-xl font-heading line-clamp-1 group-hover:text-primary transition-colors pr-2">
-                          {job.title}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-2 mt-1">
-                          <Building2 className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{job.employer_profiles?.company_name || 'Company'}</span>
-                        </CardDescription>
-                      </CardHeader>
-                      
-                      <CardContent className="flex-1 flex flex-col space-y-3">
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {job.description}
-                        </p>
-                        
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{job.location}, {job.country}</span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-primary whitespace-pre-line">
-                            {job.salary_display || formatSalary(job.salary_min, job.salary_max, job.currency)}
-                          </span>
-                          <span className="text-xs text-muted-foreground">/month</span>
-                        </div>
-
-                        {job.visa_sponsorship && (
-                          <Badge variant="secondary" className="bg-success/10 text-success border-success/20 w-fit">
-                            <Zap className="h-3 w-3 mr-1" />
-                            Visa Sponsorship
+                    <CardContent className="p-4 sm:p-5 flex-1 flex flex-col">
+                      {/* Top row: badge + time + actions */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Badge variant={getJobTypeBadge(job.job_type)} className="text-xs font-medium shrink-0">
+                            {job.job_type.replace('_', ' ')}
                           </Badge>
-                        )}
+                          <span className="flex items-center text-xs text-muted-foreground shrink-0">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {getDaysAgo(job.posted_at)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 rounded-full hover:bg-primary/10"
+                            onClick={(e) => { e.stopPropagation(); handleSaveJob(job.id); }}
+                          >
+                            <Bookmark className={`h-4 w-4 ${savedJobs.has(job.id) ? 'fill-primary text-primary' : ''}`} />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 rounded-full hover:bg-secondary/10"
+                            onClick={(e) => { e.stopPropagation(); handleShareJob(job); }}
+                          >
+                            <Share2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
 
-                        {job.job_skills && job.job_skills.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5">
-                            {job.job_skills.slice(0, 3).map((skill, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs bg-muted/50">
-                                {skill.skill_name}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
+                      {/* Title & Company */}
+                      <h3 className="text-base sm:text-lg font-semibold font-heading text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
+                        {job.title}
+                      </h3>
+                      <p className="flex items-center gap-1.5 text-sm text-muted-foreground mb-3">
+                        <Building2 className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{job.employer_profiles?.company_name || 'Company'}</span>
+                      </p>
 
-                        <div className="flex-1" />
-                        
-                        <Button 
-                          className="w-full mt-auto group/btn rounded-xl"
-                          onClick={(e) => { e.stopPropagation(); handleQuickApply(job.slug || job.id); }}
-                        >
-                          View & Apply
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                );
-              })}
+                      {/* Description */}
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                        {job.description}
+                      </p>
+
+                      {/* Location */}
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-3">
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{job.location}, {job.country}</span>
+                      </div>
+
+                      {/* Salary */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-base sm:text-lg font-bold text-primary whitespace-pre-line">
+                          {job.salary_display || formatSalary(job.salary_min, job.salary_max, job.currency)}
+                        </span>
+                        <span className="text-xs text-muted-foreground">/month</span>
+                      </div>
+
+                      {/* Visa badge */}
+                      {job.visa_sponsorship && (
+                        <Badge variant="secondary" className="bg-success/10 text-success border-success/20 w-fit mb-3">
+                          <Zap className="h-3 w-3 mr-1" />
+                          Visa Sponsorship
+                        </Badge>
+                      )}
+
+                      {/* Skills */}
+                      {job.job_skills && job.job_skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {job.job_skills.slice(0, 3).map((skill, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs bg-muted/50">
+                              {skill.skill_name}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex-1" />
+
+                      {/* CTA */}
+                      <Button
+                        className="w-full mt-3 group/btn rounded-xl"
+                        onClick={(e) => { e.stopPropagation(); handleQuickApply(job.slug || job.id); }}
+                      >
+                        View & Apply
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
             </div>
 
             <div className="text-center">
@@ -285,7 +287,6 @@ export default function FeaturedJobs() {
           </>
         )}
       </div>
-
     </section>
   );
 }
