@@ -1,9 +1,9 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { notifyOfferResponse } from '@/services/NotificationService';
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -355,24 +355,14 @@ export default function WorkerOffers() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <WorkerHeader />
-        <div className="flex flex-1">
-          <WorkerSidebar />
-          <main className="flex-1 p-8">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <DashboardSkeleton />
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <WorkerHeader />
-      <div className="flex flex-1">
-        <WorkerSidebar />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Job Offers</h1>

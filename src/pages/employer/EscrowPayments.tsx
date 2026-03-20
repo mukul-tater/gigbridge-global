@@ -1,5 +1,5 @@
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -284,26 +284,16 @@ export default function EscrowPayments() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <EmployerHeader />
-        <div className="flex flex-1">
-          <EmployerSidebar />
-          <main className="flex-1 p-4 md:p-8">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
             <div className="flex items-center justify-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
           <PortalBreadcrumb />
           <div className="mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Escrow & Payment System</h1>
@@ -615,9 +605,7 @@ export default function EscrowPayments() {
               </div>
             </div>
           </Card>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }
 

@@ -1,5 +1,5 @@
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ContractVersionHistory from "@/components/ContractVersionHistory";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,11 +40,7 @@ export default function ContractHistory() {
   });
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-      <div className="flex-1">
-        <WorkerHeader />
-          <main className="flex-1 p-4 md:p-6">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <PortalBreadcrumb />
             <Card>
             <CardHeader>
@@ -85,8 +81,6 @@ export default function ContractHistory() {
               )}
             </CardContent>
           </Card>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

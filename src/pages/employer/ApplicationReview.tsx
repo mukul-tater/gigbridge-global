@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { Link } from "react-router-dom";
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -208,24 +208,14 @@ export default function ApplicationReview() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background w-full">
-        <EmployerSidebar />
-        <div className="flex-1 flex flex-col">
-          <EmployerHeader />
-          <main className="flex-1 p-4 md:p-8">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
             <div className="text-center">Loading applications...</div>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <EmployerSidebar />
-      <div className="flex-1 flex flex-col">
-        <EmployerHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold">Application Review</h1>
           </div>
@@ -412,8 +402,6 @@ export default function ApplicationReview() {
             ))}
           </div>
         )}
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

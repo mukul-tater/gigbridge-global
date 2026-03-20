@@ -1,8 +1,8 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import WorkerSidebar from '@/components/worker/WorkerSidebar';
-import WorkerHeader from '@/components/worker/WorkerHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -156,24 +156,14 @@ export default function ApplicationTracking() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
-        <WorkerSidebar />
-        <div className="flex-1 ml-64">
-          <WorkerHeader />
-          <main className="p-6">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <p>Loading applications...</p>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <div className="mb-6">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Application Tracking</h1>
@@ -391,8 +381,6 @@ export default function ApplicationTracking() {
               )}
             </TabsContent>
           </Tabs>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

@@ -1,5 +1,5 @@
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plane, MapPin, Calendar, FileCheck, AlertCircle } from "lucide-react";
@@ -50,11 +50,7 @@ export default function TravelStatus() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Travel & Visa Status</h1>
@@ -205,8 +201,6 @@ export default function TravelStatus() {
             </div>
           </Card>
         </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

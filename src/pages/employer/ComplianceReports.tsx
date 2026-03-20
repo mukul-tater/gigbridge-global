@@ -1,5 +1,5 @@
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -95,11 +95,7 @@ export default function ComplianceReports() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Compliance Reports</h1>
           <p className="text-muted-foreground">Track contracts, visas, insurance, and compliance status</p>
@@ -224,8 +220,6 @@ export default function ComplianceReports() {
             Generate Report
           </Button>
         </Card>
-      </main>
-      </div>
-    </div>
+      </DashboardLayout>
   );
 }

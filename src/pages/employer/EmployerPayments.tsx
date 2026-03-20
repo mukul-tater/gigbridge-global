@@ -1,5 +1,5 @@
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DollarSign } from "lucide-react";
@@ -13,11 +13,7 @@ export default function EmployerPayments() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <EmployerSidebar />
-      <div className="flex-1 flex flex-col">
-        <EmployerHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
           <PortalBreadcrumb />
           <h1 className="text-2xl md:text-3xl font-bold mb-8">Payments</h1>
 
@@ -66,8 +62,6 @@ export default function EmployerPayments() {
             ))}
           </div>
         </Card>
-      </main>
-      </div>
-    </div>
+      </DashboardLayout>
   );
 }

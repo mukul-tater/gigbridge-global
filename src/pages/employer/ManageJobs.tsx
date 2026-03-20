@@ -1,5 +1,5 @@
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -174,27 +174,17 @@ export default function ManageJobs() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background w-full">
-        <EmployerSidebar />
-        <div className="flex-1 flex flex-col">
-          <EmployerHeader />
-          <main className="flex-1 p-4 md:p-8">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
               <h1 className="text-2xl md:text-3xl font-bold">Manage Jobs</h1>
             </div>
             <JobListSkeleton count={4} />
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <EmployerSidebar />
-      <div className="flex-1 flex flex-col">
-        <EmployerHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
         <PortalBreadcrumb />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold">Manage Jobs</h1>
@@ -341,8 +331,6 @@ export default function ManageJobs() {
             ))}
           </div>
         )}
-      </main>
-      </div>
-    </div>
+      </DashboardLayout>
   );
 }

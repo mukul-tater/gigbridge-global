@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { adminNavGroups, adminProfileMenu } from "@/config/adminNav";
 import { useState, useEffect } from "react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminHeader from "@/components/admin/AdminHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -137,8 +137,7 @@ export default function UserManagement() {
           <main className="flex-1 p-4 md:p-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">User Management</h1>
             <p className="text-muted-foreground">Loading users...</p>
-          </main>
-        </div>
+          </DashboardLayout>
       </div>
     );
   }

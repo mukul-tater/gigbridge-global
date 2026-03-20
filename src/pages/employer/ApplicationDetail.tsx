@@ -1,10 +1,9 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import EmployerSidebar from '@/components/employer/EmployerSidebar';
-import EmployerHeader from '@/components/employer/EmployerHeader';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -308,50 +307,29 @@ export default function ApplicationDetail() {
 
   if (loading) {
     return (
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
-          <EmployerSidebar />
-          <div className="flex-1">
-            <EmployerHeader />
-            <main className="p-6">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
               <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
-            </main>
-          </div>
-        </div>
-      </SidebarProvider>
+            </DashboardLayout>
     );
   }
 
   if (!application || !profile) {
     return (
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
-          <EmployerSidebar />
-          <div className="flex-1">
-            <EmployerHeader />
-            <main className="p-6">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
               <div className="text-center py-12">
                 <p className="text-muted-foreground">Application not found</p>
                 <Button onClick={() => navigate('/employer/applications')} className="mt-4">
                   Back to Applications
                 </Button>
               </div>
-            </main>
-          </div>
-        </div>
-      </SidebarProvider>
+            </DashboardLayout>
     );
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <EmployerSidebar />
-        <div className="flex-1">
-          <EmployerHeader />
-          <main className="p-6">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
             {/* Back Button & Header */}
             <div className="mb-6">
               <Button variant="ghost" onClick={() => navigate('/employer/applications')} className="mb-4">
@@ -904,9 +882,6 @@ export default function ApplicationDetail() {
                 </Tabs>
               </div>
             </div>
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+          </DashboardLayout>
   );
 }
