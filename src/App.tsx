@@ -373,6 +373,12 @@ const App = () => (
                 <InvestorDashboard />
               </ProtectedRoute>
             } />
+            {/* Agent Routes */}
+            <Route path="/agent/dashboard" element={
+              <ProtectedRoute allowedRoles={["agent"]}>
+                <AgentDashboard />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
