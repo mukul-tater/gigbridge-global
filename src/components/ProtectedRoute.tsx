@@ -24,7 +24,6 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect to email verification if not verified
   if (!isEmailVerified) {
     return <Navigate to="/verify-email" replace />;
   }
