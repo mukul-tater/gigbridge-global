@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import InteractiveChart from "@/components/InteractiveChart";
 import { Card } from "@/components/ui/card";
-import { Clock, CheckCircle, AlertCircle, LayoutDashboard, User, Building2, PlusCircle, Briefcase, Users, MessageSquare, Calendar, FileSignature, Shield, FileCheck, Bookmark, Star, UserCheck, History, BarChart3 } from "lucide-react";
+import { Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,60 +13,7 @@ import ShortlistedCandidatesCard from "@/components/employer/ShortlistedCandidat
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
-import type { NavGroup } from "@/components/layout/DashboardSidebar";
-
-const employerNavGroups: NavGroup[] = [
-  {
-    label: "Overview",
-    defaultOpen: true,
-    items: [
-      { path: "/employer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-      { path: "/employer/profile", icon: User, label: "My Profile" },
-      { path: "/employer/company", icon: Building2, label: "Company & KYC" },
-    ],
-  },
-  {
-    label: "Jobs & Hiring",
-    defaultOpen: true,
-    items: [
-      { path: "/employer/post-job", icon: PlusCircle, label: "Post a Job" },
-      { path: "/employer/manage-jobs", icon: Briefcase, label: "Manage Jobs" },
-      { path: "/employer/search-workers", icon: Users, label: "Search Workers" },
-      { path: "/employer/saved-searches", icon: Bookmark, label: "Saved Searches" },
-    ],
-  },
-  {
-    label: "Applications",
-    items: [
-      { path: "/employer/applications", icon: UserCheck, label: "Applications" },
-      { path: "/employer/shortlist", icon: Star, label: "Shortlist" },
-      { path: "/employer/interviews", icon: Calendar, label: "Interviews" },
-      { path: "/employer/offers", icon: FileSignature, label: "Offers" },
-    ],
-  },
-  {
-    label: "Operations",
-    items: [
-      { path: "/employer/formalities", icon: FileCheck, label: "Formalities" },
-      { path: "/employer/contracts", icon: FileSignature, label: "Contracts" },
-      { path: "/employer/contract-history", icon: History, label: "Contract History" },
-      { path: "/employer/escrow", icon: Shield, label: "Payments" },
-    ],
-  },
-  {
-    label: "Reports",
-    items: [
-      { path: "/employer/compliance", icon: FileCheck, label: "Compliance" },
-      { path: "/employer/reports", icon: BarChart3, label: "Analytics" },
-      { path: "/employer/messaging", icon: MessageSquare, label: "Messages" },
-    ],
-  },
-];
-
-const employerProfileMenu = [
-  { label: "My Account", icon: User, path: "/employer/profile" },
-  { label: "Company Profile", icon: Building2, path: "/employer/company" },
-];
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 
 export default function EmployerDashboard() {
   const { profile } = useAuth();

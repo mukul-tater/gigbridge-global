@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
-import { Briefcase, FileText, MessageSquare, TrendingUp, User, BadgeCheck, Bookmark, FileCheck, CalendarCheck, Calendar, FileSignature, GraduationCap, Plane, Shield, DollarSign, Upload, Bell, LayoutDashboard, History } from "lucide-react";
+import { Briefcase, FileText, MessageSquare, TrendingUp, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import DocumentVerificationCard from "@/components/worker/DocumentVerificationCard";
@@ -13,60 +13,7 @@ import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 import { Link } from "react-router-dom";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 import { formatDistanceToNow } from "date-fns";
-import type { NavGroup } from "@/components/layout/DashboardSidebar";
-
-const workerNavGroups: NavGroup[] = [
-  {
-    label: "Overview",
-    defaultOpen: true,
-    items: [
-      { path: "/worker/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-      { path: "/worker/profile", icon: User, label: "Profile" },
-      { path: "/worker/verification", icon: BadgeCheck, label: "Verification" },
-    ],
-  },
-  {
-    label: "Jobs",
-    defaultOpen: true,
-    items: [
-      { path: "/jobs", icon: Briefcase, label: "Job Search" },
-      { path: "/worker/saved-searches", icon: Bookmark, label: "Saved Searches" },
-      { path: "/worker/applications", icon: FileText, label: "Applications" },
-      { path: "/worker/application-tracking", icon: FileCheck, label: "Track Applications" },
-    ],
-  },
-  {
-    label: "Hiring Process",
-    items: [
-      { path: "/worker/interviews", icon: CalendarCheck, label: "Interviews" },
-      { path: "/worker/calendar", icon: Calendar, label: "Calendar" },
-      { path: "/worker/offers", icon: FileSignature, label: "Job Offers" },
-      { path: "/worker/training", icon: GraduationCap, label: "Training & PDOT" },
-    ],
-  },
-  {
-    label: "Post-Hiring",
-    items: [
-      { path: "/worker/contracts", icon: FileSignature, label: "Contracts" },
-      { path: "/worker/contract-history", icon: History, label: "Contract History" },
-      { path: "/worker/travel", icon: Plane, label: "Travel & Visa" },
-      { path: "/worker/insurance", icon: Shield, label: "Insurance" },
-      { path: "/worker/payments", icon: DollarSign, label: "Payments" },
-    ],
-  },
-  {
-    label: "Account",
-    items: [
-      { path: "/worker/documents", icon: Upload, label: "Documents" },
-      { path: "/worker/messaging", icon: MessageSquare, label: "Messages" },
-      { path: "/worker/notifications", icon: Bell, label: "Notifications" },
-    ],
-  },
-];
-
-const workerProfileMenu = [
-  { label: "My Profile", icon: User, path: "/worker/profile" },
-];
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 
 interface RecentActivity {
   id: string;
