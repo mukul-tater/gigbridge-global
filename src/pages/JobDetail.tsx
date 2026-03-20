@@ -607,7 +607,9 @@ export default function JobDetail() {
         </div>
       </main>
 
-      <Footer />
+      <ScrollReveal>
+        <Footer />
+      </ScrollReveal>
     </div>
   );
 }
