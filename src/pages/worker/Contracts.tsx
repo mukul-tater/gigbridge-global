@@ -197,12 +197,9 @@ export default function Contracts() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <WorkerSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
-      </div>
+        </DashboardLayout>
     );
   }
 

@@ -140,11 +140,7 @@ export default function JobVerification() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background w-full">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <AdminHeader />
-          <main className="flex-1 p-4 md:p-8">
+      <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
             <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Job Verification & Management</h1>
             <p className="text-muted-foreground">Loading jobs...</p>
           </DashboardLayout>
@@ -153,11 +149,7 @@ export default function JobVerification() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+    <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
           <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Job Verification & Management</h1>
 
           <div className="space-y-4">
@@ -225,8 +217,7 @@ export default function JobVerification() {
               </Card>
             ))}
           </div>
-        </main>
-      </div>
+        </DashboardLayout>
 
       <AlertDialog open={!!deleteJobId} onOpenChange={() => setDeleteJobId(null)}>
         <AlertDialogContent>

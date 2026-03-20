@@ -91,11 +91,7 @@ export default function ContactSubmissions() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <AdminHeader />
-          <main className="flex-1 p-4 md:p-6 flex items-center justify-center">
+      <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </DashboardLayout>
       </div>
@@ -103,11 +99,7 @@ export default function ContactSubmissions() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        <main className="flex-1 p-4 md:p-6 pt-16 md:pt-6">
+    <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center gap-3">
               <Mail className="h-6 w-6 text-primary" />
@@ -233,8 +225,6 @@ export default function ContactSubmissions() {
               </CardContent>
             </Card>
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

@@ -219,11 +219,7 @@ export default function ECRManagement() {
   const ecnr = workers.filter(w => w.ecr_status === 'not_required' || w.ecr_status === 'exempted').length;
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
           <h1 className="text-2xl md:text-3xl font-bold mb-6">ECR Management</h1>
 
           {/* Info Card */}
