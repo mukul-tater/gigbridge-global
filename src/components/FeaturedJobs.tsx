@@ -17,8 +17,9 @@ interface FeaturedJob {
   country: string;
   salary_min: number;
   salary_max: number;
-  currency: string;
-  job_type: string;
+    currency: string;
+    salary_display?: string | null;
+    job_type: string;
   visa_sponsorship: boolean;
   posted_at: string;
   employer_profiles?: {
@@ -234,8 +235,8 @@ export default function FeaturedJobs() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-primary">
-                            {formatSalary(job.salary_min, job.salary_max, job.currency)}
+                          <span className="text-lg font-bold text-primary whitespace-pre-line">
+                            {job.salary_display || formatSalary(job.salary_min, job.salary_max, job.currency)}
                           </span>
                           <span className="text-xs text-muted-foreground">/month</span>
                         </div>
