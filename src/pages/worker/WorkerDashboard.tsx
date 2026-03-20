@@ -1,8 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
-import { Briefcase, FileText, MessageSquare, TrendingUp } from "lucide-react";
+import { Briefcase, FileText, MessageSquare, TrendingUp, User, BadgeCheck, Bookmark, FileCheck, CalendarCheck, Calendar, FileSignature, GraduationCap, Plane, Shield, DollarSign, Upload, Bell, LayoutDashboard, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import DocumentVerificationCard from "@/components/worker/DocumentVerificationCard";
@@ -14,6 +13,32 @@ import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 import { Link } from "react-router-dom";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 import { formatDistanceToNow } from "date-fns";
+
+const workerNavItems = [
+  { path: "/worker/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/worker/profile", icon: User, label: "Profile" },
+  { path: "/worker/verification", icon: BadgeCheck, label: "Verification Status" },
+  { path: "/jobs", icon: Briefcase, label: "Job Search" },
+  { path: "/worker/saved-searches", icon: Bookmark, label: "Saved Searches" },
+  { path: "/worker/applications", icon: FileText, label: "Applications" },
+  { path: "/worker/application-tracking", icon: FileCheck, label: "Track Applications" },
+  { path: "/worker/interviews", icon: CalendarCheck, label: "Interviews" },
+  { path: "/worker/calendar", icon: Calendar, label: "Calendar" },
+  { path: "/worker/offers", icon: FileSignature, label: "Job Offers" },
+  { path: "/worker/training", icon: GraduationCap, label: "Training & PDOT" },
+  { path: "/worker/contracts", icon: FileSignature, label: "Contracts" },
+  { path: "/worker/contract-history", icon: History, label: "Contract History" },
+  { path: "/worker/travel", icon: Plane, label: "Travel & Visa" },
+  { path: "/worker/insurance", icon: Shield, label: "Insurance & Remittance" },
+  { path: "/worker/payments", icon: DollarSign, label: "My Payments" },
+  { path: "/worker/documents", icon: Upload, label: "Documents" },
+  { path: "/worker/messaging", icon: MessageSquare, label: "Messages" },
+  { path: "/worker/notifications", icon: Bell, label: "Notifications" },
+];
+
+const workerProfileMenu = [
+  { label: "My Profile", icon: User, path: "/worker/profile" },
+];
 
 interface RecentActivity {
   id: string;
@@ -61,21 +86,8 @@ export default function WorkerDashboard() {
         supabase.from('worker_skills').select('*').eq('worker_id', profile?.id),
         supabase.from('work_experience').select('*').eq('worker_id', profile?.id),
         supabase.from('worker_certifications').select('*').eq('worker_id', profile?.id),
-        supabase.from('job_applications').select(`
-          *,
-          jobs:job_id (title, location, country)
-        `).eq('worker_id', profile?.id).order('applied_at', { ascending: false }).limit(5),
-        supabase
-          .from('job_formalities')
-          .select(`
-            *,
-            jobs:job_id (
-              title,
-              location,
-              country
-            )
-          `)
-          .eq('worker_id', profile?.id),
+        supabase.from('job_applications').select(`*, jobs:job_id (title, location, country)`).eq('worker_id', profile?.id).order('applied_at', { ascending: false }).limit(5),
+        supabase.from('job_formalities').select(`*, jobs:job_id (title, location, country)`).eq('worker_id', profile?.id),
         supabase.from('notifications').select('*').eq('user_id', profile?.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('jobs').select('*').eq('status', 'ACTIVE').order('created_at', { ascending: false }).limit(3)
       ]);
@@ -89,9 +101,7 @@ export default function WorkerDashboard() {
       setJobFormalities(formalitiesRes.data || []);
       setRecommendedJobs(jobsRes.data || []);
 
-      // Build recent activity from applications and notifications
       const activities: RecentActivity[] = [];
-      
       (appsRes.data || []).forEach((app: any) => {
         activities.push({
           id: `app-${app.id}`,
@@ -101,7 +111,6 @@ export default function WorkerDashboard() {
           timestamp: app.applied_at
         });
       });
-
       (notificationsRes.data || []).forEach((notif: any) => {
         activities.push({
           id: `notif-${notif.id}`,
@@ -111,8 +120,6 @@ export default function WorkerDashboard() {
           timestamp: notif.created_at
         });
       });
-
-      // Sort by timestamp and take first 5
       activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       setRecentActivity(activities.slice(0, 5));
     } catch (error) {
@@ -127,148 +134,133 @@ export default function WorkerDashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <WorkerSidebar />
-        <div className="flex-1 flex flex-col">
-          <WorkerHeader />
-          <main className="flex-1 p-4 md:p-8">
-            <DashboardSkeleton />
-          </main>
-        </div>
-      </div>
+      <DashboardLayout navItems={workerNavItems} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
+        <DashboardSkeleton />
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
-          <PortalBreadcrumb />
-          <OnboardingStepper />
-          
-          <div className="mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Worker'}!</h1>
-            <p className="text-muted-foreground text-sm md:text-base">Here's an overview of your activity</p>
-          </div>
+    <DashboardLayout navItems={workerNavItems} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
+      <PortalBreadcrumb />
+      <OnboardingStepper />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Briefcase className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">{applications.length}</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Active Applications</p>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <FileText className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">{verifiedDocsCount}/{documents.length}</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Verified Documents</p>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <MessageSquare className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">{pendingDocsCount}</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Pending Verifications</p>
-          </Card>
-
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">{skills.length}</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Skills Added</p>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-          <ProfileProgressCard
-            hasProfile={!!workerProfile}
-            hasDocuments={documents.length > 0}
-            documentsVerified={verifiedDocsCount > 0}
-            hasSkills={skills.length > 0}
-            hasExperience={experience.length > 0}
-            hasCertifications={certifications.length > 0}
-          />
-          <ECRStatusCard
-            ecrStatus={workerProfile?.ecr_status || 'not_checked'}
-            ecrCategory={workerProfile?.ecr_category || null}
-            nationality={workerProfile?.nationality || null}
-            hasPassport={workerProfile?.has_passport || false}
-          />
-        </div>
-
-        <div className="mb-6 md:mb-8">
-          <DocumentVerificationCard documents={documents} />
-        </div>
-
-        {jobFormalities.length > 0 && (
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-xl font-bold mb-4">Job Journey Progress</h2>
-            <JobJourneyProgressCard formalities={jobFormalities} />
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              {recentActivity.length > 0 ? (
-                recentActivity.map((activity, index) => (
-                  <div key={activity.id} className={`flex items-start gap-3 ${index < recentActivity.length - 1 ? 'pb-3 border-b' : ''}`}>
-                    <div className="bg-primary/10 p-2 rounded">
-                      {activity.type === 'application' ? (
-                        <Briefcase className="h-4 w-4 text-primary" />
-                      ) : activity.type === 'message' ? (
-                        <MessageSquare className="h-4 w-4 text-primary" />
-                      ) : (
-                        <FileText className="h-4 w-4 text-primary" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">{activity.title}</p>
-                      <p className="text-sm text-muted-foreground">{activity.subtitle}</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-muted-foreground text-center py-4">No recent activity</p>
-              )}
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Recommended Jobs</h2>
-            <div className="space-y-4">
-              {recommendedJobs.length > 0 ? (
-                recommendedJobs.map((job) => (
-                  <Link key={job.id} to={`/jobs/${job.id}`} className="block">
-                    <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                      <h3 className="font-semibold mb-1">{job.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {job.location}, {job.country}
-                        {job.salary_min && job.salary_max && (
-                          <> • {job.currency} {job.salary_min.toLocaleString()} - {job.salary_max.toLocaleString()}</>
-                        )}
-                      </p>
-                      <p className="text-sm">{job.experience_level} experience</p>
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <p className="text-muted-foreground text-center py-4">No jobs available</p>
-              )}
-            </div>
-          </Card>
-        </div>
-      </main>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {profile?.full_name || 'Worker'}!</h1>
+        <p className="text-muted-foreground text-sm md:text-base">Here's an overview of your activity</p>
       </div>
-    </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <Briefcase className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold">{applications.length}</span>
+          </div>
+          <p className="text-sm text-muted-foreground">Active Applications</p>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <FileText className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold">{verifiedDocsCount}/{documents.length}</span>
+          </div>
+          <p className="text-sm text-muted-foreground">Verified Documents</p>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <MessageSquare className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold">{pendingDocsCount}</span>
+          </div>
+          <p className="text-sm text-muted-foreground">Pending Verifications</p>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <TrendingUp className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold">{skills.length}</span>
+          </div>
+          <p className="text-sm text-muted-foreground">Skills Added</p>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+        <ProfileProgressCard
+          hasProfile={!!workerProfile}
+          hasDocuments={documents.length > 0}
+          documentsVerified={verifiedDocsCount > 0}
+          hasSkills={skills.length > 0}
+          hasExperience={experience.length > 0}
+          hasCertifications={certifications.length > 0}
+        />
+        <ECRStatusCard
+          ecrStatus={workerProfile?.ecr_status || 'not_checked'}
+          ecrCategory={workerProfile?.ecr_category || null}
+          nationality={workerProfile?.nationality || null}
+          hasPassport={workerProfile?.has_passport || false}
+        />
+      </div>
+
+      <div className="mb-6 md:mb-8">
+        <DocumentVerificationCard documents={documents} />
+      </div>
+
+      {jobFormalities.length > 0 && (
+        <div className="mb-6 md:mb-8">
+          <h2 className="text-xl font-bold mb-4">Job Journey Progress</h2>
+          <JobJourneyProgressCard formalities={jobFormalities} />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+        <Card className="p-6">
+          <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
+          <div className="space-y-4">
+            {recentActivity.length > 0 ? (
+              recentActivity.map((activity, index) => (
+                <div key={activity.id} className={`flex items-start gap-3 ${index < recentActivity.length - 1 ? 'pb-3 border-b' : ''}`}>
+                  <div className="bg-primary/10 p-2 rounded">
+                    {activity.type === 'application' ? (
+                      <Briefcase className="h-4 w-4 text-primary" />
+                    ) : activity.type === 'message' ? (
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                    ) : (
+                      <FileText className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium">{activity.title}</p>
+                    <p className="text-sm text-muted-foreground">{activity.subtitle}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-center py-4">No recent activity</p>
+            )}
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-xl font-bold mb-4">Recommended Jobs</h2>
+          <div className="space-y-4">
+            {recommendedJobs.length > 0 ? (
+              recommendedJobs.map((job) => (
+                <Link key={job.id} to={`/jobs/${job.id}`} className="block">
+                  <div className="p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                    <h3 className="font-semibold mb-1">{job.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {job.location}, {job.country}
+                      {job.salary_min && job.salary_max && (
+                        <> • {job.currency} {job.salary_min.toLocaleString()} - {job.salary_max.toLocaleString()}</>
+                      )}
+                    </p>
+                    <p className="text-sm">{job.experience_level} experience</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-center py-4">No jobs available</p>
+            )}
+          </div>
+        </Card>
+      </div>
+    </DashboardLayout>
   );
 }
