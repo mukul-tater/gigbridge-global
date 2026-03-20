@@ -22,6 +22,9 @@ export default function Dashboard() {
           case 'worker':
             navigate("/worker/dashboard");
             break;
+          case 'agent':
+            navigate("/agent/dashboard");
+            break;
           default:
             navigate("/");
         }

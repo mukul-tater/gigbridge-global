@@ -78,6 +78,7 @@ import DisputeResolution from "./pages/admin/DisputeResolution";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import InvestorDashboard from "./pages/admin/InvestorDashboard";
 import InvestorRelations from "./pages/InvestorRelations";
+import AgentDashboard from "./pages/agent/AgentDashboard";
 
 // Worker Verification
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
@@ -370,6 +371,12 @@ const App = () => (
             <Route path="/admin/investor-dashboard" element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <InvestorDashboard />
+              </ProtectedRoute>
+            } />
+            {/* Agent Routes */}
+            <Route path="/agent/dashboard" element={
+              <ProtectedRoute allowedRoles={["agent"]}>
+                <AgentDashboard />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
