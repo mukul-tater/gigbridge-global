@@ -17,8 +17,9 @@ interface FeaturedJob {
   country: string;
   salary_min: number;
   salary_max: number;
-  currency: string;
-  job_type: string;
+    currency: string;
+    salary_display?: string | null;
+    job_type: string;
   visa_sponsorship: boolean;
   posted_at: string;
   employer_profiles?: {
