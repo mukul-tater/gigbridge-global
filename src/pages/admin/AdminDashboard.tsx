@@ -207,7 +207,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout navItems={adminNavItems} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
+      <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
         <AdminDashboardSkeleton />
       </DashboardLayout>
     );
