@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import ScrollReveal from "@/components/ScrollReveal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -263,8 +264,9 @@ export default function JobCategories() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
+      <MobileBottomNav />
       
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">

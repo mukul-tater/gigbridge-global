@@ -414,7 +414,7 @@ export default function Jobs() {
 
   // Default Public Layout
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <SEOHead
         title="International Jobs | Find Global Opportunities | SafeWorkGlobal"
         description="Browse 50,000+ international job opportunities for skilled workers in construction, electrical, welding, and more. Visa sponsorship available across 15+ countries."
@@ -426,7 +426,7 @@ export default function Jobs() {
       <Header />
       <MobileBottomNav />
       
-      <main className="container mx-auto px-4 py-5 md:py-8">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-10">
         <header className="mb-5 md:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 md:mb-2">Find Your Next Global Opportunity</h1>
           <p className="text-sm md:text-base text-muted-foreground">

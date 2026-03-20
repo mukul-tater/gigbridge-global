@@ -1,97 +1,145 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import { Building2, Users, Target, Award } from "lucide-react";
+import ScrollReveal from "@/components/ScrollReveal";
+import { Building2, Users, Target, Award, Heart, Globe, Shield } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function AboutUs() {
+  const stats = [
+    { icon: Building2, value: "500+", label: "Companies", color: "bg-primary/10 text-primary" },
+    { icon: Users, value: "10K+", label: "Workers Placed", color: "bg-secondary/10 text-secondary" },
+    { icon: Target, value: "5K+", label: "Jobs Posted", color: "bg-info/10 text-info" },
+    { icon: Award, value: "98%", label: "Satisfaction", color: "bg-success/10 text-success" },
+  ];
+
+  const values = [
+    {
+      icon: Heart,
+      title: "Worker First",
+      description: "We prioritize worker welfare, safety, and fair compensation in everything we do.",
+    },
+    {
+      icon: Shield,
+      title: "Transparency",
+      description: "Clear terms, honest communication, and complete visibility throughout the process.",
+    },
+    {
+      icon: Award,
+      title: "Quality",
+      description: "We maintain high standards for both workers and employers on our platform.",
+    },
+  ];
+
+  const team = [
+    { name: "Mukul Tater", role: "Founder & CEO", initials: "MT" },
+    { name: "Priya Sharma", role: "Head of Operations", initials: "PS" },
+    { name: "Raj Patel", role: "CTO", initials: "RP" },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
       <MobileBottomNav />
+
       <main className="flex-1">
-        <section className="py-20 bg-gradient-to-b from-primary/5 to-background">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">About SafeWorkGlobal</h1>
-            <p className="text-xl text-center text-muted-foreground max-w-3xl mx-auto">
-              Connecting skilled workers with opportunities across the globe
-            </p>
+        {/* Hero */}
+        <section className="py-16 md:py-24 bg-gradient-to-b from-primary/[0.04] to-background">
+          <div className="container mx-auto px-4 sm:px-6 text-center">
+            <ScrollReveal>
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-primary/10 text-primary mb-4">
+                <Globe className="h-3.5 w-3.5" />
+                Our Story
+              </span>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-heading text-foreground mb-4 tracking-tight">
+                About SafeWorkGlobal
+              </h1>
+              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Connecting skilled workers with verified opportunities across the globe — safely, ethically, and transparently.
+              </p>
+            </ScrollReveal>
           </div>
         </section>
 
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-              <div>
-                <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
-                <p className="text-muted-foreground mb-4">
-                  SafeWorkGlobal is dedicated to bridging the gap between skilled workers and employers worldwide. 
-                  We provide a secure, transparent platform that empowers workers to find meaningful employment 
+        {/* Mission + Stats */}
+        <section className="py-12 md:py-20">
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center mb-16 md:mb-24">
+              <ScrollReveal>
+                <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-4">Our Mission</h2>
+                <p className="text-muted-foreground mb-4 leading-relaxed">
+                  SafeWorkGlobal is dedicated to bridging the gap between skilled workers and employers worldwide.
+                  We provide a secure, transparent platform that empowers workers to find meaningful employment
                   while helping employers discover qualified talent.
                 </p>
-                <p className="text-muted-foreground">
-                  With a focus on compliance, worker welfare, and fair employment practices, we're building 
-                  the future of gig work.
+                <p className="text-muted-foreground leading-relaxed">
+                  With a focus on compliance, worker welfare, and fair employment practices, we're building
+                  the future of global workforce mobility.
                 </p>
-              </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-card p-6 rounded-lg border text-center">
-                  <Building2 className="h-12 w-12 text-primary mx-auto mb-4" />
-                  <h3 className="font-bold text-2xl mb-2">500+</h3>
-                  <p className="text-sm text-muted-foreground">Companies</p>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.1}>
+                <div className="grid grid-cols-2 gap-4">
+                  {stats.map((stat) => (
+                    <Card key={stat.label} className="text-center border-border/50">
+                      <CardContent className="pt-6 pb-5">
+                        <div className={`inline-flex p-3 rounded-xl ${stat.color.split(' ')[0]} mb-3`}>
+                          <stat.icon className={`h-6 w-6 ${stat.color.split(' ')[1]}`} />
+                        </div>
+                        <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-1">{stat.value}</h3>
+                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-                <div className="bg-card p-6 rounded-lg border text-center">
-                  <Users className="h-12 w-12 text-primary mx-auto mb-4" />
-                  <h3 className="font-bold text-2xl mb-2">10K+</h3>
-                  <p className="text-sm text-muted-foreground">Workers</p>
-                </div>
-                <div className="bg-card p-6 rounded-lg border text-center">
-                  <Target className="h-12 w-12 text-primary mx-auto mb-4" />
-                  <h3 className="font-bold text-2xl mb-2">5K+</h3>
-                  <p className="text-sm text-muted-foreground">Jobs Posted</p>
-                </div>
-                <div className="bg-card p-6 rounded-lg border text-center">
-                  <Award className="h-12 w-12 text-primary mx-auto mb-4" />
-                  <h3 className="font-bold text-2xl mb-2">98%</h3>
-                  <p className="text-sm text-muted-foreground">Satisfaction</p>
-                </div>
-              </div>
+              </ScrollReveal>
             </div>
 
-            <div className="bg-primary/5 rounded-lg p-12">
-              <h2 className="text-3xl font-bold text-center mb-12">Our Values</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Worker First</h3>
-                  <p className="text-muted-foreground">
-                    We prioritize worker welfare, safety, and fair compensation in everything we do.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Target className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Transparency</h3>
-                  <p className="text-muted-foreground">
-                    Clear terms, honest communication, and complete visibility throughout the process.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Award className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="font-bold text-xl mb-3">Quality</h3>
-                  <p className="text-muted-foreground">
-                    We maintain high standards for both workers and employers on our platform.
-                  </p>
+            {/* Values */}
+            <ScrollReveal>
+              <div className="bg-muted/30 rounded-2xl p-8 sm:p-12">
+                <h2 className="text-2xl sm:text-3xl font-bold font-heading text-center mb-10">Our Values</h2>
+                <div className="grid sm:grid-cols-3 gap-8">
+                  {values.map((v, i) => (
+                    <ScrollReveal key={v.title} delay={i * 0.08}>
+                      <div className="text-center">
+                        <div className="inline-flex p-4 rounded-2xl bg-primary/10 mb-4">
+                          <v.icon className="h-7 w-7 text-primary" />
+                        </div>
+                        <h3 className="font-semibold text-lg text-foreground mb-2">{v.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{v.description}</p>
+                      </div>
+                    </ScrollReveal>
+                  ))}
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
+
+            {/* Team */}
+            <ScrollReveal>
+              <div className="mt-16 md:mt-24 text-center">
+                <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-8">Leadership Team</h2>
+                <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+                  {team.map((member, i) => (
+                    <ScrollReveal key={member.name} delay={i * 0.08}>
+                      <Card className="border-border/50">
+                        <CardContent className="pt-6 pb-5 text-center">
+                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                            <span className="text-lg font-bold text-primary">{member.initials}</span>
+                          </div>
+                          <h4 className="font-semibold text-foreground">{member.name}</h4>
+                          <p className="text-sm text-muted-foreground">{member.role}</p>
+                        </CardContent>
+                      </Card>
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
       </main>
+
       <Footer />
     </div>
   );

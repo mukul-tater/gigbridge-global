@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import MobileBottomNav from '@/components/MobileBottomNav';
+import ScrollReveal from '@/components/ScrollReveal';
 import SEOHead from '@/components/SEOHead';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -261,9 +263,10 @@ export default function JobDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
         <Header />
-        <main className="pt-20 pb-12">
+        <MobileBottomNav />
+        <main className="flex-1 py-6 md:py-10">
           <JobDetailSkeleton />
         </main>
         <Footer />
@@ -273,10 +276,11 @@ export default function JobDetail() {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
         <Header />
-        <main className="pt-20 pb-12">
-          <div className="container mx-auto px-4 text-center py-12">
+        <MobileBottomNav />
+        <main className="flex-1 py-6 md:py-10">
+          <div className="container mx-auto px-4 sm:px-6 text-center py-12">
             <h1 className="text-2xl font-bold mb-4">Job Not Found</h1>
             <p className="text-muted-foreground mb-6">This job listing may have been removed or expired.</p>
             <Button onClick={() => navigate('/jobs')}>Browse All Jobs</Button>
@@ -328,7 +332,7 @@ export default function JobDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <SEOHead
         title={`${job.title} at ${companyName} | SafeWorkGlobal`}
         description={`Apply for ${job.title} in ${job.location}, ${job.country}. ${job.visa_sponsorship ? 'Visa sponsorship available.' : ''} Salary: ${job.currency} ${job.salary_min}-${job.salary_max}/month.`}
@@ -338,9 +342,10 @@ export default function JobDetail() {
         structuredData={jobStructuredData}
       />
       <Header />
+      <MobileBottomNav />
       
-      <main className="pt-20 pb-12">
-        <div className="container mx-auto px-4">
+      <main className="flex-1 py-6 md:py-10">
+        <div className="container mx-auto px-4 sm:px-6">
           {/* Back Button */}
           <Link to="/jobs">
             <Button variant="ghost" className="mb-6">
@@ -359,7 +364,7 @@ export default function JobDetail() {
                     <Badge variant="outline">{job.job_type.replace('_', ' ')}</Badge>
                     <Badge variant="outline">{job.experience_level}</Badge>
                     {job.visa_sponsorship && (
-                      <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                      <Badge className="bg-success/10 text-success border-success/20">
                         <Shield className="h-3 w-3 mr-1" />
                         Visa Sponsorship
                       </Badge>
@@ -512,9 +517,9 @@ export default function JobDetail() {
                   )}
                   
                   {hasApplied && (
-                    <Alert className="bg-green-500/10 border-green-500/20">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-700">
+                    <Alert className="bg-success/10 border-success/20">
+                      <CheckCircle2 className="h-4 w-4 text-success" />
+                      <AlertDescription className="text-success">
                         Your application is under review.
                       </AlertDescription>
                     </Alert>
@@ -606,7 +611,9 @@ export default function JobDetail() {
         </div>
       </main>
 
-      <Footer />
+      <ScrollReveal>
+        <Footer />
+      </ScrollReveal>
     </div>
   );
 }
