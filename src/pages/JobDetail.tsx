@@ -328,7 +328,7 @@ export default function JobDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <SEOHead
         title={`${job.title} at ${companyName} | SafeWorkGlobal`}
         description={`Apply for ${job.title} in ${job.location}, ${job.country}. ${job.visa_sponsorship ? 'Visa sponsorship available.' : ''} Salary: ${job.currency} ${job.salary_min}-${job.salary_max}/month.`}
@@ -338,9 +338,10 @@ export default function JobDetail() {
         structuredData={jobStructuredData}
       />
       <Header />
+      <MobileBottomNav />
       
-      <main className="pt-20 pb-12">
-        <div className="container mx-auto px-4">
+      <main className="flex-1 py-6 md:py-10">
+        <div className="container mx-auto px-4 sm:px-6">
           {/* Back Button */}
           <Link to="/jobs">
             <Button variant="ghost" className="mb-6">
