@@ -263,9 +263,10 @@ export default function JobDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
         <Header />
-        <main className="pt-20 pb-12">
+        <MobileBottomNav />
+        <main className="flex-1 py-6 md:py-10">
           <JobDetailSkeleton />
         </main>
         <Footer />
@@ -275,10 +276,11 @@ export default function JobDetail() {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
         <Header />
-        <main className="pt-20 pb-12">
-          <div className="container mx-auto px-4 text-center py-12">
+        <MobileBottomNav />
+        <main className="flex-1 py-6 md:py-10">
+          <div className="container mx-auto px-4 sm:px-6 text-center py-12">
             <h1 className="text-2xl font-bold mb-4">Job Not Found</h1>
             <p className="text-muted-foreground mb-6">This job listing may have been removed or expired.</p>
             <Button onClick={() => navigate('/jobs')}>Browse All Jobs</Button>
