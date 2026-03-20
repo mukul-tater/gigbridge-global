@@ -26,7 +26,7 @@ const SuccessMetrics = () => {
           animateCounts();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
 
     if (sectionRef.current) {
@@ -46,7 +46,7 @@ const SuccessMetrics = () => {
       step++;
       const progress = Math.min(step / steps, 1);
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      
+
       setCounts({
         jobsFilled: Math.floor(finalCounts.jobsFilled * easeOutQuart),
         workersPlaced: Math.floor(finalCounts.workersPlaced * easeOutQuart),
@@ -67,7 +67,6 @@ const SuccessMetrics = () => {
       label: "Jobs Filled",
       value: counts.jobsFilled.toLocaleString(),
       suffix: "+",
-      gradient: "from-primary to-primary/70",
       iconBg: "bg-primary/10",
       iconColor: "text-primary"
     },
@@ -76,7 +75,6 @@ const SuccessMetrics = () => {
       label: "Workers Placed",
       value: counts.workersPlaced.toLocaleString(),
       suffix: "+",
-      gradient: "from-secondary to-secondary/70",
       iconBg: "bg-secondary/10",
       iconColor: "text-secondary"
     },
@@ -85,7 +83,6 @@ const SuccessMetrics = () => {
       label: "Countries Covered",
       value: counts.countries.toLocaleString(),
       suffix: "",
-      gradient: "from-success to-success/70",
       iconBg: "bg-success/10",
       iconColor: "text-success"
     },
@@ -94,62 +91,43 @@ const SuccessMetrics = () => {
       label: "Active Employers",
       value: counts.activeEmployers.toLocaleString(),
       suffix: "+",
-      gradient: "from-info to-info/70",
       iconBg: "bg-info/10",
       iconColor: "text-info"
     }
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 lg:py-24 relative overflow-hidden">
-      {/* Background */}
+    <section ref={sectionRef} className="py-12 sm:py-16 lg:py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
-      
-      {/* Decorative elements */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-      
-      <div className="container mx-auto px-4 lg:px-6 relative z-10">
-        {/* Section Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-2xl lg:text-3xl font-bold font-heading text-foreground mb-3">
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold font-heading text-foreground mb-2 sm:mb-3">
             Trusted by <span className="text-gradient">Thousands</span> Worldwide
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto">
             Join our growing community of workers finding opportunities across the globe
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {metrics.map((metric, index) => (
-            <div 
-              key={index} 
-              className="group relative"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              {/* Card */}
-              <div className="relative h-full p-6 lg:p-8 rounded-2xl lg:rounded-3xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-lg overflow-hidden">
-                {/* Gradient overlay on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${metric.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500`} />
-                
-                {/* Icon */}
-                <div className={`inline-flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl ${metric.iconBg} mb-4 group-hover:scale-110 transition-transform duration-500`}>
-                  <metric.icon className={`h-6 w-6 lg:h-7 lg:w-7 ${metric.iconColor}`} />
+            <div key={index} className="group relative">
+              <div className="relative h-full p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg overflow-hidden">
+                <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg sm:rounded-xl ${metric.iconBg} mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <metric.icon className={`h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 ${metric.iconColor}`} />
                 </div>
-                
-                {/* Value */}
-                <div className="text-3xl lg:text-4xl xl:text-5xl font-bold font-heading text-foreground mb-2 tracking-tight">
+
+                <div className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold font-heading text-foreground mb-1 sm:mb-2 tracking-tight tabular-nums">
                   {metric.value}
-                  <span className={`text-2xl lg:text-3xl ${metric.iconColor}`}>{metric.suffix}</span>
+                  <span className={`text-lg sm:text-2xl lg:text-3xl ${metric.iconColor}`}>{metric.suffix}</span>
                 </div>
-                
-                {/* Label */}
-                <div className="text-sm lg:text-base text-muted-foreground font-medium">
+
+                <div className="text-xs sm:text-sm lg:text-base text-muted-foreground font-medium">
                   {metric.label}
                 </div>
-                
-                {/* Decorative corner */}
-                <div className={`absolute -bottom-4 -right-4 w-20 h-20 bg-gradient-to-br ${metric.gradient} opacity-10 rounded-full blur-xl group-hover:opacity-20 transition-opacity`} />
               </div>
             </div>
           ))}
