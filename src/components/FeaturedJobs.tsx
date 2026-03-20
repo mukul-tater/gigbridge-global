@@ -236,7 +236,7 @@ export default function FeaturedJobs() {
 
                         <div className="flex items-center gap-2">
                           <span className="text-lg font-bold text-primary">
-                            {formatSalary(job.salary_min, job.salary_max, job.currency)}
+                            {job.salary_display || formatSalary(job.salary_min, job.salary_max, job.currency)}
                           </span>
                           <span className="text-xs text-muted-foreground">/month</span>
                         </div>
