@@ -263,8 +263,9 @@ export default function JobCategories() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
+      <MobileBottomNav />
       
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">

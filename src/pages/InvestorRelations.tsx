@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { 
   TrendingUp, 
   Users, 
