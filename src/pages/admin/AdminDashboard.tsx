@@ -214,7 +214,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <DashboardLayout navItems={adminNavItems} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
+    <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
       <PortalBreadcrumb />
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2">Admin Dashboard</h1>
