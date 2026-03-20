@@ -136,7 +136,7 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4 pb-24 md:pb-8">
         <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="text-center">
-            <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-2" />
+            <CheckCircle className="h-12 w-12 mx-auto text-success mb-2" />
             <CardTitle>Password Updated!</CardTitle>
             <CardDescription>
               Your password has been successfully updated. Redirecting to login...
