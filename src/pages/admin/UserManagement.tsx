@@ -219,6 +219,6 @@ export default function UserManagement() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </DashboardLayout>
   );
 }
