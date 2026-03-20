@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useParams, Link } from "react-router-dom";
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -164,25 +164,15 @@ export default function WorkerApplicationDetail() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <WorkerSidebar />
-        <div className="flex-1 flex flex-col">
-          <WorkerHeader />
-          <main className="flex-1 p-8">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <div className="text-center">Loading application details...</div>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   if (!application || !job) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <WorkerSidebar />
-        <div className="flex-1 flex flex-col">
-          <WorkerHeader />
-          <main className="flex-1 p-8">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <Card className="p-12 text-center">
               <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-xl font-semibold mb-2">Application Not Found</h3>
@@ -193,18 +183,12 @@ export default function WorkerApplicationDetail() {
                 <Link to="/worker/applications">Back to Applications</Link>
               </Button>
             </Card>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <Button variant="ghost" asChild className="mb-6">
             <Link to="/worker/applications">
@@ -374,8 +358,6 @@ export default function WorkerApplicationDetail() {
               )}
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

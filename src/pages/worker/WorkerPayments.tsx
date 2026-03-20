@@ -1,10 +1,10 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import WorkerHeader from "@/components/worker/WorkerHeader";
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -113,12 +113,7 @@ export default function WorkerPayments() {
   const totalPayments = payments.filter((p) => p.escrow_status === "RELEASED").length;
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <WorkerSidebar />
-        <SidebarInset className="flex-1">
-          <WorkerHeader />
-          <main className="flex-1 p-6">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <div className="max-w-7xl mx-auto space-y-6">
               <div>
                 <h1 className="text-3xl font-bold text-foreground">My Payments</h1>
@@ -326,9 +321,6 @@ export default function WorkerPayments() {
                 </CardContent>
               </Card>
             </div>
-          </main>
-        </SidebarInset>
-      </div>
 
       {/* Payment Details Modal */}
       <Dialog open={!!selectedPayment} onOpenChange={() => setSelectedPayment(null)}>
@@ -448,6 +440,6 @@ export default function WorkerPayments() {
           )}
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </DashboardLayout>
   );
 }

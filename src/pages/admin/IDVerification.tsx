@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { adminNavGroups, adminProfileMenu } from "@/config/adminNav";
 import { useState, useEffect } from "react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminHeader from "@/components/admin/AdminHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -210,11 +210,7 @@ export default function IDVerification() {
   const verifiedDocs = workers.reduce((acc, w) => acc + w.documents.filter(d => d.verification_status === 'verified').length, 0);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
           <h1 className="text-2xl md:text-3xl font-bold mb-6">ID Verification</h1>
 
           {/* Stats Cards */}
@@ -488,8 +484,6 @@ export default function IDVerification() {
               </div>
             </DialogContent>
           </Dialog>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

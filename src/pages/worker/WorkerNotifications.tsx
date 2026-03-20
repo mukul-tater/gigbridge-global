@@ -1,5 +1,5 @@
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { Card } from "@/components/ui/card";
 import { Bell, Briefcase, MessageSquare, CheckCircle } from "lucide-react";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
@@ -36,11 +36,7 @@ export default function WorkerNotifications() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Notifications</h1>
 
@@ -66,8 +62,6 @@ export default function WorkerNotifications() {
               );
             })}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

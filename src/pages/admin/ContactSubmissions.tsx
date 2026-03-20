@@ -1,7 +1,7 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { adminNavGroups, adminProfileMenu } from "@/config/adminNav";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminHeader from "@/components/admin/AdminHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -91,24 +91,14 @@ export default function ContactSubmissions() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <AdminHeader />
-          <main className="flex-1 p-4 md:p-6 flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </main>
-        </div>
-      </div>
+      <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        <main className="flex-1 p-4 md:p-6 pt-16 md:pt-6">
+    <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex items-center gap-3">
               <Mail className="h-6 w-6 text-primary" />
@@ -234,8 +224,6 @@ export default function ContactSubmissions() {
               </CardContent>
             </Card>
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

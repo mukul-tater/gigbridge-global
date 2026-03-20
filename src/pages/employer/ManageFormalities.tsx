@@ -1,8 +1,8 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import EmployerSidebar from '@/components/employer/EmployerSidebar';
-import EmployerHeader from '@/components/employer/EmployerHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -187,24 +187,14 @@ export default function ManageFormalities() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen">
-        <EmployerHeader />
-        <div className="flex flex-1">
-          <EmployerSidebar />
-          <main className="flex-1 p-6">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
             <p>Loading formalities...</p>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-6">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
           <div className="mb-6">
             <h1 className="text-3xl font-bold mb-2">Manage Post-Approval Formalities</h1>
             <p className="text-muted-foreground">
@@ -484,8 +474,6 @@ export default function ManageFormalities() {
               ))
             )}
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

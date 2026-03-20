@@ -1,3 +1,5 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useEffect, useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths } from "date-fns";
 import { Calendar, ChevronLeft, ChevronRight, Video, MapPin, Clock } from "lucide-react";
@@ -6,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
@@ -111,11 +111,7 @@ export default function WorkerCalendar() {
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
@@ -301,8 +297,6 @@ export default function WorkerCalendar() {
             </Card>
           </div>
           </div>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

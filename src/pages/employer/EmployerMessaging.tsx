@@ -1,16 +1,12 @@
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { Card } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 
 export default function EmployerMessaging() {
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <EmployerSidebar />
-      <div className="flex-1 flex flex-col">
-        <EmployerHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
         <PortalBreadcrumb />
         <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Messages</h1>
 
@@ -21,8 +17,6 @@ export default function EmployerMessaging() {
             Start conversations with candidates or workers here.
           </p>
         </Card>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

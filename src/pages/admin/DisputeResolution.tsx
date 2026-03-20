@@ -1,4 +1,5 @@
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { adminNavGroups, adminProfileMenu } from "@/config/adminNav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -159,22 +160,17 @@ export default function DisputeResolution() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <AdminSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
+      <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-muted-foreground">Loading disputes...</p>
           </div>
-        </main>
-      </div>
+        </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <AdminSidebar />
-      <main className="flex-1 p-8">
+    <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Dispute Resolution Center</h1>
           <p className="text-muted-foreground">Manage and resolve employer-worker disputes</p>
@@ -456,7 +452,6 @@ export default function DisputeResolution() {
             </TabsContent>
           ))}
         </Tabs>
-      </main>
-    </div>
+    </DashboardLayout>
   );
 }

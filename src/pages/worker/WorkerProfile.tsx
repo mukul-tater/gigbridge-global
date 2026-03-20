@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useState, useEffect, useCallback } from 'react';
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -187,24 +187,14 @@ export default function WorkerProfile() {
 
   if (!user || !profile || loading) {
     return (
-      <div className="flex min-h-screen bg-background w-full">
-        <WorkerSidebar />
-        <div className="flex-1 flex flex-col">
-          <WorkerHeader />
-          <main className="flex-1 p-4 md:p-8">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <ProfileSkeleton />
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden pb-24 md:pb-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">My Profile</h1>
 
@@ -442,8 +432,6 @@ export default function WorkerProfile() {
             </Button>
           </div>
         </form>
-      </main>
-      </div>
-    </div>
+      </DashboardLayout>
   );
 }

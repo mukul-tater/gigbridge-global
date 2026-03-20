@@ -1,9 +1,9 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import WorkerSidebar from '@/components/worker/WorkerSidebar';
-import WorkerHeader from '@/components/worker/WorkerHeader';
 import SEOHead from '@/components/SEOHead';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -304,11 +304,7 @@ export default function Jobs() {
   // Worker Portal Layout
   if (role === 'worker') {
     return (
-      <div className="flex min-h-screen bg-background">
-        <WorkerSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <WorkerHeader />
-          <main className="flex-1 p-4 md:p-6 lg:p-8 pb-20 md:pb-8 overflow-x-hidden">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <div className="mb-5 md:mb-8">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 md:mb-2">Find Your Next Global Opportunity</h1>
               <p className="text-sm md:text-base text-muted-foreground">
@@ -379,15 +375,13 @@ export default function Jobs() {
                 )}
               </div>
             </div>
-          </main>
-        </div>
 
-        <SavedSearchDialog
-          open={showSaveDialog}
-          onOpenChange={setShowSaveDialog}
-          onSave={handleSaveSearch}
-        />
-      </div>
+            <SavedSearchDialog
+              open={showSaveDialog}
+              onOpenChange={setShowSaveDialog}
+              onSave={handleSaveSearch}
+            />
+          </DashboardLayout>
     );
   }
 

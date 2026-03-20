@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useState, useEffect } from "react";
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -140,24 +140,14 @@ export default function VerificationStatus() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-background">
-        <WorkerSidebar />
-        <div className="flex-1 flex flex-col">
-          <WorkerHeader />
-          <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
+      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <h1 className="text-2xl md:text-3xl font-bold mb-6">Verification Status</h1>
 
@@ -273,9 +263,7 @@ export default function VerificationStatus() {
               </div>
             </div>
           </Card>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }
 

@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { useState, useEffect } from 'react';
-import EmployerSidebar from '@/components/employer/EmployerSidebar';
-import EmployerHeader from '@/components/employer/EmployerHeader';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -101,24 +101,14 @@ export default function SavedSearches() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <EmployerHeader />
-        <div className="flex flex-1">
-          <EmployerSidebar />
-          <main className="flex-1 p-8 flex items-center justify-center">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <EmployerHeader />
-      <div className="flex flex-1">
-        <EmployerSidebar />
-        <main className="flex-1 p-8">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Saved Searches</h1>
           <p className="text-muted-foreground">
@@ -212,25 +202,23 @@ export default function SavedSearches() {
             ))}
           </div>
         )}
-      </main>
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Saved Search?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this saved search and disable any alerts.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      </div>
-    </div>
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Saved Search?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this saved search and disable any alerts.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+    </DashboardLayout>
   );
 }

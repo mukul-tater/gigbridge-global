@@ -1,5 +1,5 @@
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ContractVersionHistory from "@/components/ContractVersionHistory";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,11 +42,7 @@ export default function ContractHistory() {
   });
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <EmployerSidebar />
-      <div className="flex-1">
-        <EmployerHeader />
-        <main className="p-4 md:p-6 pt-16 md:pt-6">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -86,8 +82,6 @@ export default function ContractHistory() {
               )}
             </CardContent>
           </Card>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

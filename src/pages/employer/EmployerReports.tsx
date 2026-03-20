@@ -1,7 +1,7 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { useState, useEffect } from 'react';
 import { useAuth } from "@/contexts/AuthContext";
-import EmployerSidebar from "@/components/employer/EmployerSidebar";
-import EmployerHeader from "@/components/employer/EmployerHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -279,26 +279,16 @@ export default function EmployerReports() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
-        <EmployerHeader />
-        <div className="flex flex-1">
-          <EmployerSidebar />
-          <main className="flex-1 p-8">
+      <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
-          </main>
-        </div>
-      </div>
+          </DashboardLayout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background w-full">
-      <EmployerSidebar />
-      <div className="flex-1 flex flex-col">
-        <EmployerHeader />
-        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
+    <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
           <PortalBreadcrumb />
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
@@ -587,8 +577,6 @@ export default function EmployerReports() {
               </div>
             </TabsContent>
           </Tabs>
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }

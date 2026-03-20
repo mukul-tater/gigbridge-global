@@ -1,6 +1,6 @@
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
 import { useState, useEffect } from "react";
-import WorkerSidebar from "@/components/worker/WorkerSidebar";
-import WorkerHeader from "@/components/worker/WorkerHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Loader2, Upload, Trash2 } from "lucide-react";
@@ -176,11 +176,7 @@ export default function WorkerDocuments() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <WorkerSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkerHeader />
-        <main className="flex-1 p-4 md:p-8">
+    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
           <PortalBreadcrumb />
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl md:text-3xl font-bold">My Documents</h1>
@@ -331,8 +327,6 @@ export default function WorkerDocuments() {
               ))}
             </div>
           )}
-        </main>
-      </div>
-    </div>
+        </DashboardLayout>
   );
 }
