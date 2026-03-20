@@ -452,7 +452,6 @@ export default function DisputeResolution() {
             </TabsContent>
           ))}
         </Tabs>
-      </main>
-    </div>
+    </DashboardLayout>
   );
 }

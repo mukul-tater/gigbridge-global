@@ -537,8 +537,6 @@ export default function WorkerOffers() {
               </p>
             </Card>
           )}
-        </main>
-      </div>
 
       {/* Accept Dialog */}
       <Dialog open={isAcceptDialogOpen} onOpenChange={setIsAcceptDialogOpen}>
@@ -625,6 +623,6 @@ export default function WorkerOffers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </DashboardLayout>
   );
 }

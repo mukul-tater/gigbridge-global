@@ -437,7 +437,6 @@ export default function EditJob() {
             </div>
           </div>
         </form>
-      </main>
-    </div>
+    </DashboardLayout>
   );
 }

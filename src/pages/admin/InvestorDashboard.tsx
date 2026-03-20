@@ -660,7 +660,6 @@ export default function InvestorDashboard() {
             </CardContent>
           </Card>
         </div>
-      </main>
-    </div>
+    </DashboardLayout>
   );
 }

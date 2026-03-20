@@ -439,14 +439,12 @@ export default function SearchWorkers() {
             )}
           </div>
         </div>
-        </main>
 
         <SavedSearchDialog
           open={showSaveDialog}
           onOpenChange={setShowSaveDialog}
           onSave={handleSaveSearch}
         />
-      </div>
-    </div>
+    </DashboardLayout>
   );
 }
