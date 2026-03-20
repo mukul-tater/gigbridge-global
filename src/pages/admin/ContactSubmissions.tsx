@@ -92,9 +92,8 @@ export default function ContactSubmissions() {
   if (loading) {
     return (
       <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </DashboardLayout>
-      </div>
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </DashboardLayout>
     );
   }
 

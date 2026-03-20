@@ -131,10 +131,9 @@ export default function UserManagement() {
   if (loading) {
     return (
       <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
-            <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">User Management</h1>
-            <p className="text-muted-foreground">Loading users...</p>
-          </DashboardLayout>
-      </div>
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">User Management</h1>
+        <p className="text-muted-foreground">Loading users...</p>
+      </DashboardLayout>
     );
   }
 

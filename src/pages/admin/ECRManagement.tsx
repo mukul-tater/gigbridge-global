@@ -465,6 +465,5 @@ export default function ECRManagement() {
             </DialogContent>
           </Dialog>
         </DashboardLayout>
-    </div>
   );
 }

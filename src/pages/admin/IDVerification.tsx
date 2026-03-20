@@ -485,6 +485,5 @@ export default function IDVerification() {
             </DialogContent>
           </Dialog>
         </DashboardLayout>
-    </div>
   );
 }

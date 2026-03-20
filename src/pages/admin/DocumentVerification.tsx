@@ -356,6 +356,5 @@ export default function DocumentVerification() {
           </div>
         )}
         </DashboardLayout>
-    </div>
   );
 }

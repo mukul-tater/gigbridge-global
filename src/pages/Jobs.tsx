@@ -375,14 +375,13 @@ export default function Jobs() {
                 )}
               </div>
             </div>
-          </DashboardLayout>
 
-        <SavedSearchDialog
-          open={showSaveDialog}
-          onOpenChange={setShowSaveDialog}
-          onSave={handleSaveSearch}
-        />
-      </div>
+            <SavedSearchDialog
+              open={showSaveDialog}
+              onOpenChange={setShowSaveDialog}
+              onSave={handleSaveSearch}
+            />
+          </DashboardLayout>
     );
   }
 
