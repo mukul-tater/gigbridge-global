@@ -426,7 +426,7 @@ export default function Jobs() {
       <Header />
       <MobileBottomNav />
       
-      <main className="container mx-auto px-4 py-5 md:py-8">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-10">
         <header className="mb-5 md:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 md:mb-2">Find Your Next Global Opportunity</h1>
           <p className="text-sm md:text-base text-muted-foreground">
