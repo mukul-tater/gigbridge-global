@@ -71,12 +71,30 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
   const [loading, setLoading] = useState(true);
 
   const fetchApplications = async () => {
-    const { data } = await supabase
+    const { data: apps } = await supabase
       .from("job_applications")
-      .select("id, job_id, status, applied_at, updated_at, jobs:job_id (title, location, country)")
+      .select("id, job_id, status, applied_at, updated_at")
       .eq("worker_id", userId)
       .order("applied_at", { ascending: false });
-    setApplications((data as Application[]) || []);
+
+    if (!apps || apps.length === 0) {
+      setApplications([]);
+      setLoading(false);
+      return;
+    }
+
+    const jobIds = [...new Set(apps.map((a) => a.job_id))];
+    const { data: jobs } = await supabase
+      .from("jobs")
+      .select("id, title, location, country")
+      .in("id", jobIds);
+
+    const jobMap = new Map((jobs || []).map((j) => [j.id, j]));
+    const merged: Application[] = apps.map((a) => ({
+      ...a,
+      jobs: jobMap.get(a.job_id) || null,
+    }));
+    setApplications(merged);
     setLoading(false);
   };
 
