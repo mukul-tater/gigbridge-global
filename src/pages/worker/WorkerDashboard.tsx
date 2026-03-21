@@ -157,6 +157,10 @@ export default function WorkerDashboard() {
         <DocumentVerificationCard documents={documents} />
       </div>
 
+      <div className="mb-6">
+        <ApplicationProgressCard userId={profile?.id || ""} />
+      </div>
+
       {jobFormalities.length > 0 && (
         <div className="mb-6">
           <h2 className="text-lg font-bold mb-3">Job Journey Progress</h2>
