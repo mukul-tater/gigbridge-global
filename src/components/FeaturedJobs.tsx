@@ -66,7 +66,7 @@ export default function FeaturedJobs() {
   const formatSalary = (min: number, max: number, currency: string) => {
     const inrMin = currency === 'INR' ? min : min * 83;
     const inrMax = currency === 'INR' ? max : max * 83;
-    return `₹${(inrMin / 1000).toFixed(0)}K - ₹${(inrMax / 1000).toFixed(0)}K`;
+    return `₹${inrMin.toLocaleString('en-IN')} - ₹${inrMax.toLocaleString('en-IN')}`;
   };
 
   const getJobTypeBadge = (type: string) => {
