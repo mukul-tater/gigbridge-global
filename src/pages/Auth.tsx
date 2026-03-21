@@ -6,12 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, Loader2, Briefcase, HardHat, Users, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Eye, EyeOff, Loader2, Briefcase, HardHat, Users, ShieldCheck, ArrowLeft, Mail, Phone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 type AuthView = 'login' | 'signup' | 'forgot' | 'role-select';
+type LoginMethod = 'email' | 'mobile';
 
 const roles: { value: AppRole; label: string; description: string; icon: React.ReactNode; color: string }[] = [
   { value: 'worker', label: 'Worker', description: 'Find international job opportunities', icon: <HardHat className="h-6 w-6" />, color: 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:border-emerald-400' },
@@ -22,14 +24,15 @@ const roles: { value: AppRole; label: string; description: string; icon: React.R
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, signup, isAuthenticated, isEmailVerified } = useAuth();
+  const { login, signup, isAuthenticated } = useAuth();
   const [view, setView] = useState<AuthView>('login');
+  const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   // Login
-  const [loginEmail, setLoginEmail] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
   // Signup
@@ -44,19 +47,34 @@ export default function Auth() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (!isEmailVerified) {
-        navigate('/verify-email');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
     }
-  }, [isAuthenticated, isEmailVerified, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(loginEmail, loginPassword);
+
+    let emailToUse = loginIdentifier;
+
+    if (loginMethod === 'mobile') {
+      // Look up email by phone number via profiles table
+      const { data, error: lookupError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('phone', loginIdentifier)
+        .maybeSingle();
+
+      if (lookupError || !data) {
+        setError('No account found with this mobile number');
+        setLoading(false);
+        return;
+      }
+      emailToUse = data.email;
+    }
+
+    const result = await login(emailToUse, loginPassword);
     if (!result.success) setError(result.error || 'Login failed');
     setLoading(false);
   };
@@ -78,8 +96,8 @@ export default function Auth() {
     });
 
     if (result.success) {
-      navigate('/verify-email');
-      toast.success('Account created! Check your email to verify.');
+      toast.success('Account created successfully!');
+      navigate('/dashboard');
     } else {
       setError(result.error || 'Signup failed');
     }
@@ -111,11 +129,9 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      {/* Subtle background pattern */}
       <div className="fixed inset-0 pointer-events-none" style={{ background: 'var(--gradient-mesh)' }} />
 
       <div className="w-full max-w-[440px] relative z-10">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-4">
             <img src="/safework-global-logo.png" alt="SafeWorkGlobal" className="h-8 w-8" />
@@ -145,9 +161,23 @@ export default function Auth() {
             {/* LOGIN */}
             {view === 'login' && (
               <form onSubmit={handleLogin} className="space-y-4">
+                <Tabs value={loginMethod} onValueChange={(v) => { setLoginMethod(v as LoginMethod); setLoginIdentifier(''); setError(''); }}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="email" className="gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</TabsTrigger>
+                    <TabsTrigger value="mobile" className="gap-1.5"><Phone className="h-3.5 w-3.5" /> Mobile</TabsTrigger>
+                  </TabsList>
+                </Tabs>
                 <div className="space-y-1.5">
-                  <Label htmlFor="login-email">Email</Label>
-                  <Input id="login-email" type="email" placeholder="you@example.com" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} required className="h-11" />
+                  <Label htmlFor="login-id">{loginMethod === 'email' ? 'Email' : 'Mobile Number'}</Label>
+                  <Input
+                    id="login-id"
+                    type={loginMethod === 'email' ? 'email' : 'tel'}
+                    placeholder={loginMethod === 'email' ? 'you@example.com' : '+91 98765 43210'}
+                    value={loginIdentifier}
+                    onChange={e => setLoginIdentifier(e.target.value)}
+                    required
+                    className="h-11"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
@@ -213,8 +243,8 @@ export default function Auth() {
                   <Input id="signup-email" type="email" placeholder="you@example.com" value={signupEmail} onChange={e => setSignupEmail(e.target.value)} required className="h-11" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="signup-phone">Phone <span className="text-muted-foreground font-normal">(optional)</span></Label>
-                  <Input id="signup-phone" type="tel" placeholder="+1 234 567 8900" value={signupPhone} onChange={e => setSignupPhone(e.target.value)} className="h-11" />
+                  <Label htmlFor="signup-phone">Phone</Label>
+                  <Input id="signup-phone" type="tel" placeholder="+91 98765 43210" value={signupPhone} onChange={e => setSignupPhone(e.target.value)} required className="h-11" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="signup-password">Password</Label>
