@@ -8,6 +8,7 @@ import DocumentVerificationCard from "@/components/worker/DocumentVerificationCa
 import ECRStatusCard from "@/components/worker/ECRStatusCard";
 import ProfileProgressCard from "@/components/worker/ProfileProgressCard";
 import JobJourneyProgressCard from "@/components/worker/JobJourneyProgressCard";
+import ApplicationProgressCard from "@/components/worker/ApplicationProgressCard";
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
 import { Link } from "react-router-dom";
@@ -154,6 +155,10 @@ export default function WorkerDashboard() {
 
       <div className="mb-6">
         <DocumentVerificationCard documents={documents} />
+      </div>
+
+      <div className="mb-6">
+        <ApplicationProgressCard userId={profile?.id || ""} />
       </div>
 
       {jobFormalities.length > 0 && (
