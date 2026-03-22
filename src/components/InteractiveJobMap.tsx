@@ -126,8 +126,7 @@ const InteractiveJobMap = () => {
           {regions.map((region, index) => (
             <div
               key={index}
-              className="group opacity-0 animate-fade-in-up"
-              style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'forwards' }}
+              className="group"
             >
               <Card
                 className={`h-full relative overflow-hidden bg-card border-2 transition-all duration-300 hover:shadow-lg cursor-pointer ${

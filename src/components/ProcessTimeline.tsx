@@ -32,8 +32,7 @@ const ProcessTimeline = () => {
           {steps.map((step, index) => (
             <div
               key={step.number}
-              className="relative flex flex-col items-center text-center group opacity-0 animate-fade-in-up"
-              style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+              className="relative flex flex-col items-center text-center group"
             >
               {/* Step number */}
               <div className="relative mb-4">

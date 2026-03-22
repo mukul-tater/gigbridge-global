@@ -86,8 +86,7 @@ const CountryInsights = () => {
           {countries.map((country, index) => (
             <div
               key={index}
-              className="group opacity-0 animate-fade-in-up"
-              style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'forwards' }}
+              className="group"
             >
               <Card
                 className="h-full bg-card border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg cursor-pointer overflow-hidden flex flex-col"
