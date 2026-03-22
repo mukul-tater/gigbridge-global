@@ -254,6 +254,23 @@ export default function Auth() {
                       {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                   </div>
+                  {signupPassword.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4].map(level => (
+                          <div key={level} className={cn(
+                            "h-1 flex-1 rounded-full transition-colors",
+                            signupPassword.length >= level * 3 
+                              ? level <= 1 ? "bg-destructive" : level <= 2 ? "bg-warning" : "bg-success"
+                              : "bg-muted"
+                          )} />
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        {signupPassword.length < 6 ? "Too short" : signupPassword.length < 8 ? "Fair" : signupPassword.length < 12 ? "Good" : "Strong"}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <Button type="submit" className="w-full h-11 font-medium" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
