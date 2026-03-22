@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Building2, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { SkeletonJobGrid } from '@/components/ui/skeleton-card';
 
 interface FeaturedJob {
   id: string;
