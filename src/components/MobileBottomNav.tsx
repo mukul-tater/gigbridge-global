@@ -8,6 +8,10 @@ export default function MobileBottomNav() {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
 
+  // Hide on dashboard pages (they have their own nav)
+  const isDashboard = ["/worker/", "/employer/", "/admin/", "/agent/"].some(p => location.pathname.startsWith(p));
+  if (isDashboard) return null;
+
   const handleLogout = async () => {
     await logout();
     navigate("/");
