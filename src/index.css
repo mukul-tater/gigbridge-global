@@ -214,6 +214,20 @@
 }
 
 @layer components {
+  /* Animate-in utility */
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .fade-in {
+    animation-name: fade-in-simple;
+  }
+
+  @keyframes fade-in-simple {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
   /* Premium Card Styles */
   .card-premium {
     @apply bg-card rounded-2xl border border-border relative overflow-hidden;

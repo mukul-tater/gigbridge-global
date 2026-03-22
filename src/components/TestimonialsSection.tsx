@@ -70,8 +70,7 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="group opacity-0 animate-fade-in-up"
-              style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+              className="group"
             >
               <Card className="h-full relative overflow-hidden bg-card border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg">
                 <div className="absolute -top-2 -right-2 text-primary/5">
