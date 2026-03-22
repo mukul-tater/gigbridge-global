@@ -36,33 +36,31 @@ const Index = () => {
         <SuccessMetrics />
       </ScrollReveal>
 
-      <ScrollReveal delay={0.05}>
+      <ScrollReveal>
         <ProcessTimeline />
       </ScrollReveal>
 
-      <ScrollReveal delay={0.05}>
+      <ScrollReveal>
         <FeaturedJobs />
       </ScrollReveal>
 
-      <ScrollReveal delay={0.05}>
+      <ScrollReveal>
         <JobCategories />
       </ScrollReveal>
 
-      <ScrollReveal delay={0.05}>
+      <ScrollReveal>
         <InteractiveJobMap />
       </ScrollReveal>
 
-      <ScrollReveal delay={0.05}>
+      <ScrollReveal>
         <CountryInsights />
       </ScrollReveal>
 
-      <ScrollReveal delay={0.05}>
+      <ScrollReveal>
         <TestimonialsSection />
       </ScrollReveal>
 
-      <ScrollReveal>
-        <Footer />
-      </ScrollReveal>
+      <Footer />
 
       <MobileBottomNav />
     </div>
