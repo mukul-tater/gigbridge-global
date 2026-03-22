@@ -128,14 +128,15 @@ export default function FeaturedJobs() {
 
   if (loading) {
     return (
-      <section className="py-16 lg:py-24 bg-background" id="jobs">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
-            </div>
-            <p className="text-muted-foreground">Loading featured jobs...</p>
+      <section className="py-16 lg:py-24 relative overflow-hidden" id="jobs">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 via-background to-background" />
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-10 lg:mb-14">
+            <div className="h-6 w-40 rounded-full shimmer mx-auto mb-4" />
+            <div className="h-8 w-72 rounded shimmer mx-auto mb-3" />
+            <div className="h-5 w-64 rounded shimmer mx-auto" />
           </div>
+          <SkeletonJobGrid count={6} />
         </div>
       </section>
     );
