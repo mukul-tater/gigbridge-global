@@ -170,11 +170,10 @@ export default function FeaturedJobs() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 mb-10 lg:mb-12">
-              {jobs.map((job, index) => (
+              {jobs.map((job) => (
                 <div
                   key={job.id}
-                  className="group opacity-0 animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+                  className="group"
                 >
                   <Card
                     className="h-full relative overflow-hidden bg-card border border-border hover:border-primary/40 transition-all duration-300 hover:shadow-lg cursor-pointer flex flex-col"
