@@ -27,6 +27,7 @@ interface RecentActivity {
 interface RecommendedJob {
   id: string;
   title: string;
+  slug: string | null;
   location: string;
   country: string;
   salary_min: number | null;
