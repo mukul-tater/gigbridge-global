@@ -58,6 +58,14 @@ export default function Jobs() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const paginatedJobs = useMemo(() => {
+    const start = (currentPage - 1) * JOBS_PER_PAGE;
+    return jobs.slice(start, start + JOBS_PER_PAGE);
+  }, [jobs, currentPage]);
+
+  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
 
   // Load jobs on mount and when search params change
   useEffect(() => {
