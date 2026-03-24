@@ -19,7 +19,6 @@ const roles: { value: AppRole; label: string; description: string; icon: React.R
   { value: 'worker', label: 'Worker', description: 'Find international job opportunities', icon: <HardHat className="h-6 w-6" />, color: 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:border-emerald-400' },
   { value: 'employer', label: 'Employer', description: 'Hire skilled workers globally', icon: <Briefcase className="h-6 w-6" />, color: 'bg-blue-50 text-blue-600 border-blue-200 hover:border-blue-400' },
   { value: 'agent', label: 'Agent', description: 'Recruit & place workers for employers', icon: <Users className="h-6 w-6" />, color: 'bg-amber-50 text-amber-600 border-amber-200 hover:border-amber-400' },
-  { value: 'admin', label: 'Admin', description: 'Platform administration & oversight', icon: <ShieldCheck className="h-6 w-6" />, color: 'bg-rose-50 text-rose-600 border-rose-200 hover:border-rose-400' },
 ];
 
 export default function Auth() {

@@ -2,7 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, Globe, TrendingUp, ArrowRight, CheckCircle, Sparkles, Users, Shield } from "lucide-react";
-import heroImage from "@/assets/hero-workers.jpg";
+// Hero image with fallback - may not exist
+let heroImage: string | undefined;
+try {
+  heroImage = new URL("@/assets/hero-workers.jpg", import.meta.url).href;
+} catch {
+  heroImage = undefined;
+}
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DESTINATION_COUNTRIES, JOB_CATEGORIES } from "@/lib/constants";

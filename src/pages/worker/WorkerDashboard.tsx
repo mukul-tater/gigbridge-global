@@ -193,7 +193,7 @@ export default function WorkerDashboard() {
           <h2 className="text-lg font-bold mb-3">Recommended Jobs</h2>
           <div className="space-y-3">
             {recommendedJobs.length > 0 ? recommendedJobs.map((job) => (
-              <Link key={job.id} to={`/jobs/${job.id}`} className="block">
+              <Link key={job.id} to={`/jobs/${job.slug || job.id}`} className="block">
                 <div className="p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                   <h3 className="font-semibold text-sm mb-1 truncate">{job.title}</h3>
                   <p className="text-xs text-muted-foreground mb-1">
