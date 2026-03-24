@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileBottomNav from '@/components/MobileBottomNav';
@@ -9,12 +9,14 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { MapPin, Briefcase, Clock, Globe } from 'lucide-react';
+import { MapPin, Briefcase, Clock, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 import JobSearchFilters, { type JobFilters } from '@/components/search/JobSearchFilters';
 import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+
+const JOBS_PER_PAGE = 24;
 
 interface Job {
   id: string;
