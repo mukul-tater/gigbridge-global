@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { workerNavGroups, workerProfileMenu } from "@/config/workerNav";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileBottomNav from '@/components/MobileBottomNav';
@@ -9,12 +9,14 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { MapPin, Briefcase, Clock, Globe } from 'lucide-react';
+import { MapPin, Briefcase, Clock, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 import JobSearchFilters, { type JobFilters } from '@/components/search/JobSearchFilters';
 import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+
+const JOBS_PER_PAGE = 24;
 
 interface Job {
   id: string;
@@ -56,6 +58,14 @@ export default function Jobs() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const paginatedJobs = useMemo(() => {
+    const start = (currentPage - 1) * JOBS_PER_PAGE;
+    return jobs.slice(start, start + JOBS_PER_PAGE);
+  }, [jobs, currentPage]);
+
+  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
 
   // Load jobs on mount and when search params change
   useEffect(() => {
@@ -190,6 +200,7 @@ export default function Jobs() {
     // Apply sorting
     const sortedJobs = sortJobs(filtered, sort);
     setJobs(sortedJobs);
+    setCurrentPage(1);
     if (!loading) {
       toast.success(`Found ${sortedJobs.length} jobs matching your criteria`);
     }
@@ -358,7 +369,7 @@ export default function Jobs() {
                   </Card>
                 ) : (
                   <>
-                    {jobs.map((job) => (
+                    {paginatedJobs.map((job) => (
                       <JobCard key={job.id} job={job} />
                     ))}
 
@@ -370,6 +381,20 @@ export default function Jobs() {
                           Try adjusting your filters to see more results
                         </p>
                       </Card>
+                    )}
+
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-center gap-2 pt-4">
+                        <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => { setCurrentPage(p => p - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                          <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                        </Button>
+                        <span className="text-sm text-muted-foreground px-3">
+                          Page {currentPage} of {totalPages}
+                        </span>
+                        <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => { setCurrentPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                          Next <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
                     )}
                   </>
                 )}
@@ -482,7 +507,7 @@ export default function Jobs() {
               </Card>
             ) : (
               <>
-                {jobs.map((job) => (
+                {paginatedJobs.map((job) => (
                   <JobCard key={job.id} job={job} />
                 ))}
 
@@ -494,6 +519,20 @@ export default function Jobs() {
                       Try adjusting your filters or search criteria
                     </p>
                   </Card>
+                )}
+
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 pt-4">
+                    <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => { setCurrentPage(p => p - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                      <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                    </Button>
+                    <span className="text-sm text-muted-foreground px-3">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => { setCurrentPage(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                      Next <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
                 )}
               </>
             )}

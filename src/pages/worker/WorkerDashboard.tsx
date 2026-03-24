@@ -27,6 +27,7 @@ interface RecentActivity {
 interface RecommendedJob {
   id: string;
   title: string;
+  slug: string | null;
   location: string;
   country: string;
   salary_min: number | null;
@@ -63,7 +64,7 @@ export default function WorkerDashboard() {
         supabase.from('job_applications').select(`*, jobs:job_id (title, location, country)`).eq('worker_id', profile?.id).order('applied_at', { ascending: false }).limit(5),
         supabase.from('job_formalities').select(`*, jobs:job_id (title, location, country)`).eq('worker_id', profile?.id),
         supabase.from('notifications').select('*').eq('user_id', profile?.id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('jobs').select('*').eq('status', 'ACTIVE').order('created_at', { ascending: false }).limit(3)
+        supabase.from('jobs').select('id, title, slug, location, country, salary_min, salary_max, currency, experience_level').eq('status', 'ACTIVE').order('created_at', { ascending: false }).limit(3)
       ]);
 
       setDocuments(docsRes.data || []);
@@ -192,7 +193,7 @@ export default function WorkerDashboard() {
           <h2 className="text-lg font-bold mb-3">Recommended Jobs</h2>
           <div className="space-y-3">
             {recommendedJobs.length > 0 ? recommendedJobs.map((job) => (
-              <Link key={job.id} to={`/jobs/${job.id}`} className="block">
+              <Link key={job.id} to={`/jobs/${job.slug || job.id}`} className="block">
                 <div className="p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                   <h3 className="font-semibold text-sm mb-1 truncate">{job.title}</h3>
                   <p className="text-xs text-muted-foreground mb-1">
