@@ -200,6 +200,7 @@ export default function Jobs() {
     // Apply sorting
     const sortedJobs = sortJobs(filtered, sort);
     setJobs(sortedJobs);
+    setCurrentPage(1);
     if (!loading) {
       toast.success(`Found ${sortedJobs.length} jobs matching your criteria`);
     }
