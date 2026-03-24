@@ -63,7 +63,7 @@ export default function WorkerDashboard() {
         supabase.from('job_applications').select(`*, jobs:job_id (title, location, country)`).eq('worker_id', profile?.id).order('applied_at', { ascending: false }).limit(5),
         supabase.from('job_formalities').select(`*, jobs:job_id (title, location, country)`).eq('worker_id', profile?.id),
         supabase.from('notifications').select('*').eq('user_id', profile?.id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('jobs').select('*').eq('status', 'ACTIVE').order('created_at', { ascending: false }).limit(3)
+        supabase.from('jobs').select('id, title, slug, location, country, salary_min, salary_max, currency, experience_level').eq('status', 'ACTIVE').order('created_at', { ascending: false }).limit(3)
       ]);
 
       setDocuments(docsRes.data || []);
