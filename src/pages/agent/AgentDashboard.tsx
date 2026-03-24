@@ -22,9 +22,9 @@ const agentNavGroups: NavGroup[] = [
     label: "Management",
     defaultOpen: true,
     items: [
-      { path: "/agent/dashboard", icon: Users, label: "My Workers", badge: "Soon" },
-      { path: "/agent/dashboard", icon: ClipboardList, label: "Placements", badge: "Soon" },
-      { path: "/agent/dashboard", icon: DollarSign, label: "Commissions", badge: "Soon" },
+      { path: "/agent/dashboard", icon: Users, label: "My Workers" },
+      { path: "/agent/dashboard", icon: ClipboardList, label: "Placements" },
+      { path: "/agent/dashboard", icon: DollarSign, label: "Commissions" },
     ],
   },
   {
