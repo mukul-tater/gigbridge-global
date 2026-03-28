@@ -620,6 +620,66 @@ export default function JobDetail() {
       <ScrollReveal>
         <Footer />
       </ScrollReveal>
+
+      {/* Application Dialog */}
+      <Dialog open={showApplyDialog} onOpenChange={setShowApplyDialog}>
+        <DialogContent className="max-w-lg mx-4">
+          <DialogHeader>
+            <DialogTitle>Apply for {job.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="coverLetter">Cover Letter</Label>
+              <Textarea
+                id="coverLetter"
+                value={coverLetter}
+                onChange={(e) => setCoverLetter(e.target.value)}
+                placeholder="Tell the employer why you're a great fit for this role..."
+                rows={5}
+                className="mt-1"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Optional but recommended</p>
+            </div>
+            <div>
+              <Label htmlFor="resume">Resume / CV</Label>
+              <div className="mt-1">
+                <Input
+                  id="resume"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground mt-1">PDF, DOC, or DOCX (max 10MB)</p>
+              </div>
+              {resumeFile && (
+                <div className="flex items-center gap-2 mt-2 text-sm text-primary">
+                  <FileText className="h-4 w-4" />
+                  <span className="truncate">{resumeFile.name}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowApplyDialog(false)} disabled={applying}>
+              Cancel
+            </Button>
+            <Button onClick={handleApply} disabled={applying}>
+              {applying ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {uploadingResume ? 'Uploading resume...' : 'Submitting...'}
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Submit Application
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
