@@ -442,7 +442,7 @@ export default function Jobs() {
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <SEOHead
         title="International Jobs | Find Global Opportunities | SafeWorkGlobal"
-        description="Browse 50,000+ international job opportunities for skilled workers in construction, electrical, welding, and more. Visa sponsorship available across 15+ countries."
+        description="Browse 900+ international job opportunities for skilled workers in construction, electrical, welding, and more. Visa sponsorship available across 40+ countries."
         keywords="international jobs, overseas jobs, visa sponsorship jobs, construction jobs abroad, welding jobs overseas, skilled worker jobs, gulf jobs, middle east jobs"
         canonicalUrl={`${window.location.origin}/jobs`}
         ogType="website"

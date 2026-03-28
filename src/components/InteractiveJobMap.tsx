@@ -76,7 +76,7 @@ const InteractiveJobMap = () => {
     {
       name: "Southeast Asia",
       countries: ["Malaysia", "Thailand", "Vietnam"],
-      jobs: "12,300+",
+      jobs: "65+",
       avgSalary: "₹1.4-2.2L",
       easyHiring: true,
       hiringTime: "2-4 weeks",

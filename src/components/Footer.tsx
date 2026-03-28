@@ -104,7 +104,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2 text-xs text-background/40">
                 <Sparkles className="h-3 w-3" />
-                <span>Join 50,000+ subscribers</span>
+                <span>Join 1,000+ subscribers</span>
               </div>
             </div>
           </div>

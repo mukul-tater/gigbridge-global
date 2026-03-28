@@ -7,9 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function AboutUs() {
   const stats = [
-    { icon: Building2, value: "500+", label: "Companies", color: "bg-primary/10 text-primary" },
-    { icon: Users, value: "10K+", label: "Workers Placed", color: "bg-secondary/10 text-secondary" },
-    { icon: Target, value: "5K+", label: "Jobs Posted", color: "bg-info/10 text-info" },
+    { icon: Building2, value: "120+", label: "Companies", color: "bg-primary/10 text-primary" },
+    { icon: Users, value: "450+", label: "Workers Placed", color: "bg-secondary/10 text-secondary" },
+    { icon: Target, value: "920+", label: "Jobs Posted", color: "bg-info/10 text-info" },
     { icon: Award, value: "98%", label: "Satisfaction", color: "bg-success/10 text-success" },
   ];
 

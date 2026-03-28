@@ -134,7 +134,7 @@ const TestimonialsSection = () => {
               ))}
             </div>
             <span className="text-xs sm:text-sm text-muted-foreground">
-              Join <span className="font-semibold text-foreground">24,000+</span> workers who found success
+              Join <span className="font-semibold text-foreground">450+</span> workers who found success
             </span>
           </div>
         </div>
