@@ -22,7 +22,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "Within 3 weeks of signing up, I had 5 job offers from Germany. The platform made it easy to compare opportunities and choose the best fit for my skills.",
       placement: "Solar Panel Installer",
-      salary: "₹3,30,000/month"
+      salary: "₹78,000/month"
     },
     {
       name: "Ahmed Hassan",
