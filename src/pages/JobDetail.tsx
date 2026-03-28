@@ -141,31 +141,46 @@ export default function JobDetail() {
     loadData();
   }, [slug, user, navigate, toast]);
 
-  const handleApply = async () => {
+  const openApplyDialog = () => {
     if (!isAuthenticated) {
-      toast({
-        title: 'Login Required',
-        description: 'Please login to apply for jobs',
-        variant: 'destructive'
-      });
+      toast({ title: 'Login Required', description: 'Please login to apply for jobs', variant: 'destructive' });
       navigate('/auth');
       return;
     }
-
     if (role === 'employer') {
-      toast({
-        title: 'Not Allowed',
-        description: 'Employers cannot apply for jobs. You can only post and manage jobs.',
-        variant: 'destructive'
-      });
+      toast({ title: 'Not Allowed', description: 'Employers cannot apply for jobs.', variant: 'destructive' });
       return;
     }
+    setShowApplyDialog(true);
+  };
 
+  const handleApply = async () => {
     if (!user || !job) return;
-
     setApplying(true);
 
     try {
+      let resumeUrl: string | null = null;
+
+      // Upload resume if provided
+      if (resumeFile) {
+        setUploadingResume(true);
+        const fileExt = resumeFile.name.split('.').pop();
+        const filePath = `${user.id}/${Date.now()}-resume.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('worker-documents')
+          .upload(filePath, resumeFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('worker-documents')
+          .getPublicUrl(filePath);
+        
+        resumeUrl = urlData.publicUrl;
+        setUploadingResume(false);
+      }
+
       const { error } = await supabase
         .from('job_applications')
         .insert({
@@ -173,24 +188,20 @@ export default function JobDetail() {
           worker_id: user.id,
           employer_id: job.employer_id,
           status: 'PENDING',
-          cover_letter: 'Application submitted through platform'
+          cover_letter: coverLetter || 'Application submitted through platform',
+          resume_url: resumeUrl,
         });
 
       if (error) throw error;
 
       setHasApplied(true);
-      toast({
-        title: 'Application Submitted!',
-        description: 'Your application has been sent to the employer',
-      });
+      setShowApplyDialog(false);
+      toast({ title: 'Application Submitted!', description: 'Your application has been sent to the employer' });
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to submit application',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: error.message || 'Failed to submit application', variant: 'destructive' });
     } finally {
       setApplying(false);
+      setUploadingResume(false);
     }
   };
 
