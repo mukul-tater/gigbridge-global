@@ -12,10 +12,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { 
   MapPin, Building2, Briefcase, Clock, 
   CheckCircle2, ArrowLeft, Users, Globe, Shield, Calendar,
-  Share2, Bookmark
+  Share2, Bookmark, Upload, FileText, Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -64,6 +68,10 @@ export default function JobDetail() {
   const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showApplyDialog, setShowApplyDialog] = useState(false);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
   useEffect(() => {
     const loadData = async () => {
       if (!slug) return;
@@ -133,31 +141,46 @@ export default function JobDetail() {
     loadData();
   }, [slug, user, navigate, toast]);
 
-  const handleApply = async () => {
+  const openApplyDialog = () => {
     if (!isAuthenticated) {
-      toast({
-        title: 'Login Required',
-        description: 'Please login to apply for jobs',
-        variant: 'destructive'
-      });
+      toast({ title: 'Login Required', description: 'Please login to apply for jobs', variant: 'destructive' });
       navigate('/auth');
       return;
     }
-
     if (role === 'employer') {
-      toast({
-        title: 'Not Allowed',
-        description: 'Employers cannot apply for jobs. You can only post and manage jobs.',
-        variant: 'destructive'
-      });
+      toast({ title: 'Not Allowed', description: 'Employers cannot apply for jobs.', variant: 'destructive' });
       return;
     }
+    setShowApplyDialog(true);
+  };
 
+  const handleApply = async () => {
     if (!user || !job) return;
-
     setApplying(true);
 
     try {
+      let resumeUrl: string | null = null;
+
+      // Upload resume if provided
+      if (resumeFile) {
+        setUploadingResume(true);
+        const fileExt = resumeFile.name.split('.').pop();
+        const filePath = `${user.id}/${Date.now()}-resume.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('worker-documents')
+          .upload(filePath, resumeFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('worker-documents')
+          .getPublicUrl(filePath);
+        
+        resumeUrl = urlData.publicUrl;
+        setUploadingResume(false);
+      }
+
       const { error } = await supabase
         .from('job_applications')
         .insert({
@@ -165,24 +188,20 @@ export default function JobDetail() {
           worker_id: user.id,
           employer_id: job.employer_id,
           status: 'PENDING',
-          cover_letter: 'Application submitted through platform'
+          cover_letter: coverLetter || 'Application submitted through platform',
+          resume_url: resumeUrl,
         });
 
       if (error) throw error;
 
       setHasApplied(true);
-      toast({
-        title: 'Application Submitted!',
-        description: 'Your application has been sent to the employer',
-      });
+      setShowApplyDialog(false);
+      toast({ title: 'Application Submitted!', description: 'Your application has been sent to the employer' });
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to submit application',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: error.message || 'Failed to submit application', variant: 'destructive' });
     } finally {
       setApplying(false);
+      setUploadingResume(false);
     }
   };
 
@@ -486,18 +505,7 @@ export default function JobDetail() {
                   ) : (
                     <Button 
                       size="lg" 
-                      onClick={() => {
-                        if (!isAuthenticated) {
-                          toast({
-                            title: 'Login Required',
-                            description: 'Please login as a worker to apply for jobs',
-                            variant: 'destructive'
-                          });
-                          navigate('/auth');
-                          return;
-                        }
-                        handleApply();
-                      }}
+                      onClick={openApplyDialog}
                       disabled={hasApplied || applying || job.status !== 'ACTIVE'}
                       className="w-full"
                     >
@@ -506,8 +514,6 @@ export default function JobDetail() {
                           <CheckCircle2 className="mr-2 h-5 w-5" />
                           Already Applied
                         </>
-                      ) : applying ? (
-                        'Submitting...'
                       ) : !isAuthenticated ? (
                         'Login to Apply'
                       ) : (
@@ -614,6 +620,66 @@ export default function JobDetail() {
       <ScrollReveal>
         <Footer />
       </ScrollReveal>
+
+      {/* Application Dialog */}
+      <Dialog open={showApplyDialog} onOpenChange={setShowApplyDialog}>
+        <DialogContent className="max-w-lg mx-4">
+          <DialogHeader>
+            <DialogTitle>Apply for {job.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="coverLetter">Cover Letter</Label>
+              <Textarea
+                id="coverLetter"
+                value={coverLetter}
+                onChange={(e) => setCoverLetter(e.target.value)}
+                placeholder="Tell the employer why you're a great fit for this role..."
+                rows={5}
+                className="mt-1"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Optional but recommended</p>
+            </div>
+            <div>
+              <Label htmlFor="resume">Resume / CV</Label>
+              <div className="mt-1">
+                <Input
+                  id="resume"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground mt-1">PDF, DOC, or DOCX (max 10MB)</p>
+              </div>
+              {resumeFile && (
+                <div className="flex items-center gap-2 mt-2 text-sm text-primary">
+                  <FileText className="h-4 w-4" />
+                  <span className="truncate">{resumeFile.name}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowApplyDialog(false)} disabled={applying}>
+              Cancel
+            </Button>
+            <Button onClick={handleApply} disabled={applying}>
+              {applying ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {uploadingResume ? 'Uploading resume...' : 'Submitting...'}
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Submit Application
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

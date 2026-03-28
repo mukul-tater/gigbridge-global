@@ -33,6 +33,7 @@ import WorkerContracts from "./pages/worker/Contracts";
 import WorkerTravelStatus from "./pages/worker/TravelStatus";
 import WorkerInsurance from "./pages/worker/Insurance";
 import WorkerSavedSearches from "./pages/worker/SavedSearches";
+import WorkerSavedJobs from "./pages/worker/SavedJobs";
 import WorkerPublicProfile from "./pages/worker/WorkerPublicProfile";
 import WorkerOffers from "./pages/worker/WorkerOffers";
 import WorkerInterviews from "./pages/worker/WorkerInterviews";
@@ -121,6 +122,7 @@ function App() {
                 <Route path="/worker/documents" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerDocuments /></ProtectedRoute>} />
                 <Route path="/worker/notifications" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerNotifications /></ProtectedRoute>} />
                 <Route path="/worker/saved-searches" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerSavedSearches /></ProtectedRoute>} />
+                <Route path="/worker/saved-jobs" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerSavedJobs /></ProtectedRoute>} />
                 <Route path="/worker/offers" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerOffers /></ProtectedRoute>} />
                 <Route path="/worker/interviews" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerInterviews /></ProtectedRoute>} />
                 <Route path="/worker/calendar" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerCalendar /></ProtectedRoute>} />
