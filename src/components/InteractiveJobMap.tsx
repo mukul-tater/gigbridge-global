@@ -11,7 +11,7 @@ const InteractiveJobMap = () => {
     {
       name: "Eastern Europe",
       countries: ["Poland", "Czech Republic", "Romania"],
-      jobs: "15,400+",
+      jobs: "62+",
       avgSalary: "₹1.75-2.5L",
       easyHiring: true,
       hiringTime: "2-4 weeks",
