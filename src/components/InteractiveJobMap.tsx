@@ -24,7 +24,7 @@ const InteractiveJobMap = () => {
     {
       name: "Middle East",
       countries: ["UAE", "Saudi Arabia", "Qatar"],
-      jobs: "22,800+",
+      jobs: "72+",
       avgSalary: "₹2.2-3.5L",
       easyHiring: true,
       hiringTime: "1-3 weeks",
