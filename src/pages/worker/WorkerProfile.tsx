@@ -244,7 +244,91 @@ export default function WorkerProfile() {
                   id="full_name"
                   {...register('full_name')}
                   className={errors.full_name ? 'border-destructive' : ''}
-                />
+          />
+
+          {/* Resume Upload */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Resume / CV</h2>
+            {resumeUrl ? (
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3 min-w-0">
+                  <FileText className="h-5 w-5 text-primary shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{resumeName || 'Resume'}</p>
+                    <a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
+                      View file
+                    </a>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      await supabase.from('worker_documents').delete()
+                        .eq('worker_id', user.id).eq('document_type', 'resume');
+                      setResumeUrl(null);
+                      setResumeName(null);
+                      toast.success("Resume removed");
+                    } catch { toast.error("Failed to remove resume"); }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground mb-3">Upload your resume to attach it when applying for jobs.</p>
+            )}
+            <div className="mt-3">
+              <Input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                disabled={uploadingResume}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !user) return;
+                  setUploadingResume(true);
+                  try {
+                    const ext = file.name.split('.').pop();
+                    const path = `${user.id}/${Date.now()}-resume.${ext}`;
+                    const { error: upErr } = await supabase.storage.from('worker-documents').upload(path, file);
+                    if (upErr) throw upErr;
+                    const { data: urlData } = supabase.storage.from('worker-documents').getPublicUrl(path);
+                    
+                    // Remove old resume doc entry
+                    await supabase.from('worker_documents').delete()
+                      .eq('worker_id', user.id).eq('document_type', 'resume');
+                    
+                    // Save new resume doc entry
+                    await supabase.from('worker_documents').insert({
+                      worker_id: user.id,
+                      document_type: 'resume',
+                      document_name: file.name,
+                      file_url: urlData.publicUrl,
+                      file_size: file.size,
+                    });
+
+                    setResumeUrl(urlData.publicUrl);
+                    setResumeName(file.name);
+                    toast.success("Resume uploaded successfully!");
+                  } catch (err: any) {
+                    toast.error(err.message || "Failed to upload resume");
+                  } finally {
+                    setUploadingResume(false);
+                  }
+                }}
+                className="cursor-pointer"
+              />
+              {uploadingResume && (
+                <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Uploading...
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">PDF, DOC, or DOCX (max 10MB)</p>
+            </div>
+          </Card>
                 {errors.full_name && (
                   <p className="text-sm text-destructive mt-1">{errors.full_name.message}</p>
                 )}
