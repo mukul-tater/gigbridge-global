@@ -37,7 +37,7 @@ const InteractiveJobMap = () => {
     {
       name: "Western Europe",
       countries: ["Germany", "Netherlands", "Belgium"],
-      jobs: "18,900+",
+      jobs: "66+",
       avgSalary: "₹2.75-3.8L",
       easyHiring: false,
       hiringTime: "2-6 months",
