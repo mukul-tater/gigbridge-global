@@ -124,6 +124,20 @@ export default function WorkerProfile() {
           setValue('certifications', '');
           setValue('visa_type', workerProfile.ecr_category || '');
         }
+
+        // Fetch existing resume from worker_documents
+        const { data: docs } = await supabase
+          .from('worker_documents')
+          .select('file_url, document_name')
+          .eq('worker_id', user.id)
+          .eq('document_type', 'resume')
+          .order('uploaded_at', { ascending: false })
+          .limit(1);
+
+        if (docs && docs.length > 0) {
+          setResumeUrl(docs[0].file_url);
+          setResumeName(docs[0].document_name);
+        }
       } catch (error) {
         console.error('Error loading worker profile:', error);
         toast.error("Failed to load profile data");
