@@ -33,8 +33,8 @@ const HeroSection = () => {
   };
 
   const stats = [
-    { value: "50K+", label: "Active Jobs", icon: TrendingUp },
-    { value: "50+", label: "Countries", icon: Globe },
+    { value: "900+", label: "Active Jobs", icon: TrendingUp },
+    { value: "40+", label: "Countries", icon: Globe },
     { value: "98%", label: "Success Rate", icon: CheckCircle },
   ];
 
