@@ -12,7 +12,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "SafeWorkGlobal helped me find my dream job in Japan. The process was smooth and transparent. Within 3 months, I was working for a top construction company!",
       placement: "Construction Manager",
-      salary: "₹3,00,000/month"
+      salary: "₹85,000/month"
     },
     {
       name: "Maria Santos",
