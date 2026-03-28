@@ -33,8 +33,8 @@ const HeroSection = () => {
   };
 
   const stats = [
-    { value: "50K+", label: "Active Jobs", icon: TrendingUp },
-    { value: "50+", label: "Countries", icon: Globe },
+    { value: "900+", label: "Active Jobs", icon: TrendingUp },
+    { value: "40+", label: "Countries", icon: Globe },
     { value: "98%", label: "Success Rate", icon: CheckCircle },
   ];
 
@@ -63,7 +63,7 @@ const HeroSection = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-info/10 text-primary px-4 py-2 rounded-full text-xs sm:text-sm font-semibold mb-6 border border-primary/20 animate-fade-in backdrop-blur-sm">
               <Sparkles className="h-3.5 w-3.5 animate-bounce-subtle" />
-              <span>Over 50,000 global opportunities</span>
+              <span>Over 900 global opportunities across 40+ countries</span>
             </div>
 
             {/* Heading */}

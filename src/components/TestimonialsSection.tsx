@@ -12,7 +12,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "SafeWorkGlobal helped me find my dream job in Japan. The process was smooth and transparent. Within 3 months, I was working for a top construction company!",
       placement: "Construction Manager",
-      salary: "₹3,00,000/month"
+      salary: "₹85,000/month"
     },
     {
       name: "Maria Santos",
@@ -22,7 +22,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "Within 3 weeks of signing up, I had 5 job offers from Germany. The platform made it easy to compare opportunities and choose the best fit for my skills.",
       placement: "Solar Panel Installer",
-      salary: "₹3,30,000/month"
+      salary: "₹78,000/month"
     },
     {
       name: "Ahmed Hassan",
@@ -32,7 +32,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "SafeWork Global connected me with a reputable company in Dubai. The accommodation and benefits are excellent. I recommend this to all skilled workers!",
       placement: "Pipeline Welder",
-      salary: "₹2,75,000/month"
+      salary: "₹72,000/month"
     },
     {
       name: "Chen Wei",
@@ -42,7 +42,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "Fast hiring process with minimal paperwork. I started my job in Poland within 6 weeks. The platform's support team helped me every step of the way.",
       placement: "Assembly Line Lead",
-      salary: "₹2,20,000/month"
+      salary: "₹55,000/month"
     }
   ];
 
@@ -55,7 +55,7 @@ const TestimonialsSection = () => {
         <div className="text-center mb-10 sm:mb-12 lg:mb-16 max-w-2xl mx-auto">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-success/10 text-success mb-4">
             <Star className="h-3.5 w-3.5 fill-current" />
-            4.9/5 from 12,000+ workers
+            4.9/5 from 500+ workers
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading mb-4 tracking-tight">
             Real People, <span className="text-gradient">Real Success</span>
@@ -134,7 +134,7 @@ const TestimonialsSection = () => {
               ))}
             </div>
             <span className="text-xs sm:text-sm text-muted-foreground">
-              Join <span className="font-semibold text-foreground">24,000+</span> workers who found success
+              Join <span className="font-semibold text-foreground">450+</span> workers who found success
             </span>
           </div>
         </div>

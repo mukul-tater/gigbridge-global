@@ -12,10 +12,10 @@ const SuccessMetrics = () => {
   const sectionRef = useRef<HTMLElement>(null);
 
   const finalCounts = {
-    jobsFilled: 28450,
-    workersPlaced: 24380,
-    countries: 32,
-    activeEmployers: 1240
+    jobsFilled: 920,
+    workersPlaced: 450,
+    countries: 41,
+    activeEmployers: 120
   };
 
   useEffect(() => {

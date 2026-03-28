@@ -11,7 +11,7 @@ const InteractiveJobMap = () => {
     {
       name: "Eastern Europe",
       countries: ["Poland", "Czech Republic", "Romania"],
-      jobs: "15,400+",
+      jobs: "62+",
       avgSalary: "₹1.75-2.5L",
       easyHiring: true,
       hiringTime: "2-4 weeks",
@@ -24,7 +24,7 @@ const InteractiveJobMap = () => {
     {
       name: "Middle East",
       countries: ["UAE", "Saudi Arabia", "Qatar"],
-      jobs: "22,800+",
+      jobs: "72+",
       avgSalary: "₹2.2-3.5L",
       easyHiring: true,
       hiringTime: "1-3 weeks",
@@ -37,7 +37,7 @@ const InteractiveJobMap = () => {
     {
       name: "Western Europe",
       countries: ["Germany", "Netherlands", "Belgium"],
-      jobs: "18,900+",
+      jobs: "66+",
       avgSalary: "₹2.75-3.8L",
       easyHiring: false,
       hiringTime: "2-6 months",
@@ -50,7 +50,7 @@ const InteractiveJobMap = () => {
     {
       name: "East Asia",
       countries: ["Japan", "South Korea", "Singapore"],
-      jobs: "16,200+",
+      jobs: "88+",
       avgSalary: "₹2.5-3.5L",
       easyHiring: false,
       hiringTime: "3-6 months",
@@ -63,7 +63,7 @@ const InteractiveJobMap = () => {
     {
       name: "Scandinavia",
       countries: ["Norway", "Sweden", "Denmark"],
-      jobs: "8,500+",
+      jobs: "65+",
       avgSalary: "₹3.15-4.3L",
       easyHiring: false,
       hiringTime: "2-6 months",
@@ -76,7 +76,7 @@ const InteractiveJobMap = () => {
     {
       name: "Southeast Asia",
       countries: ["Malaysia", "Thailand", "Vietnam"],
-      jobs: "12,300+",
+      jobs: "65+",
       avgSalary: "₹1.4-2.2L",
       easyHiring: true,
       hiringTime: "2-4 weeks",
