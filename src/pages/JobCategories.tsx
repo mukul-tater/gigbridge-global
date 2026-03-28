@@ -59,18 +59,18 @@ const categoryDetails: CategoryDetail[] = [
     title: "Construction",
     description: "Building the future with infrastructure and residential projects",
     longDescription: "Construction professionals are in high demand globally as countries invest in infrastructure development, residential housing, and commercial buildings. This sector offers diverse opportunities from hands-on labor to project management roles.",
-    totalJobs: "12,847",
-    avgSalary: "$3,200/month",
-    salaryRange: "$2,000 - $5,500",
+    totalJobs: "74",
+    avgSalary: "₹50,000/month",
+    salaryRange: "₹35,000 - ₹85,000",
     demand: "High",
     growth: "+15% annually",
     topCountries: ["Japan", "Germany", "UAE", "Singapore", "Australia"],
     skills: ["Masonry", "Concrete Work", "Blueprint Reading", "Safety Management", "Heavy Equipment"],
     subcategories: [
-      { name: "Masonry & Bricklaying", count: 4521, avgSalary: "$2,800/mo", growth: "+12%" },
-      { name: "Concrete Workers", count: 3214, avgSalary: "$3,000/mo", growth: "+18%" },
-      { name: "Construction Managers", count: 2876, avgSalary: "$4,500/mo", growth: "+20%" },
-      { name: "Site Supervisors", count: 2236, avgSalary: "$3,800/mo", growth: "+16%" }
+      { name: "Masonry & Bricklaying", count: 22, avgSalary: "₹42,000/mo", growth: "+12%" },
+      { name: "Concrete Workers", count: 18, avgSalary: "₹45,000/mo", growth: "+18%" },
+      { name: "Construction Managers", count: 20, avgSalary: "₹65,000/mo", growth: "+20%" },
+      { name: "Site Supervisors", count: 14, avgSalary: "₹58,000/mo", growth: "+16%" }
     ],
     requirements: [
       "Physical fitness and stamina",
