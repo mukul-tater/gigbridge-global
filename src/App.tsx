@@ -61,6 +61,7 @@ import EmployerPayments from "./pages/employer/EmployerPayments";
 import ContractManagement from "./pages/employer/ContractManagement";
 import EmployerContractHistory from "./pages/employer/ContractHistory";
 import EmployerReports from "./pages/employer/EmployerReports";
+import EmployerEditJob from "./pages/employer/EditJob";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
@@ -133,6 +134,7 @@ function App() {
                 <Route path="/employer/company" element={<ProtectedRoute allowedRoles={["employer"]}><CompanyProfile /></ProtectedRoute>} />
                 <Route path="/employer/post-job" element={<ProtectedRoute allowedRoles={["employer"]}><PostJob /></ProtectedRoute>} />
                 <Route path="/employer/manage-jobs" element={<ProtectedRoute allowedRoles={["employer"]}><ManageJobs /></ProtectedRoute>} />
+                <Route path="/employer/edit-job/:jobId" element={<ProtectedRoute allowedRoles={["employer"]}><EmployerEditJob /></ProtectedRoute>} />
                 <Route path="/employer/search-workers" element={<ProtectedRoute allowedRoles={["employer"]}><SearchWorkers /></ProtectedRoute>} />
                 <Route path="/employer/interviews" element={<ProtectedRoute allowedRoles={["employer"]}><EmployerInterviews /></ProtectedRoute>} />
                 <Route path="/employer/offers" element={<ProtectedRoute allowedRoles={["employer"]}><EmployerOffers /></ProtectedRoute>} />

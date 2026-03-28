@@ -296,7 +296,7 @@ export default function ManageJobs() {
                         variant="outline"
                         size="sm"
                         className="flex-1 sm:flex-none"
-                        onClick={() => navigate(`/admin/jobs/${job.id}/edit`)}
+                        onClick={() => navigate(`/employer/edit-job/${job.id}`)}
                       >
                         <Pencil className="h-4 w-4 mr-2" />
                         Edit
