@@ -123,18 +123,18 @@ const categoryDetails: CategoryDetail[] = [
     title: "Welding",
     description: "Precision metalwork for industries worldwide",
     longDescription: "Welders are in critical demand across shipbuilding, pipeline construction, and heavy industry. Specialized welding certifications command premium salaries, especially in oil & gas and maritime sectors.",
-    totalJobs: "6,521",
-    avgSalary: "$4,100/month",
-    salaryRange: "$2,800 - $6,500",
+    totalJobs: "77",
+    avgSalary: "₹65,000/month",
+    salaryRange: "₹45,000 - ₹1,00,000",
     demand: "High",
     growth: "+18% annually",
     topCountries: ["Qatar", "Russia", "South Korea", "UAE", "Singapore"],
     skills: ["MIG Welding", "TIG Welding", "Arc Welding", "Underwater Welding", "Pipeline Welding"],
     subcategories: [
-      { name: "Pipeline Welders", count: 2431, avgSalary: "$5,200/mo", growth: "+22%" },
-      { name: "Structural Welders", count: 1987, avgSalary: "$3,800/mo", growth: "+15%" },
-      { name: "Underwater Welders", count: 876, avgSalary: "$6,500/mo", growth: "+25%" },
-      { name: "Fabrication Welders", count: 1227, avgSalary: "$3,500/mo", growth: "+12%" }
+      { name: "Pipeline Welders", count: 25, avgSalary: "₹82,000/mo", growth: "+22%" },
+      { name: "Structural Welders", count: 22, avgSalary: "₹58,000/mo", growth: "+15%" },
+      { name: "Underwater Welders", count: 12, avgSalary: "₹1,00,000/mo", growth: "+25%" },
+      { name: "Fabrication Welders", count: 18, avgSalary: "₹54,000/mo", growth: "+12%" }
     ],
     requirements: [
       "Welding certification (AWS or equivalent)",
