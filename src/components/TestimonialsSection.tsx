@@ -42,7 +42,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "Fast hiring process with minimal paperwork. I started my job in Poland within 6 weeks. The platform's support team helped me every step of the way.",
       placement: "Assembly Line Lead",
-      salary: "₹2,20,000/month"
+      salary: "₹55,000/month"
     }
   ];
 
