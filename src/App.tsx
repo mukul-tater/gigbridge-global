@@ -33,6 +33,7 @@ import WorkerContracts from "./pages/worker/Contracts";
 import WorkerTravelStatus from "./pages/worker/TravelStatus";
 import WorkerInsurance from "./pages/worker/Insurance";
 import WorkerSavedSearches from "./pages/worker/SavedSearches";
+import WorkerSavedJobs from "./pages/worker/SavedJobs";
 import WorkerPublicProfile from "./pages/worker/WorkerPublicProfile";
 import WorkerOffers from "./pages/worker/WorkerOffers";
 import WorkerInterviews from "./pages/worker/WorkerInterviews";
