@@ -219,18 +219,18 @@ const categoryDetails: CategoryDetail[] = [
     title: "Manufacturing",
     description: "Modern production facilities with automated systems",
     longDescription: "Manufacturing roles span from traditional assembly work to operating sophisticated CNC machines and robotics. Industry 4.0 has created demand for tech-savvy workers in smart factories.",
-    totalJobs: "9,876",
-    avgSalary: "$3,000/month",
-    salaryRange: "$2,200 - $5,000",
+    totalJobs: "103",
+    avgSalary: "₹48,000/month",
+    salaryRange: "₹28,000 - ₹78,000",
     demand: "High",
     growth: "+14% annually",
     topCountries: ["Czech Republic", "Poland", "Slovakia", "Germany", "Japan"],
     skills: ["Machine Operation", "Quality Control", "Assembly", "CNC Programming", "Safety Protocols"],
     subcategories: [
-      { name: "CNC Operators", count: 3421, avgSalary: "$3,800/mo", growth: "+18%" },
-      { name: "Assembly Workers", count: 2987, avgSalary: "$2,500/mo", growth: "+12%" },
-      { name: "Quality Inspectors", count: 2156, avgSalary: "$3,200/mo", growth: "+15%" },
-      { name: "Production Supervisors", count: 1312, avgSalary: "$4,200/mo", growth: "+16%" }
+      { name: "CNC Operators", count: 32, avgSalary: "₹60,000/mo", growth: "+18%" },
+      { name: "Assembly Workers", count: 30, avgSalary: "₹38,000/mo", growth: "+12%" },
+      { name: "Quality Inspectors", count: 24, avgSalary: "₹50,000/mo", growth: "+15%" },
+      { name: "Production Supervisors", count: 17, avgSalary: "₹65,000/mo", growth: "+16%" }
     ],
     requirements: [
       "High school diploma or equivalent",
