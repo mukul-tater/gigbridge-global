@@ -91,18 +91,18 @@ const categoryDetails: CategoryDetail[] = [
     title: "Electrical",
     description: "Powering industries with expertise in electrical systems",
     longDescription: "Electrical workers are essential for industrial operations, renewable energy projects, and smart infrastructure development. The transition to renewable energy has created unprecedented opportunities in this field.",
-    totalJobs: "8,234",
-    avgSalary: "$3,800/month",
-    salaryRange: "$2,500 - $6,000",
+    totalJobs: "103",
+    avgSalary: "₹60,000/month",
+    salaryRange: "₹40,000 - ₹95,000",
     demand: "Very High",
     growth: "+22% annually",
     topCountries: ["Norway", "Australia", "Canada", "Germany", "Netherlands"],
     skills: ["Electrical Wiring", "Panel Installation", "Troubleshooting", "Solar Systems", "Industrial Controls"],
     subcategories: [
-      { name: "Industrial Electrician", count: 3105, avgSalary: "$4,000/mo", growth: "+24%" },
-      { name: "Solar Panel Installer", count: 2234, avgSalary: "$3,600/mo", growth: "+30%" },
-      { name: "Electrical Engineer", count: 1876, avgSalary: "$5,200/mo", growth: "+25%" },
-      { name: "Maintenance Electrician", count: 1019, avgSalary: "$3,400/mo", growth: "+15%" }
+      { name: "Industrial Electrician", count: 35, avgSalary: "₹65,000/mo", growth: "+24%" },
+      { name: "Solar Panel Installer", count: 28, avgSalary: "₹58,000/mo", growth: "+30%" },
+      { name: "Electrical Engineer", count: 24, avgSalary: "₹80,000/mo", growth: "+25%" },
+      { name: "Maintenance Electrician", count: 16, avgSalary: "₹52,000/mo", growth: "+15%" }
     ],
     requirements: [
       "Licensed electrician certification",
