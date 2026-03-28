@@ -55,7 +55,7 @@ const TestimonialsSection = () => {
         <div className="text-center mb-10 sm:mb-12 lg:mb-16 max-w-2xl mx-auto">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-success/10 text-success mb-4">
             <Star className="h-3.5 w-3.5 fill-current" />
-            4.9/5 from 12,000+ workers
+            4.9/5 from 500+ workers
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading mb-4 tracking-tight">
             Real People, <span className="text-gradient">Real Success</span>
