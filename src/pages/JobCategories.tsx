@@ -187,18 +187,18 @@ const categoryDetails: CategoryDetail[] = [
     title: "Delivery & Logistics",
     description: "Fast-growing sector for supply chain and last-mile delivery",
     longDescription: "The e-commerce boom has created massive demand for delivery drivers, warehouse workers, and logistics coordinators. This sector offers flexible schedules and rapid employment opportunities.",
-    totalJobs: "15,678",
-    avgSalary: "$2,400/month",
-    salaryRange: "$1,800 - $3,500",
+    totalJobs: "79",
+    avgSalary: "₹38,000/month",
+    salaryRange: "₹25,000 - ₹55,000",
     demand: "Very High",
     growth: "+28% annually",
     topCountries: ["Netherlands", "Belgium", "Denmark", "USA", "Germany"],
     skills: ["Driving License", "Route Planning", "Package Handling", "Customer Service", "Warehouse Operations"],
     subcategories: [
-      { name: "Delivery Drivers", count: 7234, avgSalary: "$2,300/mo", growth: "+30%" },
-      { name: "Warehouse Operators", count: 4321, avgSalary: "$2,400/mo", growth: "+25%" },
-      { name: "Logistics Coordinators", count: 2876, avgSalary: "$3,200/mo", growth: "+28%" },
-      { name: "Forklift Operators", count: 1247, avgSalary: "$2,600/mo", growth: "+22%" }
+      { name: "Delivery Drivers", count: 28, avgSalary: "₹35,000/mo", growth: "+30%" },
+      { name: "Warehouse Operators", count: 22, avgSalary: "₹37,000/mo", growth: "+25%" },
+      { name: "Logistics Coordinators", count: 18, avgSalary: "₹50,000/mo", growth: "+28%" },
+      { name: "Forklift Operators", count: 11, avgSalary: "₹40,000/mo", growth: "+22%" }
     ],
     requirements: [
       "Valid driving license (for driver roles)",
