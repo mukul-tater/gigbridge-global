@@ -155,18 +155,18 @@ const categoryDetails: CategoryDetail[] = [
     title: "Plumbing",
     description: "Essential services for residential and commercial systems",
     longDescription: "Plumbing professionals are needed for new construction, maintenance, and HVAC systems. The growing focus on water conservation and sustainable building practices has expanded opportunities in this traditional trade.",
-    totalJobs: "5,432",
-    avgSalary: "$2,900/month",
-    salaryRange: "$2,000 - $4,500",
+    totalJobs: "73",
+    avgSalary: "₹45,000/month",
+    salaryRange: "₹30,000 - ₹70,000",
     demand: "Medium",
     growth: "+12% annually",
     topCountries: ["UK", "Ireland", "New Zealand", "Canada", "Australia"],
     skills: ["Pipe Fitting", "Drainage Systems", "HVAC", "Water Systems", "Gas Lines"],
     subcategories: [
-      { name: "Master Plumbers", count: 1876, avgSalary: "$4,200/mo", growth: "+15%" },
-      { name: "HVAC Technicians", count: 1654, avgSalary: "$3,400/mo", growth: "+18%" },
-      { name: "Commercial Plumbers", count: 1234, avgSalary: "$3,100/mo", growth: "+10%" },
-      { name: "Residential Plumbers", count: 668, avgSalary: "$2,500/mo", growth: "+8%" }
+      { name: "Master Plumbers", count: 22, avgSalary: "₹65,000/mo", growth: "+15%" },
+      { name: "HVAC Technicians", count: 20, avgSalary: "₹52,000/mo", growth: "+18%" },
+      { name: "Commercial Plumbers", count: 18, avgSalary: "₹48,000/mo", growth: "+10%" },
+      { name: "Residential Plumbers", count: 13, avgSalary: "₹38,000/mo", growth: "+8%" }
     ],
     requirements: [
       "Plumbing license or apprenticeship completion",
