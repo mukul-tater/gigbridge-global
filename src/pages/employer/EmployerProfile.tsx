@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import AvatarUpload from "@/components/AvatarUpload";
 import { employerProfileSchema, type EmployerProfileFormData } from "@/lib/validations/profile";
+import ChangePasswordCard from "@/components/ChangePasswordCard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
@@ -294,6 +295,10 @@ export default function EmployerProfile() {
             </Button>
           </div>
         </form>
+
+        <div className="max-w-3xl mt-6">
+          <ChangePasswordCard />
+        </div>
       </DashboardLayout>
   );
 }
