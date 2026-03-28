@@ -63,7 +63,7 @@ const InteractiveJobMap = () => {
     {
       name: "Scandinavia",
       countries: ["Norway", "Sweden", "Denmark"],
-      jobs: "8,500+",
+      jobs: "65+",
       avgSalary: "₹3.15-4.3L",
       easyHiring: false,
       hiringTime: "2-6 months",
