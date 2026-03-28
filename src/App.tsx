@@ -61,6 +61,7 @@ import EmployerPayments from "./pages/employer/EmployerPayments";
 import ContractManagement from "./pages/employer/ContractManagement";
 import EmployerContractHistory from "./pages/employer/ContractHistory";
 import EmployerReports from "./pages/employer/EmployerReports";
+import EmployerEditJob from "./pages/employer/EditJob";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
