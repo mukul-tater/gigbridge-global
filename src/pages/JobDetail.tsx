@@ -505,18 +505,7 @@ export default function JobDetail() {
                   ) : (
                     <Button 
                       size="lg" 
-                      onClick={() => {
-                        if (!isAuthenticated) {
-                          toast({
-                            title: 'Login Required',
-                            description: 'Please login as a worker to apply for jobs',
-                            variant: 'destructive'
-                          });
-                          navigate('/auth');
-                          return;
-                        }
-                        handleApply();
-                      }}
+                      onClick={openApplyDialog}
                       disabled={hasApplied || applying || job.status !== 'ACTIVE'}
                       className="w-full"
                     >
@@ -525,8 +514,6 @@ export default function JobDetail() {
                           <CheckCircle2 className="mr-2 h-5 w-5" />
                           Already Applied
                         </>
-                      ) : applying ? (
-                        'Submitting...'
                       ) : !isAuthenticated ? (
                         'Login to Apply'
                       ) : (
