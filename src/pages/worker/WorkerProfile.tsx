@@ -49,6 +49,9 @@ export default function WorkerProfile() {
   const [loading, setLoading] = useState(true);
   const [videos, setVideos] = useState<WorkerVideo[]>([]);
   const [nationality, setNationality] = useState<string>("");
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [resumeName, setResumeName] = useState<string | null>(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<WorkerProfileFormData>({
     resolver: zodResolver(workerProfileSchema),
