@@ -294,6 +294,10 @@ export default function EmployerProfile() {
             </Button>
           </div>
         </form>
+
+        <div className="max-w-3xl mt-6">
+          <ChangePasswordCard />
+        </div>
       </DashboardLayout>
   );
 }
