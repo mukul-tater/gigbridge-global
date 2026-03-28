@@ -68,6 +68,10 @@ export default function JobDetail() {
   const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showApplyDialog, setShowApplyDialog] = useState(false);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
   useEffect(() => {
     const loadData = async () => {
       if (!slug) return;
