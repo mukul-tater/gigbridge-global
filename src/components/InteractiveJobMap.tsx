@@ -50,7 +50,7 @@ const InteractiveJobMap = () => {
     {
       name: "East Asia",
       countries: ["Japan", "South Korea", "Singapore"],
-      jobs: "16,200+",
+      jobs: "88+",
       avgSalary: "₹2.5-3.5L",
       easyHiring: false,
       hiringTime: "3-6 months",
