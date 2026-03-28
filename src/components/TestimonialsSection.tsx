@@ -32,7 +32,7 @@ const TestimonialsSection = () => {
       rating: 5,
       text: "SafeWork Global connected me with a reputable company in Dubai. The accommodation and benefits are excellent. I recommend this to all skilled workers!",
       placement: "Pipeline Welder",
-      salary: "₹2,75,000/month"
+      salary: "₹72,000/month"
     },
     {
       name: "Chen Wei",
