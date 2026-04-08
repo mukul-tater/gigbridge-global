@@ -7,8 +7,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import BackgroundVerificationCard from "@/components/employer/BackgroundVerificationCard";
-import PaymentManagementCard from "@/components/employer/PaymentManagementCard";
-import AnalyticsSummaryCard from "@/components/employer/AnalyticsSummaryCard";
+import EscrowQuickActions from "@/components/employer/EscrowQuickActions";
+import QuickStatsRow from "@/components/employer/QuickStatsRow";
+import RecentActivityFeed from "@/components/employer/RecentActivityFeed";
 import ShortlistedCandidatesCard from "@/components/employer/ShortlistedCandidatesCard";
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
@@ -21,6 +22,8 @@ export default function EmployerDashboard() {
   const [payments, setPayments] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [interviews, setInterviews] = useState<any[]>([]);
+  const [offers, setOffers] = useState<any[]>([]);
   const [shortlistedWorkers, setShortlistedWorkers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,18 +33,22 @@ export default function EmployerDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [verificationsRes, paymentsRes, jobsRes, applicationsRes, shortlistRes] = await Promise.all([
+      const [verificationsRes, paymentsRes, jobsRes, applicationsRes, shortlistRes, interviewsRes, offersRes] = await Promise.all([
         supabase.from('background_verifications').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
         supabase.from('payments').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
         supabase.from('jobs').select('*').eq('employer_id', profile?.id),
         supabase.from('job_applications').select('*').eq('employer_id', profile?.id),
-        supabase.from('shortlisted_workers').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }).limit(5)
+        supabase.from('shortlisted_workers').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('interviews').select('*').eq('employer_id', profile?.id).order('scheduled_date', { ascending: false }),
+        supabase.from('offers').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
       ]);
 
       setVerifications(verificationsRes.data || []);
       setPayments(paymentsRes.data || []);
       setJobs(jobsRes.data || []);
       setApplications(applicationsRes.data || []);
+      setInterviews(interviewsRes.data || []);
+      setOffers(offersRes.data || []);
 
       if (shortlistRes.data && shortlistRes.data.length > 0) {
         const workerIds = shortlistRes.data.map(w => w.worker_id);
@@ -88,33 +95,6 @@ export default function EmployerDashboard() {
     { stage: "Hired", count: applications.filter((a: any) => a.status === 'HIRED').length, color: "hsl(var(--chart-5))" },
   ];
 
-  const getTopPerformingJobs = () => {
-    const jobAppCounts: Record<string, { job: any; count: number }> = {};
-    applications.forEach((app: any) => {
-      if (!jobAppCounts[app.job_id]) {
-        const job = jobs.find((j: any) => j.id === app.job_id);
-        if (job) jobAppCounts[app.job_id] = { job, count: 0 };
-      }
-      if (jobAppCounts[app.job_id]) jobAppCounts[app.job_id].count++;
-    });
-    return Object.values(jobAppCounts).sort((a, b) => b.count - a.count).slice(0, 3);
-  };
-
-  const hiringMetricsData = generateHiringMetrics();
-  const pipelineData = generatePipelineData();
-  const topPerformingJobs = getTopPerformingJobs();
-
-  const analyticsData = {
-    totalJobs: jobs.length,
-    activeJobs: jobs.filter((j: any) => j.status === 'ACTIVE').length,
-    totalApplications: applications.length,
-    totalViews: jobs.reduce((sum: number, job: any) => sum + (job.views || 0), 0),
-    shortlistedCandidates: applications.filter((a: any) => a.status === 'SHORTLISTED').length,
-    hiredCandidates: applications.filter((a: any) => a.status === 'HIRED').length,
-    avgTimeToHire: 28,
-    conversionRate: applications.length > 0 ? ((applications.filter((a: any) => a.status === 'HIRED').length / applications.length) * 100) : 0
-  };
-
   if (loading) {
     return (
       <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
@@ -123,10 +103,8 @@ export default function EmployerDashboard() {
     );
   }
 
-  const timeToHireData = jobs.slice(0, 5).map((job: any) => ({
-    position: job.title.length > 15 ? job.title.substring(0, 15) + '...' : job.title,
-    days: Math.floor(Math.random() * 20) + 15
-  }));
+  const hiringMetricsData = generateHiringMetrics();
+  const pipelineData = generatePipelineData();
 
   const totalVerifications = verifications.length || 1;
   const compliantCount = verifications.filter((v: any) => v.status === 'completed' && v.result === 'passed').length;
@@ -139,6 +117,23 @@ export default function EmployerDashboard() {
     { status: "Non-Compliant", value: totalVerifications > 0 ? Math.round((failedCount / totalVerifications) * 100) : 0, color: "hsl(var(--destructive))" },
   ];
 
+  const timeToHireData = jobs.slice(0, 5).map((job: any) => ({
+    month: job.title.length > 15 ? job.title.substring(0, 15) + '...' : job.title,
+    days: Math.floor(Math.random() * 20) + 15
+  }));
+
+  const topPerformingJobs = (() => {
+    const jobAppCounts: Record<string, { job: any; count: number }> = {};
+    applications.forEach((app: any) => {
+      if (!jobAppCounts[app.job_id]) {
+        const job = jobs.find((j: any) => j.id === app.job_id);
+        if (job) jobAppCounts[app.job_id] = { job, count: 0 };
+      }
+      if (jobAppCounts[app.job_id]) jobAppCounts[app.job_id].count++;
+    });
+    return Object.values(jobAppCounts).sort((a, b) => b.count - a.count).slice(0, 3);
+  })();
+
   return (
     <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
       <PortalBreadcrumb />
@@ -146,16 +141,25 @@ export default function EmployerDashboard() {
 
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome back, {profile?.full_name || 'Employer'}!</h1>
-        <p className="text-muted-foreground text-sm">Manage your job postings and find talent</p>
+        <p className="text-muted-foreground text-sm">Manage your job postings, hiring pipeline, and payments</p>
       </div>
 
-      <AnalyticsSummaryCard data={analyticsData} />
+      {/* Quick Stats Row */}
+      <QuickStatsRow
+        activeJobs={jobs.filter((j: any) => j.status === 'ACTIVE').length}
+        totalApplications={applications.length}
+        shortlisted={applications.filter((a: any) => a.status === 'SHORTLISTED').length}
+        interviews={interviews.length}
+        offers={offers.length}
+        hired={applications.filter((a: any) => a.status === 'HIRED').length}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-6">
-        <BackgroundVerificationCard verifications={verifications} onRefresh={fetchDashboardData} />
-        <PaymentManagementCard payments={payments} />
+      {/* Escrow Payment Widget */}
+      <div className="my-6">
+        <EscrowQuickActions payments={payments} />
       </div>
 
+      {/* Charts Row */}
       <div className="grid lg:grid-cols-2 gap-4 mb-6">
         <Card className="p-5">
           <InteractiveChart title="Hiring Metrics" type="line" data={hiringMetricsData}
@@ -167,13 +171,20 @@ export default function EmployerDashboard() {
           />
         </Card>
         <Card className="p-5">
-          <InteractiveChart title="Time to Hire" type="bar"
-            data={timeToHireData.map(item => ({ month: item.position, days: item.days }))}
+          <InteractiveChart title="Time to Hire (Days)" type="bar"
+            data={timeToHireData}
             dataKeys={[{ key: 'days', color: 'hsl(var(--chart-3))', name: 'Days' }]}
           />
         </Card>
       </div>
 
+      {/* Verification & Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <BackgroundVerificationCard verifications={verifications} onRefresh={fetchDashboardData} />
+        <RecentActivityFeed applications={applications} jobs={jobs} payments={payments} />
+      </div>
+
+      {/* Pipeline & Compliance */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <Card className="p-5">
           <h2 className="text-lg font-bold mb-3">Candidate Pipeline</h2>
@@ -212,12 +223,12 @@ export default function EmployerDashboard() {
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
             <div className="p-2.5 bg-muted/50 rounded-lg text-center">
-              <CheckCircle className="h-4 w-4 text-success mx-auto mb-1" />
+              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground">Compliant</p>
               <p className="text-sm font-bold">{compliantCount}</p>
             </div>
             <div className="p-2.5 bg-muted/50 rounded-lg text-center">
-              <Clock className="h-4 w-4 text-warning mx-auto mb-1" />
+              <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mx-auto mb-1" />
               <p className="text-[10px] text-muted-foreground">Pending</p>
               <p className="text-sm font-bold">{pendingCount}</p>
             </div>
@@ -230,6 +241,7 @@ export default function EmployerDashboard() {
         </Card>
       </div>
 
+      {/* Shortlist & Top Jobs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ShortlistedCandidatesCard workers={shortlistedWorkers} loading={loading} />
         <Card className="p-5">
