@@ -64,7 +64,8 @@ export default function FeaturedJobs() {
     loadJobs();
   }, []);
 
-  const formatSalary = (min: number, max: number, currency: string) => {
+  const formatSalary = (min: number | null | undefined, max: number | null | undefined, currency: string) => {
+    if (min == null || max == null) return 'Salary not specified';
     const inrMin = currency === 'INR' ? min : min * 83;
     const inrMax = currency === 'INR' ? max : max * 83;
     return `₹${inrMin.toLocaleString('en-IN')} - ₹${inrMax.toLocaleString('en-IN')}`;
