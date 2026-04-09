@@ -1,4 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { formatSalaryINR } from '@/lib/utils';
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Briefcase, FileText, MessageSquare, TrendingUp, User } from "lucide-react";
@@ -198,8 +199,8 @@ export default function WorkerDashboard() {
                   <h3 className="font-semibold text-sm mb-1 truncate">{job.title}</h3>
                   <p className="text-xs text-muted-foreground mb-1">
                     {job.location}, {job.country}
-                    {job.salary_min && job.salary_max && (
-                      <> • ₹{(job.currency === 'INR' ? job.salary_min : job.salary_min * 83).toLocaleString()} - ₹{(job.currency === 'INR' ? job.salary_max : job.salary_max * 83).toLocaleString()}</>
+                    {(job.salary_min != null || job.salary_max != null) && (
+                      <> • {formatSalaryINR(job.salary_min, job.salary_max, job.currency)}</>
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground">{job.experience_level} experience</p>
