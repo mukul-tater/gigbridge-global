@@ -1,71 +1,58 @@
 
+Goal: stop the homepage crash, make salary rendering null-safe everywhere, and ensure the live site serves the fixed bundle instead of a stale cached one.
 
-## Comprehensive Website Audit & Fix Plan
+1. Confirm the real root cause
+- The current homepage includes `FeaturedJobs`, and that component still formats salary on every featured job card.
+- The database already contains active jobs with partial salary data, e.g. an active “Cleaner” job has `salary_min = 100000` and `salary_max = null`.
+- The published error stack points to the minified production bundle, which matches the old crash pattern from `FeaturedJobs`.
 
-### Current State Summary
-After scanning all routes, components, and database schema, here is a full audit of what works, what's broken, and what's missing for an initial product version.
+2. Fix the code path that is crashing
+- Update `src/components/FeaturedJobs.tsx` so salary formatting never assumes both values exist.
+- Use explicit null checks (`min == null`, `max == null`) instead of truthy checks.
+- Support all cases cleanly:
+  - both min/max present → show range
+  - only min present → show “From …”
+  - only max present → show “Up to …”
+  - neither present → show “Salary not specified”
+- Also only show the “/month” suffix when an actual numeric salary string is being shown.
 
----
+3. Prevent similar crashes in other screens
+- Harden the same pattern in other files that still call `.toLocaleString()` on nullable values:
+  - `src/pages/worker/WorkerApplications.tsx`
+  - `src/pages/worker/SavedJobs.tsx`
+  - `src/pages/Jobs.tsx`
+  - `src/pages/employer/SearchWorkers.tsx`
+  - `src/pages/worker/WorkerPublicProfile.tsx`
+  - `src/pages/employer/ApplicationDetail.tsx`
+  - any other salary/expected-salary display using truthy checks instead of null-safe checks
+- Best approach: create one shared salary formatter helper and reuse it across job cards, lists, profile views, and application views.
 
-### SECTION A: BROKEN / NON-FUNCTIONAL ITEMS (Must Fix)
+4. Reduce blank-screen risk
+- Wrap the routed app with the existing `ErrorBoundary` so a single rendering bug does not take down the whole site.
+- This will turn future rendering failures into a fallback screen instead of a broken homepage.
 
-#### 1. Messaging System is Empty Shell
-Both `WorkerMessaging.tsx` and `EmployerMessaging.tsx` are placeholder pages with just "No messages yet" text and zero functionality. The `messages` table exists in the database but there is no UI to compose, send, or read messages.
+5. Fix stale publish / cache behavior
+- The live site is likely still serving an old JS bundle or a cached service worker response.
+- The project currently has custom service worker registration in `src/main.tsx` plus PWA plugin setup, so I would align this to one consistent PWA registration approach.
+- I would remove duplicate/manual SW behavior if needed and ensure the activation path refreshes users onto the latest assets.
 
-**Fix:** Build a functional messaging interface for both worker and employer portals with conversation threads, message composition, and real-time updates using the existing `messages` table.
+6. Redeploy safely
+- After the frontend fix is implemented, publish an updated frontend build so the live `.lovable.app` site receives the corrected bundle.
+- Because frontend changes need publishing, I would explicitly republish after the fix.
+- I would also validate that the new published bundle no longer references the crashing salary logic.
 
-#### 2. Insurance & Remittance Page Uses Hardcoded Mock Data
-`src/pages/worker/Insurance.tsx` shows a fake insurance policy ("INS-2024-56789") and fake remittance transactions. The "Send Money" button shows a toast but does nothing. No database backing.
+7. Verification checklist
+- Open `/` logged out and confirm homepage loads without a blank screen.
+- Confirm featured jobs render correctly for:
+  - full salary range
+  - only minimum salary
+  - only maximum salary
+  - missing salary
+- Refresh the live site and confirm the same result after service worker/cache update.
+- Spot-check Jobs list, Saved Jobs, Worker Applications, public worker profile, employer application detail, and worker search results for the same null-safety issue.
 
-**Fix:** Either connect to real database tables or clearly label as "Coming Soon" with disabled controls to avoid misleading users.
-
-#### 3. Travel Status Page Uses Hardcoded Mock Data
-`src/pages/worker/TravelStatus.tsx` shows a fake flight booking (EK 542) and visa details. Not connected to any real data source.
-
-**Fix:** Connect to the `job_formalities` table which already has `visa_status`, `flight_booking_status`, `departure_date`, `arrival_date`, and `travel_details` fields, or mark as "Coming Soon."
-
-#### 4. Agent Dashboard is a Stub
-`src/pages/agent/AgentDashboard.tsx` has sidebar nav items that all point back to `/agent/dashboard`. No separate pages for Workers, Placements, Commissions, Analytics, or Settings. Uses hardcoded mock stats.
-
-**Fix:** Either build out basic agent sub-pages or simplify to a single functional dashboard pulling real data from `agent_profiles` table.
-
-#### 5. Hero Section References Missing Image Asset
-`src/components/HeroSection.tsx` imports `heroImage from "@/assets/hero-workers.jpg"` but this file may not exist (no `src/assets` directory visible).
-
-**Fix:** Verify image exists or replace with a fallback/gradient background.
-
-#### 6. Worker Recommended Jobs Link Uses Raw ID Instead of Slug
-In `WorkerDashboard.tsx` line 195: `<Link to={/jobs/${job.id}}>` but the route expects a slug (`/jobs/:slug`). This means clicking recommended jobs leads to a "Job Not Found" page.
-
-**Fix:** Fetch the `slug` field in the jobs query and use it in the link.
-
----
-
-### SECTION B: UX ISSUES TO FIX
-
-#### 7. No Pagination on Jobs Page
-920+ jobs load all at once with no pagination or infinite scroll. This is slow and overwhelming.
-
-**Fix:** Add pagination (20-30 jobs per page) with page navigation controls.
-
-#### 8. Homepage Search Bar - Location Field Maps Inconsistently
-The hero search has a "Location" select that maps to the `location` URL param, but the Jobs page interprets it as `country`. This causes filter mismatches.
-
-**Fix:** Ensure consistent parameter naming between homepage search and jobs page filters.
-
-#### 9. No "Back to Dashboard" from Job Detail for Workers
-When a logged-in worker views a job detail page, there's only "Back to Jobs" but no way to return to their dashboard context.
-
-**Fix:** Show contextual back link based on referrer or role.
-
-#### 10. Admin Role Selectable During Signup
-The Auth page exposes "Admin" as a signup role option. Anyone can register as admin, creating a security concern (though the `handle_admin_user` trigger only assigns admin to a specific email).
-
-**Fix:** Remove Admin from the public signup role selector. Admin accounts should only be created through backend processes.
-
----
-
-### SECTION C: MISSING FEATURES FOR INITIAL VERSION
-
-#### 11. No Job Edit Capability for Employers
-Employers can post jobs and
+Technical notes
+- Current likely trigger: active job record with `salary_max = null`.
+- The codebase already shows nullable salary types in several interfaces, so the UI should match that reality.
+- Truthy checks like `if (min && max)` are unsafe here because `0` and `null` are treated similarly and partial salary data is valid in this dataset.
+- The production error appearing after an earlier “fix” strongly suggests a live publish/cache mismatch in addition to the underlying null-handling gap.
