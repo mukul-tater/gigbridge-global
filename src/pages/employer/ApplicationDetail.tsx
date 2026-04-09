@@ -600,7 +600,7 @@ export default function ApplicationDetail() {
 
                         {/* Additional Info */}
                         <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                          {workerProfile?.expected_salary_min && (
+                          {(workerProfile?.expected_salary_min != null || workerProfile?.expected_salary_max != null) && (
                             <span className="flex items-center gap-1">
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
                               {formatExpectedSalary(workerProfile.expected_salary_min, workerProfile.expected_salary_max, workerProfile.currency || 'USD')}

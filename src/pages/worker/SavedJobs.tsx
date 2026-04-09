@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Bookmark, MapPin, Briefcase, Trash2, Loader2, ExternalLink } from "lucide-react";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import { formatSalaryINR } from "@/lib/utils";
 
 interface SavedJob {
   id: string;
@@ -73,14 +74,6 @@ export default function SavedJobs() {
     }
   };
 
-  const formatSalary = (min: number | null, max: number | null, currency: string) => {
-    if (!min && !max) return "Not specified";
-    const val = (n: number) => `₹${(currency === "INR" ? n : n * 83).toLocaleString()}`;
-    if (min && max) return `${val(min)} - ${val(max)}/mo`;
-    if (min) return `From ${val(min)}/mo`;
-    return `Up to ${val(max!)}/mo`;
-  };
-
   return (
     <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
       <PortalBreadcrumb />
@@ -136,7 +129,7 @@ export default function SavedJobs() {
                         {job.location}, {job.country}
                       </span>
                       <span className="font-medium text-foreground">
-                        {formatSalary(job.salary_min, job.salary_max, job.currency)}
+                        {formatSalaryINR(job.salary_min, job.salary_max, job.currency)}
                       </span>
                     </div>
                   </div>

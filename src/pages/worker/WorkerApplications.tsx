@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ApplicationListSkeleton } from "@/components/ui/page-skeleton";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import { formatSalaryINR } from "@/lib/utils";
 
 interface JobData {
   title: string;
@@ -82,13 +83,6 @@ export default function WorkerApplications() {
     }
   };
 
-  const formatSalary = (min: number | null, max: number | null, currency: string) => {
-    if (!min && !max) return null;
-    if (min && max) return `${currency} ${min.toLocaleString()} - ${max.toLocaleString()}`;
-    if (min) return `${currency} ${min.toLocaleString()}+`;
-    return `Up to ${currency} ${max?.toLocaleString()}`;
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING": return "default";
@@ -148,10 +142,10 @@ export default function WorkerApplications() {
                               <Briefcase className="h-4 w-4" />
                               {app.job.job_type}
                             </span>
-                            {formatSalary(app.job.salary_min, app.job.salary_max, app.job.currency) && (
+                            {(app.job.salary_min != null || app.job.salary_max != null) && (
                               <span className="flex items-center gap-1">
                                 <DollarSign className="h-4 w-4" />
-                                {formatSalary(app.job.salary_min, app.job.salary_max, app.job.currency)}
+                                {formatSalaryINR(app.job.salary_min, app.job.salary_max, app.job.currency)}
                               </span>
                             )}
                           </>
