@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Building2, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles } from 'lucide-react';
+import { formatSalaryINR } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { SkeletonJobGrid } from '@/components/ui/skeleton-card';
@@ -65,10 +66,7 @@ export default function FeaturedJobs() {
   }, []);
 
   const formatSalary = (min: number | null | undefined, max: number | null | undefined, currency: string) => {
-    if (min == null || max == null) return 'Salary not specified';
-    const inrMin = currency === 'INR' ? min : min * 83;
-    const inrMax = currency === 'INR' ? max : max * 83;
-    return `₹${inrMin.toLocaleString('en-IN')} - ₹${inrMax.toLocaleString('en-IN')}`;
+    return formatSalaryINR(min, max, currency);
   };
 
   const getJobTypeBadge = (type: string) => {
@@ -240,7 +238,9 @@ export default function FeaturedJobs() {
                         <span className="text-base sm:text-lg font-bold text-primary whitespace-pre-line">
                           {job.salary_display || formatSalary(job.salary_min, job.salary_max, job.currency)}
                         </span>
-                        <span className="text-xs text-muted-foreground">/month</span>
+                        {(job.salary_display || job.salary_min != null || job.salary_max != null) && (
+                          <span className="text-xs text-muted-foreground">/month</span>
+                        )}
                       </div>
 
                       {/* Visa badge */}

@@ -408,10 +408,7 @@ export default function JobDetail() {
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <span className="font-bold text-primary">₹</span>
                       <span className="font-semibold text-foreground">
-                        {job.currency === 'INR' 
-                          ? `₹${job.salary_min?.toLocaleString()} - ₹${job.salary_max?.toLocaleString()}`
-                          : `₹${(job.salary_min * 83)?.toLocaleString()} - ₹${(job.salary_max * 83)?.toLocaleString()}`
-                        }
+                        {formatSalaryINR(job.salary_min, job.salary_max, job.currency)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">

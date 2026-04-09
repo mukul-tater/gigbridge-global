@@ -602,8 +602,7 @@ export default function ApplicationDetail() {
                           {workerProfile?.expected_salary_min && (
                             <span className="flex items-center gap-1">
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
-                              {workerProfile.currency || 'USD'} {workerProfile.expected_salary_min.toLocaleString()}
-                              {workerProfile.expected_salary_max && ` - ${workerProfile.expected_salary_max.toLocaleString()}`}
+                              {formatExpectedSalary(workerProfile.expected_salary_min, workerProfile.expected_salary_max, workerProfile.currency || 'USD')}
                             </span>
                           )}
                           {workerProfile?.languages && workerProfile.languages.length > 0 && (

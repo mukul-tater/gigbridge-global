@@ -383,7 +383,7 @@ export default function SearchWorkers() {
                           <div>
                             <p className="text-muted-foreground">Expected Salary</p>
                             <p className="font-semibold">
-                              {worker.currency} {worker.expected_salary_min.toLocaleString()} - {worker.expected_salary_max.toLocaleString()}
+                              {formatExpectedSalary(worker.expected_salary_min, worker.expected_salary_max, worker.currency)}
                             </p>
                           </div>
                         )}
