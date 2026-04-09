@@ -1,4 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { formatSalaryINR } from '@/lib/utils';
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Briefcase, FileText, MessageSquare, TrendingUp, User } from "lucide-react";

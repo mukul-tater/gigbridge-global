@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { formatExpectedSalary } from '@/lib/utils';
 import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
