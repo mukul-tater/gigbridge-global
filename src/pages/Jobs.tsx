@@ -15,6 +15,7 @@ import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { formatSalaryINR } from '@/lib/utils';
 
 const JOBS_PER_PAGE = 24;
 
@@ -26,8 +27,8 @@ interface Job {
   location: string;
   country: string;
   salary: string;
-  salaryMin: number;
-  salaryMax: number;
+  salaryMin: number | null;
+  salaryMax: number | null;
   type: string;
   category: string;
   visaSponsorship: boolean;
@@ -100,9 +101,8 @@ export default function Jobs() {
       if (error) throw error;
 
       const formattedJobs: Job[] = (data || []).map((job: any) => {
-        // Convert to INR if needed
-        const salaryMinVal = job.currency === 'INR' ? job.salary_min : job.salary_min * 83;
-        const salaryMaxVal = job.currency === 'INR' ? job.salary_max : job.salary_max * 83;
+        const salaryMinVal = job.salary_min == null ? null : (job.currency === 'INR' ? job.salary_min : job.salary_min * 83);
+        const salaryMaxVal = job.salary_max == null ? null : (job.currency === 'INR' ? job.salary_max : job.salary_max * 83);
         
         return {
           id: job.id,
@@ -111,9 +111,9 @@ export default function Jobs() {
           company: job.employer_profiles?.company_name || 'Company',
           location: `${job.location}, ${job.country}`,
           country: job.country,
-          salary: `₹${(salaryMinVal / 1000).toFixed(0)}K - ₹${(salaryMaxVal / 1000).toFixed(0)}K`,
-          salaryMin: salaryMinVal || 0,
-          salaryMax: salaryMaxVal || 0,
+          salary: formatSalaryINR(job.salary_min, job.salary_max, job.currency),
+          salaryMin: salaryMinVal,
+          salaryMax: salaryMaxVal,
           type: job.job_type === 'FULL_TIME' ? 'Full-time' : job.job_type === 'PART_TIME' ? 'Part-time' : 'Contract',
           category: job.title.split(' ')[0],
           visaSponsorship: job.visa_sponsorship || false,

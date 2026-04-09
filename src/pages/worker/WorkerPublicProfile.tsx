@@ -458,7 +458,7 @@ export default function WorkerPublicProfile() {
                 </>
               )}
 
-              {workerProfile?.expected_salary_min && workerProfile?.expected_salary_max && (
+              {(workerProfile?.expected_salary_min != null || workerProfile?.expected_salary_max != null) && (
                 <>
                   <Separator className="my-6" />
                   <div className="flex items-center gap-2">

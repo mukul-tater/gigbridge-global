@@ -380,7 +380,7 @@ export default function SearchWorkers() {
                             <p className="font-semibold">{worker.availability}</p>
                           </div>
                         )}
-                        {worker.expected_salary_min && worker.expected_salary_max && (
+                        {(worker.expected_salary_min != null || worker.expected_salary_max != null) && (
                           <div>
                             <p className="text-muted-foreground">Expected Salary</p>
                             <p className="font-semibold">
