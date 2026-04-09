@@ -92,6 +92,7 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <ErrorBoundary>
             <PWAInstallPrompt />
             <PageTransition>
               <Routes>
@@ -175,6 +176,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </PageTransition>
+            </ErrorBoundary>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
