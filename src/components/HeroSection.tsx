@@ -6,6 +6,7 @@ import heroImage from "@/assets/hero-workers.jpg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DESTINATION_COUNTRIES, JOB_CATEGORIES } from "@/lib/constants";
+import { supabase } from "@/integrations/supabase/client";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -32,9 +33,27 @@ const HeroSection = () => {
     navigate(`/jobs?${params.toString()}`);
   };
 
+  const [jobCount, setJobCount] = useState(0);
+  const [countryCount, setCountryCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const [jobRes, countryRes] = await Promise.all([
+        supabase.from('jobs').select('id', { count: 'exact', head: true }).eq('status', 'ACTIVE'),
+        supabase.from('jobs').select('country').eq('status', 'ACTIVE'),
+      ]);
+      if (jobRes.count != null) setJobCount(jobRes.count);
+      if (countryRes.data) {
+        const unique = new Set(countryRes.data.map((r: any) => r.country));
+        setCountryCount(unique.size);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const stats = [
-    { value: "900+", label: "Active Jobs", icon: TrendingUp },
-    { value: "40+", label: "Countries", icon: Globe },
+    { value: jobCount > 0 ? `${jobCount.toLocaleString()}+` : '…', label: "Active Jobs", icon: TrendingUp },
+    { value: countryCount > 0 ? `${countryCount}+` : '…', label: "Countries", icon: Globe },
     { value: "98%", label: "Success Rate", icon: CheckCircle },
   ];
 
