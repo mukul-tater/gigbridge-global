@@ -1,58 +1,56 @@
 
-Goal: stop the homepage crash, make salary rendering null-safe everywhere, and ensure the live site serves the fixed bundle instead of a stale cached one.
 
-1. Confirm the real root cause
-- The current homepage includes `FeaturedJobs`, and that component still formats salary on every featured job card.
-- The database already contains active jobs with partial salary data, e.g. an active “Cleaner” job has `salary_min = 100000` and `salary_max = null`.
-- The published error stack points to the minified production bundle, which matches the old crash pattern from `FeaturedJobs`.
+# Platform Readiness Audit & Fixes for Investor Demo
 
-2. Fix the code path that is crashing
-- Update `src/components/FeaturedJobs.tsx` so salary formatting never assumes both values exist.
-- Use explicit null checks (`min == null`, `max == null`) instead of truthy checks.
-- Support all cases cleanly:
-  - both min/max present → show range
-  - only min present → show “From …”
-  - only max present → show “Up to …”
-  - neither present → show “Salary not specified”
-- Also only show the “/month” suffix when an actual numeric salary string is being shown.
+## Current Status
 
-3. Prevent similar crashes in other screens
-- Harden the same pattern in other files that still call `.toLocaleString()` on nullable values:
-  - `src/pages/worker/WorkerApplications.tsx`
-  - `src/pages/worker/SavedJobs.tsx`
-  - `src/pages/Jobs.tsx`
-  - `src/pages/employer/SearchWorkers.tsx`
-  - `src/pages/worker/WorkerPublicProfile.tsx`
-  - `src/pages/employer/ApplicationDetail.tsx`
-  - any other salary/expected-salary display using truthy checks instead of null-safe checks
-- Best approach: create one shared salary formatter helper and reuse it across job cards, lists, profile views, and application views.
+After a thorough review of the codebase, database, and live preview:
 
-4. Reduce blank-screen risk
-- Wrap the routed app with the existing `ErrorBoundary` so a single rendering bug does not take down the whole site.
-- This will turn future rendering failures into a fallback screen instead of a broken homepage.
+**Working correctly:**
+- Homepage loads without errors (the previous `toLocaleString` crash is fixed in the codebase)
+- Auth flow: Login (email + mobile), Signup with role selection (Worker/Employer/Agent), Forgot password
+- Worker dashboard with onboarding stepper, profile, documents, applications, messaging
+- Employer dashboard with job posting, application review, interviews, offers, escrow payments
+- Admin dashboard with user management, job verification, investor dashboard
+- Database has 922 real active jobs across 41 countries
+- ErrorBoundary wraps the app to prevent blank-screen crashes
+- Salary formatting is now null-safe everywhere via `formatSalaryINR`
 
-5. Fix stale publish / cache behavior
-- The live site is likely still serving an old JS bundle or a cached service worker response.
-- The project currently has custom service worker registration in `src/main.tsx` plus PWA plugin setup, so I would align this to one consistent PWA registration approach.
-- I would remove duplicate/manual SW behavior if needed and ensure the activation path refreshes users onto the latest assets.
+**Issues to fix for investor readiness:**
 
-6. Redeploy safely
-- After the frontend fix is implemented, publish an updated frontend build so the live `.lovable.app` site receives the corrected bundle.
-- Because frontend changes need publishing, I would explicitly republish after the fix.
-- I would also validate that the new published bundle no longer references the crashing salary logic.
+### 1. Published site still serves old crashed bundle (CRITICAL)
+The published site at `gigbridge-global.lovable.app` is likely still serving the old JavaScript bundle that crashes. The code fixes are in the source but need to be published. You must click **Publish > Update** to push the fixed code live.
 
-7. Verification checklist
-- Open `/` logged out and confirm homepage loads without a blank screen.
-- Confirm featured jobs render correctly for:
-  - full salary range
-  - only minimum salary
-  - only maximum salary
-  - missing salary
-- Refresh the live site and confirm the same result after service worker/cache update.
-- Spot-check Jobs list, Saved Jobs, Worker Applications, public worker profile, employer application detail, and worker search results for the same null-safety issue.
+### 2. Hardcoded hero stats should be dynamic
+The HeroSection has hardcoded "900+" and "Over 900 global opportunities across 40+ countries". The SuccessMetrics component has hardcoded final counts (920, 450, 41, 120). These happen to be close to real data now, but will become stale as jobs change. For investor credibility, these should pull real counts from the database.
 
-Technical notes
-- Current likely trigger: active job record with `salary_max = null`.
-- The codebase already shows nullable salary types in several interfaces, so the UI should match that reality.
-- Truthy checks like `if (min && max)` are unsafe here because `0` and `null` are treated similarly and partial salary data is valid in this dataset.
-- The production error appearing after an earlier “fix” strongly suggests a live publish/cache mismatch in addition to the underlying null-handling gap.
+### 3. FeaturedJob interface types don't match DB nullability
+The `FeaturedJob` interface declares `salary_min: number` and `salary_max: number` as non-nullable, but the DB allows nulls. While the formatting is safe due to `as any` cast + null-safe formatter, the types should be corrected to `number | null` for maintainability.
+
+---
+
+## Implementation Plan
+
+### Step 1: Make homepage stats dynamic
+- Update `SuccessMetrics` to fetch real counts from the database (jobs count, distinct countries, profiles count)
+- Update `HeroSection` badge text to use a dynamic job count
+- This ensures stats always reflect reality, which is critical per the data quality memory
+
+### Step 2: Fix FeaturedJob interface types
+- Change `salary_min` and `salary_max` to `number | null` in the `FeaturedJob` interface
+- Minor defensive change that prevents future confusion
+
+### Step 3: Service Worker cleanup
+- The `src/main.tsx` SW registration registers `/sw.js` which is a push-notification-only SW (no caching). This is fine, but the Lovable preview domain may have stale Workbox SWs from the PWA plugin. The current cleanup code already handles this.
+- No additional changes needed here.
+
+### Step 4: Final build verification
+- Run TypeScript check to ensure no compile errors
+- Verify the homepage loads cleanly in preview
+
+---
+
+## What you need to do after approval
+
+After I implement these changes, click **Publish > Update** to push the fixed bundle to your live site. The published site will then load without the crash and show real dynamic data for investors.
+
