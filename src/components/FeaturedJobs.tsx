@@ -17,8 +17,8 @@ interface FeaturedJob {
   description: string;
   location: string;
   country: string;
-  salary_min: number;
-  salary_max: number;
+  salary_min: number | null;
+  salary_max: number | null;
   currency: string;
   salary_display?: string | null;
   job_type: string;
