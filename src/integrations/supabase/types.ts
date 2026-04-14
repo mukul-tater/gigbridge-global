@@ -358,40 +358,118 @@ export type Database = {
       }
       employer_profiles: {
         Row: {
+          billing_address: string | null
           bio: string | null
+          business_type: string | null
+          cin_number: string | null
+          company_logo_url: string | null
           company_name: string | null
           company_registration: string | null
           company_size: string | null
+          country: string | null
           created_at: string | null
+          employer_role: string | null
+          expected_start_date: string | null
+          follows_safety_standards: boolean | null
+          gst_number: string | null
+          hiring_roles: string[] | null
           id: string
+          id_number: string | null
+          id_type: string | null
           industry: string | null
+          job_type: string | null
+          office_address: string | null
+          office_state: string | null
+          onboarding_completed: boolean | null
+          payment_method_preference: string | null
+          preferred_countries: string[] | null
+          provides_ppe: string | null
+          salary_amount: number | null
+          salary_type: string | null
+          site_safety_level: string | null
+          tax_info_number: string | null
           updated_at: string | null
           user_id: string
           website: string | null
+          work_locations: string[] | null
+          worker_type_needed: string | null
+          workers_required: number | null
         }
         Insert: {
+          billing_address?: string | null
           bio?: string | null
+          business_type?: string | null
+          cin_number?: string | null
+          company_logo_url?: string | null
           company_name?: string | null
           company_registration?: string | null
           company_size?: string | null
+          country?: string | null
           created_at?: string | null
+          employer_role?: string | null
+          expected_start_date?: string | null
+          follows_safety_standards?: boolean | null
+          gst_number?: string | null
+          hiring_roles?: string[] | null
           id?: string
+          id_number?: string | null
+          id_type?: string | null
           industry?: string | null
+          job_type?: string | null
+          office_address?: string | null
+          office_state?: string | null
+          onboarding_completed?: boolean | null
+          payment_method_preference?: string | null
+          preferred_countries?: string[] | null
+          provides_ppe?: string | null
+          salary_amount?: number | null
+          salary_type?: string | null
+          site_safety_level?: string | null
+          tax_info_number?: string | null
           updated_at?: string | null
           user_id: string
           website?: string | null
+          work_locations?: string[] | null
+          worker_type_needed?: string | null
+          workers_required?: number | null
         }
         Update: {
+          billing_address?: string | null
           bio?: string | null
+          business_type?: string | null
+          cin_number?: string | null
+          company_logo_url?: string | null
           company_name?: string | null
           company_registration?: string | null
           company_size?: string | null
+          country?: string | null
           created_at?: string | null
+          employer_role?: string | null
+          expected_start_date?: string | null
+          follows_safety_standards?: boolean | null
+          gst_number?: string | null
+          hiring_roles?: string[] | null
           id?: string
+          id_number?: string | null
+          id_type?: string | null
           industry?: string | null
+          job_type?: string | null
+          office_address?: string | null
+          office_state?: string | null
+          onboarding_completed?: boolean | null
+          payment_method_preference?: string | null
+          preferred_countries?: string[] | null
+          provides_ppe?: string | null
+          salary_amount?: number | null
+          salary_type?: string | null
+          site_safety_level?: string | null
+          tax_info_number?: string | null
           updated_at?: string | null
           user_id?: string
           website?: string | null
+          work_locations?: string[] | null
+          worker_type_needed?: string | null
+          workers_required?: number | null
         }
         Relationships: []
       }
