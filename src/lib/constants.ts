@@ -106,6 +106,26 @@ export const AVAILABILITY_OPTIONS = [
   'Notice period required'
 ];
 
+// Worker onboarding constants
+export const SKILL_LEVELS = ['Helper', 'Semi-skilled', 'Skilled', 'Expert'];
+
+export const EXPERIENCE_RANGES = ['0-1 years', '1-3 years', '3-5 years', '5+ years'];
+
+export const SHIFT_PREFERENCES = ['Day', 'Night', 'Flexible'];
+
+export const WORK_PREFERENCES = ['Contract', 'Full-time', 'Daily wage'];
+
+export const WAGE_TYPES = ['Daily', 'Monthly'];
+
+export const AVAILABILITY_CHOICES = ['Immediate', '7 days', '15 days'];
+
+export const PROJECT_TYPES = [
+  'Residential', 'Commercial', 'Industrial', 'Infrastructure',
+  'Oil & Gas', 'Power Plant', 'Marine', 'Hospitality',
+  'Healthcare Facility', 'Educational Institution', 'Government',
+  'Renovation', 'Maintenance', 'Other'
+];
+
 // Currencies
 export const CURRENCIES = [
   { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
