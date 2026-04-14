@@ -33,8 +33,8 @@ export default function AboutUs() {
 
   const team = [
     { name: "Mukul Tater", role: "Founder & CEO", initials: "MT" },
-    { name: "Priya Sharma", role: "Head of Operations", initials: "PS" },
-    { name: "Raj Patel", role: "CTO", initials: "RP" },
+    { name: "Kailash Gayari", role: "Head of Platform/Tech", initials: "KG" },
+    { name: "Deependra Gadwal", role: "Operations- Migration Advisor and Legal", initials: "DG" },
   ];
 
   return (
