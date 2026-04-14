@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Dashboard() {
   const { role, isAuthenticated, loading } = useAuth();
@@ -20,7 +21,19 @@ export default function Dashboard() {
             navigate("/employer/dashboard");
             break;
           case 'worker':
-            navigate("/worker/dashboard");
+            // Check if onboarding is completed
+            supabase.from('worker_profiles')
+              .select('onboarding_completed')
+              .eq('user_id', role ? '' : '')
+              .maybeSingle()
+              .then(({ data }) => {
+                if ((data as any)?.onboarding_completed) {
+                  navigate("/worker/dashboard");
+                } else {
+                  navigate("/worker/onboarding");
+                }
+              })
+              .catch(() => navigate("/worker/onboarding"));
             break;
           case 'agent':
             navigate("/agent/dashboard");
