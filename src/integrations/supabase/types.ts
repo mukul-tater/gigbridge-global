@@ -1009,6 +1009,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          mobile_verified: boolean | null
           phone: string | null
           updated_at: string | null
         }
@@ -1018,6 +1019,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          mobile_verified?: boolean | null
           phone?: string | null
           updated_at?: string | null
         }
@@ -1027,6 +1029,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          mobile_verified?: boolean | null
           phone?: string | null
           updated_at?: string | null
         }
@@ -1404,64 +1407,106 @@ export type Database = {
         Row: {
           availability: string | null
           bio: string | null
+          country: string | null
           created_at: string | null
           currency: string | null
+          current_city: string | null
           current_location: string | null
           ecr_category: string | null
           ecr_status: string | null
           expected_salary_max: number | null
           expected_salary_min: number | null
+          expected_wage_amount: number | null
+          expected_wage_type: string | null
+          experience_range: string | null
           has_passport: boolean | null
           has_visa: boolean | null
           id: string
           languages: string[] | null
           nationality: string | null
+          onboarding_completed: boolean | null
+          open_to_relocation: boolean | null
           passport_number: string | null
+          preferred_shift: string | null
+          preferred_work_city: string | null
+          primary_work_type: string | null
+          project_types_worked: string[] | null
+          secondary_skills: string[] | null
+          skill_level: string | null
           updated_at: string | null
           user_id: string
           visa_countries: string[] | null
+          work_preference: string | null
           years_of_experience: number | null
         }
         Insert: {
           availability?: string | null
           bio?: string | null
+          country?: string | null
           created_at?: string | null
           currency?: string | null
+          current_city?: string | null
           current_location?: string | null
           ecr_category?: string | null
           ecr_status?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
+          expected_wage_amount?: number | null
+          expected_wage_type?: string | null
+          experience_range?: string | null
           has_passport?: boolean | null
           has_visa?: boolean | null
           id?: string
           languages?: string[] | null
           nationality?: string | null
+          onboarding_completed?: boolean | null
+          open_to_relocation?: boolean | null
           passport_number?: string | null
+          preferred_shift?: string | null
+          preferred_work_city?: string | null
+          primary_work_type?: string | null
+          project_types_worked?: string[] | null
+          secondary_skills?: string[] | null
+          skill_level?: string | null
           updated_at?: string | null
           user_id: string
           visa_countries?: string[] | null
+          work_preference?: string | null
           years_of_experience?: number | null
         }
         Update: {
           availability?: string | null
           bio?: string | null
+          country?: string | null
           created_at?: string | null
           currency?: string | null
+          current_city?: string | null
           current_location?: string | null
           ecr_category?: string | null
           ecr_status?: string | null
           expected_salary_max?: number | null
           expected_salary_min?: number | null
+          expected_wage_amount?: number | null
+          expected_wage_type?: string | null
+          experience_range?: string | null
           has_passport?: boolean | null
           has_visa?: boolean | null
           id?: string
           languages?: string[] | null
           nationality?: string | null
+          onboarding_completed?: boolean | null
+          open_to_relocation?: boolean | null
           passport_number?: string | null
+          preferred_shift?: string | null
+          preferred_work_city?: string | null
+          primary_work_type?: string | null
+          project_types_worked?: string[] | null
+          secondary_skills?: string[] | null
+          skill_level?: string | null
           updated_at?: string | null
           user_id?: string
           visa_countries?: string[] | null
+          work_preference?: string | null
           years_of_experience?: number | null
         }
         Relationships: []
