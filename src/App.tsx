@@ -83,6 +83,7 @@ import TermsOfService from "./pages/TermsOfService";
 import AgentDashboard from "./pages/agent/AgentDashboard";
 
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
+import WorkerOnboarding from "./pages/worker/WorkerOnboarding";
 
 const qc = new QueryClient();
 
@@ -115,6 +116,7 @@ function App() {
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
                 {/* Worker */}
+                <Route path="/worker/onboarding" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerOnboarding /></ProtectedRoute>} />
                 <Route path="/worker/dashboard" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerDashboard /></ProtectedRoute>} />
                 <Route path="/worker/profile" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerProfile /></ProtectedRoute>} />
                 <Route path="/worker/applications" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerApplications /></ProtectedRoute>} />
