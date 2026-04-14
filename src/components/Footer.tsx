@@ -130,9 +130,8 @@ const Footer = () => {
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
-                <Link to="#" className="text-background/40 hover:text-background transition-colors">Privacy</Link>
-                <Link to="#" className="text-background/40 hover:text-background transition-colors">Terms</Link>
-                <Link to="#" className="text-background/40 hover:text-background transition-colors">Cookies</Link>
+                <Link to="/privacy" className="text-background/40 hover:text-background transition-colors">Privacy</Link>
+                <Link to="/terms" className="text-background/40 hover:text-background transition-colors">Terms</Link>
                 <span className="text-background/30 hidden sm:inline">|</span>
                 <span className="text-background/40">© {new Date().getFullYear()} SafeWorkGlobal</span>
               </div>
