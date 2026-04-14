@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Dashboard() {
-  const { role, isAuthenticated, loading } = useAuth();
+  const { user, role, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,7 +12,6 @@ export default function Dashboard() {
       if (!isAuthenticated) {
         navigate("/auth");
       } else if (role) {
-        // Redirect to role-specific dashboard
         switch (role) {
           case 'admin':
             navigate("/admin/dashboard");
@@ -21,19 +20,22 @@ export default function Dashboard() {
             navigate("/employer/dashboard");
             break;
           case 'worker':
-            // Check if onboarding is completed
-            supabase.from('worker_profiles')
-              .select('onboarding_completed')
-              .eq('user_id', role ? '' : '')
-              .maybeSingle()
-              .then(({ data }) => {
+            // Check onboarding
+            (async () => {
+              try {
+                const { data } = await supabase.from('worker_profiles')
+                  .select('onboarding_completed')
+                  .eq('user_id', user?.id || '')
+                  .maybeSingle();
                 if ((data as any)?.onboarding_completed) {
                   navigate("/worker/dashboard");
                 } else {
                   navigate("/worker/onboarding");
                 }
-              })
-              .catch(() => navigate("/worker/onboarding"));
+              } catch {
+                navigate("/worker/onboarding");
+              }
+            })();
             break;
           case 'agent':
             navigate("/agent/dashboard");
@@ -43,7 +45,7 @@ export default function Dashboard() {
         }
       }
     }
-  }, [isAuthenticated, role, loading, navigate]);
+  }, [isAuthenticated, role, loading, navigate, user]);
 
   if (loading) {
     return (
