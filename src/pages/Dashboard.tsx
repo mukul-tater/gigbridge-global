@@ -17,7 +17,22 @@ export default function Dashboard() {
             navigate("/admin/dashboard");
             break;
           case 'employer':
-            navigate("/employer/dashboard");
+            // Check onboarding
+            (async () => {
+              try {
+                const { data } = await supabase.from('employer_profiles')
+                  .select('onboarding_completed')
+                  .eq('user_id', user?.id || '')
+                  .maybeSingle();
+                if ((data as any)?.onboarding_completed) {
+                  navigate("/employer/dashboard");
+                } else {
+                  navigate("/employer/onboarding");
+                }
+              } catch {
+                navigate("/employer/onboarding");
+              }
+            })();
             break;
           case 'worker':
             // Check onboarding
