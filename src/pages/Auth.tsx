@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, EyeOff, Loader2, Briefcase, HardHat, Users, ShieldCheck, ArrowLeft, Mail, Phone } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Briefcase, HardHat, Users, ArrowLeft, Mail, Phone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -23,10 +24,11 @@ const roles: { value: AppRole; label: string; description: string; icon: React.R
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, signup, isAuthenticated } = useAuth();
+  const { login, signup, isAuthenticated, role } = useAuth();
   const [view, setView] = useState<AuthView>('login');
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -45,10 +47,33 @@ export default function Auth() {
   const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
+    if (isAuthenticated && role) {
+      // Redirect workers to onboarding check
+      if (role === 'worker') {
+        navigate('/worker/onboarding');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, role, navigate]);
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    setError('');
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        setError(result.error instanceof Error ? result.error.message : 'Google sign-in failed');
+      }
+      if (result.redirected) return;
+    } catch (err) {
+      setError('Google sign-in failed. Please try again.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +83,6 @@ export default function Auth() {
     let emailToUse = loginIdentifier;
 
     if (loginMethod === 'mobile') {
-      // Look up email by phone number via profiles table
       const { data, error: lookupError } = await supabase
         .from('profiles')
         .select('email')
@@ -83,6 +107,7 @@ export default function Auth() {
     setError('');
     if (!signupRole) { setError('Please select a role'); return; }
     if (!signupName.trim()) { setError('Full name is required'); return; }
+    if (!signupPhone.trim()) { setError('Mobile number is required'); return; }
     if (signupPassword.length < 6) { setError('Password must be at least 6 characters'); return; }
     setLoading(true);
 
@@ -96,7 +121,11 @@ export default function Auth() {
 
     if (result.success) {
       toast.success('Account created successfully!');
-      navigate('/dashboard');
+      if (signupRole === 'worker') {
+        navigate('/worker/onboarding');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       setError(result.error || 'Signup failed');
     }
@@ -125,6 +154,28 @@ export default function Auth() {
     setSignupRole(role);
     setView('signup');
   };
+
+  const GoogleButton = ({ label }: { label: string }) => (
+    <Button
+      type="button"
+      variant="outline"
+      className="w-full h-11 gap-2 font-medium"
+      onClick={handleGoogleSignIn}
+      disabled={googleLoading}
+    >
+      {googleLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <svg className="h-4 w-4" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+      )}
+      {label}
+    </Button>
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -159,46 +210,55 @@ export default function Auth() {
 
             {/* LOGIN */}
             {view === 'login' && (
-              <form onSubmit={handleLogin} className="space-y-4">
-                <Tabs value={loginMethod} onValueChange={(v) => { setLoginMethod(v as LoginMethod); setLoginIdentifier(''); setError(''); }}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="email" className="gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</TabsTrigger>
-                    <TabsTrigger value="mobile" className="gap-1.5"><Phone className="h-3.5 w-3.5" /> Mobile</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-                <div className="space-y-1.5">
-                  <Label htmlFor="login-id">{loginMethod === 'email' ? 'Email' : 'Mobile Number'}</Label>
-                  <Input
-                    id="login-id"
-                    type={loginMethod === 'email' ? 'email' : 'tel'}
-                    placeholder={loginMethod === 'email' ? 'you@example.com' : '+91 98765 43210'}
-                    value={loginIdentifier}
-                    onChange={e => setLoginIdentifier(e.target.value)}
-                    required
-                    className="h-11"
-                  />
+              <div className="space-y-4">
+                <GoogleButton label="Sign in with Google" />
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">or continue with</span></div>
                 </div>
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="login-password">Password</Label>
-                    <button type="button" onClick={() => { setError(''); setView('forgot'); }} className="text-xs text-primary hover:underline">Forgot password?</button>
+
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <Tabs value={loginMethod} onValueChange={(v) => { setLoginMethod(v as LoginMethod); setLoginIdentifier(''); setError(''); }}>
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="email" className="gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</TabsTrigger>
+                      <TabsTrigger value="mobile" className="gap-1.5"><Phone className="h-3.5 w-3.5" /> Mobile</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="login-id">{loginMethod === 'email' ? 'Email' : 'Mobile Number'}</Label>
+                    <Input
+                      id="login-id"
+                      type={loginMethod === 'email' ? 'email' : 'tel'}
+                      placeholder={loginMethod === 'email' ? 'you@example.com' : '+91 98765 43210'}
+                      value={loginIdentifier}
+                      onChange={e => setLoginIdentifier(e.target.value)}
+                      required
+                      className="h-11"
+                    />
                   </div>
-                  <div className="relative">
-                    <Input id="login-password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required minLength={6} className="h-11 pr-10" />
-                    <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)}>
-                      {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                    </Button>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="login-password">Password</Label>
+                      <button type="button" onClick={() => { setError(''); setView('forgot'); }} className="text-xs text-primary hover:underline">Forgot password?</button>
+                    </div>
+                    <div className="relative">
+                      <Input id="login-password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required minLength={6} className="h-11 pr-10" />
+                      <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <Button type="submit" className="w-full h-11 font-medium" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign in
-                </Button>
-                <p className="text-sm text-center text-muted-foreground pt-2">
-                  Don't have an account?{' '}
-                  <button type="button" onClick={() => { setError(''); setView('role-select'); }} className="text-primary font-medium hover:underline">Sign up</button>
-                </p>
-              </form>
+                  <Button type="submit" className="w-full h-11 font-medium" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Sign in
+                  </Button>
+                  <p className="text-sm text-center text-muted-foreground pt-2">
+                    Don't have an account?{' '}
+                    <button type="button" onClick={() => { setError(''); setView('role-select'); }} className="text-primary font-medium hover:underline">Sign up</button>
+                  </p>
+                </form>
+              </div>
             )}
 
             {/* ROLE SELECT */}
@@ -229,57 +289,67 @@ export default function Auth() {
 
             {/* SIGNUP FORM */}
             {view === 'signup' && (
-              <form onSubmit={handleSignup} className="space-y-4">
+              <div className="space-y-4">
                 <button type="button" onClick={() => { setError(''); setView('role-select'); }} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors -mt-1 mb-2">
                   <ArrowLeft className="h-3.5 w-3.5" /> Change role
                 </button>
-                <div className="space-y-1.5">
-                  <Label htmlFor="signup-name">Full Name</Label>
-                  <Input id="signup-name" placeholder="Your full name" value={signupName} onChange={e => setSignupName(e.target.value)} required className="h-11" />
+
+                <GoogleButton label="Sign up with Google" />
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">or with email</span></div>
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input id="signup-email" type="email" placeholder="you@example.com" value={signupEmail} onChange={e => setSignupEmail(e.target.value)} required className="h-11" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="signup-phone">Phone</Label>
-                  <Input id="signup-phone" type="tel" placeholder="+91 98765 43210" value={signupPhone} onChange={e => setSignupPhone(e.target.value)} required className="h-11" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <div className="relative">
-                    <Input id="signup-password" type={showPassword ? 'text' : 'password'} placeholder="Min 6 characters" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} required minLength={6} className="h-11 pr-10" />
-                    <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)}>
-                      {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                    </Button>
+
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-name">Full Name *</Label>
+                    <Input id="signup-name" placeholder="Your full name" value={signupName} onChange={e => setSignupName(e.target.value)} required className="h-11" />
                   </div>
-                  {signupPassword.length > 0 && (
-                    <div className="space-y-1.5 pt-1">
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4].map(level => (
-                          <div key={level} className={cn(
-                            "h-1 flex-1 rounded-full transition-colors",
-                            signupPassword.length >= level * 3 
-                              ? level <= 1 ? "bg-destructive" : level <= 2 ? "bg-warning" : "bg-success"
-                              : "bg-muted"
-                          )} />
-                        ))}
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">
-                        {signupPassword.length < 6 ? "Too short" : signupPassword.length < 8 ? "Fair" : signupPassword.length < 12 ? "Good" : "Strong"}
-                      </p>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-phone">Mobile Number *</Label>
+                    <Input id="signup-phone" type="tel" placeholder="+91 98765 43210" value={signupPhone} onChange={e => setSignupPhone(e.target.value)} required className="h-11" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-email">Email (recommended)</Label>
+                    <Input id="signup-email" type="email" placeholder="you@example.com" value={signupEmail} onChange={e => setSignupEmail(e.target.value)} required className="h-11" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-password">Password *</Label>
+                    <div className="relative">
+                      <Input id="signup-password" type={showPassword ? 'text' : 'password'} placeholder="Min 6 characters" value={signupPassword} onChange={e => setSignupPassword(e.target.value)} required minLength={6} className="h-11 pr-10" />
+                      <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 hover:bg-transparent" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                      </Button>
                     </div>
-                  )}
-                </div>
-                <Button type="submit" className="w-full h-11 font-medium" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create Account
-                </Button>
-                <p className="text-sm text-center text-muted-foreground pt-1">
-                  Already have an account?{' '}
-                  <button type="button" onClick={() => { setError(''); setView('login'); }} className="text-primary font-medium hover:underline">Sign in</button>
-                </p>
-              </form>
+                    {signupPassword.length > 0 && (
+                      <div className="space-y-1.5 pt-1">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4].map(level => (
+                            <div key={level} className={cn(
+                              "h-1 flex-1 rounded-full transition-colors",
+                              signupPassword.length >= level * 3 
+                                ? level <= 1 ? "bg-destructive" : level <= 2 ? "bg-warning" : "bg-success"
+                                : "bg-muted"
+                            )} />
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">
+                          {signupPassword.length < 6 ? "Too short" : signupPassword.length < 8 ? "Fair" : signupPassword.length < 12 ? "Good" : "Strong"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <Button type="submit" className="w-full h-11 font-medium" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Create Account
+                  </Button>
+                  <p className="text-sm text-center text-muted-foreground pt-1">
+                    Already have an account?{' '}
+                    <button type="button" onClick={() => { setError(''); setView('login'); }} className="text-primary font-medium hover:underline">Sign in</button>
+                  </p>
+                </form>
+              </div>
             )}
 
             {/* FORGOT PASSWORD */}
@@ -302,7 +372,9 @@ export default function Auth() {
         </Card>
 
         <p className="text-xs text-center text-muted-foreground mt-6">
-          By continuing, you agree to our Terms of Service and Privacy Policy.
+          By continuing, you agree to our{' '}
+          <a href="/terms" className="underline">Terms of Service</a> and{' '}
+          <a href="/privacy" className="underline">Privacy Policy</a>.
         </p>
       </div>
     </div>
