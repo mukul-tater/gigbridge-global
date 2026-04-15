@@ -307,7 +307,10 @@ export default function AdminDashboard() {
 
       <div id="section-users" className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Recent Users</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Recent Users</CardTitle>
+            <Button variant="outline" size="sm" onClick={() => navigate('/admin/users')}>Manage All</Button>
+          </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {recentUsers.length > 0 ? recentUsers.map((u) => (
