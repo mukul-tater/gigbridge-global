@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Users, Briefcase, AlertTriangle, CheckCircle, Building2, UserCheck, FileText, TrendingUp,
