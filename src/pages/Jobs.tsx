@@ -355,7 +355,7 @@ export default function Jobs() {
               <div className="space-y-3 md:space-y-4 order-1 lg:order-2">
                 <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">
                   <h2 className="text-base sm:text-lg md:text-xl font-semibold">
-                    {jobs.length} Jobs Found
+                    {loading ? 'Searching...' : `${jobs.length} Jobs Found`}
                   </h2>
                   <select 
                     className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto"
