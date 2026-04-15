@@ -330,7 +330,10 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5" /> Recent Jobs</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5" /> Recent Jobs</CardTitle>
+            <Button variant="outline" size="sm" onClick={() => navigate('/admin/job-verification')}>Manage All</Button>
+          </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {recentJobs.length > 0 ? recentJobs.map((job) => (
