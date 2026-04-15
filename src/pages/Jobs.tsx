@@ -181,7 +181,7 @@ export default function Jobs() {
 
     if (currentFilters.country && currentFilters.country !== 'All Countries') {
       filtered = filtered.filter(job =>
-        job.location.toLowerCase().includes(currentFilters.country.toLowerCase())
+        job.country.toLowerCase().includes(currentFilters.country.toLowerCase())
       );
     }
 
