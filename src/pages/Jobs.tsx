@@ -57,6 +57,7 @@ export default function Jobs() {
   });
   const [loading, setLoading] = useState(true);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
   const [currentPage, setCurrentPage] = useState(1);
