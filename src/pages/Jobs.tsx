@@ -86,6 +86,13 @@ export default function Jobs() {
     fetchJobsWithFilters(newFilters);
   }, [searchParams]);
 
+  // Re-apply filters when filters change (reactive filtering)
+  useEffect(() => {
+    if (allJobs.length > 0) {
+      applyFiltersToJobs(allJobs, filters);
+    }
+  }, [filters, sortOption]);
+
   const fetchJobsWithFilters = async (currentFilters: JobFilters) => {
     try {
       setLoading(true);
@@ -125,10 +132,12 @@ export default function Jobs() {
         };
       });
 
+      setAllJobs(formattedJobs);
       applyFiltersToJobs(formattedJobs, currentFilters);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast.error('Failed to load jobs');
+      setAllJobs([]);
       setJobs([]);
     } finally {
       setLoading(false);
