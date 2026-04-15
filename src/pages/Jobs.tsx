@@ -57,6 +57,7 @@ export default function Jobs() {
   });
   const [loading, setLoading] = useState(true);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,6 +85,13 @@ export default function Jobs() {
     setFilters(newFilters);
     fetchJobsWithFilters(newFilters);
   }, [searchParams]);
+
+  // Re-apply filters when filters change (reactive filtering)
+  useEffect(() => {
+    if (allJobs.length > 0) {
+      applyFiltersToJobs(allJobs, filters);
+    }
+  }, [filters, sortOption]);
 
   const fetchJobsWithFilters = async (currentFilters: JobFilters) => {
     try {
@@ -124,10 +132,12 @@ export default function Jobs() {
         };
       });
 
+      setAllJobs(formattedJobs);
       applyFiltersToJobs(formattedJobs, currentFilters);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast.error('Failed to load jobs');
+      setAllJobs([]);
       setJobs([]);
     } finally {
       setLoading(false);
@@ -171,7 +181,7 @@ export default function Jobs() {
 
     if (currentFilters.country && currentFilters.country !== 'All Countries') {
       filtered = filtered.filter(job =>
-        job.location.toLowerCase().includes(currentFilters.country.toLowerCase())
+        job.country.toLowerCase().includes(currentFilters.country.toLowerCase())
       );
     }
 
@@ -201,15 +211,10 @@ export default function Jobs() {
     const sortedJobs = sortJobs(filtered, sort);
     setJobs(sortedJobs);
     setCurrentPage(1);
-    if (!loading) {
-      toast.success(`Found ${sortedJobs.length} jobs matching your criteria`);
-    }
   };
 
   const handleSortChange = (newSort: SortOption) => {
     setSortOption(newSort);
-    const sortedJobs = sortJobs(jobs, newSort);
-    setJobs(sortedJobs);
   };
 
   const handleSearch = () => {
@@ -347,7 +352,7 @@ export default function Jobs() {
               <div className="space-y-3 md:space-y-4 order-1 lg:order-2">
                 <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">
                   <h2 className="text-base sm:text-lg md:text-xl font-semibold">
-                    {jobs.length} Jobs Found
+                    {loading ? 'Searching...' : `${jobs.length} Jobs Found`}
                   </h2>
                   <select 
                     className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto"
@@ -485,7 +490,7 @@ export default function Jobs() {
           <div className="space-y-3 md:space-y-4 order-1 lg:order-2">
             <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2">
               <h2 className="text-base sm:text-lg md:text-xl font-semibold">
-                {jobs.length} Jobs Found
+                {loading ? 'Searching...' : `${jobs.length} Jobs Found`}
               </h2>
               <select 
                 className="border rounded-lg px-3 py-2 text-sm bg-card w-full xs:w-auto"

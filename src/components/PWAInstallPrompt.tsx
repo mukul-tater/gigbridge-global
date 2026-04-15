@@ -29,9 +29,10 @@ export default function PWAInstallPrompt() {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       
-      // Check if user has dismissed the prompt before
-      const dismissed = localStorage.getItem('pwa-prompt-dismissed');
-      if (!dismissed) {
+      // Check if user has dismissed the prompt before (with 30-day cooldown)
+      const dismissedAt = localStorage.getItem('pwa-prompt-dismissed');
+      const isStillDismissed = dismissedAt && (Date.now() - parseInt(dismissedAt, 10)) < 30 * 24 * 60 * 60 * 1000;
+      if (!isStillDismissed) {
         setShowPrompt(true);
       }
     };
@@ -59,12 +60,7 @@ export default function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    localStorage.setItem('pwa-prompt-dismissed', 'true');
-    
-    // Show again after 7 days
-    setTimeout(() => {
-      localStorage.removeItem('pwa-prompt-dismissed');
-    }, 7 * 24 * 60 * 60 * 1000);
+    localStorage.setItem('pwa-prompt-dismissed', Date.now().toString());
   };
 
   // Don't show if already installed or dismissed
