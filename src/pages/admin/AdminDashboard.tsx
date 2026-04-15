@@ -38,6 +38,7 @@ interface RecentJob {
 }
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [currentSection, setCurrentSection] = useState(0);
