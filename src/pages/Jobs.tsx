@@ -218,8 +218,6 @@ export default function Jobs() {
 
   const handleSortChange = (newSort: SortOption) => {
     setSortOption(newSort);
-    const sortedJobs = sortJobs(jobs, newSort);
-    setJobs(sortedJobs);
   };
 
   const handleSearch = () => {
