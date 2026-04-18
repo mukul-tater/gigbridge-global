@@ -72,6 +72,24 @@ export const JOB_CATEGORIES = [
   'Mining'
 ];
 
+// Popular job titles/roles for autocomplete suggestions
+export const POPULAR_JOB_TITLES = [
+  'Electrician', 'Industrial Electrician', 'Welder', 'TIG Welder', 'MIG Welder', 'Arc Welder',
+  'Plumber', 'Pipe Fitter', 'Carpenter', 'Mason', 'Painter', 'Steel Fixer', 'Scaffolder',
+  'Construction Worker', 'Construction Helper', 'Site Supervisor', 'Civil Foreman',
+  'HVAC Technician', 'AC Technician', 'Refrigeration Technician',
+  'Heavy Equipment Operator', 'Crane Operator', 'Forklift Operator', 'Excavator Operator',
+  'Driver', 'Heavy Truck Driver', 'Light Vehicle Driver', 'Delivery Driver',
+  'Warehouse Worker', 'Warehouse Supervisor', 'Logistics Coordinator',
+  'CNC Machinist', 'Fabricator', 'Assembly Line Worker', 'Production Operator', 'Quality Inspector',
+  'Oil & Gas Technician', 'Rigger', 'Roustabout', 'Drilling Operator',
+  'Chef', 'Cook', 'Kitchen Helper', 'Waiter', 'Housekeeper', 'Hotel Cleaner',
+  'Security Guard', 'Cleaner', 'Janitor', 'Gardener',
+  'Nurse', 'Caregiver', 'Healthcare Assistant',
+  'Farm Worker', 'Agricultural Helper',
+  'IT Support', 'Software Engineer', 'Mechanical Engineer', 'Electrical Engineer', 'Civil Engineer'
+];
+
 // Experience levels
 export const EXPERIENCE_LEVELS = [
   'All Levels',
