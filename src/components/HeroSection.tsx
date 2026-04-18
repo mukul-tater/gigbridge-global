@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Globe, TrendingUp, ArrowRight, CheckCircle, Sparkles, Users, Shield } from "lucide-react";
+import { Search, MapPin, Globe, TrendingUp, ArrowRight, CheckCircle, Sparkles, Users, Shield, Phone } from "lucide-react";
 import heroImage from "@/assets/hero-workers.jpg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -124,9 +124,16 @@ const HeroSection = () => {
                 <Users className="h-5 w-5" /> Hire Workers
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground -mt-4 mb-6 lg:text-left text-center">
-              Employers: Hire verified workers at just 1% cost — no upfront fees.
-            </p>
+            <div className="-mt-4 mb-6 flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-2 sm:gap-3 text-xs text-muted-foreground">
+              <span>Employers: Hire verified workers at just 1% cost — no upfront fees.</span>
+              <a
+                href="tel:+919950085843"
+                className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
+              >
+                <Phone className="h-3 w-3" />
+                Call us: +91-9950085843
+              </a>
+            </div>
 
             {/* Search Form */}
             <div className="glass-strong p-4 sm:p-5 rounded-2xl max-w-2xl mx-auto lg:mx-0 opacity-0 animate-fade-in-up animation-delay-300">
