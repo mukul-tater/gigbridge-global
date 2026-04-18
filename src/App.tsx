@@ -89,6 +89,10 @@ import WorkerTrust from "./pages/worker/WorkerTrust";
 import WorkerDiscover from "./pages/worker/WorkerDiscover";
 import ApplicationSuccess from "./pages/worker/ApplicationSuccess";
 import EmployerOnboarding from "./pages/employer/EmployerOnboarding";
+import QuickEmployerSignup from "./pages/employer/QuickEmployerSignup";
+import EmployerTrust from "./pages/employer/EmployerTrust";
+import QuickPostJob from "./pages/employer/QuickPostJob";
+import PilotOffer from "./pages/employer/PilotOffer";
 
 const qc = new QueryClient();
 
@@ -148,6 +152,12 @@ function App() {
                 <Route path="/worker/contract-history" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerContractHistory /></ProtectedRoute>} />
                 <Route path="/worker/verification" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerVerificationStatus /></ProtectedRoute>} />
                 <Route path="/worker/payments" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerPayments /></ProtectedRoute>} />
+
+                {/* Employer quick-start */}
+                <Route path="/employer/quick-signup" element={<QuickEmployerSignup />} />
+                <Route path="/employer/trust" element={<ProtectedRoute allowedRoles={["employer"]}><EmployerTrust /></ProtectedRoute>} />
+                <Route path="/employer/quick-post-job" element={<ProtectedRoute allowedRoles={["employer"]}><QuickPostJob /></ProtectedRoute>} />
+                <Route path="/employer/pilot-offer" element={<ProtectedRoute allowedRoles={["employer"]}><PilotOffer /></ProtectedRoute>} />
 
                 {/* Employer */}
                 <Route path="/employer/onboarding" element={<ProtectedRoute allowedRoles={["employer"]}><EmployerOnboarding /></ProtectedRoute>} />

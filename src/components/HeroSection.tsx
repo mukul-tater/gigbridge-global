@@ -115,7 +115,18 @@ const HeroSection = () => {
               >
                 Browse jobs first
               </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
+                onClick={() => navigate('/employer/quick-signup')}
+              >
+                <Users className="h-5 w-5" /> Hire Workers
+              </Button>
             </div>
+            <p className="text-xs text-muted-foreground -mt-4 mb-6 lg:text-left text-center">
+              Employers: Hire verified workers at just 1% cost — no upfront fees.
+            </p>
 
             {/* Search Form */}
             <div className="glass-strong p-4 sm:p-5 rounded-2xl max-w-2xl mx-auto lg:mx-0 opacity-0 animate-fade-in-up animation-delay-300">
