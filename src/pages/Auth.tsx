@@ -48,15 +48,9 @@ export default function Auth() {
 
   useEffect(() => {
     if (isAuthenticated && role) {
-      // Use replace so back button doesn't loop back to /auth
+      // Redirect workers to onboarding check
       if (role === 'worker') {
-        navigate('/worker/dashboard', { replace: true });
-      } else if (role === 'employer') {
-        navigate('/employer/dashboard', { replace: true });
-      } else if (role === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
-      } else if (role === 'agent') {
-        navigate('/agent/dashboard', { replace: true });
+        navigate('/worker/onboarding', { replace: true });
       } else {
         navigate('/dashboard', { replace: true });
       }
