@@ -81,7 +81,7 @@ export default function EmployerDashboard() {
         month: months[targetMonth.getMonth()],
         applications: monthApps.length,
         shortlisted: monthApps.filter((a: any) => a.status === 'SHORTLISTED').length,
-        hired: monthApps.filter((a: any) => a.status === 'HIRED').length
+        hired: monthApps.filter((a: any) => a.status === 'HIRED' || a.status === 'APPROVED').length
       });
     }
     return metricsData;
@@ -92,7 +92,7 @@ export default function EmployerDashboard() {
     { stage: "Shortlisted", count: applications.filter((a: any) => a.status === 'SHORTLISTED').length, color: "hsl(var(--chart-2))" },
     { stage: "Interview", count: applications.filter((a: any) => a.status === 'INTERVIEW').length, color: "hsl(var(--chart-3))" },
     { stage: "Offered", count: applications.filter((a: any) => a.status === 'OFFERED').length, color: "hsl(var(--chart-4))" },
-    { stage: "Hired", count: applications.filter((a: any) => a.status === 'HIRED').length, color: "hsl(var(--chart-5))" },
+    { stage: "Hired", count: applications.filter((a: any) => a.status === 'HIRED' || a.status === 'APPROVED').length, color: "hsl(var(--chart-5))" },
   ];
 
   if (loading) {
@@ -151,7 +151,7 @@ export default function EmployerDashboard() {
         shortlisted={applications.filter((a: any) => a.status === 'SHORTLISTED').length}
         interviews={interviews.length}
         offers={offers.length}
-        hired={applications.filter((a: any) => a.status === 'HIRED').length}
+        hired={applications.filter((a: any) => a.status === 'HIRED' || a.status === 'APPROVED').length}
       />
 
       {/* Escrow Payment Widget */}
