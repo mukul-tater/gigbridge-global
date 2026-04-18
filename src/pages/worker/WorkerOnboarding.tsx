@@ -397,18 +397,16 @@ export default function WorkerOnboarding() {
           )}
         </div>
 
-        {/* Skip option on step 3 */}
-        {step === 3 && (
-          <p className="text-center mt-3">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="text-sm text-muted-foreground hover:text-foreground underline"
-            >
-              Skip for now
-            </button>
-          </p>
-        )}
+        {/* Skip & browse jobs — always available */}
+        <p className="text-center mt-3">
+          <button
+            onClick={() => navigate('/worker/discover')}
+            disabled={saving}
+            className="text-sm text-muted-foreground hover:text-foreground underline"
+          >
+            Skip for now & browse jobs →
+          </button>
+        </p>
       </div>
     </div>
   );

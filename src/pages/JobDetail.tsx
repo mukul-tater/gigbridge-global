@@ -182,7 +182,7 @@ export default function JobDetail() {
         setUploadingResume(false);
       }
 
-      const { error } = await supabase
+      const { data: inserted, error } = await supabase
         .from('job_applications')
         .insert({
           job_id: job.id,
@@ -191,13 +191,19 @@ export default function JobDetail() {
           status: 'PENDING',
           cover_letter: coverLetter || 'Application submitted through platform',
           resume_url: resumeUrl,
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
       setHasApplied(true);
       setShowApplyDialog(false);
       toast({ title: 'Application Submitted!', description: 'Your application has been sent to the employer' });
+      // Route to success screen for instant feedback + tracking nudge
+      if (inserted?.id) {
+        navigate(`/worker/application-success/${inserted.id}`);
+      }
     } catch (error: any) {
       toast({ title: 'Error', description: error.message || 'Failed to submit application', variant: 'destructive' });
     } finally {

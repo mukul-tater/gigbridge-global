@@ -87,16 +87,35 @@ const HeroSection = () => {
 
             {/* Heading */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-heading text-foreground mb-5 leading-[1.1] tracking-tight opacity-0 animate-fade-in-up animation-delay-100">
-              Find Your Next
+              Find Foreign
               <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">
-                Global Career
+                Jobs Abroad
               </span>
             </h1>
 
             {/* Subheading */}
-            <p className="text-base sm:text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed opacity-0 animate-fade-in-up animation-delay-200">
-              Connect with verified employers worldwide seeking skilled workers. Your career without borders starts here.
+            <p className="text-base sm:text-lg text-muted-foreground mb-4 max-w-xl mx-auto lg:mx-0 leading-relaxed opacity-0 animate-fade-in-up animation-delay-200">
+              No agent fees. Verified jobs only. Connect directly with employers worldwide.
             </p>
+
+            {/* Primary CTA — Find Foreign Jobs */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-8 opacity-0 animate-fade-in-up animation-delay-200">
+              <Button
+                size="lg"
+                className="h-12 px-6 gap-2 text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary"
+                onClick={() => navigate('/worker/quick-signup')}
+              >
+                Find Foreign Jobs <ArrowRight className="h-5 w-5" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 px-6 text-base font-semibold rounded-xl"
+                onClick={() => navigate('/jobs')}
+              >
+                Browse jobs first
+              </Button>
+            </div>
 
             {/* Search Form */}
             <div className="glass-strong p-4 sm:p-5 rounded-2xl max-w-2xl mx-auto lg:mx-0 opacity-0 animate-fade-in-up animation-delay-300">
