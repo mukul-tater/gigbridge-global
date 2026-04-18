@@ -84,6 +84,10 @@ import AgentDashboard from "./pages/agent/AgentDashboard";
 
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
 import WorkerOnboarding from "./pages/worker/WorkerOnboarding";
+import QuickWorkerSignup from "./pages/worker/QuickWorkerSignup";
+import WorkerTrust from "./pages/worker/WorkerTrust";
+import WorkerDiscover from "./pages/worker/WorkerDiscover";
+import ApplicationSuccess from "./pages/worker/ApplicationSuccess";
 import EmployerOnboarding from "./pages/employer/EmployerOnboarding";
 
 const qc = new QueryClient();
@@ -116,7 +120,13 @@ function App() {
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
+                {/* Worker quick-start (public — handles auth itself) */}
+                <Route path="/worker/quick-signup" element={<QuickWorkerSignup />} />
+
                 {/* Worker */}
+                <Route path="/worker/trust" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerTrust /></ProtectedRoute>} />
+                <Route path="/worker/discover" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerDiscover /></ProtectedRoute>} />
+                <Route path="/worker/application-success/:applicationId" element={<ProtectedRoute allowedRoles={["worker"]}><ApplicationSuccess /></ProtectedRoute>} />
                 <Route path="/worker/onboarding" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerOnboarding /></ProtectedRoute>} />
                 <Route path="/worker/dashboard" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerDashboard /></ProtectedRoute>} />
                 <Route path="/worker/profile" element={<ProtectedRoute allowedRoles={["worker"]}><WorkerProfile /></ProtectedRoute>} />
