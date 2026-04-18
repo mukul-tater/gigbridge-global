@@ -8,78 +8,67 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading) {
-      if (!isAuthenticated) {
-        navigate("/auth");
-      } else if (role) {
-        switch (role) {
-          case 'admin':
-            navigate("/admin/dashboard");
-            break;
-          case 'employer':
-            // Check onboarding
-            (async () => {
-              try {
-                const { data } = await supabase.from('employer_profiles')
-                  .select('onboarding_completed')
-                  .eq('user_id', user?.id || '')
-                  .maybeSingle();
-                if ((data as any)?.onboarding_completed) {
-                  navigate("/employer/dashboard");
-                } else {
-                  navigate("/employer/onboarding");
-                }
-              } catch {
-                navigate("/employer/onboarding");
-              }
-            })();
-            break;
-          case 'worker':
-            // Check onboarding
-            (async () => {
-              try {
-                const { data } = await supabase.from('worker_profiles')
-                  .select('onboarding_completed')
-                  .eq('user_id', user?.id || '')
-                  .maybeSingle();
-                if ((data as any)?.onboarding_completed) {
-                  navigate("/worker/dashboard");
-                } else {
-                  navigate("/worker/onboarding");
-                }
-              } catch {
-                navigate("/worker/onboarding");
-              }
-            })();
-            break;
-          case 'agent':
-            navigate("/agent/dashboard");
-            break;
-          default:
-            navigate("/");
-        }
-      }
+    if (loading) return;
+
+    if (!isAuthenticated) {
+      navigate("/auth", { replace: true });
+      return;
+    }
+
+    if (!role) return;
+
+    switch (role) {
+      case 'admin':
+        navigate("/admin/dashboard", { replace: true });
+        break;
+      case 'employer':
+        (async () => {
+          try {
+            const { data } = await supabase.from('employer_profiles')
+              .select('onboarding_completed')
+              .eq('user_id', user?.id || '')
+              .maybeSingle();
+            if ((data as any)?.onboarding_completed) {
+              navigate("/employer/dashboard", { replace: true });
+            } else {
+              navigate("/employer/onboarding", { replace: true });
+            }
+          } catch {
+            navigate("/employer/onboarding", { replace: true });
+          }
+        })();
+        break;
+      case 'worker':
+        (async () => {
+          try {
+            const { data } = await supabase.from('worker_profiles')
+              .select('onboarding_completed')
+              .eq('user_id', user?.id || '')
+              .maybeSingle();
+            if ((data as any)?.onboarding_completed) {
+              navigate("/worker/dashboard", { replace: true });
+            } else {
+              navigate("/worker/onboarding", { replace: true });
+            }
+          } catch {
+            navigate("/worker/onboarding", { replace: true });
+          }
+        })();
+        break;
+      case 'agent':
+        navigate("/agent/dashboard", { replace: true });
+        break;
+      default:
+        navigate("/", { replace: true });
     }
   }, [isAuthenticated, role, loading, navigate, user]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Redirecting...</p>
+        <p className="mt-4 text-muted-foreground">Loading your dashboard...</p>
       </div>
     </div>
   );
-
 }
