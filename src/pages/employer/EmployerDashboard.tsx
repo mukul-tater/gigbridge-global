@@ -81,7 +81,7 @@ export default function EmployerDashboard() {
         month: months[targetMonth.getMonth()],
         applications: monthApps.length,
         shortlisted: monthApps.filter((a: any) => a.status === 'SHORTLISTED').length,
-        hired: monthApps.filter((a: any) => a.status === 'HIRED').length
+        hired: monthApps.filter((a: any) => a.status === 'HIRED' || a.status === 'APPROVED').length
       });
     }
     return metricsData;
