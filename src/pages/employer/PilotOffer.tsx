@@ -1,7 +1,10 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, Sparkles, ShieldCheck, ArrowRight, Wallet } from "lucide-react";
+import { CheckCircle2, Sparkles, ShieldCheck, ArrowRight, Wallet, Phone, Clock } from "lucide-react";
+
+const SUPPORT_PHONE_DISPLAY = "+91-9950085843";
+const SUPPORT_PHONE_TEL = "+919950085843";
 
 export default function PilotOffer() {
   const navigate = useNavigate();
