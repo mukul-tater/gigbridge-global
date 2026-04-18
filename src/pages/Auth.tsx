@@ -152,6 +152,14 @@ export default function Auth() {
 
   const handleRoleSelect = (role: AppRole) => {
     setSignupRole(role);
+    if (role === 'worker') {
+      navigate('/worker/quick-signup');
+      return;
+    }
+    if (role === 'employer') {
+      navigate('/employer/quick-signup');
+      return;
+    }
     setView('signup');
   };
 
