@@ -19,6 +19,7 @@ import { useState } from "react";
 import { X, Plus } from "lucide-react";
 import { DESTINATION_COUNTRIES, CURRENCIES } from "@/lib/constants";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import JobTitleAutocomplete from "@/components/employer/JobTitleAutocomplete";
 
 export default function PostJob() {
   const { user } = useAuth();
@@ -158,11 +159,15 @@ export default function PostJob() {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="title">Job Title *</Label>
-                  <Input
+                  <JobTitleAutocomplete
                     id="title"
-                    {...register("title")}
-                    placeholder="e.g. Senior Welder - Industrial Fabrication"
+                    value={watch("title") || ""}
+                    onChange={(v) => setValue("title", v, { shouldValidate: true })}
+                    placeholder="Start typing — e.g. Electrician, Welder, Carpenter…"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Pick from suggestions or enter your own custom title.
+                  </p>
                   {errors.title && (
                     <p className="text-sm text-destructive mt-1">{errors.title.message}</p>
                   )}
