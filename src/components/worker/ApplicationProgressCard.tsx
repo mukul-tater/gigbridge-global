@@ -1,10 +1,17 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Circle, Clock, XCircle, Briefcase, ChevronRight } from "lucide-react";
+import { CheckCircle, Circle, XCircle, Briefcase, ChevronRight, Plane } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+
+interface Formality {
+  visa_status: string | null;
+  visa_required: boolean | null;
+  overall_status: string | null;
+  completion_percentage: number | null;
+}
 
 interface Application {
   id: string;
@@ -17,41 +24,61 @@ interface Application {
     location: string;
     country: string;
   } | null;
+  formality: Formality | null;
 }
 
+// 5-stage flow per product spec
 const APPLICATION_STAGES = [
-  { key: "PENDING", label: "Applied" },
+  { key: "APPLIED", label: "Applied" },
   { key: "SHORTLISTED", label: "Shortlisted" },
-  { key: "INTERVIEWED", label: "Interview" },
-  { key: "APPROVED", label: "Approved" },
-  { key: "HIRED", label: "Hired" },
+  { key: "INTERVIEW", label: "Interview" },
+  { key: "SELECTED", label: "Selected" },
+  { key: "VISA", label: "Visa in process" },
 ];
 
-function getStageIndex(status: string): number {
-  if (status === "REJECTED") return -1;
-  const idx = APPLICATION_STAGES.findIndex((s) => s.key === status);
-  return idx >= 0 ? idx : 0;
-}
+/**
+ * Determine the current stage index (0-4) from application status + formality.
+ * - PENDING/APPLIED → 0
+ * - SHORTLISTED → 1
+ * - INTERVIEWED/INTERVIEWING → 2
+ * - APPROVED/HIRED (without active visa progress) → 3
+ * - APPROVED/HIRED with visa formality in progress or completed → 4
+ * - REJECTED → -1
+ */
+function getStageIndex(app: Application): number {
+  if (app.status === "REJECTED") return -1;
 
-function getProgressPercent(status: string): number {
-  if (status === "REJECTED") return 100;
-  const idx = getStageIndex(status);
-  return Math.round(((idx + 1) / APPLICATION_STAGES.length) * 100);
-}
+  const visaActive =
+    app.formality?.visa_required &&
+    app.formality?.visa_status &&
+    app.formality.visa_status !== "NOT_STARTED";
 
-function getStatusColor(status: string) {
-  switch (status) {
+  switch (app.status) {
+    case "PENDING":
+    case "APPLIED":
+      return 0;
+    case "SHORTLISTED":
+      return 1;
+    case "INTERVIEWED":
+    case "INTERVIEWING":
+      return 2;
     case "APPROVED":
     case "HIRED":
-      return "text-green-500";
-    case "REJECTED":
-      return "text-destructive";
-    case "SHORTLISTED":
-    case "INTERVIEWED":
-      return "text-yellow-500";
+      return visaActive ? 4 : 3;
     default:
-      return "text-muted-foreground";
+      return 0;
   }
+}
+
+function getProgressPercent(app: Application): number {
+  if (app.status === "REJECTED") return 100;
+  // If visa stage is active, use formality completion if available
+  const idx = getStageIndex(app);
+  if (idx === 4 && app.formality?.completion_percentage != null) {
+    // Final stage: scale 80% (entering stage 5) → 100% based on visa completion
+    return 80 + Math.round((app.formality.completion_percentage / 100) * 20);
+  }
+  return Math.round(((idx + 1) / APPLICATION_STAGES.length) * 100);
 }
 
 function getStatusBadgeVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
@@ -64,6 +91,12 @@ function getStatusBadgeVariant(status: string): "default" | "secondary" | "destr
     default:
       return "secondary";
   }
+}
+
+function getDisplayStatus(app: Application): string {
+  const idx = getStageIndex(app);
+  if (idx === -1) return "REJECTED";
+  return APPLICATION_STAGES[idx].label;
 }
 
 export default function ApplicationProgressCard({ userId }: { userId: string }) {
@@ -84,15 +117,25 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
     }
 
     const jobIds = [...new Set(apps.map((a) => a.job_id))];
-    const { data: jobs } = await supabase
-      .from("jobs")
-      .select("id, title, location, country")
-      .in("id", jobIds);
+    const appIds = apps.map((a) => a.id);
 
-    const jobMap = new Map((jobs || []).map((j) => [j.id, j]));
+    const [jobsRes, formalitiesRes] = await Promise.all([
+      supabase.from("jobs").select("id, title, location, country").in("id", jobIds),
+      supabase
+        .from("job_formalities")
+        .select("application_id, visa_status, visa_required, overall_status, completion_percentage")
+        .in("application_id", appIds),
+    ]);
+
+    const jobMap = new Map((jobsRes.data || []).map((j) => [j.id, j]));
+    const formalityMap = new Map(
+      (formalitiesRes.data || []).map((f: any) => [f.application_id, f as Formality])
+    );
+
     const merged: Application[] = apps.map((a) => ({
       ...a,
       jobs: jobMap.get(a.job_id) || null,
+      formality: formalityMap.get(a.id) || null,
     }));
     setApplications(merged);
     setLoading(false);
@@ -102,20 +145,25 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
     if (userId) fetchApplications();
   }, [userId]);
 
-  // Real-time subscription for application status updates
+  // Real-time subscription for application + formality updates
   useEffect(() => {
     if (!userId) return;
-    const channel = supabase
+    const appsChannel = supabase
       .channel("worker-application-updates")
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "job_applications", filter: `worker_id=eq.${userId}` },
-        () => {
-          fetchApplications();
-        }
+        { event: "*", schema: "public", table: "job_applications", filter: `worker_id=eq.${userId}` },
+        () => fetchApplications()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "job_formalities", filter: `worker_id=eq.${userId}` },
+        () => fetchApplications()
       )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(appsChannel);
+    };
   }, [userId]);
 
   if (loading) {
@@ -150,9 +198,9 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
       </h2>
       <div className="space-y-4">
         {applications.map((app) => {
-          const currentIdx = getStageIndex(app.status);
-          const isRejected = app.status === "REJECTED";
-          const progress = getProgressPercent(app.status);
+          const currentIdx = getStageIndex(app);
+          const isRejected = currentIdx === -1;
+          const progress = getProgressPercent(app);
 
           return (
             <div key={app.id} className="border rounded-lg p-4 space-y-3">
@@ -164,7 +212,7 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
                   </p>
                 </div>
                 <Badge variant={getStatusBadgeVariant(app.status)} className="shrink-0 text-xs">
-                  {app.status.replace(/_/g, " ")}
+                  {getDisplayStatus(app)}
                 </Badge>
               </div>
 
@@ -178,6 +226,7 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
                 {APPLICATION_STAGES.map((stage, idx) => {
                   const isComplete = !isRejected && idx <= currentIdx;
                   const isCurrent = !isRejected && idx === currentIdx;
+                  const isVisaStage = idx === 4;
 
                   return (
                     <div key={stage.key} className="flex flex-col items-center flex-1 min-w-0">
@@ -188,7 +237,11 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
                           <Circle className="h-4 w-4 text-muted-foreground/40" />
                         )
                       ) : isComplete ? (
-                        <CheckCircle className={`h-4 w-4 ${isCurrent ? getStatusColor(app.status) : "text-green-500"}`} />
+                        isVisaStage && isCurrent ? (
+                          <Plane className={`h-4 w-4 text-primary animate-pulse`} />
+                        ) : (
+                          <CheckCircle className={`h-4 w-4 ${isCurrent ? "text-primary" : "text-green-500"}`} />
+                        )
                       ) : (
                         <Circle className="h-4 w-4 text-muted-foreground/40" />
                       )}
@@ -202,6 +255,18 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
                 })}
               </div>
 
+              {/* Visa progress sub-bar */}
+              {currentIdx === 4 && app.formality && (
+                <div className="p-2 bg-primary/10 rounded text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1 font-medium">
+                      <Plane className="h-3 w-3" /> Visa: {(app.formality.visa_status || "NOT_STARTED").replace(/_/g, " ")}
+                    </span>
+                    <span className="text-muted-foreground">{app.formality.completion_percentage ?? 0}%</span>
+                  </div>
+                </div>
+              )}
+
               {isRejected && (
                 <div className="p-2 bg-destructive/10 rounded text-xs text-destructive">
                   Application was not selected. Keep trying!
@@ -211,7 +276,7 @@ export default function ApplicationProgressCard({ userId }: { userId: string }) 
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Applied {new Date(app.applied_at).toLocaleDateString()}</span>
                 <Link
-                  to={`/worker/applications/${app.id}`}
+                  to={`/worker/application-tracking`}
                   className="text-primary flex items-center gap-0.5 hover:underline"
                 >
                   Details <ChevronRight className="h-3 w-3" />
