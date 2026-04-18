@@ -49,6 +49,17 @@ export default function PilotOffer() {
             <p className="text-xs text-muted-foreground mt-2 italic">No full upfront payment required.</p>
           </div>
 
+          {/* Time-to-hire highlight */}
+          <div className="mb-4 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
+            <div className="p-1.5 rounded-lg bg-primary/15 shrink-0">
+              <Clock className="h-4 w-4 text-primary" />
+            </div>
+            <p className="text-xs sm:text-sm">
+              <span className="font-semibold">Shortlist in 7–10 days</span>
+              <span className="text-muted-foreground"> — verified candidates ready to interview.</span>
+            </p>
+          </div>
+
           <Button
             size="lg"
             className="w-full h-12 gap-2"
@@ -56,6 +67,16 @@ export default function PilotOffer() {
           >
             Start Pilot <ArrowRight className="h-4 w-4" />
           </Button>
+
+          {/* Call support */}
+          <a
+            href={`tel:${SUPPORT_PHONE_TEL}`}
+            className="mt-3 flex items-center justify-center gap-2 w-full h-11 rounded-md border border-border bg-card text-sm font-medium hover:bg-accent transition-colors"
+          >
+            <Phone className="h-4 w-4 text-success" />
+            Talk to us — {SUPPORT_PHONE_DISPLAY}
+          </a>
+
           <button
             type="button"
             onClick={() => navigate("/employer/dashboard")}
