@@ -151,7 +151,7 @@ export default function EmployerDashboard() {
         shortlisted={applications.filter((a: any) => a.status === 'SHORTLISTED').length}
         interviews={interviews.length}
         offers={offers.length}
-        hired={applications.filter((a: any) => a.status === 'HIRED').length}
+        hired={applications.filter((a: any) => a.status === 'HIRED' || a.status === 'APPROVED').length}
       />
 
       {/* Escrow Payment Widget */}
