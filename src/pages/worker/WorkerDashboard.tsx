@@ -126,18 +126,20 @@ export default function WorkerDashboard() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
         {[
-          { icon: Briefcase, value: applications.length, label: "Applications", color: "text-primary" },
-          { icon: FileText, value: `${verifiedDocsCount}/${documents.length}`, label: "Verified Docs", color: "text-success" },
-          { icon: MessageSquare, value: pendingDocsCount, label: "Pending Checks", color: "text-warning" },
-          { icon: TrendingUp, value: skills.length, label: "Skills Added", color: "text-info" },
+          { icon: Briefcase, value: applications.length, label: "Applications", color: "text-primary", to: "/worker/applications" },
+          { icon: FileText, value: `${verifiedDocsCount}/${documents.length}`, label: "Verified Docs", color: "text-success", to: "/worker/documents" },
+          { icon: MessageSquare, value: pendingDocsCount, label: "Pending Checks", color: "text-warning", to: "/worker/verification" },
+          { icon: TrendingUp, value: skills.length, label: "Skills Added", color: "text-info", to: "/worker/profile" },
         ].map(stat => (
-          <Card key={stat.label} className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <stat.icon className={`h-5 w-5 ${stat.color}`} />
-              <span className="text-2xl font-bold">{stat.value}</span>
-            </div>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
-          </Card>
+          <Link key={stat.label} to={stat.to} aria-label={`Go to ${stat.label}`}>
+            <Card className="p-4 transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40 cursor-pointer h-full">
+              <div className="flex items-center justify-between mb-2">
+                <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                <span className="text-2xl font-bold">{stat.value}</span>
+              </div>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </Card>
+          </Link>
         ))}
       </div>
 

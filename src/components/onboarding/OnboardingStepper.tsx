@@ -47,7 +47,7 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
         title: 'Verify Email',
         description: 'Confirm your email address',
         icon: <Mail className="h-5 w-5" />,
-        route: '/verify-email',
+        route: '/verify-email?send=1',
         completed: isEmailVerified
       };
 

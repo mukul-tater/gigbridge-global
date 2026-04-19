@@ -79,10 +79,18 @@ const HeroSection = () => {
 
           {/* Left Content */}
           <div className="flex-1 text-center lg:text-left max-w-2xl w-full">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-info/10 text-primary px-4 py-2 rounded-full text-xs sm:text-sm font-semibold mb-6 border border-primary/20 animate-fade-in backdrop-blur-sm">
-              <Sparkles className="h-3.5 w-3.5 animate-bounce-subtle" />
-              <span>Over 900 global opportunities across 40+ countries</span>
+            {/* Hero highlight banner — primary value prop */}
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-success/15 via-primary/15 to-info/15 text-foreground px-4 py-2 rounded-full text-xs sm:text-sm font-bold mb-5 border-2 border-primary/30 shadow-primary/20 shadow-lg animate-fade-in backdrop-blur-sm">
+              <Shield className="h-4 w-4 text-success animate-pulse-soft" />
+              <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
+                Get a safe foreign job — without agents
+              </span>
+            </div>
+
+            {/* Secondary trust badge */}
+            <div className="inline-flex items-center gap-2 bg-muted/50 text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium mb-6 border border-border/50 animate-fade-in">
+              <Sparkles className="h-3 w-3 text-primary" />
+              <span>900+ verified jobs · 40+ countries</span>
             </div>
 
             {/* Heading */}

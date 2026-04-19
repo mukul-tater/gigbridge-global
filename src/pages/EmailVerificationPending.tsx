@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,9 +10,16 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function EmailVerificationPending() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { user, isEmailVerified, logout } = useAuth();
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
+  const autoSentRef = useRef(false);
+
+  // If already verified, bounce to dashboard immediately.
+  useEffect(() => {
+    if (isEmailVerified) navigate('/dashboard', { replace: true });
+  }, [isEmailVerified, navigate]);
 
   const handleResendEmail = async () => {
     if (!user?.email) {
@@ -42,6 +49,17 @@ export default function EmailVerificationPending() {
       setResending(false);
     }
   };
+
+  // Auto-send a verification email when the user lands here from a "Verify Email"
+  // CTA (?send=1). Only runs once per mount, only if not already verified.
+  useEffect(() => {
+    if (autoSentRef.current) return;
+    if (!user?.email || isEmailVerified) return;
+    if (searchParams.get('send') !== '1') return;
+    autoSentRef.current = true;
+    handleResendEmail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email, isEmailVerified, searchParams]);
 
   const handleCheckVerification = async () => {
     try {
