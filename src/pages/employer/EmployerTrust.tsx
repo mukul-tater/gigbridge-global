@@ -21,7 +21,7 @@ export default function EmployerTrust() {
   const navigate = useNavigate();
 
   const points = [
-    { icon: Coins, title: "1% cost vs 20–30% agents", desc: "Pay only 1% platform fee — and only after you hire." },
+    { icon: Coins, title: "1% cost vs 20–30% agents", desc: "Pay only 1% PM — and only after you hire." },
     { icon: ShieldCheck, title: "Verified workers", desc: "Every worker is ID, document and skill verified." },
     { icon: CheckCircle2, title: "Escrow-secured payments", desc: "Funds held safely. Released after work completion." },
     { icon: Zap, title: "Faster hiring", desc: "Shortlists in 7–10 days for your pilot batch." },
