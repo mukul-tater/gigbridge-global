@@ -247,23 +247,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const assignRole = async (newRole: AppRole) => {
     if (!user) return { success: false, error: 'Not authenticated' };
+    if (newRole === 'admin') {
+      return { success: false, error: 'Admin role cannot be self-assigned' };
+    }
     try {
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({ user_id: user.id, role: newRole });
-
-      // 23505 = unique_violation (role already exists for user) — treat as success.
-      if (roleError && roleError.code !== '23505') {
-        return { success: false, error: roleError.message };
-      }
-
-      // Create the role-specific profile row if needed.
-      if (newRole === 'worker') {
-        await supabase.from('worker_profiles').upsert({ user_id: user.id }, { onConflict: 'user_id' });
-      } else if (newRole === 'employer') {
-        await supabase.from('employer_profiles').upsert({ user_id: user.id }, { onConflict: 'user_id' });
-      } else if (newRole === 'agent') {
-        await supabase.from('agent_profiles').upsert({ user_id: user.id }, { onConflict: 'user_id' });
+      // Use the SECURITY DEFINER RPC so the user can claim their first role
+      // without needing INSERT permission on user_roles directly.
+      const { error } = await supabase.rpc('assign_initial_role', { _role: newRole });
+      if (error) {
+        // If the role is already assigned (e.g. race), just refresh.
+        if (!/already assigned/i.test(error.message)) {
+          return { success: false, error: error.message };
+        }
       }
 
       setRole(newRole);
