@@ -561,18 +561,27 @@ export default function EmployerOnboarding() {
           )}
         </div>
 
-        {/* Skip on steps 4 & 5 */}
-        {(step === 4 || step === 5) && (
-          <p className="text-center mt-3">
-            <button
-              onClick={step === 5 ? handleSave : () => setStep(s => s + 1)}
-              disabled={saving}
-              className="text-sm text-muted-foreground hover:text-foreground underline"
-            >
-              Skip for now
-            </button>
-          </p>
-        )}
+        {/* Skip entire setup — user can complete details later from profile */}
+        <p className="text-center mt-3">
+          <button
+            onClick={step === STEPS.length ? handleSave : () => setStep(s => s + 1)}
+            disabled={saving}
+            className="text-sm text-muted-foreground hover:text-foreground underline mr-3"
+          >
+            {step === STEPS.length ? 'Skip & finish' : 'Skip this step'}
+          </button>
+          <span className="text-muted-foreground">·</span>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="text-sm text-muted-foreground hover:text-foreground underline ml-3"
+          >
+            Skip setup — complete later
+          </button>
+        </p>
+        <p className="text-center text-xs text-muted-foreground mt-2">
+          You can finish your business details anytime from your profile.
+        </p>
       </div>
     </div>
   );
