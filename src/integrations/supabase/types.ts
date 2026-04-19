@@ -1723,6 +1723,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_initial_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"] }
+        Returns: undefined
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
