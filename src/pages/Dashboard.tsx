@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Dashboard() {
-  const { user, role, isAuthenticated, loading } = useAuth();
+  const { user, role, isAuthenticated, loading, profileLoading, needsRoleSelection } = useAuth();
   const navigate = useNavigate();
   const [stuck, setStuck] = useState(false);
 
@@ -18,8 +18,16 @@ export default function Dashboard() {
       return;
     }
 
-    // Authenticated but role hasn't loaded yet — wait (role fetch is async in AuthContext)
-    if (!role) return;
+    // Authenticated but no role assigned (e.g. fresh Google sign-in) — send
+    // them to the auth page to pick a role. Auth.tsx handles role-select for
+    // already-authenticated users.
+    if (needsRoleSelection) {
+      navigate("/auth", { replace: true });
+      return;
+    }
+
+    // Profile/role still loading — wait.
+    if (profileLoading || !role) return;
 
     let cancelled = false;
 
