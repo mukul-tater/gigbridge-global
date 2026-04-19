@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,9 +10,16 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function EmailVerificationPending() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { user, isEmailVerified, logout } = useAuth();
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
+  const autoSentRef = useRef(false);
+
+  // If already verified, bounce to dashboard immediately.
+  useEffect(() => {
+    if (isEmailVerified) navigate('/dashboard', { replace: true });
+  }, [isEmailVerified, navigate]);
 
   const handleResendEmail = async () => {
     if (!user?.email) {
