@@ -103,7 +103,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 className="h-12 px-6 gap-2 text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary"
-                onClick={() => navigate('/jobs?category=')}
+                onClick={() => navigate('/jobs')}
               >
                 Find Foreign Jobs <ArrowRight className="h-5 w-5" />
               </Button>

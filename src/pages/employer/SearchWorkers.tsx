@@ -29,6 +29,8 @@ interface Worker {
   availability: string | null;
   has_passport: boolean;
   has_visa: boolean;
+  primary_work_type: string | null;
+  skill_level: string | null;
   skills: Array<{ skill_name: string }>;
 }
 
@@ -48,6 +50,7 @@ export default function SearchWorkers() {
   });
   const [loading, setLoading] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [allWorkers, setAllWorkers] = useState<Worker[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [shortlistedIds, setShortlistedIds] = useState<Set<string>>(new Set());
   const [shortlistingId, setShortlistingId] = useState<string | null>(null);
@@ -57,6 +60,7 @@ export default function SearchWorkers() {
     if (user) {
       loadShortlistedWorkers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadShortlistedWorkers = async () => {
@@ -65,7 +69,7 @@ export default function SearchWorkers() {
       .from('shortlisted_workers')
       .select('worker_id')
       .eq('employer_id', user.id);
-    
+
     if (data) {
       setShortlistedIds(new Set(data.map(s => s.worker_id)));
     }
@@ -87,9 +91,9 @@ export default function SearchWorkers() {
           .delete()
           .eq('employer_id', user.id)
           .eq('worker_id', workerId);
-        
+
         if (error) throw error;
-        
+
         setShortlistedIds(prev => {
           const next = new Set(prev);
           next.delete(workerId);
@@ -103,9 +107,9 @@ export default function SearchWorkers() {
             employer_id: user.id,
             worker_id: workerId
           });
-        
+
         if (error) throw error;
-        
+
         setShortlistedIds(prev => new Set(prev).add(workerId));
         toast.success('Worker added to shortlist');
       }
@@ -120,47 +124,33 @@ export default function SearchWorkers() {
   const loadWorkers = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          full_name,
-          avatar_url,
-          worker_profiles!inner (
-            nationality,
-            current_location,
-            years_of_experience,
-            expected_salary_min,
-            expected_salary_max,
-            currency,
-            availability,
-            has_passport,
-            has_visa
-          ),
-          worker_skills (
-            skill_name
-          )
-        `);
+      // Use the SECURITY DEFINER RPC so any authenticated employer can browse
+      // anonymized worker previews (first name + last initial). Full profiles
+      // unlock once a worker applies to one of their jobs (RLS-enforced).
+      const { data, error } = await supabase.rpc('list_public_workers', { p_limit: 100 });
 
       if (error) throw error;
 
-      const formattedWorkers = data?.map((worker: any) => ({
-        id: worker.id,
-        full_name: worker.full_name,
-        avatar_url: worker.avatar_url,
-        nationality: worker.worker_profiles?.nationality,
-        current_location: worker.worker_profiles?.current_location,
-        years_of_experience: worker.worker_profiles?.years_of_experience,
-        expected_salary_min: worker.worker_profiles?.expected_salary_min,
-        expected_salary_max: worker.worker_profiles?.expected_salary_max,
-        currency: worker.worker_profiles?.currency || 'USD',
-        availability: worker.worker_profiles?.availability,
-        has_passport: worker.worker_profiles?.has_passport || false,
-        has_visa: worker.worker_profiles?.has_visa || false,
-        skills: worker.worker_skills || []
-      })) || [];
+      const formatted: Worker[] = (data || []).map((w: any) => ({
+        id: w.user_id,
+        full_name: w.display_name || 'Worker',
+        avatar_url: w.avatar_url,
+        nationality: w.nationality,
+        current_location: w.current_location,
+        years_of_experience: w.years_of_experience != null ? Number(w.years_of_experience) : null,
+        expected_salary_min: null,
+        expected_salary_max: null,
+        currency: 'INR',
+        availability: w.availability,
+        has_passport: !!w.has_passport,
+        has_visa: !!w.has_visa,
+        primary_work_type: w.primary_work_type,
+        skill_level: w.skill_level,
+        skills: (w.top_skills || []).map((s: string) => ({ skill_name: s })),
+      }));
 
-      setWorkers(formattedWorkers);
+      setAllWorkers(formatted);
+      setWorkers(formatted);
     } catch (error) {
       console.error('Error loading workers:', error);
       toast.error('Failed to load workers');
