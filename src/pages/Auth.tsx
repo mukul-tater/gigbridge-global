@@ -176,13 +176,13 @@ export default function Auth() {
         return;
       }
       toast.success(`Welcome${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}!`);
-      // Send to onboarding for the chosen role.
+      // Send to the streamlined start step for the chosen role.
       if (selectedRole === 'worker') {
-        navigate('/worker/onboarding', { replace: true });
+        navigate('/worker/trust', { replace: true });
       } else if (selectedRole === 'employer') {
-        navigate('/employer/onboarding', { replace: true });
+        navigate('/employer/trust', { replace: true });
       } else {
-        navigate('/dashboard', { replace: true });
+        navigate('/agent/dashboard', { replace: true });
       }
       return;
     }
