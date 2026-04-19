@@ -300,9 +300,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Safe fallback used only when the context is momentarily unavailable
+// (e.g. during Vite HMR after AuthContext.tsx was just edited). Throwing
+// here would blank-screen the whole app on every hot update.
+const noopAuth: AuthContextType = {
+  user: null,
+  session: null,
+  profile: null,
+  role: null,
+  isAuthenticated: false,
+  isEmailVerified: false,
+  loading: true,
+  profileLoading: false,
+  needsRoleSelection: false,
+  login: async () => ({ success: false, error: 'Auth not ready' }),
+  signup: async () => ({ success: false, error: 'Auth not ready' }),
+  logout: async () => {},
+  hasRole: () => false,
+  refreshProfile: async () => {},
+  assignRole: async () => ({ success: false, error: 'Auth not ready' }),
+};
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
+    if (import.meta.env.DEV) {
+      console.warn('useAuth called outside AuthProvider — returning safe defaults (likely HMR).');
+      return noopAuth;
+    }
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
