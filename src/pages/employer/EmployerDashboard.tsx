@@ -17,7 +17,8 @@ import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 
 export default function EmployerDashboard() {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
+  const employerId = user?.id ?? profile?.id;
   const [verifications, setVerifications] = useState([]);
   const [payments, setPayments] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -28,19 +29,30 @@ export default function EmployerDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (profile?.id) fetchDashboardData();
-  }, [profile?.id]);
+    if (employerId) {
+      fetchDashboardData();
+    } else {
+      // No id available yet — don't block UI forever.
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employerId]);
 
   const fetchDashboardData = async () => {
+    if (!employerId) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     try {
       const [verificationsRes, paymentsRes, jobsRes, applicationsRes, shortlistRes, interviewsRes, offersRes] = await Promise.all([
-        supabase.from('background_verifications').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
-        supabase.from('payments').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
-        supabase.from('jobs').select('*').eq('employer_id', profile?.id),
-        supabase.from('job_applications').select('*').eq('employer_id', profile?.id),
-        supabase.from('shortlisted_workers').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('interviews').select('*').eq('employer_id', profile?.id).order('scheduled_date', { ascending: false }),
-        supabase.from('offers').select('*').eq('employer_id', profile?.id).order('created_at', { ascending: false }),
+        supabase.from('background_verifications').select('*').eq('employer_id', employerId).order('created_at', { ascending: false }),
+        supabase.from('payments').select('*').eq('employer_id', employerId).order('created_at', { ascending: false }),
+        supabase.from('jobs').select('*').eq('employer_id', employerId),
+        supabase.from('job_applications').select('*').eq('employer_id', employerId),
+        supabase.from('shortlisted_workers').select('*').eq('employer_id', employerId).order('created_at', { ascending: false }).limit(5),
+        supabase.from('interviews').select('*').eq('employer_id', employerId).order('scheduled_date', { ascending: false }),
+        supabase.from('offers').select('*').eq('employer_id', employerId).order('created_at', { ascending: false }),
       ]);
 
       setVerifications(verificationsRes.data || []);
