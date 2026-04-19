@@ -79,7 +79,7 @@ export default function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, role, loading, navigate, user]);
+  }, [isAuthenticated, role, loading, profileLoading, needsRoleSelection, navigate, user]);
 
   // Safety net: if we're stuck on this page for >5s, show a recovery action
   useEffect(() => {

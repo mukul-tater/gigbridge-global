@@ -24,13 +24,14 @@ const roles: { value: AppRole; label: string; description: string; icon: React.R
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, signup, isAuthenticated, role } = useAuth();
+  const { login, signup, isAuthenticated, role, needsRoleSelection, profileLoading, assignRole, profile } = useAuth();
   const [view, setView] = useState<AuthView>('login');
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [assigningRole, setAssigningRole] = useState<AppRole | null>(null);
 
   // Login
   const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -46,16 +47,24 @@ export default function Auth() {
   // Forgot
   const [resetEmail, setResetEmail] = useState('');
 
+  // If an authenticated user lands here without a role (e.g. fresh Google
+  // sign-in), force them into the role-select flow instead of redirecting.
   useEffect(() => {
-    if (isAuthenticated && role) {
-      // Redirect workers to onboarding check
+    if (isAuthenticated && needsRoleSelection) {
+      setView('role-select');
+    }
+  }, [isAuthenticated, needsRoleSelection]);
+
+  // Redirect once both auth + role are ready.
+  useEffect(() => {
+    if (isAuthenticated && role && !assigningRole) {
       if (role === 'worker') {
         navigate('/worker/onboarding', { replace: true });
       } else {
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [isAuthenticated, role, navigate]);
+  }, [isAuthenticated, role, navigate, assigningRole]);
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -68,6 +77,8 @@ export default function Auth() {
         setError(result.error instanceof Error ? result.error.message : 'Google sign-in failed');
       }
       if (result.redirected) return;
+      // Authenticated. The role-select effect above will switch the view if
+      // no role is set. Otherwise the redirect effect will navigate.
     } catch (err) {
       setError('Google sign-in failed. Please try again.');
     } finally {
