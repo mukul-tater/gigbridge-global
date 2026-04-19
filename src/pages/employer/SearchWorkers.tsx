@@ -305,6 +305,11 @@ export default function SearchWorkers() {
                       <div className="flex flex-col sm:flex-row justify-between sm:items-start mb-3 gap-2">
                         <div className="min-w-0">
                           <h3 className="text-lg md:text-xl font-semibold mb-1 truncate">{worker.full_name || 'Worker'}</h3>
+                          {(worker.primary_work_type || worker.skill_level) && (
+                            <p className="text-xs md:text-sm text-primary font-medium mb-1.5">
+                              {[worker.primary_work_type, worker.skill_level].filter(Boolean).join(' • ')}
+                            </p>
+                          )}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground">
                             {worker.nationality && (
                               <span className="flex items-center gap-1">
