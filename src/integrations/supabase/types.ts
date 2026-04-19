@@ -1761,6 +1761,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_public_workers: {
+        Args: { p_limit?: number }
+        Returns: {
+          availability: string
+          avatar_url: string
+          current_location: string
+          display_name: string
+          has_passport: boolean
+          has_visa: boolean
+          nationality: string
+          primary_work_type: string
+          skill_level: string
+          top_skills: string[]
+          user_id: string
+          years_of_experience: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "employer" | "worker" | "agent"
