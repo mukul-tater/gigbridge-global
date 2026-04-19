@@ -84,12 +84,16 @@ export default function PortalBreadcrumb({ currentPageTitle }: PortalBreadcrumbP
 
   if (!isPortalPage) return null;
 
+  // Each portal's home is its dashboard route — `/worker`, `/employer`, `/admin`
+  // are not real routes and would 404.
+  const portalHome = `/${portalType}/dashboard`;
+
   return (
     <Breadcrumb className="mb-4">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link to={`/${portalType}`} className="flex items-center gap-1.5">
+            <Link to={portalHome} className="flex items-center gap-1.5">
               <Home className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">{getLabel(portalType)}</span>
             </Link>
