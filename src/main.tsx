@@ -2,21 +2,18 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+// Aggressively unregister any existing service workers and clear caches
+// to prevent stale builds from being served.
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((registration) => {
-        if (registration.active?.scriptURL.includes("dev-sw") || registration.active?.scriptURL.includes("registerSW.js")) {
-          registration.unregister();
-        }
-      });
-    });
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => registration.unregister());
+  }).catch(() => {});
+}
 
-    navigator.serviceWorker
-      .register("/sw.js", { scope: "/" })
-      .then((reg) => console.log("SW registered:", reg))
-      .catch((err) => console.log("SW registration failed:", err));
-  });
+if (typeof window !== "undefined" && "caches" in window) {
+  caches.keys().then((keys) => {
+    keys.forEach((key) => caches.delete(key));
+  }).catch(() => {});
 }
 
 const root = document.getElementById("root")!;
