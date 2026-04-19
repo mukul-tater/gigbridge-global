@@ -232,13 +232,15 @@ export default function Auth() {
           </div>
           <h1 className="text-2xl font-heading font-bold text-foreground">
             {view === 'login' && 'Welcome back'}
-            {view === 'role-select' && 'Join as'}
+            {view === 'role-select' && (needsRoleSelection ? 'One last step' : 'Join as')}
             {view === 'signup' && 'Create your account'}
             {view === 'forgot' && 'Reset password'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             {view === 'login' && 'Sign in to your SafeWorkGlobal account'}
-            {view === 'role-select' && 'Choose how you want to use the platform'}
+            {view === 'role-select' && (needsRoleSelection
+              ? `Welcome${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! Choose how you want to use SafeWorkGlobal.`
+              : 'Choose how you want to use the platform')}
             {view === 'signup' && `Signing up as ${roles.find(r => r.value === signupRole)?.label}`}
             {view === 'forgot' && "We'll send you a link to reset it"}
           </p>
@@ -308,26 +310,34 @@ export default function Auth() {
             {/* ROLE SELECT */}
             {view === 'role-select' && (
               <div className="space-y-3">
-                {roles.map(r => (
-                  <button
-                    key={r.value}
-                    onClick={() => handleRoleSelect(r.value)}
-                    className={cn(
-                      'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left group',
-                      r.color
-                    )}
-                  >
-                    <div className="shrink-0">{r.icon}</div>
-                    <div>
-                      <div className="font-semibold text-foreground">{r.label}</div>
-                      <div className="text-xs text-muted-foreground">{r.description}</div>
-                    </div>
-                  </button>
-                ))}
-                <p className="text-sm text-center text-muted-foreground pt-2">
-                  Already have an account?{' '}
-                  <button type="button" onClick={() => { setError(''); setView('login'); }} className="text-primary font-medium hover:underline">Sign in</button>
-                </p>
+                {roles.map(r => {
+                  const isAssigningThis = assigningRole === r.value;
+                  return (
+                    <button
+                      key={r.value}
+                      onClick={() => handleRoleSelect(r.value)}
+                      disabled={!!assigningRole}
+                      className={cn(
+                        'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left group disabled:opacity-60 disabled:cursor-not-allowed',
+                        r.color
+                      )}
+                    >
+                      <div className="shrink-0">
+                        {isAssigningThis ? <Loader2 className="h-6 w-6 animate-spin" /> : r.icon}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-foreground">{r.label}</div>
+                        <div className="text-xs text-muted-foreground">{r.description}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+                {!needsRoleSelection && (
+                  <p className="text-sm text-center text-muted-foreground pt-2">
+                    Already have an account?{' '}
+                    <button type="button" onClick={() => { setError(''); setView('login'); }} className="text-primary font-medium hover:underline">Sign in</button>
+                  </p>
+                )}
               </div>
             )}
 
