@@ -4,6 +4,7 @@ import { Menu, Search, Globe, User, Bell, X, LogOut, ChevronRight } from "lucide
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -100,6 +101,7 @@ const Header = () => {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-3">
+              <ThemeToggle />
               {isAuthenticated ? (
                 <>
                   <Link to="/dashboard">
@@ -134,11 +136,13 @@ const Header = () => {
               )}
             </div>
 
+            {/* Mobile Actions */}
+            <div className="flex items-center gap-1 md:hidden">
+              <ThemeToggle />
             {/* Mobile Menu Toggle */}
             <Button 
               variant="ghost" 
               size="icon" 
-              className="md:hidden" 
               onClick={toggleMobileMenu}
               aria-controls="mobile-menu"
               aria-expanded={isMobileMenuOpen}
@@ -146,6 +150,7 @@ const Header = () => {
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
+            </div>
           </div>
         </div>
       </header>
