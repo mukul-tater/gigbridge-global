@@ -50,9 +50,9 @@ const Footer = () => {
                 {[
                   { to: "/jobs", label: "Find Jobs" },
                   { to: "/auth", label: "Create Profile" },
-                  { to: "/about", label: "Visa Guide" },
-                  { to: "/about", label: "Success Stories" },
-                  { to: "/contact", label: "Support Center" },
+                  { to: "/visa-guide", label: "Visa Guide" },
+                  { to: "/success-stories", label: "Success Stories" },
+                  { to: "/support", label: "Support Center" },
                 ].map((link) => (
                   <li key={link.label}>
                     <Link to={link.to} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
@@ -68,11 +68,11 @@ const Footer = () => {
               <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">Resources</h3>
               <ul className="space-y-2.5">
                 {[
-                  { to: "/about", label: "Country Insights" },
-                  { to: "/jobs", label: "Salary Guide" },
-                  { to: "/about", label: "Language Resources" },
-                  { to: "/about", label: "Cultural Guides" },
-                  { to: "/contact", label: "Legal Advice" },
+                  { to: "/country-insights", label: "Country Insights" },
+                  { to: "/salary-guide", label: "Salary Guide" },
+                  { to: "/language-resources", label: "Language Resources" },
+                  { to: "/cultural-guides", label: "Cultural Guides" },
+                  { to: "/legal-advice", label: "Legal Advice" },
                 ].map((link) => (
                   <li key={link.label}>
                     <Link to={link.to} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
