@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { isAuthenticated, role, loading, profileLoading } = useAuth();
+  const { isAuthenticated, role, loading, profileLoading, needsRoleSelection } = useAuth();
 
   if (loading || profileLoading) {
     return (
@@ -22,6 +22,12 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   }
 
   if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  // Authenticated but no role yet (e.g. fresh Google sign-in) — send to
+  // /auth so the role-select step can run before any dashboard renders.
+  if (needsRoleSelection) {
     return <Navigate to="/auth" replace />;
   }
 

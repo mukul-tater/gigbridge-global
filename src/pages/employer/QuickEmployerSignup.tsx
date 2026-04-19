@@ -65,7 +65,9 @@ export default function QuickEmployerSignup() {
   const handleGoogle = async () => {
     setLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/employer/trust` });
+      // Redirect to /auth so Google users land on the role-select step.
+      // The user will pick "Employer" and then be routed into the employer flow.
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth` });
       if (result.error) {
         toast.error("Google signup failed");
         setLoading(false);
