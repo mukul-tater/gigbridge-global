@@ -109,14 +109,6 @@ const HeroSection = () => {
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="h-12 px-6 text-base font-semibold rounded-xl"
-                onClick={() => navigate('/jobs')}
-              >
-                Browse jobs first
-              </Button>
-              <Button
-                size="lg"
                 variant="secondary"
                 className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
                 onClick={() => navigate('/employer/quick-signup')}
