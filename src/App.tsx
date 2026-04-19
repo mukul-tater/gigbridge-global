@@ -21,6 +21,14 @@ import ContactUs from "./pages/ContactUs";
 import InstallPWA from "./pages/InstallPWA";
 import ResetPassword from "./pages/ResetPassword";
 import EmailVerificationPending from "./pages/EmailVerificationPending";
+import VisaGuide from "./pages/resources/VisaGuide";
+import SuccessStories from "./pages/resources/SuccessStories";
+import SupportCenter from "./pages/resources/SupportCenter";
+import SalaryGuide from "./pages/resources/SalaryGuide";
+import CulturalGuides from "./pages/resources/CulturalGuides";
+import CountryInsightsPage from "./pages/resources/CountryInsightsPage";
+import LanguageResources from "./pages/resources/LanguageResources";
+import LegalAdvice from "./pages/resources/LegalAdvice";
 
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import WorkerProfile from "./pages/worker/WorkerProfile";
@@ -124,6 +132,14 @@ function App() {
                 <Route path="/investors" element={<InvestorRelations />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/visa-guide" element={<VisaGuide />} />
+                <Route path="/success-stories" element={<SuccessStories />} />
+                <Route path="/support" element={<SupportCenter />} />
+                <Route path="/salary-guide" element={<SalaryGuide />} />
+                <Route path="/cultural-guides" element={<CulturalGuides />} />
+                <Route path="/country-insights" element={<CountryInsightsPage />} />
+                <Route path="/language-resources" element={<LanguageResources />} />
+                <Route path="/legal-advice" element={<LegalAdvice />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
                 {/* Worker quick-start (public — handles auth itself) */}
