@@ -24,13 +24,14 @@ const roles: { value: AppRole; label: string; description: string; icon: React.R
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, signup, isAuthenticated, role } = useAuth();
+  const { login, signup, isAuthenticated, role, needsRoleSelection, profileLoading, assignRole, profile } = useAuth();
   const [view, setView] = useState<AuthView>('login');
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [assigningRole, setAssigningRole] = useState<AppRole | null>(null);
 
   // Login
   const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -46,16 +47,24 @@ export default function Auth() {
   // Forgot
   const [resetEmail, setResetEmail] = useState('');
 
+  // If an authenticated user lands here without a role (e.g. fresh Google
+  // sign-in), force them into the role-select flow instead of redirecting.
   useEffect(() => {
-    if (isAuthenticated && role) {
-      // Redirect workers to onboarding check
+    if (isAuthenticated && needsRoleSelection) {
+      setView('role-select');
+    }
+  }, [isAuthenticated, needsRoleSelection]);
+
+  // Redirect once both auth + role are ready.
+  useEffect(() => {
+    if (isAuthenticated && role && !assigningRole) {
       if (role === 'worker') {
         navigate('/worker/onboarding', { replace: true });
       } else {
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [isAuthenticated, role, navigate]);
+  }, [isAuthenticated, role, navigate, assigningRole]);
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -68,6 +77,8 @@ export default function Auth() {
         setError(result.error instanceof Error ? result.error.message : 'Google sign-in failed');
       }
       if (result.redirected) return;
+      // Authenticated. The role-select effect above will switch the view if
+      // no role is set. Otherwise the redirect effect will navigate.
     } catch (err) {
       setError('Google sign-in failed. Please try again.');
     } finally {
@@ -150,13 +161,38 @@ export default function Auth() {
     setLoading(false);
   };
 
-  const handleRoleSelect = (role: AppRole) => {
-    setSignupRole(role);
-    if (role === 'worker') {
+  const handleRoleSelect = async (selectedRole: AppRole) => {
+    setSignupRole(selectedRole);
+    setError('');
+
+    // Already authenticated (e.g. Google sign-in with no role yet) — assign
+    // the role server-side and let the redirect effect take over.
+    if (isAuthenticated && needsRoleSelection) {
+      setAssigningRole(selectedRole);
+      const result = await assignRole(selectedRole);
+      setAssigningRole(null);
+      if (!result.success) {
+        setError(result.error || 'Could not set your role. Please try again.');
+        return;
+      }
+      toast.success(`Welcome${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}!`);
+      // Send to onboarding for the chosen role.
+      if (selectedRole === 'worker') {
+        navigate('/worker/onboarding', { replace: true });
+      } else if (selectedRole === 'employer') {
+        navigate('/employer/onboarding', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+      return;
+    }
+
+    // Not authenticated yet — original signup flow.
+    if (selectedRole === 'worker') {
       navigate('/worker/quick-signup');
       return;
     }
-    if (role === 'employer') {
+    if (selectedRole === 'employer') {
       navigate('/employer/quick-signup');
       return;
     }
@@ -196,13 +232,15 @@ export default function Auth() {
           </div>
           <h1 className="text-2xl font-heading font-bold text-foreground">
             {view === 'login' && 'Welcome back'}
-            {view === 'role-select' && 'Join as'}
+            {view === 'role-select' && (needsRoleSelection ? 'One last step' : 'Join as')}
             {view === 'signup' && 'Create your account'}
             {view === 'forgot' && 'Reset password'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             {view === 'login' && 'Sign in to your SafeWorkGlobal account'}
-            {view === 'role-select' && 'Choose how you want to use the platform'}
+            {view === 'role-select' && (needsRoleSelection
+              ? `Welcome${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! Choose how you want to use SafeWorkGlobal.`
+              : 'Choose how you want to use the platform')}
             {view === 'signup' && `Signing up as ${roles.find(r => r.value === signupRole)?.label}`}
             {view === 'forgot' && "We'll send you a link to reset it"}
           </p>
@@ -272,26 +310,34 @@ export default function Auth() {
             {/* ROLE SELECT */}
             {view === 'role-select' && (
               <div className="space-y-3">
-                {roles.map(r => (
-                  <button
-                    key={r.value}
-                    onClick={() => handleRoleSelect(r.value)}
-                    className={cn(
-                      'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left group',
-                      r.color
-                    )}
-                  >
-                    <div className="shrink-0">{r.icon}</div>
-                    <div>
-                      <div className="font-semibold text-foreground">{r.label}</div>
-                      <div className="text-xs text-muted-foreground">{r.description}</div>
-                    </div>
-                  </button>
-                ))}
-                <p className="text-sm text-center text-muted-foreground pt-2">
-                  Already have an account?{' '}
-                  <button type="button" onClick={() => { setError(''); setView('login'); }} className="text-primary font-medium hover:underline">Sign in</button>
-                </p>
+                {roles.map(r => {
+                  const isAssigningThis = assigningRole === r.value;
+                  return (
+                    <button
+                      key={r.value}
+                      onClick={() => handleRoleSelect(r.value)}
+                      disabled={!!assigningRole}
+                      className={cn(
+                        'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left group disabled:opacity-60 disabled:cursor-not-allowed',
+                        r.color
+                      )}
+                    >
+                      <div className="shrink-0">
+                        {isAssigningThis ? <Loader2 className="h-6 w-6 animate-spin" /> : r.icon}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-foreground">{r.label}</div>
+                        <div className="text-xs text-muted-foreground">{r.description}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+                {!needsRoleSelection && (
+                  <p className="text-sm text-center text-muted-foreground pt-2">
+                    Already have an account?{' '}
+                    <button type="button" onClick={() => { setError(''); setView('login'); }} className="text-primary font-medium hover:underline">Sign in</button>
+                  </p>
+                )}
               </div>
             )}
 
