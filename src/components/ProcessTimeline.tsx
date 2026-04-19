@@ -2,12 +2,12 @@ import { Search, FileText, CheckCircle, Video, Shield, Plane } from "lucide-reac
 
 const ProcessTimeline = () => {
   const steps = [
-    { number: 1, title: "Search Jobs", description: "Browse verified international opportunities", icon: Search, bgColor: "bg-primary" },
-    { number: 2, title: "Apply", description: "Submit application with your documents", icon: FileText, bgColor: "bg-secondary" },
-    { number: 3, title: "Get Shortlisted", description: "Employers review qualified candidates", icon: CheckCircle, bgColor: "bg-success" },
-    { number: 4, title: "Interview", description: "Complete interviews and get offer", icon: Video, bgColor: "bg-warning" },
-    { number: 5, title: "Visa Process", description: "Complete visa and ECR verification", icon: Shield, bgColor: "bg-info" },
-    { number: 6, title: "Travel", description: "Start your new career abroad", icon: Plane, bgColor: "bg-gradient-to-r from-primary to-info" }
+    { number: 1, title: "Search Jobs", description: "Browse verified international opportunities", icon: Search, bgColor: "bg-primary", iconGradient: "bg-gradient-to-br from-primary to-primary/70" },
+    { number: 2, title: "Apply", description: "Submit application with your documents", icon: FileText, bgColor: "bg-secondary", iconGradient: "bg-gradient-to-br from-secondary to-secondary/70" },
+    { number: 3, title: "Get Shortlisted", description: "Employers review qualified candidates", icon: CheckCircle, bgColor: "bg-success", iconGradient: "bg-gradient-to-br from-success to-success/70" },
+    { number: 4, title: "Interview", description: "Complete interviews and get offer", icon: Video, bgColor: "bg-warning", iconGradient: "bg-gradient-to-br from-warning to-warning/70" },
+    { number: 5, title: "Visa Process", description: "Complete visa and ECR verification", icon: Shield, bgColor: "bg-info", iconGradient: "bg-gradient-to-br from-info to-info/70" },
+    { number: 6, title: "Travel", description: "Start your new career abroad", icon: Plane, bgColor: "bg-gradient-to-r from-primary to-info", iconGradient: "bg-gradient-to-br from-primary to-info" }
   ];
 
   return (
@@ -43,7 +43,7 @@ const ProcessTimeline = () => {
 
               {/* Icon Card */}
               <div className="w-full p-3 sm:p-4 rounded-xl bg-card border border-border/50 group-hover:border-primary/30 group-hover:shadow-md transition-all duration-300 mb-2.5">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br ${step.bgColor === 'bg-gradient-to-r from-primary to-info' ? 'from-primary to-info' : step.bgColor.replace('bg-', 'from-') + ' to-' + step.bgColor.replace('bg-', '') + '/70'} flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${step.iconGradient} flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}>
                   <step.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
