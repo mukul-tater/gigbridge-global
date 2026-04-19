@@ -50,6 +50,17 @@ export default function EmailVerificationPending() {
     }
   };
 
+  // Auto-send a verification email when the user lands here from a "Verify Email"
+  // CTA (?send=1). Only runs once per mount, only if not already verified.
+  useEffect(() => {
+    if (autoSentRef.current) return;
+    if (!user?.email || isEmailVerified) return;
+    if (searchParams.get('send') !== '1') return;
+    autoSentRef.current = true;
+    handleResendEmail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email, isEmailVerified, searchParams]);
+
   const handleCheckVerification = async () => {
     try {
       const { data, error } = await supabase.auth.getUser();
