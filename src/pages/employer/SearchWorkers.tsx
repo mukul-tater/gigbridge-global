@@ -160,84 +160,50 @@ export default function SearchWorkers() {
   };
 
   const handleSearch = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      let query = supabase
-        .from('profiles')
-        .select(`
-          id,
-          full_name,
-          avatar_url,
-          worker_profiles!inner (
-            nationality,
-            current_location,
-            years_of_experience,
-            expected_salary_min,
-            expected_salary_max,
-            currency,
-            availability,
-            has_passport,
-            has_visa
-          ),
-          worker_skills (
-            skill_name
-          )
-        `);
+      let filtered = [...allWorkers];
 
-      // Apply filters
       if (filters.keyword) {
-        query = query.or(`full_name.ilike.%${filters.keyword}%`);
+        const kw = filters.keyword.toLowerCase();
+        filtered = filtered.filter(w =>
+          w.full_name.toLowerCase().includes(kw) ||
+          (w.primary_work_type ?? '').toLowerCase().includes(kw) ||
+          w.skills.some(s => s.skill_name.toLowerCase().includes(kw))
+        );
       }
 
       if (filters.nationality && filters.nationality !== 'All Nationalities') {
-        query = query.eq('worker_profiles.nationality', filters.nationality);
+        filtered = filtered.filter(w => w.nationality === filters.nationality);
       }
 
-      if (filters.hasPassport) {
-        query = query.eq('worker_profiles.has_passport', true);
+      if (filters.currentLocation) {
+        const loc = filters.currentLocation.toLowerCase();
+        filtered = filtered.filter(w => (w.current_location ?? '').toLowerCase().includes(loc));
       }
 
-      if (filters.hasVisa) {
-        query = query.eq('worker_profiles.has_visa', true);
+      if (filters.hasPassport) filtered = filtered.filter(w => w.has_passport);
+      if (filters.hasVisa) filtered = filtered.filter(w => w.has_visa);
+
+      if (filters.availability && filters.availability !== 'All') {
+        filtered = filtered.filter(w => w.availability === filters.availability);
       }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      let filtered = data?.map((worker: any) => ({
-        id: worker.id,
-        full_name: worker.full_name,
-        avatar_url: worker.avatar_url,
-        nationality: worker.worker_profiles?.nationality,
-        current_location: worker.worker_profiles?.current_location,
-        years_of_experience: worker.worker_profiles?.years_of_experience,
-        expected_salary_min: worker.worker_profiles?.expected_salary_min,
-        expected_salary_max: worker.worker_profiles?.expected_salary_max,
-        currency: worker.worker_profiles?.currency || 'USD',
-        availability: worker.worker_profiles?.availability,
-        has_passport: worker.worker_profiles?.has_passport || false,
-        has_visa: worker.worker_profiles?.has_visa || false,
-        skills: worker.worker_skills || []
-      })) || [];
-
-      // Client-side filtering for complex conditions
       if (filters.skills.length > 0) {
-        filtered = filtered.filter((worker: Worker) =>
-          filters.skills.some(skill => 
-            worker.skills.some(s => s.skill_name === skill)
+        filtered = filtered.filter(w =>
+          filters.skills.some(skill =>
+            w.skills.some(s => s.skill_name.toLowerCase() === skill.toLowerCase())
           )
         );
       }
 
-      filtered = filtered.filter((worker: Worker) =>
-        (worker.years_of_experience || 0) >= filters.experienceYears[0] &&
-        (worker.years_of_experience || 0) <= filters.experienceYears[1]
+      filtered = filtered.filter(w =>
+        (w.years_of_experience || 0) >= filters.experienceYears[0] &&
+        (w.years_of_experience || 0) <= filters.experienceYears[1]
       );
 
       setWorkers(filtered);
-      toast.success(`Found ${filtered.length} workers matching your criteria`);
+      toast.success(`Found ${filtered.length} worker${filtered.length === 1 ? '' : 's'} matching your criteria`);
     } catch (error) {
       console.error('Error searching workers:', error);
       toast.error('Failed to search workers');
