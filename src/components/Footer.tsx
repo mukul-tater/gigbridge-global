@@ -12,7 +12,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20 relative z-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
             {/* Company Info */}
-            <div className="sm:col-span-2 lg:col-span-4 space-y-5">
+            <div className="sm:col-span-2 lg:col-span-3 space-y-5">
               <Link to="/" className="inline-flex items-center gap-2.5 group">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-info flex items-center justify-center">
                   <img src="/safework-global-logo.png" alt="SafeWorkGlobal" className="h-5 w-5" />
@@ -63,6 +63,31 @@ const Footer = () => {
               </ul>
             </div>
 
+            {/* For Employers */}
+            <div className="lg:col-span-3 space-y-4">
+              <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">For Employers</h3>
+              <ul className="space-y-2.5">
+                {[
+                  { to: "/workers", label: "Browse Workers" },
+                  { to: "/employer/quick-signup", label: "Post a Job" },
+                  { to: "/employer/quick-signup", label: "How It Works" },
+                  { to: "/contact", label: "Talk to our team" },
+                ].map((link, i) => (
+                  <li key={`${link.label}-${i}`}>
+                    <Link to={link.to} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <div className="rounded-lg border border-background/10 bg-background/5 p-3">
+                <p className="text-[11px] sm:text-xs text-background/70 leading-relaxed">
+                  <span className="font-semibold text-background">Pay only 1% per month</span> — and only after you hire.
+                  Employer pays securely → platform takes a 1% fee → the rest is held in escrow until the worker joins.
+                </p>
+              </div>
+            </div>
+
             {/* Resources */}
             <div className="lg:col-span-2 space-y-4">
               <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">Resources</h3>
@@ -84,7 +109,7 @@ const Footer = () => {
             </div>
 
             {/* Newsletter */}
-            <div className="sm:col-span-2 lg:col-span-4 space-y-4">
+            <div className="sm:col-span-2 lg:col-span-2 space-y-4">
               <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">Stay Updated</h3>
               <p className="text-background/50 text-xs sm:text-sm">
                 Get weekly updates on new opportunities and career insights.
@@ -97,7 +122,6 @@ const Footer = () => {
                     className="h-10 sm:h-11 bg-transparent border-0 text-background placeholder:text-background/40 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
                   />
                   <Button className="h-10 sm:h-11 px-4 rounded-lg bg-gradient-to-r from-primary to-info hover:opacity-90 gap-1.5 shrink-0 text-sm">
-                    <span className="hidden sm:inline">Subscribe</span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
