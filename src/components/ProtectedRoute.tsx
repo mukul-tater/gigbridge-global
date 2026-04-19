@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth, type AppRole } from '@/contexts/AuthContext';
+import AccessDenied from '@/pages/AccessDenied';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -7,9 +8,9 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { isAuthenticated, role, loading } = useAuth();
+  const { isAuthenticated, role, loading, profileLoading } = useAuth();
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -24,8 +25,11 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
     return <Navigate to="/auth" replace />;
   }
 
+  // Strict role enforcement — wrong role gets a clear Access Denied page
+  // with a button back to their own dashboard. Prevents Workers from
+  // landing on Employer pages and vice versa.
   if (allowedRoles && role && !allowedRoles.includes(role)) {
-    return <Navigate to="/dashboard" replace />;
+    return <AccessDenied />;
   }
 
   return <>{children}</>;
