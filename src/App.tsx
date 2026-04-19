@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
+import Workers from "./pages/Workers";
 import JobCategories from "./pages/JobCategories";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -116,6 +117,7 @@ function App() {
                 <Route path="/seed-data" element={<SeedData />} />
                 <Route path="/jobs" element={<Jobs />} />
                 <Route path="/jobs/:slug" element={<JobDetail />} />
+                <Route path="/workers" element={<Workers />} />
                 <Route path="/job-categories" element={<JobCategories />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<ContactUs />} />

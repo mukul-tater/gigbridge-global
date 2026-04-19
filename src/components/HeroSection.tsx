@@ -111,7 +111,7 @@ const HeroSection = () => {
                 size="lg"
                 variant="secondary"
                 className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
-                onClick={() => navigate('/employer/quick-signup')}
+                onClick={() => navigate('/workers')}
               >
                 <Users className="h-5 w-5" /> Hire Workers
               </Button>
