@@ -161,13 +161,38 @@ export default function Auth() {
     setLoading(false);
   };
 
-  const handleRoleSelect = (role: AppRole) => {
-    setSignupRole(role);
-    if (role === 'worker') {
+  const handleRoleSelect = async (selectedRole: AppRole) => {
+    setSignupRole(selectedRole);
+    setError('');
+
+    // Already authenticated (e.g. Google sign-in with no role yet) — assign
+    // the role server-side and let the redirect effect take over.
+    if (isAuthenticated && needsRoleSelection) {
+      setAssigningRole(selectedRole);
+      const result = await assignRole(selectedRole);
+      setAssigningRole(null);
+      if (!result.success) {
+        setError(result.error || 'Could not set your role. Please try again.');
+        return;
+      }
+      toast.success(`Welcome${profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}!`);
+      // Send to onboarding for the chosen role.
+      if (selectedRole === 'worker') {
+        navigate('/worker/onboarding', { replace: true });
+      } else if (selectedRole === 'employer') {
+        navigate('/employer/onboarding', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+      return;
+    }
+
+    // Not authenticated yet — original signup flow.
+    if (selectedRole === 'worker') {
       navigate('/worker/quick-signup');
       return;
     }
-    if (role === 'employer') {
+    if (selectedRole === 'employer') {
       navigate('/employer/quick-signup');
       return;
     }
