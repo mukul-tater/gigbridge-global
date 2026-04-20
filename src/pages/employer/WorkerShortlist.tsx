@@ -11,7 +11,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Star, Trash2, User, FileText, GitCompare, Plus } from "lucide-react";
+import { Star, Trash2, User, FileText, GitCompare, Plus, Handshake, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
 
 interface ShortlistedWorker {
   id: string;
@@ -30,6 +32,7 @@ interface ShortlistedWorker {
 export default function WorkerShortlist() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [shortlistedWorkers, setShortlistedWorkers] = useState<ShortlistedWorker[]>([]);
   const [filteredWorkers, setFilteredWorkers] = useState<ShortlistedWorker[]>([]);
   const [loading, setLoading] = useState(true);
@@ -191,8 +194,12 @@ export default function WorkerShortlist() {
 
   return (
     <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
+        <EmployerFlowStepper current="shortlist" />
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Worker Shortlist</h1>
+          <div>
+            <h1 className="text-3xl font-bold">Worker Shortlist</h1>
+            <p className="text-sm text-muted-foreground mt-1">Pick a candidate and click <strong>Hire & Open Escrow</strong> to start the secure payment.</p>
+          </div>
           <div className="flex gap-2">
             <Button
               variant={compareMode ? "default" : "outline"}
@@ -307,6 +314,15 @@ export default function WorkerShortlist() {
                   </div>
                 )}
 
+                <Button
+                  size="sm"
+                  className="w-full mb-2 gap-1"
+                  onClick={() => navigate(`/employer/escrow?workerId=${worker.worker_id}`)}
+                >
+                  <Handshake className="h-4 w-4" />
+                  Hire & Open Escrow
+                  <Shield className="h-3.5 w-3.5 opacity-80" />
+                </Button>
                 <div className="flex gap-2">
                   <Dialog>
                     <DialogTrigger asChild>

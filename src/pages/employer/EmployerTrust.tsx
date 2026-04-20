@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
 import {
   CheckCircle2,
   ShieldCheck,
@@ -28,8 +29,11 @@ export default function EmployerTrust() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-info/5 p-4 py-8">
-      <Card className="w-full max-w-3xl shadow-elegant">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-info/5 p-4 py-8">
+      <div className="max-w-3xl mx-auto">
+        <EmployerFlowStepper current="search" />
+      </div>
+      <Card className="w-full max-w-3xl mx-auto shadow-elegant">
         <CardContent className="p-6 sm:p-10">
           <div className="text-center mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold font-heading mb-2">
@@ -133,16 +137,24 @@ export default function EmployerTrust() {
           <Button
             size="lg"
             className="w-full h-12 gap-2"
+            onClick={() => navigate("/employer/search-workers")}
+          >
+            Browse verified workers <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full h-11 mt-3 gap-2"
             onClick={() => navigate("/employer/quick-post-job")}
           >
-            Post your first job <ArrowRight className="h-4 w-4" />
+            Skip — Post a job directly
           </Button>
           <button
             type="button"
             onClick={() => navigate("/employer/dashboard")}
             className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
           >
-            Skip for now
+            Go to dashboard
           </button>
         </CardContent>
       </Card>

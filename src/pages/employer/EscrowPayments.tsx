@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
+import { useSearchParams } from "react-router-dom";
 
 interface EscrowPayment {
   id: string;
@@ -48,6 +50,8 @@ const PLATFORM_FEE_PERCENTAGE = 1;
 
 export default function EscrowPayments() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const prefilledWorkerId = searchParams.get("workerId");
   const [payments, setPayments] = useState<EscrowPayment[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -71,6 +75,15 @@ export default function EscrowPayments() {
       fetchWorkersAndJobs();
     }
   }, [user]);
+
+  // Auto-open the create-escrow dialog when arriving from Shortlist with a worker preselected.
+  useEffect(() => {
+    if (prefilledWorkerId && !loading) {
+      setSelectedWorker(prefilledWorkerId);
+      setIsDialogOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefilledWorkerId, loading]);
 
   const fetchPayments = async () => {
     try {
@@ -295,6 +308,7 @@ export default function EscrowPayments() {
   return (
     <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
           <PortalBreadcrumb />
+          <EmployerFlowStepper current="escrow" />
           <div className="mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Escrow & Payment System</h1>
             <p className="text-muted-foreground">Secure salary payments with 1% platform fee</p>
