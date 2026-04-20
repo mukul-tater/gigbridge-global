@@ -158,7 +158,6 @@ export default function EmployerTrust() {
           </button>
         </CardContent>
       </Card>
-      </Card>
     </div>
   );
 }
