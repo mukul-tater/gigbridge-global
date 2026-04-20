@@ -133,16 +133,24 @@ export default function EmployerTrust() {
           <Button
             size="lg"
             className="w-full h-12 gap-2"
+            onClick={() => navigate("/employer/search-workers")}
+          >
+            Browse verified workers <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full h-11 mt-3 gap-2"
             onClick={() => navigate("/employer/quick-post-job")}
           >
-            Post your first job <ArrowRight className="h-4 w-4" />
+            Skip — Post a job directly
           </Button>
           <button
             type="button"
             onClick={() => navigate("/employer/dashboard")}
             className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
           >
-            Skip for now
+            Go to dashboard
           </button>
         </CardContent>
       </Card>

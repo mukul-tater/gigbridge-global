@@ -63,9 +63,17 @@ export default function PilotOffer() {
           <Button
             size="lg"
             className="w-full h-12 gap-2"
-            onClick={() => navigate(jobId ? `/employer/applications?jobId=${jobId}` : "/employer/dashboard")}
+            onClick={() => navigate("/employer/shortlist")}
           >
-            Start Pilot <ArrowRight className="h-4 w-4" />
+            Review Shortlist <ArrowRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full h-11 mt-3 gap-2"
+            onClick={() => navigate(jobId ? `/employer/applications?jobId=${jobId}` : "/employer/applications")}
+          >
+            View Applications
           </Button>
 
           {/* Call support */}
