@@ -314,6 +314,15 @@ export default function WorkerShortlist() {
                   </div>
                 )}
 
+                <Button
+                  size="sm"
+                  className="w-full mb-2 gap-1"
+                  onClick={() => navigate(`/employer/escrow?workerId=${worker.worker_id}`)}
+                >
+                  <Handshake className="h-4 w-4" />
+                  Hire & Open Escrow
+                  <Shield className="h-3.5 w-3.5 opacity-80" />
+                </Button>
                 <div className="flex gap-2">
                   <Dialog>
                     <DialogTrigger asChild>
