@@ -15,6 +15,8 @@ import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import { WorkerListSkeleton } from '@/components/ui/page-skeleton';
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
+import { ArrowRight } from "lucide-react";
 
 interface Worker {
   id: string;
@@ -239,11 +241,19 @@ export default function SearchWorkers() {
   return (
     <DashboardLayout navGroups={employerNavGroups} portalLabel="Employer Portal" portalName="Employer Portal" profileMenuItems={employerProfileMenu}>
         <PortalBreadcrumb />
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Skilled Workers</h1>
-          <p className="text-muted-foreground text-sm md:text-base">
-            Search and connect with qualified workers from around the world
-          </p>
+        <EmployerFlowStepper current="search" />
+        <div className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Skilled Workers</h1>
+            <p className="text-muted-foreground text-sm md:text-base">
+              Browse verified workers, then post a job to start hiring at just 1% fee.
+            </p>
+          </div>
+          <Link to="/employer/quick-post-job">
+            <Button size="lg" className="gap-2 shadow-primary">
+              Post a Job <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
 
         <div className="grid lg:grid-cols-[350px_1fr] gap-4 md:gap-6">
