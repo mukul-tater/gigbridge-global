@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Briefcase, ArrowRight, Loader2 } from "lucide-react";
 import { DESTINATION_COUNTRIES, JOB_CATEGORIES } from "@/lib/constants";
+import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
 
 export default function QuickPostJob() {
   const navigate = useNavigate();
@@ -66,6 +67,9 @@ export default function QuickPostJob() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-info/5 p-4 py-8">
+      <div className="max-w-2xl mx-auto">
+        <EmployerFlowStepper current="post" />
+      </div>
       <Card className="w-full max-w-2xl mx-auto shadow-elegant">
         <CardContent className="p-6 sm:p-8">
           <div className="text-center mb-6">

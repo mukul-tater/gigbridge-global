@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Sparkles, ShieldCheck, ArrowRight, Wallet, Phone, Clock } from "lucide-react";
+import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
 
 const SUPPORT_PHONE_DISPLAY = "+91-9950085843";
 const SUPPORT_PHONE_TEL = "+919950085843";
@@ -13,6 +14,9 @@ export default function PilotOffer() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-info/5 p-4 py-8">
+      <div className="max-w-2xl mx-auto">
+        <EmployerFlowStepper current="pilot" />
+      </div>
       <Card className="w-full max-w-2xl mx-auto shadow-elegant">
         <CardContent className="p-6 sm:p-10">
           <div className="text-center mb-6">
