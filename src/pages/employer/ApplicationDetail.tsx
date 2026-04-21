@@ -657,11 +657,20 @@ export default function ApplicationDetail() {
                                 </p>
                               </div>
                             </div>
-                            <Button variant="default" size="sm" asChild>
-                              <a href={application.resume_url} target="_blank" rel="noopener noreferrer">
-                                <Download className="h-4 w-4 mr-2" />
-                                View Resume
-                              </a>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  const signed = await getWorkerDocumentSignedUrl(application.resume_url!);
+                                  window.open(signed, '_blank', 'noopener,noreferrer');
+                                } catch (err: any) {
+                                  toast.error(err?.message || 'Could not open resume');
+                                }
+                              }}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              View Resume
                             </Button>
                           </div>
                         ) : (
