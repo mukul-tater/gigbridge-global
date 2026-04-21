@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, Globe, TrendingUp, ArrowRight, CheckCircle, Sparkles, Users, Shield, Phone } from "lucide-react";
+import SalaryProtectionPromise from "@/components/SalaryProtectionPromise";
 import heroImage from "@/assets/hero-workers.jpg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
