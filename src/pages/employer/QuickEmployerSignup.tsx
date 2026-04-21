@@ -124,6 +124,16 @@ export default function QuickEmployerSignup() {
             Signing up as an Employer
           </div>
 
+          <Button type="button" variant="outline" className="w-full h-11" onClick={handleGoogle} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            Continue with Google as Employer
+          </Button>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">OR</span></div>
+          </div>
+
           <form onSubmit={handleSignup} className="space-y-3">
             <div>
               <Label htmlFor="company">Company name *</Label>
@@ -146,15 +156,6 @@ export default function QuickEmployerSignup() {
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Create account <ArrowRight className="h-4 w-4" /></>}
             </Button>
           </form>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">OR</span></div>
-          </div>
-
-          <Button type="button" variant="outline" className="w-full h-11" onClick={handleGoogle} disabled={loading}>
-            Continue with Google as Employer
-          </Button>
 
           <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-success" />
