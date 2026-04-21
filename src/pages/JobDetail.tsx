@@ -25,6 +25,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { JobDetailSkeleton } from '@/components/ui/page-skeleton';
+import { withRetry } from '@/lib/retry';
 
 interface JobData {
   id: string;
