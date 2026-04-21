@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import VerificationBadge, { calculateVerificationLevel, VerificationLevel } from '@/components/worker/VerificationBadge';
+import { getWorkerDocumentSignedUrl } from '@/lib/storage';
 
 interface ApplicationData {
   id: string;
