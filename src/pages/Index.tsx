@@ -7,14 +7,20 @@ import JobCategories from "@/components/JobCategories";
 import InteractiveJobMap from "@/components/InteractiveJobMap";
 import CountryInsights from "@/components/CountryInsights";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import EmployerHomeSections from "@/components/EmployerHomeSections";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Database } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { isAuthenticated, role, loading, profileLoading } = useAuth();
+  const authResolving = loading || (isAuthenticated && profileLoading);
+  const isEmployer = role === "employer";
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Header />
@@ -40,17 +46,31 @@ const Index = () => {
         <ProcessTimeline />
       </ScrollReveal>
 
-      <ScrollReveal>
-        <FeaturedJobs />
-      </ScrollReveal>
+      {/*
+        Worker-centric sections (job listings, categories, job map) only make
+        sense for guests and logged-in workers. Employers see employer-focused
+        quick actions and value props instead. While auth is still resolving
+        we render nothing here to avoid flashing the wrong content.
+      */}
+      {!authResolving && isEmployer ? (
+        <ScrollReveal>
+          <EmployerHomeSections />
+        </ScrollReveal>
+      ) : !authResolving ? (
+        <>
+          <ScrollReveal>
+            <FeaturedJobs />
+          </ScrollReveal>
 
-      <ScrollReveal>
-        <JobCategories />
-      </ScrollReveal>
+          <ScrollReveal>
+            <JobCategories />
+          </ScrollReveal>
 
-      <ScrollReveal>
-        <InteractiveJobMap />
-      </ScrollReveal>
+          <ScrollReveal>
+            <InteractiveJobMap />
+          </ScrollReveal>
+        </>
+      ) : null}
 
       <ScrollReveal>
         <CountryInsights />
