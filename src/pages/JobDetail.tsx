@@ -285,13 +285,21 @@ export default function JobDetail() {
     try {
       if (isSaved) {
         // Unsave the job
-        const { error } = await supabase
-          .from('saved_jobs')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('job_id', job.id);
-
-        if (error) throw error;
+        await withRetry(
+          async () => {
+            const { error } = await supabase
+              .from('saved_jobs')
+              .delete()
+              .eq('user_id', user.id)
+              .eq('job_id', job.id);
+            if (error) throw error;
+          },
+          {
+            onAttempt: (n) => {
+              if (n > 1) toast({ title: `Retrying… (${n}/3)` });
+            },
+          }
+        );
 
         setIsSaved(false);
         toast({
@@ -300,14 +308,19 @@ export default function JobDetail() {
         });
       } else {
         // Save the job
-        const { error } = await supabase
-          .from('saved_jobs')
-          .insert({
-            user_id: user.id,
-            job_id: job.id
-          });
-
-        if (error) throw error;
+        await withRetry(
+          async () => {
+            const { error } = await supabase
+              .from('saved_jobs')
+              .insert({ user_id: user.id, job_id: job.id });
+            if (error) throw error;
+          },
+          {
+            onAttempt: (n) => {
+              if (n > 1) toast({ title: `Retrying… (${n}/3)` });
+            },
+          }
+        );
 
         setIsSaved(true);
         toast({
@@ -317,8 +330,8 @@ export default function JobDetail() {
       }
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to save job',
+        title: isSaved ? 'Could not unsave job' : 'Could not save job',
+        description: error?.message || 'Please check your connection and try again.',
         variant: 'destructive'
       });
     } finally {
