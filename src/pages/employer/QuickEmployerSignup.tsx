@@ -88,14 +88,17 @@ export default function QuickEmployerSignup() {
   const handleGoogle = async () => {
     setLoading(true);
     try {
-      // Redirect to /auth so Google users land on the role-select step.
-      // The user will pick "Employer" and then be routed into the employer flow.
+      // Pre-select the Employer role so the OAuth callback can auto-assign it
+      // without showing the role chooser again on /auth.
+      sessionStorage.setItem("pending_oauth_role", "employer");
       const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/auth` });
       if (result.error) {
+        sessionStorage.removeItem("pending_oauth_role");
         toast.error("Google signup failed");
         setLoading(false);
       }
     } catch {
+      sessionStorage.removeItem("pending_oauth_role");
       setLoading(false);
     }
   };
