@@ -267,12 +267,33 @@ const Header = () => {
                     </Button>
                   </div>
                 ) : (
-                  <Link to="/auth" onClick={closeMobileMenu}>
-                    <Button variant="default" size="lg" className="w-full gap-2">
-                      <User className="h-4 w-4" />
-                      Get Started
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground px-1">I want to…</p>
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="w-full justify-start gap-3"
+                      onClick={() => { navigate('/auth?role=worker&mode=signup'); closeMobileMenu(); }}
+                    >
+                      <HardHat className="h-4 w-4" />
+                      Find a job (Worker signup)
                     </Button>
-                  </Link>
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="w-full justify-start gap-3"
+                      onClick={() => { navigate('/auth?role=employer&mode=signup'); closeMobileMenu(); }}
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      Hire workers (Employer signup)
+                    </Button>
+                    <button
+                      onClick={() => { navigate('/auth'); closeMobileMenu(); }}
+                      className="w-full text-xs text-center text-primary hover:underline py-1"
+                    >
+                      Already have an account? Sign in
+                    </button>
+                  </div>
                 )}
               </div>
             </nav>
