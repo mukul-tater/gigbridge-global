@@ -1,7 +1,12 @@
-import { Search, FileText, CheckCircle, Video, Shield, Plane } from "lucide-react";
+import { Search, FileText, CheckCircle, Video, Shield, Plane, Building2, Users, FileSignature, Handshake, Wallet } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ProcessTimeline = () => {
-  const steps = [
+  const { role, isAuthenticated, loading, profileLoading } = useAuth();
+  const authResolving = loading || (isAuthenticated && profileLoading);
+  const isEmployer = role === "employer";
+
+  const workerSteps = [
     { number: 1, title: "Search Jobs", description: "Browse verified international opportunities", icon: Search, bgColor: "bg-primary", iconGradient: "bg-gradient-to-br from-primary to-primary/70" },
     { number: 2, title: "Apply", description: "Submit application with your documents", icon: FileText, bgColor: "bg-secondary", iconGradient: "bg-gradient-to-br from-secondary to-secondary/70" },
     { number: 3, title: "Get Shortlisted", description: "Employers review qualified candidates", icon: CheckCircle, bgColor: "bg-success", iconGradient: "bg-gradient-to-br from-success to-success/70" },
@@ -9,6 +14,29 @@ const ProcessTimeline = () => {
     { number: 5, title: "Visa Process", description: "Complete visa and ECR verification", icon: Shield, bgColor: "bg-info", iconGradient: "bg-gradient-to-br from-info to-info/70" },
     { number: 6, title: "Travel", description: "Start your new career abroad", icon: Plane, bgColor: "bg-gradient-to-r from-primary to-info", iconGradient: "bg-gradient-to-br from-primary to-info" }
   ];
+
+  const employerSteps = [
+    { number: 1, title: "Post a Job", description: "Share role, skills, and requirements", icon: FileText, bgColor: "bg-primary", iconGradient: "bg-gradient-to-br from-primary to-primary/70" },
+    { number: 2, title: "Browse Workers", description: "Search verified, pre-vetted candidates", icon: Users, bgColor: "bg-secondary", iconGradient: "bg-gradient-to-br from-secondary to-secondary/70" },
+    { number: 3, title: "Shortlist", description: "Save top candidates to your shortlist", icon: CheckCircle, bgColor: "bg-success", iconGradient: "bg-gradient-to-br from-success to-success/70" },
+    { number: 4, title: "Interview", description: "Schedule video interviews in one click", icon: Video, bgColor: "bg-warning", iconGradient: "bg-gradient-to-br from-warning to-warning/70" },
+    { number: 5, title: "Send Offer", description: "Issue offer letter and sign contract", icon: FileSignature, bgColor: "bg-info", iconGradient: "bg-gradient-to-br from-info to-info/70" },
+    { number: 6, title: "Hire & Pay", description: "Escrow-secured payment after onboarding", icon: Wallet, bgColor: "bg-gradient-to-r from-primary to-info", iconGradient: "bg-gradient-to-br from-primary to-info" }
+  ];
+
+  // While auth resolves, default to the worker (public) steps to avoid layout
+  // shift; real role-specific content swaps in once `role` is known.
+  const steps = !authResolving && isEmployer ? employerSteps : workerSteps;
+
+  const heading = !authResolving && isEmployer ? (
+    <>Your Path to <span className="text-gradient">Hiring Success</span></>
+  ) : (
+    <>Your Path to <span className="text-gradient">Global Success</span></>
+  );
+
+  const subheading = !authResolving && isEmployer
+    ? "A simple, transparent 6-step process to hire verified workers — no upfront fees"
+    : "A simple, transparent 6-step process to help you land your dream job abroad";
 
   return (
     <section className="py-14 sm:py-20 lg:py-28 relative overflow-hidden">
@@ -20,10 +48,10 @@ const ProcessTimeline = () => {
             How it Works
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading mb-4 tracking-tight">
-            Your Path to <span className="text-gradient">Global Success</span>
+            {heading}
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
-            A simple, transparent 6-step process to help you land your dream job abroad
+            {subheading}
           </p>
         </div>
 
