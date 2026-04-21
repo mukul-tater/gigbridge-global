@@ -130,12 +130,50 @@ const Header = () => {
                   </Button>
                 </>
               ) : (
-                <Link to="/auth">
-                  <Button variant="default" className="gap-2">
-                    <User className="h-4 w-4" />
-                    Get Started
-                  </Button>
-                </Link>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="default" className="gap-2">
+                      <User className="h-4 w-4" />
+                      Get Started
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-72 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2 px-1">
+                      I want to…
+                    </p>
+                    <button
+                      onClick={() => navigate('/auth?role=worker&mode=signup')}
+                      className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950">
+                        <HardHat className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Find a job</div>
+                        <div className="text-xs text-muted-foreground">Sign up as a Worker</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => navigate('/auth?role=employer&mode=signup')}
+                      className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors mt-1"
+                    >
+                      <div className="p-2 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950">
+                        <Briefcase className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Hire workers</div>
+                        <div className="text-xs text-muted-foreground">Sign up as an Employer</div>
+                      </div>
+                    </button>
+                    <div className="border-t border-border my-2" />
+                    <button
+                      onClick={() => navigate('/auth')}
+                      className="w-full text-xs text-center text-primary hover:underline py-1"
+                    >
+                      Already have an account? Sign in
+                    </button>
+                  </PopoverContent>
+                </Popover>
               )}
             </div>
 
