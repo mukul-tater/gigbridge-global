@@ -24,7 +24,10 @@ import { toast } from "sonner";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role, loading, profileLoading } = useAuth();
+  const isEmployer = role === 'employer';
+  const isWorker = role === 'worker';
+  const authResolving = loading || (isAuthenticated && profileLoading);
   const [isSticky, setIsSticky] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
