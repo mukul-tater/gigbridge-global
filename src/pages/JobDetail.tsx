@@ -74,9 +74,18 @@ export default function JobDetail() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [uploadingResume, setUploadingResume] = useState(false);
   useEffect(() => {
+    let cancelled = false;
+    // Safety net: never let the page sit in "loading" forever.
+    const watchdog = setTimeout(() => {
+      if (!cancelled) setLoading(false);
+    }, 8000);
+
     const loadData = async () => {
-      if (!slug) return;
-      
+      if (!slug) {
+        setLoading(false);
+        return;
+      }
+
       try {
         // Fetch job by slug with skills
         const { data: jobData, error: jobError } = await supabase
@@ -89,6 +98,7 @@ export default function JobDetail() {
           .single();
 
         if (jobError || !jobData) {
+          if (cancelled) return;
           toast({
             title: 'Job not found',
             description: 'This job listing does not exist',
@@ -98,6 +108,7 @@ export default function JobDetail() {
           return;
         }
 
+        if (cancelled) return;
         setJob(jobData as any);
 
         // Fetch employer profile
@@ -107,12 +118,12 @@ export default function JobDetail() {
           .eq('user_id', jobData.employer_id)
           .maybeSingle();
 
-        if (employerData) {
+        if (employerData && !cancelled) {
           setEmployer(employerData);
         }
 
         // Check if user has already applied and if job is saved
-        if (user) {
+        if (user && !cancelled) {
           const { data: application } = await supabase
             .from('job_applications')
             .select('id')
@@ -135,12 +146,18 @@ export default function JobDetail() {
       } catch (error) {
         console.error('Error loading job:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
+        clearTimeout(watchdog);
       }
     };
-    
+
     loadData();
-  }, [slug, user, navigate, toast]);
+    return () => {
+      cancelled = true;
+      clearTimeout(watchdog);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, user?.id]);
 
   const openApplyDialog = () => {
     if (!isAuthenticated) {
