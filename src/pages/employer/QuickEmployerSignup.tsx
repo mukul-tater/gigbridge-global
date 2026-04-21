@@ -87,7 +87,7 @@ export default function QuickEmployerSignup() {
             </div>
             <h1 className="text-2xl font-bold font-heading mb-1">Hire Workers</h1>
             <p className="text-sm text-muted-foreground">
-              Verified workers at just 1% cost — no upfront fees.
+              Verified workers, escrow-secured payments — no upfront fees.
             </p>
             <p className="text-xs text-muted-foreground mt-1">Takes less than 2 minutes</p>
           </div>
@@ -126,7 +126,7 @@ export default function QuickEmployerSignup() {
 
           <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-success" />
-            <span>Escrow-secured · 1% fee only after hiring</span>
+            <span>Escrow-secured · Pay only after you hire</span>
           </div>
 
           <p className="text-center text-xs text-muted-foreground mt-4">
