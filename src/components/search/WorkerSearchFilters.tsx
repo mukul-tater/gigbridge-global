@@ -340,7 +340,17 @@ export default function WorkerSearchFilters({
             salaryMax: 10000,
             hasPassport: false,
             hasVisa: false,
-            availability: 'All'
+            availability: 'All',
+            hasVideo: false,
+            verifiedDocs: [],
+            hasCertifications: false,
+            certificationKeyword: '',
+            ecrStatus: 'all',
+            primaryWorkType: 'All',
+            skillLevel: 'All',
+            languages: [],
+            openToRelocation: false,
+            preferredShift: 'All',
           })}
         >
           Clear All
