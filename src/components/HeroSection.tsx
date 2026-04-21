@@ -44,6 +44,13 @@ const HeroSection = () => {
   }, []);
 
   const handleSearch = () => {
+    if (isEmployer) {
+      const params = new URLSearchParams();
+      if (searchKeyword) params.set("skill", searchKeyword);
+      if (searchLocation) params.set("country", searchLocation);
+      navigate(`/employer/search-workers?${params.toString()}`);
+      return;
+    }
     const params = new URLSearchParams();
     if (searchKeyword) params.set("keyword", searchKeyword);
     if (searchLocation) params.set("location", searchLocation);
