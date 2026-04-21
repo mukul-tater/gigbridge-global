@@ -1,7 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Globe, TrendingUp, ArrowRight, CheckCircle, Sparkles, Users, Shield, Phone } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Globe,
+  TrendingUp,
+  ArrowRight,
+  CheckCircle,
+  Sparkles,
+  Users,
+  Shield,
+  Phone,
+} from "lucide-react";
 import SalaryProtectionPromise from "@/components/SalaryProtectionPromise";
 import heroImage from "@/assets/hero-workers.jpg";
 import { useState, useEffect } from "react";
@@ -22,15 +33,15 @@ const HeroSection = () => {
       setIsSticky(window.scrollY > heroHeight);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchKeyword) params.set('keyword', searchKeyword);
-    if (searchLocation) params.set('location', searchLocation);
-    if (searchCategory) params.set('category', searchCategory);
+    if (searchKeyword) params.set("keyword", searchKeyword);
+    if (searchLocation) params.set("location", searchLocation);
+    if (searchCategory) params.set("category", searchCategory);
     navigate(`/jobs?${params.toString()}`);
   };
 
@@ -40,8 +51,8 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchStats = async () => {
       const [jobRes, countryRes] = await Promise.all([
-        supabase.from('jobs').select('id', { count: 'exact', head: true }).eq('status', 'ACTIVE'),
-        supabase.from('jobs').select('country').eq('status', 'ACTIVE'),
+        supabase.from("jobs").select("id", { count: "exact", head: true }).eq("status", "ACTIVE"),
+        supabase.from("jobs").select("country").eq("status", "ACTIVE"),
       ]);
       if (jobRes.count != null) setJobCount(jobRes.count);
       if (countryRes.data) {
@@ -53,8 +64,8 @@ const HeroSection = () => {
   }, []);
 
   const stats = [
-    { value: jobCount > 0 ? `${jobCount.toLocaleString()}+` : '…', label: "Active Jobs", icon: TrendingUp },
-    { value: countryCount > 0 ? `${countryCount}+` : '…', label: "Countries", icon: Globe },
+    { value: jobCount > 0 ? `${jobCount.toLocaleString()}+` : "…", label: "Active Jobs", icon: TrendingUp },
+    { value: countryCount > 0 ? `${countryCount}+` : "…", label: "Countries", icon: Globe },
     { value: "98%", label: "Success Rate", icon: CheckCircle },
   ];
 
@@ -77,7 +88,6 @@ const HeroSection = () => {
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="flex flex-col lg:flex-row items-center min-h-[80vh] lg:min-h-screen gap-8 lg:gap-16 py-12 lg:py-0">
-
           {/* Left Content */}
           <div className="flex-1 text-center lg:text-left max-w-2xl w-full">
             {/* Hero highlight banner — primary value prop */}
@@ -97,9 +107,7 @@ const HeroSection = () => {
             {/* Heading */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-heading text-foreground mb-5 leading-[1.1] tracking-tight opacity-0 animate-fade-in-up animation-delay-100">
               Find Foreign
-              <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">
-                Jobs Abroad
-              </span>
+              <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">Jobs Abroad</span>
             </h1>
 
             {/* Subheading */}
@@ -112,7 +120,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 className="h-12 px-6 gap-2 text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary"
-                onClick={() => navigate('/jobs')}
+                onClick={() => navigate("/jobs")}
               >
                 Find Foreign Jobs <ArrowRight className="h-5 w-5" />
               </Button>
@@ -120,7 +128,7 @@ const HeroSection = () => {
                 size="lg"
                 variant="secondary"
                 className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
-                onClick={() => navigate('/employer/quick-signup')}
+                onClick={() => navigate("/employer/quick-signup")}
               >
                 <Users className="h-5 w-5" /> Hire Workers
               </Button>
@@ -146,7 +154,7 @@ const HeroSection = () => {
                     className="pl-10 h-11 sm:h-12 bg-background/80 border-border/50 focus:border-primary focus:bg-background rounded-xl text-sm sm:text-base"
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   />
                 </div>
 
@@ -157,9 +165,13 @@ const HeroSection = () => {
                       <SelectValue placeholder="Country" />
                     </SelectTrigger>
                     <SelectContent className="max-h-64">
-                      {DESTINATION_COUNTRIES.filter(c => c !== 'All Countries').slice(0, 25).map(country => (
-                        <SelectItem key={country} value={country}>{country}</SelectItem>
-                      ))}
+                      {DESTINATION_COUNTRIES.filter((c) => c !== "All Countries")
+                        .slice(0, 25)
+                        .map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -169,8 +181,10 @@ const HeroSection = () => {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent className="max-h-64">
-                    {JOB_CATEGORIES.filter(c => c !== 'All Categories').map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    {JOB_CATEGORIES.filter((c) => c !== "All Categories").map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -225,7 +239,6 @@ const HeroSection = () => {
             {/* Feature Cards */}
             <div className="space-y-3">
               {/* Plain-language salary protection — primary trust driver */}
-              <SalaryProtectionPromise variant="hero" />
 
               {[
                 {
@@ -233,26 +246,27 @@ const HeroSection = () => {
                   title: "Global Reach",
                   description: "Access opportunities in 50+ countries with high demand for skilled workers",
                   iconBg: "bg-primary/15",
-                  iconColor: "text-primary"
+                  iconColor: "text-primary",
                 },
                 {
                   icon: TrendingUp,
                   title: "Fast Track Hiring",
                   description: "Countries with 1-4 week hiring times and simplified visa processes",
                   iconBg: "bg-secondary/15",
-                  iconColor: "text-secondary"
-                }
+                  iconColor: "text-secondary",
+                },
               ].map((feature) => (
-                <div
-                  key={feature.title}
-                  className="group card-premium p-4 sm:p-5"
-                >
+                <div key={feature.title} className="group card-premium p-4 sm:p-5">
                   <div className="flex items-start gap-3 sm:gap-4">
-                    <div className={`p-2.5 sm:p-3 rounded-xl ${feature.iconBg} shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                    <div
+                      className={`p-2.5 sm:p-3 rounded-xl ${feature.iconBg} shrink-0 group-hover:scale-110 transition-transform duration-300`}
+                    >
                       <feature.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${feature.iconColor}`} />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="font-semibold font-heading text-foreground mb-1 text-base sm:text-lg">{feature.title}</h3>
+                      <h3 className="font-semibold font-heading text-foreground mb-1 text-base sm:text-lg">
+                        {feature.title}
+                      </h3>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                     </div>
                   </div>
@@ -275,7 +289,7 @@ const HeroSection = () => {
                   className="pl-10 h-11 bg-background/80 rounded-xl"
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
               </div>
               <Button size="sm" className="h-11 px-4 rounded-xl" onClick={handleSearch}>
