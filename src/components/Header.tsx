@@ -12,7 +12,7 @@ import {
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isAuthenticated, profile, logout } = useAuth();
+  const { isAuthenticated, profile, role, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -54,7 +54,9 @@ const Header = () => {
   const isActiveLink = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { to: "/jobs", label: "Find Jobs", icon: Search },
+    ...(role === 'employer'
+      ? [{ to: "/employer/search-workers", label: "Find Workers", icon: Search }]
+      : [{ to: "/jobs", label: "Find Jobs", icon: Search }]),
     { to: "/about", label: "About Us", icon: Globe },
     { to: "/contact", label: "Contact", icon: Bell },
   ];

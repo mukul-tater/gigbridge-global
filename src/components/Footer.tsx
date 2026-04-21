@@ -71,6 +71,7 @@ const Footer = () => {
             </div>
 
             {/* For Workers */}
+            {role !== 'employer' && (
             <div className="lg:col-span-2 space-y-4">
               <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">For Workers</h3>
               <ul className="space-y-2.5">
@@ -87,8 +88,10 @@ const Footer = () => {
                 <li><Link to="/support" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Support Center</Link></li>
               </ul>
             </div>
+            )}
 
             {/* For Employers */}
+            {role !== 'worker' && (
             <div className="lg:col-span-3 space-y-4">
               <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">For Employers</h3>
               <ul className="space-y-2.5">
@@ -112,6 +115,7 @@ const Footer = () => {
                 </p>
               </div>
             </div>
+            )}
 
             {/* Resources */}
             <div className="lg:col-span-2 space-y-4">
