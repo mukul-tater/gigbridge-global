@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { X, Award, MapPin, Globe, ShieldCheck, Video, Languages, Briefcase, Check } from 'lucide-react';
+import { X, Award, MapPin, Globe, ShieldCheck, Video, Languages, Briefcase, Check, Play, FileCheck, FileX } from 'lucide-react';
 
 export interface CompareWorker {
   id: string;
@@ -18,6 +18,7 @@ export interface CompareWorker {
   has_passport: boolean;
   has_visa: boolean;
   has_video: boolean;
+  video_url?: string | null;
   certifications_count: number;
   verified_documents: string[];
   languages: string[];
@@ -35,67 +36,114 @@ interface Props {
   onClearAll: () => void;
 }
 
-const fields = [
-  { key: 'role', label: 'Role', icon: Briefcase },
-  { key: 'experience', label: 'Experience', icon: Award },
-  { key: 'location', label: 'Location', icon: MapPin },
-  { key: 'nationality', label: 'Nationality', icon: Globe },
-  { key: 'video', label: 'Intro Video', icon: Video },
-  { key: 'docs', label: 'Verified Docs', icon: ShieldCheck },
-  { key: 'certs', label: 'Certifications', icon: Award },
-  { key: 'languages', label: 'Languages', icon: Languages },
-  { key: 'shift', label: 'Preferred Shift', icon: Briefcase },
-  { key: 'relocation', label: 'Open to Relocation', icon: MapPin },
-  { key: 'ecr', label: 'ECR Status', icon: ShieldCheck },
-  { key: 'skills', label: 'Top Skills', icon: Briefcase },
+const documentTypes = [
+  { key: 'passport', label: 'Passport' },
+  { key: 'visa', label: 'Visa' },
+  { key: 'id', label: 'ID' },
+  { key: 'police_clearance', label: 'Police' },
+  { key: 'medical', label: 'Medical' },
 ];
 
-function renderValue(w: CompareWorker, key: string) {
+const fields = [
+  { key: 'video', label: 'Intro Video', icon: Video },
+  { key: 'docs', label: 'Documents', icon: ShieldCheck },
+  { key: 'certs', label: 'Certifications', icon: Award },
+  { key: 'experience', label: 'Experience', icon: Award },
+  { key: 'role', label: 'Role', icon: Briefcase },
+  { key: 'skills', label: 'Top Skills', icon: Briefcase },
+  { key: 'languages', label: 'Languages', icon: Languages },
+  { key: 'location', label: 'Location', icon: MapPin },
+  { key: 'nationality', label: 'Nationality', icon: Globe },
+  { key: 'shift', label: 'Preferred Shift', icon: Briefcase },
+  { key: 'relocation', label: 'Relocation', icon: MapPin },
+  { key: 'ecr', label: 'ECR Status', icon: ShieldCheck },
+];
+
+const hasDocument = (worker: CompareWorker, key: string) => {
+  if (key === 'passport') return worker.has_passport || worker.verified_documents.includes(key);
+  if (key === 'visa') return worker.has_visa || worker.verified_documents.includes(key);
+  return worker.verified_documents.includes(key);
+};
+
+const verificationScore = (worker: CompareWorker) => {
+  const docs = documentTypes.filter((doc) => hasDocument(worker, doc.key)).length;
+  return docs + (worker.has_video || worker.video_url ? 1 : 0) + (worker.certifications_count > 0 ? 1 : 0);
+};
+
+function DocumentStatus({ worker }: { worker: CompareWorker }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {documentTypes.map((doc) => {
+        const verified = hasDocument(worker, doc.key);
+        return (
+          <Badge
+            key={doc.key}
+            variant="outline"
+            className={verified ? 'border-success/30 bg-success/10 text-success gap-1' : 'border-border bg-muted/40 text-muted-foreground gap-1'}
+          >
+            {verified ? <FileCheck className="h-3 w-3" /> : <FileX className="h-3 w-3" />}
+            {doc.label}
+          </Badge>
+        );
+      })}
+    </div>
+  );
+}
+
+function VideoTile({ worker }: { worker: CompareWorker }) {
+  const available = worker.has_video || !!worker.video_url;
+  return (
+    <div className={available ? 'relative flex h-24 items-center justify-center overflow-hidden rounded-md border bg-primary/10' : 'flex h-24 items-center justify-center rounded-md border border-dashed bg-muted/30'}>
+      {available ? (
+        <>
+          <Video className="h-7 w-7 text-primary" />
+          <span className="absolute inset-0 flex items-center justify-center bg-foreground/20">
+            <Play className="h-7 w-7 fill-primary text-primary" />
+          </span>
+        </>
+      ) : (
+        <span className="text-sm text-muted-foreground">No video</span>
+      )}
+    </div>
+  );
+}
+
+function renderValue(worker: CompareWorker, key: string) {
   switch (key) {
-    case 'role':
-      return [w.primary_work_type, w.skill_level].filter(Boolean).join(' • ') || '—';
-    case 'experience':
-      return `${w.years_of_experience || 0} yrs`;
-    case 'location':
-      return w.current_location || '—';
-    case 'nationality':
-      return w.nationality || '—';
     case 'video':
-      return w.has_video ? (
-        <Badge className="bg-success/10 text-success border-success/20"><Check className="h-3 w-3 mr-1" />Available</Badge>
-      ) : <span className="text-muted-foreground text-sm">—</span>;
+      return <VideoTile worker={worker} />;
     case 'docs':
-      return w.verified_documents.length > 0 ? (
-        <div className="flex flex-wrap gap-1">
-          {w.verified_documents.map((d) => (
-            <Badge key={d} variant="outline" className="text-xs capitalize">{d.replace('_', ' ')}</Badge>
-          ))}
-        </div>
-      ) : <span className="text-muted-foreground text-sm">None</span>;
+      return <DocumentStatus worker={worker} />;
     case 'certs':
-      return w.certifications_count > 0 ? `${w.certifications_count} certified` : '—';
-    case 'languages':
-      return w.languages.length > 0 ? (
-        <div className="flex flex-wrap gap-1">
-          {w.languages.slice(0, 4).map((l) => (
-            <Badge key={l} variant="secondary" className="text-xs">{l}</Badge>
-          ))}
-        </div>
-      ) : '—';
-    case 'shift':
-      return w.preferred_shift || 'Any';
-    case 'relocation':
-      return w.open_to_relocation ? 'Yes' : 'No';
-    case 'ecr':
-      return w.ecr_status ? <span className="capitalize">{w.ecr_status.replace('_', ' ')}</span> : '—';
+      return worker.certifications_count > 0 ? (
+        <Badge className="bg-success/10 text-success border-success/20 gap-1"><Check className="h-3 w-3" />{worker.certifications_count} verified</Badge>
+      ) : <span className="text-muted-foreground text-sm">None</span>;
+    case 'experience':
+      return <span className="text-lg font-semibold text-foreground">{worker.years_of_experience || 0} yrs</span>;
+    case 'role':
+      return [worker.primary_work_type, worker.skill_level].filter(Boolean).join(' • ') || '—';
     case 'skills':
-      return w.skills.length > 0 ? (
+      return worker.skills.length > 0 ? (
         <div className="flex flex-wrap gap-1">
-          {w.skills.slice(0, 4).map((s, i) => (
-            <Badge key={i} variant="outline" className="text-xs">{s.skill_name}</Badge>
-          ))}
+          {worker.skills.slice(0, 5).map((skill, index) => <Badge key={`${skill.skill_name}-${index}`} variant="outline">{skill.skill_name}</Badge>)}
         </div>
       ) : '—';
+    case 'languages':
+      return worker.languages.length > 0 ? (
+        <div className="flex flex-wrap gap-1">
+          {worker.languages.slice(0, 4).map((language) => <Badge key={language} variant="secondary">{language}</Badge>)}
+        </div>
+      ) : '—';
+    case 'location':
+      return worker.current_location || '—';
+    case 'nationality':
+      return worker.nationality || '—';
+    case 'shift':
+      return worker.preferred_shift || 'Any';
+    case 'relocation':
+      return worker.open_to_relocation ? <Badge className="bg-success/10 text-success border-success/20">Yes</Badge> : 'No';
+    case 'ecr':
+      return worker.ecr_status ? <span className="capitalize">{worker.ecr_status.replace('_', ' ')}</span> : '—';
     default:
       return '—';
   }
@@ -104,64 +152,64 @@ function renderValue(w: CompareWorker, key: string) {
 export default function WorkerComparisonDrawer({ open, onOpenChange, workers, onRemove, onClearAll }: Props) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[85vh] sm:h-[80vh]">
+      <SheetContent side="bottom" className="h-[88vh] sm:h-[82vh]">
         <SheetHeader className="pb-4 border-b">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <SheetTitle className="text-xl font-heading">Compare Workers</SheetTitle>
-              <SheetDescription>
-                Side-by-side view of {workers.length} worker{workers.length !== 1 ? 's' : ''} (max 4)
-              </SheetDescription>
+              <SheetDescription>Visual side-by-side comparison of {workers.length} worker{workers.length !== 1 ? 's' : ''} (max 4)</SheetDescription>
             </div>
-            {workers.length > 0 && (
-              <Button variant="outline" size="sm" onClick={onClearAll}>Clear All</Button>
-            )}
+            {workers.length > 0 && <Button variant="outline" size="sm" onClick={onClearAll}>Clear All</Button>}
           </div>
         </SheetHeader>
 
-        <ScrollArea className="h-[calc(100%-100px)] mt-4">
+        <ScrollArea className="h-[calc(100%-104px)] mt-4">
           {workers.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <Briefcase className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-lg font-medium">No workers to compare</p>
-              <p className="text-sm text-muted-foreground">Tick the "Compare" box on worker cards to add them here.</p>
+              <p className="text-sm text-muted-foreground">Tick the Compare box on worker cards to add them here.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px]">
+            <div className="overflow-x-auto pb-4">
+              <table className="w-full min-w-[760px] border-separate border-spacing-0">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground w-40 sticky left-0 bg-background">Criteria</th>
-                    {workers.map((w) => (
-                      <th key={w.id} className="text-left py-3 px-4 min-w-[220px]">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Avatar className="h-9 w-9 shrink-0">
-                              <AvatarImage src={w.avatar_url || ''} />
-                              <AvatarFallback>{w.full_name?.[0] || 'W'}</AvatarFallback>
-                            </Avatar>
-                            <p className="font-semibold text-foreground truncate">{w.full_name}</p>
+                  <tr>
+                    <th className="sticky left-0 z-10 w-40 bg-background p-3 text-left align-top text-sm font-semibold text-muted-foreground">Criteria</th>
+                    {workers.map((worker) => (
+                      <th key={worker.id} className="min-w-[250px] p-3 align-top">
+                        <div className="rounded-lg border bg-card p-3 shadow-sm">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <Avatar className="h-10 w-10 shrink-0">
+                                <AvatarImage src={worker.avatar_url || ''} />
+                                <AvatarFallback>{worker.full_name?.[0] || 'W'}</AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0 text-left">
+                                <p className="truncate font-semibold text-foreground">{worker.full_name}</p>
+                                <p className="truncate text-xs font-normal text-muted-foreground">{[worker.primary_work_type, worker.skill_level].filter(Boolean).join(' • ') || 'Worker'}</p>
+                              </div>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => onRemove(worker.id)}>
+                              <X className="h-4 w-4" />
+                            </Button>
                           </div>
-                          <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => onRemove(w.id)}>
-                            <X className="h-4 w-4" />
-                          </Button>
+                          <div className="mt-3 flex items-center justify-between gap-2">
+                            <Badge className="bg-primary/10 text-primary border-primary/20">{verificationScore(worker)}/7 verified</Badge>
+                            {(worker.has_video || worker.video_url) && <Badge variant="secondary" className="gap-1"><Video className="h-3 w-3" />Video</Badge>}
+                          </div>
                         </div>
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {fields.map((f, i) => (
-                    <tr key={f.key} className={i % 2 === 0 ? 'bg-muted/30' : ''}>
-                      <td className="py-3 px-4 font-medium text-muted-foreground sticky left-0 bg-inherit">
-                        <div className="flex items-center gap-2">
-                          <f.icon className="h-4 w-4" />
-                          {f.label}
-                        </div>
+                  {fields.map((field, index) => (
+                    <tr key={field.key} className={index % 2 === 0 ? 'bg-muted/25' : ''}>
+                      <td className="sticky left-0 z-10 bg-inherit p-3 align-top font-medium text-muted-foreground">
+                        <div className="flex items-center gap-2"><field.icon className="h-4 w-4" />{field.label}</div>
                       </td>
-                      {workers.map((w) => (
-                        <td key={w.id} className="py-3 px-4 align-top text-sm">{renderValue(w, f.key)}</td>
-                      ))}
+                      {workers.map((worker) => <td key={worker.id} className="p-3 align-top text-sm">{renderValue(worker, field.key)}</td>)}
                     </tr>
                   ))}
                 </tbody>
