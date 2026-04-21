@@ -25,6 +25,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { JobDetailSkeleton } from '@/components/ui/page-skeleton';
+import { withRetry } from '@/lib/retry';
 
 interface JobData {
   id: string;
@@ -184,12 +185,20 @@ export default function JobDetail() {
         setUploadingResume(true);
         const fileExt = resumeFile.name.split('.').pop();
         const filePath = `${user.id}/${Date.now()}-resume.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('worker-documents')
-          .upload(filePath, resumeFile);
 
-        if (uploadError) throw uploadError;
+        await withRetry(
+          async () => {
+            const { error: uploadError } = await supabase.storage
+              .from('worker-documents')
+              .upload(filePath, resumeFile);
+            if (uploadError) throw uploadError;
+          },
+          {
+            onAttempt: (n) => {
+              if (n > 1) toast({ title: `Retrying upload… (${n}/3)` });
+            },
+          }
+        );
 
         const { data: urlData } = supabase.storage
           .from('worker-documents')
@@ -199,20 +208,29 @@ export default function JobDetail() {
         setUploadingResume(false);
       }
 
-      const { data: inserted, error } = await supabase
-        .from('job_applications')
-        .insert({
-          job_id: job.id,
-          worker_id: user.id,
-          employer_id: job.employer_id,
-          status: 'PENDING',
-          cover_letter: coverLetter || 'Application submitted through platform',
-          resume_url: resumeUrl,
-        })
-        .select('id')
-        .single();
-
-      if (error) throw error;
+      const inserted = await withRetry(
+        async () => {
+          const { data, error } = await supabase
+            .from('job_applications')
+            .insert({
+              job_id: job.id,
+              worker_id: user.id,
+              employer_id: job.employer_id,
+              status: 'PENDING',
+              cover_letter: coverLetter || 'Application submitted through platform',
+              resume_url: resumeUrl,
+            })
+            .select('id')
+            .single();
+          if (error) throw error;
+          return data;
+        },
+        {
+          onAttempt: (n) => {
+            if (n > 1) toast({ title: `Retrying submission… (${n}/3)` });
+          },
+        }
+      );
 
       setHasApplied(true);
       setShowApplyDialog(false);
@@ -222,7 +240,11 @@ export default function JobDetail() {
         navigate(`/worker/application-success/${inserted.id}`);
       }
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message || 'Failed to submit application', variant: 'destructive' });
+      toast({
+        title: 'Could not submit application',
+        description: error?.message || 'Please check your connection and try again.',
+        variant: 'destructive',
+      });
     } finally {
       setApplying(false);
       setUploadingResume(false);
@@ -263,13 +285,21 @@ export default function JobDetail() {
     try {
       if (isSaved) {
         // Unsave the job
-        const { error } = await supabase
-          .from('saved_jobs')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('job_id', job.id);
-
-        if (error) throw error;
+        await withRetry(
+          async () => {
+            const { error } = await supabase
+              .from('saved_jobs')
+              .delete()
+              .eq('user_id', user.id)
+              .eq('job_id', job.id);
+            if (error) throw error;
+          },
+          {
+            onAttempt: (n) => {
+              if (n > 1) toast({ title: `Retrying… (${n}/3)` });
+            },
+          }
+        );
 
         setIsSaved(false);
         toast({
@@ -278,14 +308,19 @@ export default function JobDetail() {
         });
       } else {
         // Save the job
-        const { error } = await supabase
-          .from('saved_jobs')
-          .insert({
-            user_id: user.id,
-            job_id: job.id
-          });
-
-        if (error) throw error;
+        await withRetry(
+          async () => {
+            const { error } = await supabase
+              .from('saved_jobs')
+              .insert({ user_id: user.id, job_id: job.id });
+            if (error) throw error;
+          },
+          {
+            onAttempt: (n) => {
+              if (n > 1) toast({ title: `Retrying… (${n}/3)` });
+            },
+          }
+        );
 
         setIsSaved(true);
         toast({
@@ -295,8 +330,8 @@ export default function JobDetail() {
       }
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to save job',
+        title: isSaved ? 'Could not unsave job' : 'Could not save job',
+        description: error?.message || 'Please check your connection and try again.',
         variant: 'destructive'
       });
     } finally {
