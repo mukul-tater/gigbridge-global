@@ -291,6 +291,22 @@ export default function QuickWorkerSignup() {
                   Continue
                 </Button>
 
+                <div className="relative my-1">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+                  <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">OR</span></div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-11"
+                  onClick={handleGoogle}
+                  disabled={loading}
+                >
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Continue with Google as Worker
+                </Button>
+
                 <div className="flex items-center gap-2 text-xs text-success bg-success/5 border border-success/20 rounded-lg p-2.5">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                   <span>Verified jobs only · No upfront fees</span>
