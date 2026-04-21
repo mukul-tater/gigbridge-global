@@ -641,15 +641,43 @@ export default function ApplicationDetail() {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <FileText className="h-5 w-5" />
-                          Cover Letter
+                          Cover Letter & Resume
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        {application.cover_letter ? (
-                          <p className="whitespace-pre-wrap">{application.cover_letter}</p>
+                      <CardContent className="space-y-4">
+                        {application.resume_url ? (
+                          <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/30">
+                            <div className="flex items-center gap-3">
+                              <FileText className="h-8 w-8 text-primary" />
+                              <div>
+                                <p className="font-medium">Resume / CV</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Submitted with this application
+                                </p>
+                              </div>
+                            </div>
+                            <Button variant="default" size="sm" asChild>
+                              <a href={application.resume_url} target="_blank" rel="noopener noreferrer">
+                                <Download className="h-4 w-4 mr-2" />
+                                View Resume
+                              </a>
+                            </Button>
+                          </div>
                         ) : (
-                          <p className="text-muted-foreground italic">No cover letter provided</p>
+                          <p className="text-sm text-muted-foreground italic">
+                            No resume attached to this application
+                          </p>
                         )}
+                        <div className="border-t pt-4">
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                            Cover Letter
+                          </p>
+                          {application.cover_letter ? (
+                            <p className="whitespace-pre-wrap">{application.cover_letter}</p>
+                          ) : (
+                            <p className="text-muted-foreground italic">No cover letter provided</p>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
