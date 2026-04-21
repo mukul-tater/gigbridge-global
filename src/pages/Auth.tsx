@@ -444,7 +444,7 @@ export default function Auth() {
                   <ArrowLeft className="h-3.5 w-3.5" /> Change role
                 </button>
 
-                <GoogleButton label="Sign up with Google" />
+                <GoogleButton label="Sign up with Google" context="signup" />
                 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
