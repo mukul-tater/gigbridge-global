@@ -108,7 +108,7 @@ const Footer = () => {
               <div className="rounded-lg border border-background/10 bg-background/5 p-3">
                 <p className="text-[11px] sm:text-xs text-background/70 leading-relaxed">
                   <span className="font-semibold text-background">Pay only after you hire.</span>
-                  Only 1% platform fee. Funds held securely in escrow and released once the worker joins.
+                  Funds held securely in escrow and released once the worker joins.
                 </p>
               </div>
             </div>
