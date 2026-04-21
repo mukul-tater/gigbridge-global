@@ -7,8 +7,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Search, Save, X, MapPin, DollarSign, Briefcase, Award } from 'lucide-react';
-import { NATIONALITIES, AVAILABILITY_OPTIONS, POPULAR_SKILLS } from '@/lib/constants';
+import { Search, Save, X, MapPin, DollarSign, Briefcase, Award, ShieldCheck, Languages, Settings2 } from 'lucide-react';
+import {
+  NATIONALITIES,
+  AVAILABILITY_OPTIONS,
+  POPULAR_SKILLS,
+  PRIMARY_WORK_TYPES,
+  WORKER_LANGUAGES,
+  VERIFIABLE_DOC_TYPES,
+  ECR_STATUS_OPTIONS,
+  SKILL_LEVELS,
+  SHIFT_PREFERENCES,
+} from '@/lib/constants';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
 
 export interface WorkerFilters {
   keyword: string;
@@ -21,6 +33,19 @@ export interface WorkerFilters {
   hasPassport: boolean;
   hasVisa: boolean;
   availability: string;
+  // New trust & verification filters
+  hasVideo: boolean;
+  verifiedDocs: string[]; // doc_type keys, e.g. ['passport','visa']
+  hasCertifications: boolean;
+  certificationKeyword: string;
+  ecrStatus: string; // 'all' | 'ecr' | 'ecnr' | 'not_checked'
+  // Skills & experience
+  primaryWorkType: string; // 'All' or a specific role
+  skillLevel: string; // 'All' or one of SKILL_LEVELS
+  // Preferences
+  languages: string[];
+  openToRelocation: boolean;
+  preferredShift: string; // 'All' | 'Day' | 'Night' | 'Flexible'
 }
 
 interface WorkerSearchFiltersProps {
@@ -293,6 +318,222 @@ export default function WorkerSearchFilters({
         </div>
       </div>
 
+      {/* Advanced Filter Sections */}
+      <Accordion type="multiple" defaultValue={['trust']} className="w-full">
+        {/* Trust & Verification */}
+        <AccordionItem value="trust">
+          <AccordionTrigger>
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-success" />
+              Trust & Verification
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="hasVideo" className="cursor-pointer text-sm">
+                Video proof available
+              </Label>
+              <Switch
+                id="hasVideo"
+                checked={filters.hasVideo}
+                onCheckedChange={(checked) => onFiltersChange({ ...filters, hasVideo: checked })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm">Verified documents</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {VERIFIABLE_DOC_TYPES.map((doc) => {
+                  const checked = filters.verifiedDocs.includes(doc.key);
+                  return (
+                    <div key={doc.key} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`doc-${doc.key}`}
+                        checked={checked}
+                        onCheckedChange={(c) => {
+                          const next = c
+                            ? [...filters.verifiedDocs, doc.key]
+                            : filters.verifiedDocs.filter((d) => d !== doc.key);
+                          onFiltersChange({ ...filters, verifiedDocs: next });
+                        }}
+                      />
+                      <Label htmlFor={`doc-${doc.key}`} className="cursor-pointer text-xs">
+                        {doc.label}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="hasCerts" className="cursor-pointer text-sm">
+                  Has certifications
+                </Label>
+                <Switch
+                  id="hasCerts"
+                  checked={filters.hasCertifications}
+                  onCheckedChange={(checked) =>
+                    onFiltersChange({ ...filters, hasCertifications: checked })
+                  }
+                />
+              </div>
+              <Input
+                placeholder="Filter cert. by name (optional)"
+                value={filters.certificationKeyword}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, certificationKeyword: e.target.value })
+                }
+                className="text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm">ECR status</Label>
+              <Select
+                value={filters.ecrStatus}
+                onValueChange={(v) => onFiltersChange({ ...filters, ecrStatus: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card z-50">
+                  {ECR_STATUS_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>
+                      {o.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Skills & Experience */}
+        <AccordionItem value="skills-exp">
+          <AccordionTrigger>
+            <span className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4 text-primary" />
+              Skills & Experience
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label className="text-sm">Primary work type</Label>
+              <Select
+                value={filters.primaryWorkType}
+                onValueChange={(v) => onFiltersChange({ ...filters, primaryWorkType: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card z-50 max-h-64">
+                  <SelectItem value="All">All work types</SelectItem>
+                  {PRIMARY_WORK_TYPES.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm">Skill level</Label>
+              <Select
+                value={filters.skillLevel}
+                onValueChange={(v) => onFiltersChange({ ...filters, skillLevel: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card z-50">
+                  <SelectItem value="All">All levels</SelectItem>
+                  {SKILL_LEVELS.map((l) => (
+                    <SelectItem key={l} value={l}>
+                      {l}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Preferences */}
+        <AccordionItem value="prefs">
+          <AccordionTrigger>
+            <span className="flex items-center gap-2">
+              <Settings2 className="h-4 w-4 text-primary" />
+              Preferences
+            </span>
+          </AccordionTrigger>
+          <AccordionContent className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label className="text-sm">
+                <Languages className="h-4 w-4 inline mr-1" />
+                Languages spoken
+              </Label>
+              <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
+                {WORKER_LANGUAGES.map((lang) => {
+                  const checked = filters.languages.includes(lang);
+                  return (
+                    <div key={lang} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`lang-${lang}`}
+                        checked={checked}
+                        onCheckedChange={(c) => {
+                          const next = c
+                            ? [...filters.languages, lang]
+                            : filters.languages.filter((l) => l !== lang);
+                          onFiltersChange({ ...filters, languages: next });
+                        }}
+                      />
+                      <Label htmlFor={`lang-${lang}`} className="cursor-pointer text-xs">
+                        {lang}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="relocation" className="cursor-pointer text-sm">
+                Open to relocation
+              </Label>
+              <Switch
+                id="relocation"
+                checked={filters.openToRelocation}
+                onCheckedChange={(checked) =>
+                  onFiltersChange({ ...filters, openToRelocation: checked })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm">Preferred shift</Label>
+              <Select
+                value={filters.preferredShift}
+                onValueChange={(v) => onFiltersChange({ ...filters, preferredShift: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card z-50">
+                  <SelectItem value="All">Any shift</SelectItem>
+                  {SHIFT_PREFERENCES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4">
         <Button
@@ -315,7 +556,17 @@ export default function WorkerSearchFilters({
             salaryMax: 10000,
             hasPassport: false,
             hasVisa: false,
-            availability: 'All'
+            availability: 'All',
+            hasVideo: false,
+            verifiedDocs: [],
+            hasCertifications: false,
+            certificationKeyword: '',
+            ecrStatus: 'all',
+            primaryWorkType: 'All',
+            skillLevel: 'All',
+            languages: [],
+            openToRelocation: false,
+            preferredShift: 'All',
           })}
         >
           Clear All

@@ -144,6 +144,48 @@ export const PROJECT_TYPES = [
   'Renovation', 'Maintenance', 'Other'
 ];
 
+// Languages spoken (for worker filters)
+export const WORKER_LANGUAGES = [
+  'English', 'Hindi', 'Arabic', 'Tagalog', 'Bengali', 'Nepali',
+  'Urdu', 'Tamil', 'Telugu', 'Malayalam', 'Punjabi', 'Marathi',
+  'Sinhala', 'Indonesian', 'Vietnamese', 'Thai', 'Mandarin', 'Spanish',
+  'French', 'Portuguese', 'Russian', 'Swahili'
+];
+
+// Primary work types (for worker search filter)
+export const PRIMARY_WORK_TYPES = [
+  'Welder', 'Electrician', 'Plumber', 'Mason', 'Carpenter', 'Painter',
+  'Steel Fixer', 'Scaffolder', 'HVAC Technician', 'Driver', 'Heavy Equipment Operator',
+  'Crane Operator', 'Forklift Operator', 'Construction Worker', 'Helper',
+  'Pipe Fitter', 'Fabricator', 'Rigger', 'Site Supervisor', 'Foreman',
+  'Cleaner', 'Security Guard', 'Cook', 'Housekeeper', 'Warehouse Worker'
+];
+
+// Verifiable document types (must match worker_documents.document_type values)
+export const VERIFIABLE_DOC_TYPES = [
+  { key: 'passport', label: 'Passport' },
+  { key: 'visa', label: 'Visa' },
+  { key: 'id', label: 'ID Card' },
+  { key: 'police_clearance', label: 'Police Clearance' },
+  { key: 'medical', label: 'Medical Certificate' },
+];
+
+// ECR status options
+export const ECR_STATUS_OPTIONS = [
+  { value: 'all', label: 'Any' },
+  { value: 'ecr', label: 'ECR' },
+  { value: 'ecnr', label: 'ECNR' },
+  { value: 'not_checked', label: 'Not Checked' },
+];
+
+// Sort options for worker search
+export const WORKER_SORT_OPTIONS = [
+  { value: 'best_match', label: 'Best Match' },
+  { value: 'experience_desc', label: 'Most Experience' },
+  { value: 'recently_active', label: 'Recently Active' },
+  { value: 'most_verified', label: 'Most Verified' },
+];
+
 // Currencies
 export const CURRENCIES = [
   { code: 'INR', symbol: '₹', name: 'Indian Rupee' },

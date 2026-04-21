@@ -1766,15 +1766,23 @@ export type Database = {
         Returns: {
           availability: string
           avatar_url: string
+          certifications_count: number
           current_location: string
           display_name: string
+          ecr_status: string
           has_passport: boolean
           has_visa: boolean
+          languages: string[]
+          last_active_at: string
           nationality: string
+          open_to_relocation: boolean
+          preferred_shift: string
           primary_work_type: string
           skill_level: string
           top_skills: string[]
           user_id: string
+          verified_documents: string[]
+          video_url: string
           years_of_experience: number
         }[]
       }
