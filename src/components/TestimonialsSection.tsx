@@ -180,9 +180,12 @@ const TestimonialsSection = () => {
                         {testimonial.avatar}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <div className="font-semibold font-heading text-foreground text-sm">{testimonial.name}</div>
-                      <div className="text-xs text-muted-foreground">{testimonial.role}</div>
+                    <div className="min-w-0">
+                      <div className="font-semibold font-heading text-foreground text-sm truncate">{testimonial.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {testimonial.role}
+                        {(testimonial as any).company ? ` · ${(testimonial as any).company}` : ""}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -195,14 +198,18 @@ const TestimonialsSection = () => {
         <div className="text-center mt-10 sm:mt-12 lg:mt-16">
           <div className="inline-flex items-center gap-3 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-muted/50 border border-border/50">
             <div className="flex -space-x-2">
-              {['RK', 'MS', 'AH', 'CW'].map((initials, i) => (
+              {testimonials.slice(0, 4).map((t, i) => (
                 <div key={i} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-[10px] sm:text-xs font-medium text-primary">
-                  {initials}
+                  {t.avatar}
                 </div>
               ))}
             </div>
             <span className="text-xs sm:text-sm text-muted-foreground">
-              Join <span className="font-semibold text-foreground">450+</span> workers who found success
+              {!authResolving && isEmployer ? (
+                <>Join <span className="font-semibold text-foreground">120+</span> employers who hired with confidence</>
+              ) : (
+                <>Join <span className="font-semibold text-foreground">450+</span> workers who found success</>
+              )}
             </span>
           </div>
         </div>
