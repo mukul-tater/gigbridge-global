@@ -1,9 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, Quote, MapPin, Briefcase } from "lucide-react";
+import { Star, Quote, MapPin, Briefcase, Building2, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const TestimonialsSection = () => {
-  const testimonials = [
+  const { role, isAuthenticated, loading, profileLoading } = useAuth();
+  const authResolving = loading || (isAuthenticated && profileLoading);
+  const isEmployer = role === "employer";
+
+  const workerTestimonials = [
     {
       name: "Rajesh Kumar",
       role: "Construction Foreman",
@@ -46,6 +51,69 @@ const TestimonialsSection = () => {
     }
   ];
 
+  const employerTestimonials = [
+    {
+      name: "Tanaka Hiroshi",
+      role: "HR Director",
+      company: "Sakura Construction Co.",
+      country: "Japan",
+      avatar: "TH",
+      rating: 5,
+      text: "We hired 24 verified construction workers in just 6 weeks. Pre-screening saved us months of effort and the escrow model gave us complete peace of mind.",
+      placement: "24 workers hired",
+      salary: "Saved ₹18L vs agents"
+    },
+    {
+      name: "Klaus Müller",
+      role: "Talent Acquisition Lead",
+      company: "BauWerk Solar GmbH",
+      country: "Germany",
+      avatar: "KM",
+      rating: 5,
+      text: "Brilliant pool of skilled electricians. We shortlisted 12 candidates in 8 days and onboarded 9 of them. Zero upfront fees — only paid after hiring.",
+      placement: "9 workers hired",
+      salary: "85% time saved"
+    },
+    {
+      name: "Fatima Al-Mansoori",
+      role: "Project Manager",
+      company: "Gulf Pipelines LLC",
+      country: "UAE",
+      avatar: "FA",
+      rating: 5,
+      text: "Verified welders, full document checks, and visa support handled end-to-end. We've now hired 40+ workers through SafeWork Global with zero compliance issues.",
+      placement: "40+ workers hired",
+      salary: "100% compliance"
+    },
+    {
+      name: "Anna Kowalski",
+      role: "Operations Director",
+      company: "Polska Manufacturing",
+      country: "Poland",
+      avatar: "AK",
+      rating: 5,
+      text: "We needed 15 assembly operators urgently. SafeWork Global delivered a vetted shortlist in 7 days. Transparent pricing and a smooth contracting flow.",
+      placement: "15 workers hired",
+      salary: "Shortlist in 7 days"
+    }
+  ];
+
+  const testimonials = !authResolving && isEmployer ? employerTestimonials : workerTestimonials;
+
+  const heading = !authResolving && isEmployer ? (
+    <>Trusted by <span className="text-gradient">Hiring Teams</span></>
+  ) : (
+    <>Real People, <span className="text-gradient">Real Success</span></>
+  );
+
+  const subheading = !authResolving && isEmployer
+    ? "Hear from employers who built their workforce through SafeWorkGlobal"
+    : "Hear from workers who transformed their careers through SafeWorkGlobal";
+
+  const trustBadgeText = !authResolving && isEmployer
+    ? "4.9/5 from 120+ employers"
+    : "4.9/5 from 500+ workers";
+
   return (
     <section className="py-14 sm:py-20 lg:py-28 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/[0.02] to-background" />
@@ -55,13 +123,13 @@ const TestimonialsSection = () => {
         <div className="text-center mb-10 sm:mb-12 lg:mb-16 max-w-2xl mx-auto">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-success/10 text-success mb-4">
             <Star className="h-3.5 w-3.5 fill-current" />
-            4.9/5 from 500+ workers
+            {trustBadgeText}
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading mb-4 tracking-tight">
-            Real People, <span className="text-gradient">Real Success</span>
+            {heading}
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
-            Hear from workers who transformed their careers through SafeWorkGlobal
+            {subheading}
           </p>
         </div>
 
@@ -112,9 +180,12 @@ const TestimonialsSection = () => {
                         {testimonial.avatar}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <div className="font-semibold font-heading text-foreground text-sm">{testimonial.name}</div>
-                      <div className="text-xs text-muted-foreground">{testimonial.role}</div>
+                    <div className="min-w-0">
+                      <div className="font-semibold font-heading text-foreground text-sm truncate">{testimonial.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {testimonial.role}
+                        {(testimonial as any).company ? ` · ${(testimonial as any).company}` : ""}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -127,14 +198,18 @@ const TestimonialsSection = () => {
         <div className="text-center mt-10 sm:mt-12 lg:mt-16">
           <div className="inline-flex items-center gap-3 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-muted/50 border border-border/50">
             <div className="flex -space-x-2">
-              {['RK', 'MS', 'AH', 'CW'].map((initials, i) => (
+              {testimonials.slice(0, 4).map((t, i) => (
                 <div key={i} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-[10px] sm:text-xs font-medium text-primary">
-                  {initials}
+                  {t.avatar}
                 </div>
               ))}
             </div>
             <span className="text-xs sm:text-sm text-muted-foreground">
-              Join <span className="font-semibold text-foreground">450+</span> workers who found success
+              {!authResolving && isEmployer ? (
+                <>Join <span className="font-semibold text-foreground">120+</span> employers who hired with confidence</>
+              ) : (
+                <>Join <span className="font-semibold text-foreground">450+</span> workers who found success</>
+              )}
             </span>
           </div>
         </div>
