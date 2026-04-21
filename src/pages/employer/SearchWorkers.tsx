@@ -343,7 +343,7 @@ export default function SearchWorkers() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Find Skilled Workers</h1>
           <p className="text-muted-foreground text-sm md:text-base">
-            Browse verified workers, then post a job to start hiring at just 1% fee.
+            Browse verified workers and post a job to start hiring — no upfront fees.
           </p>
         </div>
         <Link to="/employer/quick-post-job">

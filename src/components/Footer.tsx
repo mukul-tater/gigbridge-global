@@ -1,9 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Phone, Globe, Facebook, Twitter, Linkedin, Instagram, ArrowRight, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated, role } = useAuth();
+
+  // Worker "Create Profile" — gated by auth + role
+  const handleCreateProfile = () => {
+    if (!isAuthenticated) return navigate('/auth?role=worker&mode=signup');
+    if (role === 'worker') return navigate('/worker/dashboard');
+    if (role === 'employer') {
+      toast.error("You're logged in as an Employer. Sign out to create a Worker profile.");
+      return;
+    }
+    navigate('/auth?role=worker');
+  };
+
+  // Employer destinations — gated by auth + role
+  const goEmployer = (workerPath: string) => () => {
+    if (!isAuthenticated) return navigate('/auth?role=employer&mode=signup');
+    if (role === 'employer') return navigate(workerPath);
+    if (role === 'worker') {
+      toast.error("You're logged in as a Worker. Sign out to access employer features.");
+      return;
+    }
+    navigate('/auth?role=employer');
+  };
+
   return (
     <footer className="relative overflow-hidden">
       <div className="h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
@@ -47,19 +74,17 @@ const Footer = () => {
             <div className="lg:col-span-2 space-y-4">
               <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">For Workers</h3>
               <ul className="space-y-2.5">
-                {[
-                  { to: "/jobs", label: "Find Jobs" },
-                  { to: "/auth", label: "Create Profile" },
-                  { to: "/visa-guide", label: "Visa Guide" },
-                  { to: "/success-stories", label: "Success Stories" },
-                  { to: "/support", label: "Support Center" },
-                ].map((link) => (
-                  <li key={link.label}>
-                    <Link to={link.to} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                <li>
+                  <Link to="/jobs" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Find Jobs</Link>
+                </li>
+                <li>
+                  <button onClick={handleCreateProfile} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
+                    Create Profile
+                  </button>
+                </li>
+                <li><Link to="/visa-guide" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Visa Guide</Link></li>
+                <li><Link to="/success-stories" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Success Stories</Link></li>
+                <li><Link to="/support" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Support Center</Link></li>
               </ul>
             </div>
 
@@ -67,23 +92,23 @@ const Footer = () => {
             <div className="lg:col-span-3 space-y-4">
               <h3 className="text-xs sm:text-sm font-semibold font-heading uppercase tracking-wider text-background/80">For Employers</h3>
               <ul className="space-y-2.5">
-                {[
-                  { to: "/workers", label: "Browse Workers" },
-                  { to: "/employer/quick-signup", label: "Post a Job" },
-                  { to: "/employer/quick-signup", label: "How It Works" },
-                  { to: "/contact", label: "Talk to our team" },
-                ].map((link, i) => (
-                  <li key={`${link.label}-${i}`}>
-                    <Link to={link.to} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                <li>
+                  <button onClick={goEmployer('/employer/search-workers')} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
+                    Browse Workers
+                  </button>
+                </li>
+                <li>
+                  <button onClick={goEmployer('/employer/post-job')} className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">
+                    Post a Job
+                  </button>
+                </li>
+                <li><Link to="/about" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">How It Works</Link></li>
+                <li><Link to="/contact" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Talk to our team</Link></li>
               </ul>
               <div className="rounded-lg border border-background/10 bg-background/5 p-3">
                 <p className="text-[11px] sm:text-xs text-background/70 leading-relaxed">
-                  <span className="font-semibold text-background">Pay only 1% per month</span> — and only after you hire.
-                  Employer pays securely → platform takes a 1% fee → the rest is held in escrow until the worker joins.
+                  <span className="font-semibold text-background">Pay only after you hire.</span>
+                  Funds are held securely in escrow and released once the worker joins.
                 </p>
               </div>
             </div>

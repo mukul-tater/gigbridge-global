@@ -19,9 +19,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DESTINATION_COUNTRIES, JOB_CATEGORIES } from "@/lib/constants";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, role } = useAuth();
   const [isSticky, setIsSticky] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
@@ -43,6 +46,30 @@ const HeroSection = () => {
     if (searchLocation) params.set("location", searchLocation);
     if (searchCategory) params.set("category", searchCategory);
     navigate(`/jobs?${params.toString()}`);
+  };
+
+  const handleFindJobs = () => {
+    if (!isAuthenticated) {
+      navigate('/auth?role=worker&mode=signup');
+      return;
+    }
+    if (role === 'employer') {
+      toast.error("This is an employer account. Switch to a worker account to browse jobs.");
+      return;
+    }
+    navigate('/jobs');
+  };
+
+  const handleHireWorkers = () => {
+    if (!isAuthenticated) {
+      navigate('/auth?role=employer&mode=signup');
+      return;
+    }
+    if (role === 'worker') {
+      toast.error("This is a worker account. Switch to an employer account to hire workers.");
+      return;
+    }
+    navigate('/employer/dashboard');
   };
 
   const [jobCount, setJobCount] = useState(0);
@@ -120,7 +147,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 className="h-12 px-6 gap-2 text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary"
-                onClick={() => navigate("/jobs")}
+                onClick={handleFindJobs}
               >
                 Find Foreign Jobs <ArrowRight className="h-5 w-5" />
               </Button>
@@ -128,13 +155,13 @@ const HeroSection = () => {
                 size="lg"
                 variant="secondary"
                 className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
-                onClick={() => navigate("/employer/quick-signup")}
+                onClick={handleHireWorkers}
               >
                 <Users className="h-5 w-5" /> Hire Workers
               </Button>
             </div>
             <div className="-mt-4 mb-6 flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-2 sm:gap-3 text-xs text-muted-foreground">
-              <span>Employers: Hire verified workers at just 1% cost — no upfront fees.</span>
+              <span>Employers: Hire verified workers — escrow-secured, no upfront fees.</span>
               <a
                 href="tel:+919950085843"
                 className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"

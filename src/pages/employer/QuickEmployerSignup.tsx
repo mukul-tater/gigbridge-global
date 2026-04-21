@@ -37,7 +37,17 @@ export default function QuickEmployerSignup() {
           },
         },
       });
-      if (error) throw error;
+      if (error) {
+        // If the email is already registered with a different role, surface a
+        // clear message instead of letting Supabase's "User already registered"
+        // bubble up unexplained.
+        if (/already registered|already exists/i.test(error.message)) {
+          toast.error("This email is already registered. Please sign in instead.");
+          navigate("/auth?role=employer");
+          return;
+        }
+        throw error;
+      }
 
       // Try immediate sign-in (works when email confirmation disabled)
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
@@ -47,9 +57,22 @@ export default function QuickEmployerSignup() {
         return;
       }
 
-      // Persist company name onto employer profile
+      // Verify role matches (defends against an existing account being reused).
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        const { data: roleRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (roleRow && roleRow.role !== "employer") {
+          await supabase.auth.signOut();
+          toast.error(
+            `This account is already registered as a ${roleRow.role}. Please log in with the correct role.`
+          );
+          navigate("/auth");
+          return;
+        }
         await supabase.from("employer_profiles").update({ company_name: companyName.trim() }).eq("user_id", user.id);
       }
 
@@ -87,7 +110,7 @@ export default function QuickEmployerSignup() {
             </div>
             <h1 className="text-2xl font-bold font-heading mb-1">Hire Workers</h1>
             <p className="text-sm text-muted-foreground">
-              Verified workers at just 1% cost — no upfront fees.
+              Verified workers, escrow-secured payments — no upfront fees.
             </p>
             <p className="text-xs text-muted-foreground mt-1">Takes less than 2 minutes</p>
           </div>
@@ -126,7 +149,7 @@ export default function QuickEmployerSignup() {
 
           <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-success" />
-            <span>Escrow-secured · 1% fee only after hiring</span>
+            <span>Escrow-secured · Pay only after you hire</span>
           </div>
 
           <p className="text-center text-xs text-muted-foreground mt-4">

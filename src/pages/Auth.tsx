@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth, type AppRole } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,8 +24,13 @@ const roles: { value: AppRole; label: string; description: string; icon: React.R
 
 export default function Auth() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roleHint = (searchParams.get('role') as AppRole | null) || null;
+  const modeHint = searchParams.get('mode'); // "signup" forces signup view
   const { login, signup, isAuthenticated, role, needsRoleSelection, profileLoading, assignRole, profile } = useAuth();
-  const [view, setView] = useState<AuthView>('login');
+  const [view, setView] = useState<AuthView>(
+    modeHint === 'signup' ? 'role-select' : 'login'
+  );
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -46,6 +51,20 @@ export default function Auth() {
 
   // Forgot
   const [resetEmail, setResetEmail] = useState('');
+
+  // If a role hint is provided in the URL (?role=worker|employer), funnel
+  // the user straight into that signup flow without showing the role picker.
+  useEffect(() => {
+    if (!roleHint) return;
+    if (isAuthenticated) return; // already logged in — let other effects handle it
+    if (roleHint === 'worker' || roleHint === 'employer' || roleHint === 'agent') {
+      setSignupRole(roleHint);
+      // Redirect to the dedicated quick-signup pages for worker/employer.
+      if (roleHint === 'worker') navigate('/worker/quick-signup', { replace: true });
+      else if (roleHint === 'employer') navigate('/employer/quick-signup', { replace: true });
+      else setView('signup');
+    }
+  }, [roleHint, isAuthenticated, navigate]);
 
   // If an authenticated user lands here without a role (e.g. fresh Google
   // sign-in), force them into the role-select flow instead of redirecting.
@@ -109,7 +128,37 @@ export default function Auth() {
     }
 
     const result = await login(emailToUse, loginPassword);
-    if (!result.success) setError(result.error || 'Login failed');
+    if (!result.success) {
+      setError(result.error || 'Login failed');
+      setLoading(false);
+      return;
+    }
+
+    // Enforce one-role-per-account: if a role hint was supplied, verify the
+    // signed-in user actually holds that role. Otherwise sign them out.
+    if (roleHint) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: roleRow } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        const storedRole = roleRow?.role as AppRole | undefined;
+        if (storedRole && storedRole !== roleHint) {
+          await supabase.auth.signOut();
+          const labelMap: Record<AppRole, string> = {
+            worker: 'Worker', employer: 'Employer', agent: 'Agent', admin: 'Admin',
+          };
+          setError(
+            `This account is already registered as a ${labelMap[storedRole]}. ` +
+            `Please log in with the correct role.`
+          );
+          setLoading(false);
+          return;
+        }
+      }
+    }
     setLoading(false);
   };
 

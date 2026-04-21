@@ -63,7 +63,7 @@ export default function Workers() {
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <SEOHead
-        title="Browse Verified Workers — Hire at 1% Cost | SafeWork Global"
+        title="Browse Verified Workers — Hire Globally | SafeWork Global"
         description="Preview verified workers ready to relocate. Skilled tradespeople with passports, visas and global experience — hire in days, not months."
       />
       <Header />
@@ -91,7 +91,7 @@ export default function Workers() {
                 onClick={() => navigate("/employer/quick-signup")}
               >
                 <Users className="h-5 w-5" />
-                Start Hiring — 1% Cost
+                Start Hiring — No Upfront Fees
               </Button>
               <Button
                 size="lg"
@@ -244,7 +244,7 @@ export default function Workers() {
             <div className="mt-10 text-center">
               <Card className="inline-block p-6 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
                 <h3 className="text-lg font-heading font-bold mb-1">
-                  Ready to hire? Pay just 1% — no upfront cost
+                  Ready to hire? Start free — no upfront cost
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Create a free employer account to message workers, run background

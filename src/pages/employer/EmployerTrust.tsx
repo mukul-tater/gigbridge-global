@@ -22,7 +22,7 @@ export default function EmployerTrust() {
   const navigate = useNavigate();
 
   const points = [
-    { icon: Coins, title: "1% cost vs 20–30% agents", desc: "Pay only 1% per month  — and only after you hire." },
+    { icon: Coins, title: "Save 95%+ vs traditional agents", desc: "No upfront fees — only pay after you hire." },
     { icon: ShieldCheck, title: "Verified workers", desc: "Every worker is ID, document and skill verified." },
     { icon: CheckCircle2, title: "Escrow-secured payments", desc: "Funds held safely. Released after work completion." },
     { icon: Zap, title: "Faster hiring", desc: "Shortlists in 7–10 days for your pilot batch." },
@@ -76,10 +76,10 @@ export default function EmployerTrust() {
                   <Check className="h-3.5 w-3.5" /> SafeWork Global
                 </div>
                 <div className="text-xl sm:text-2xl font-bold font-heading text-foreground">
-                  Just 1%
+                  ₹0 upfront
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  Of salary, only after hire
+                  Pay only after you hire
                 </p>
               </div>
             </div>

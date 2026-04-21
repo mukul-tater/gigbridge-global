@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, Search, Globe, User, Bell, X, LogOut, ChevronRight } from "lucide-react";
+import { Menu, Search, Globe, User, Bell, X, LogOut, ChevronRight, HardHat, Briefcase } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -127,12 +130,50 @@ const Header = () => {
                   </Button>
                 </>
               ) : (
-                <Link to="/auth">
-                  <Button variant="default" className="gap-2">
-                    <User className="h-4 w-4" />
-                    Get Started
-                  </Button>
-                </Link>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="default" className="gap-2">
+                      <User className="h-4 w-4" />
+                      Get Started
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-72 p-3">
+                    <p className="text-xs font-semibold text-muted-foreground mb-2 px-1">
+                      I want to…
+                    </p>
+                    <button
+                      onClick={() => navigate('/auth?role=worker&mode=signup')}
+                      className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors"
+                    >
+                      <div className="p-2 rounded-lg bg-success/10 text-success">
+                        <HardHat className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Find a job</div>
+                        <div className="text-xs text-muted-foreground">Sign up as a Worker</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => navigate('/auth?role=employer&mode=signup')}
+                      className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors mt-1"
+                    >
+                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <Briefcase className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Hire workers</div>
+                        <div className="text-xs text-muted-foreground">Sign up as an Employer</div>
+                      </div>
+                    </button>
+                    <div className="border-t border-border my-2" />
+                    <button
+                      onClick={() => navigate('/auth')}
+                      className="w-full text-xs text-center text-primary hover:underline py-1"
+                    >
+                      Already have an account? Sign in
+                    </button>
+                  </PopoverContent>
+                </Popover>
               )}
             </div>
 
@@ -226,12 +267,33 @@ const Header = () => {
                     </Button>
                   </div>
                 ) : (
-                  <Link to="/auth" onClick={closeMobileMenu}>
-                    <Button variant="default" size="lg" className="w-full gap-2">
-                      <User className="h-4 w-4" />
-                      Get Started
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground px-1">I want to…</p>
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="w-full justify-start gap-3"
+                      onClick={() => { navigate('/auth?role=worker&mode=signup'); closeMobileMenu(); }}
+                    >
+                      <HardHat className="h-4 w-4" />
+                      Find a job (Worker signup)
                     </Button>
-                  </Link>
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="w-full justify-start gap-3"
+                      onClick={() => { navigate('/auth?role=employer&mode=signup'); closeMobileMenu(); }}
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      Hire workers (Employer signup)
+                    </Button>
+                    <button
+                      onClick={() => { navigate('/auth'); closeMobileMenu(); }}
+                      className="w-full text-xs text-center text-primary hover:underline py-1"
+                    >
+                      Already have an account? Sign in
+                    </button>
+                  </div>
                 )}
               </div>
             </nav>
