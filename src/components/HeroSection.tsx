@@ -131,30 +131,47 @@ const HeroSection = () => {
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-success/15 via-primary/15 to-info/15 text-foreground px-4 py-2 rounded-full text-xs sm:text-sm font-bold mb-5 border-2 border-primary/30 shadow-primary/20 shadow-lg animate-fade-in backdrop-blur-sm">
               <Shield className="h-4 w-4 text-success animate-pulse-soft" />
               <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
-                Get a safe foreign job — without agents
+                {isEmployer
+                  ? "Hire verified workers — escrow-secured, no upfront fees"
+                  : "Get a safe foreign job — without agents"}
               </span>
             </div>
 
             {/* Secondary trust badge */}
             <div className="inline-flex items-center gap-2 bg-muted/50 text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium mb-6 border border-border/50 animate-fade-in">
               <Sparkles className="h-3 w-3 text-primary" />
-              <span>900+ verified jobs · 40+ countries</span>
+              <span>
+                {isEmployer
+                  ? "Verified workers · Escrow-secured payments"
+                  : "900+ verified jobs · 40+ countries"}
+              </span>
             </div>
 
             {/* Heading */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-heading text-foreground mb-5 leading-[1.1] tracking-tight opacity-0 animate-fade-in-up animation-delay-100">
-              Find Foreign
-              <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">Jobs Abroad</span>
+              {isEmployer ? (
+                <>
+                  Hire Verified
+                  <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">Workers Worldwide</span>
+                </>
+              ) : (
+                <>
+                  Find Foreign
+                  <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">Jobs Abroad</span>
+                </>
+              )}
             </h1>
 
             {/* Subheading */}
             <p className="text-base sm:text-lg text-muted-foreground mb-4 max-w-xl mx-auto lg:mx-0 leading-relaxed opacity-0 animate-fade-in-up animation-delay-200">
-              No agent fees. Verified jobs only. Connect directly with employers worldwide.
+              {isEmployer
+                ? "No upfront fees. Pre-verified workers. Escrow-secured payments — pay only after you hire."
+                : "No agent fees. Verified jobs only. Connect directly with employers worldwide."}
             </p>
 
-            {/* Primary CTA — role-aware */}
+            {/* Primary CTA — role-aware. While auth is resolving, render nothing to avoid flashing the wrong CTA. */}
             <div className="flex flex-col sm:flex-row gap-3 mb-8 opacity-0 animate-fade-in-up animation-delay-200">
-              {role !== 'employer' && (
+              {!authResolving && !isEmployer && (
                 <Button
                   size="lg"
                   className="h-12 px-6 gap-2 text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary"
@@ -163,18 +180,18 @@ const HeroSection = () => {
                   Find Foreign Jobs <ArrowRight className="h-5 w-5" />
                 </Button>
               )}
-              {role !== 'worker' && (
+              {!authResolving && !isWorker && (
                 <Button
                   size="lg"
-                  variant="secondary"
-                  className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
+                  variant={isEmployer ? "default" : "secondary"}
+                  className={`h-12 px-6 gap-2 text-base font-semibold rounded-xl ${isEmployer ? 'bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 shadow-primary' : ''}`}
                   onClick={handleHireWorkers}
                 >
-                  <Users className="h-5 w-5" /> Hire Workers
+                  <Users className="h-5 w-5" /> {isEmployer ? 'Browse Workers' : 'Hire Workers'}
                 </Button>
               )}
             </div>
-            {role !== 'worker' && (
+            {!authResolving && !isWorker && !isEmployer && (
               <div className="-mt-4 mb-6 flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-2 sm:gap-3 text-xs text-muted-foreground">
                 <span>Employers: Hire verified workers — escrow-secured, no upfront fees.</span>
                 <a
@@ -193,7 +210,7 @@ const HeroSection = () => {
                 <div className="relative group">
                   <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
-                    placeholder="Job title or skill"
+                    placeholder={isEmployer ? "Skill or worker type" : "Job title or skill"}
                     className="pl-10 h-11 sm:h-12 bg-background/80 border-border/50 focus:border-primary focus:bg-background rounded-xl text-sm sm:text-base"
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
@@ -219,18 +236,20 @@ const HeroSection = () => {
                   </Select>
                 </div>
 
-                <Select value={searchCategory} onValueChange={setSearchCategory}>
-                  <SelectTrigger className="h-11 sm:h-12 bg-background/80 border-border/50 rounded-xl sm:col-span-2 lg:col-span-1 text-sm sm:text-base">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64">
-                    {JOB_CATEGORIES.filter((c) => c !== "All Categories").map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {!isEmployer && (
+                  <Select value={searchCategory} onValueChange={setSearchCategory}>
+                    <SelectTrigger className="h-11 sm:h-12 bg-background/80 border-border/50 rounded-xl sm:col-span-2 lg:col-span-1 text-sm sm:text-base">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64">
+                      {JOB_CATEGORIES.filter((c) => c !== "All Categories").map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <Button
@@ -238,18 +257,25 @@ const HeroSection = () => {
                 className="w-full h-11 sm:h-12 gap-2 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary transition-all duration-300 hover:shadow-hover"
                 onClick={handleSearch}
               >
-                Search Jobs
+                {isEmployer ? 'Search Workers' : 'Search Jobs'}
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
 
             {/* Trust Badges */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-6 opacity-0 animate-fade-in-up animation-delay-400">
-              {[
-                { icon: Shield, text: "Verified Employers" },
-                { icon: CheckCircle, text: "Secure Process" },
-                { icon: Globe, text: "Visa Support" },
-              ].map((badge) => (
+              {(isEmployer
+                ? [
+                    { icon: Shield, text: "Verified Workers" },
+                    { icon: CheckCircle, text: "Escrow-Secured" },
+                    { icon: Globe, text: "Compliance Support" },
+                  ]
+                : [
+                    { icon: Shield, text: "Verified Employers" },
+                    { icon: CheckCircle, text: "Secure Process" },
+                    { icon: Globe, text: "Visa Support" },
+                  ]
+              ).map((badge) => (
                 <div key={badge.text} className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
                   <div className="p-1 sm:p-1.5 rounded-lg bg-success/10">
                     <badge.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-success" />
