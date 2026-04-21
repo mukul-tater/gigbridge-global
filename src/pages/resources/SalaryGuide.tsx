@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TrendingUp, IndianRupee, ArrowRight } from "lucide-react";
+import { TrendingUp, IndianRupee, ArrowRight, Clock, Home, UtensilsCrossed, Plane, FileCheck, GraduationCap, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const rows = [
@@ -35,6 +35,21 @@ export default function SalaryGuide() {
       heading="What you'll really earn abroad"
       intro="Indicative monthly take-home in INR (after typical deductions, before bonuses). Figures are based on 2024 placement data from our employer network."
     >
+      {/* Headline salary band */}
+      <Card className="mb-6 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+        <CardContent className="p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <Badge className="mb-2 bg-success/10 text-success border-success/20">Typical monthly take-home</Badge>
+            <h3 className="text-2xl md:text-3xl font-heading font-bold">₹70,000 – ₹2,00,000</h3>
+            <p className="text-sm text-muted-foreground mt-1">+ overtime paid extra (1.25x – 2x hourly rate, paid weekly or monthly)</p>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-success font-medium">
+            <Clock className="h-4 w-4" />
+            Overtime always on top of base salary
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -89,6 +104,93 @@ export default function SalaryGuide() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Benefits & perks */}
+      <div className="mt-10">
+        <h3 className="text-xl md:text-2xl font-heading font-bold mb-2">What's included beyond your salary</h3>
+        <p className="text-sm text-muted-foreground mb-5">
+          Every SafeWorkGlobal-verified contract clearly lists these perks. No hidden deductions, no surprises.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Card className="border-success/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Home className="h-5 w-5 text-success" />
+                <h4 className="font-semibold">Free accommodation</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">Shared/private rooms with electricity, water and Wi-Fi — fully paid by employer.</p>
+            </CardContent>
+          </Card>
+          <Card className="border-success/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <UtensilsCrossed className="h-5 w-5 text-success" />
+                <h4 className="font-semibold">Meals provided</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">3 meals/day or a monthly food allowance (typically ₹8k–₹15k equivalent).</p>
+            </CardContent>
+          </Card>
+          <Card className="border-success/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Plane className="h-5 w-5 text-success" />
+                <h4 className="font-semibold">Flight tickets</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">Joining flight + return ticket every 2 years (or end of contract) paid by employer.</p>
+            </CardContent>
+          </Card>
+          <Card className="border-success/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <FileCheck className="h-5 w-5 text-success" />
+                <h4 className="font-semibold">Visa & permit support</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">Work visa, residence permit and renewals fully sponsored — zero cost to worker.</p>
+            </CardContent>
+          </Card>
+          <Card className="border-success/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-5 w-5 text-success" />
+                <h4 className="font-semibold">Overtime pay</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">1.25x on weekdays, 1.5x weekends, 2x public holidays — added to monthly salary.</p>
+            </CardContent>
+          </Card>
+          <Card className="border-success/20">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck className="h-5 w-5 text-success" />
+                <h4 className="font-semibold">Medical insurance</h4>
+              </div>
+              <p className="text-sm text-muted-foreground">Full health coverage at site clinics + hospitals. Annual medical check-ups included.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Online training */}
+      <Card className="mt-8 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4 md:items-center">
+            <div className="h-12 w-12 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+              <GraduationCap className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <Badge className="mb-2 bg-primary/10 text-primary border-primary/20">Free for all workers</Badge>
+              <h4 className="font-heading font-bold text-lg mb-1">Online training for better support</h4>
+              <p className="text-sm text-muted-foreground">
+                Pre-departure orientation, workplace safety, country-specific culture, basic Arabic/English/German, and skill upskilling — delivered on your phone, in your language. Certificates added to your profile to boost your salary band.
+              </p>
+            </div>
+            <Link to="/auth">
+              <Button variant="outline" className="rounded-xl whitespace-nowrap">
+                Start training
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="mt-10 p-6 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20 text-center">
         <h3 className="text-lg font-heading font-bold mb-1">See live salaries on real jobs</h3>
