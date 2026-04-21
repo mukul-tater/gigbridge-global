@@ -1,9 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Phone, Globe, Facebook, Twitter, Linkedin, Instagram, ArrowRight, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated, role } = useAuth();
+
+  // Worker "Create Profile" — gated by auth + role
+  const handleCreateProfile = () => {
+    if (!isAuthenticated) return navigate('/auth?role=worker&mode=signup');
+    if (role === 'worker') return navigate('/worker/dashboard');
+    if (role === 'employer') {
+      toast.error("You're logged in as an Employer. Sign out to create a Worker profile.");
+      return;
+    }
+    navigate('/auth?role=worker');
+  };
+
+  // Employer destinations — gated by auth + role
+  const goEmployer = (workerPath: string) => () => {
+    if (!isAuthenticated) return navigate('/auth?role=employer&mode=signup');
+    if (role === 'employer') return navigate(workerPath);
+    if (role === 'worker') {
+      toast.error("You're logged in as a Worker. Sign out to access employer features.");
+      return;
+    }
+    navigate('/auth?role=employer');
+  };
+
   return (
     <footer className="relative overflow-hidden">
       <div className="h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
