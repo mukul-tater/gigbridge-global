@@ -301,6 +301,7 @@ export default function SearchWorkers() {
         has_passport: w.has_passport,
         has_visa: w.has_visa,
         has_video: !!w.video_url,
+        video_url: w.video_url,
         certifications_count: w.certifications_count,
         verified_documents: w.verified_documents,
         languages: w.languages,
