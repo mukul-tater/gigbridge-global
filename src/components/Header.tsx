@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, Search, Globe, User, Bell, X, LogOut, ChevronRight } from "lucide-react";
+import { Menu, Search, Globe, User, Bell, X, LogOut, ChevronRight, HardHat, Briefcase } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
