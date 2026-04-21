@@ -227,7 +227,7 @@ export default function QuickWorkerSignup() {
                   disabled={loading}
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  Continue with Google as Worker
+                   Continue with Google
                 </Button>
 
                 <div className="relative my-1">
