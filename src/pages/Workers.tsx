@@ -91,7 +91,7 @@ export default function Workers() {
                 onClick={() => navigate("/employer/quick-signup")}
               >
                 <Users className="h-5 w-5" />
-                Start Hiring — 1% Cost
+                Start Hiring — No Upfront Fees
               </Button>
               <Button
                 size="lg"
