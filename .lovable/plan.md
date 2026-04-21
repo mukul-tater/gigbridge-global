@@ -1,56 +1,76 @@
 
 
-# Platform Readiness Audit & Fixes for Investor Demo
+## Enhanced Worker Search for Employer Portal
 
-## Current Status
+Upgrade the existing `/employer/search-workers` page (already in the employer portal sidebar) into a powerful candidate-discovery tool. Employers will be able to filter by experience, skills, video proof, verified documents, certifications, languages, work type, and more — with richer worker cards that surface trust signals at a glance.
 
-After a thorough review of the codebase, database, and live preview:
+### What's new for employers
 
-**Working correctly:**
-- Homepage loads without errors (the previous `toLocaleString` crash is fixed in the codebase)
-- Auth flow: Login (email + mobile), Signup with role selection (Worker/Employer/Agent), Forgot password
-- Worker dashboard with onboarding stepper, profile, documents, applications, messaging
-- Employer dashboard with job posting, application review, interviews, offers, escrow payments
-- Admin dashboard with user management, job verification, investor dashboard
-- Database has 922 real active jobs across 41 countries
-- ErrorBoundary wraps the app to prevent blank-screen crashes
-- Salary formatting is now null-safe everywhere via `formatSalaryINR`
+**New filter categories** (added to the left sidebar):
+- **Video proof available** — only show workers who uploaded a self-intro/skills video
+- **Verified documents** — Passport / Visa / ID / Police clearance / Medical
+- **Certifications** — has any verified certification (with name search)
+- **Primary work type** — Welder, Electrician, Mason, Driver, HVAC, Scaffolder, etc.
+- **Skill level** — Beginner / Intermediate / Expert
+- **Languages spoken** — multi-select (English, Hindi, Arabic, Tagalog, Bengali, Nepali, etc.)
+- **Open to relocation** toggle
+- **Preferred shift** — Day / Night / Rotational
+- **ECR status** — ECR / ECNR / Not Checked
+- **Sort by** — Best Match, Most Experience, Recently Active, Most Verified
 
-**Issues to fix for investor readiness:**
+**Richer worker cards**:
+- Inline **video thumbnail with play button** (opens a quick preview modal) when worker has a video
+- Verification badges row (Passport ✓, Visa ✓, ID ✓, Certs ✓, Video ✓) with green checks
+- Certifications count chip (e.g. "3 certified skills")
+- Top skills with proficiency level
 
-### 1. Published site still serves old crashed bundle (CRITICAL)
-The published site at `gigbridge-global.lovable.app` is likely still serving the old JavaScript bundle that crashes. The code fixes are in the source but need to be published. You must click **Publish > Update** to push the fixed code live.
+**Quick-action improvements**:
+- "Compare" checkbox on each card → side-by-side comparison drawer for up to 4 workers
+- Active filter chips above results (with one-click remove)
+- Result count + applied-filter summary
+- Empty state suggests broadening filters
 
-### 2. Hardcoded hero stats should be dynamic
-The HeroSection has hardcoded "900+" and "Over 900 global opportunities across 40+ countries". The SuccessMetrics component has hardcoded final counts (920, 450, 41, 120). These happen to be close to real data now, but will become stale as jobs change. For investor credibility, these should pull real counts from the database.
+### Technical changes
 
-### 3. FeaturedJob interface types don't match DB nullability
-The `FeaturedJob` interface declares `salary_min: number` and `salary_max: number` as non-nullable, but the DB allows nulls. While the formatting is safe due to `as any` cast + null-safe formatter, the types should be corrected to `number | null` for maintainability.
+1. **DB function update** — extend `public.list_public_workers` to also return:
+   - `video_url` (latest from `worker-videos` storage / `worker_documents` of type `video`)
+   - `verified_documents` (array of doc types where `verification_status = 'verified'`)
+   - `certifications_count` (count from `worker_certifications`)
+   - `languages` (from `worker_profiles.languages`)
+   - `open_to_relocation`, `preferred_shift`, `ecr_status`
+   - `last_active_at` (from `worker_profiles.updated_at`)
+   - Stays anonymized (first name + last initial) and stays SECURITY DEFINER so RLS isn't broken
 
----
+2. **`WorkerFilters` interface** — extend with the new fields above (defaults preserve existing behavior)
 
-## Implementation Plan
+3. **`WorkerSearchFilters.tsx`** — add new sections grouped in collapsible accordions:
+   - Trust & Verification (video, docs, certs, ECR)
+   - Skills & Experience (work type, skill level, certifications)
+   - Preferences (languages, relocation, shift)
+   Existing filters (keyword, nationality, location, salary, experience, passport/visa, availability) remain unchanged.
 
-### Step 1: Make homepage stats dynamic
-- Update `SuccessMetrics` to fetch real counts from the database (jobs count, distinct countries, profiles count)
-- Update `HeroSection` badge text to use a dynamic job count
-- This ensures stats always reflect reality, which is critical per the data quality memory
+4. **`SearchWorkers.tsx`**:
+   - Apply new filters in `handleSearch` against the extended dataset
+   - Add **active filter chip strip** above results
+   - Add **sort dropdown** wired to actual logic (currently cosmetic)
+   - Add **Compare** checkbox + bottom-sheet `WorkerComparisonDrawer` (mirrors existing `JobComparisonDrawer` pattern)
+   - Add **video preview modal** (uses `Dialog` + `<video controls>`) on thumbnail click
 
-### Step 2: Fix FeaturedJob interface types
-- Change `salary_min` and `salary_max` to `number | null` in the `FeaturedJob` interface
-- Minor defensive change that prevents future confusion
+5. **New component** — `src/components/employer/WorkerComparisonDrawer.tsx` (side-by-side spec table for up to 4 workers).
 
-### Step 3: Service Worker cleanup
-- The `src/main.tsx` SW registration registers `/sw.js` which is a push-notification-only SW (no caching). This is fine, but the Lovable preview domain may have stale Workbox SWs from the PWA plugin. The current cleanup code already handles this.
-- No additional changes needed here.
+6. **No new routes / no nav changes** — the page already lives at `/employer/search-workers` and is accessible from the employer sidebar (and the dashboard "Search Workers" link).
 
-### Step 4: Final build verification
-- Run TypeScript check to ensure no compile errors
-- Verify the homepage loads cleanly in preview
+### Trust & access guarantees (unchanged)
+- Worker names stay anonymized in search results
+- Full profile, contact, and unmasked video only unlock after worker applies to one of the employer's jobs (existing RLS)
+- "Contact" button continues to be gated by application/interview relationship
 
----
+### Out of scope
+- No new tables
+- No changes to worker-side flows
+- No changes to homepage / public worker browsing
+- Real video uploads still depend on workers having uploaded videos; cards gracefully hide the thumbnail when none exists
 
-## What you need to do after approval
-
-After I implement these changes, click **Publish > Update** to push the fixed bundle to your live site. The published site will then load without the crash and show real dynamic data for investors.
+### Rollout
+Single-pass implementation: 1 migration (RPC update) + 3 file edits + 1 new component.
 
