@@ -7,8 +7,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Search, Save, X, MapPin, DollarSign, Briefcase, Award } from 'lucide-react';
-import { NATIONALITIES, AVAILABILITY_OPTIONS, POPULAR_SKILLS } from '@/lib/constants';
+import { Search, Save, X, MapPin, DollarSign, Briefcase, Award, ShieldCheck, Languages, Settings2 } from 'lucide-react';
+import {
+  NATIONALITIES,
+  AVAILABILITY_OPTIONS,
+  POPULAR_SKILLS,
+  PRIMARY_WORK_TYPES,
+  WORKER_LANGUAGES,
+  VERIFIABLE_DOC_TYPES,
+  ECR_STATUS_OPTIONS,
+  SKILL_LEVELS,
+  SHIFT_PREFERENCES,
+} from '@/lib/constants';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
 
 export interface WorkerFilters {
   keyword: string;
@@ -21,6 +33,19 @@ export interface WorkerFilters {
   hasPassport: boolean;
   hasVisa: boolean;
   availability: string;
+  // New trust & verification filters
+  hasVideo: boolean;
+  verifiedDocs: string[]; // doc_type keys, e.g. ['passport','visa']
+  hasCertifications: boolean;
+  certificationKeyword: string;
+  ecrStatus: string; // 'all' | 'ecr' | 'ecnr' | 'not_checked'
+  // Skills & experience
+  primaryWorkType: string; // 'All' or a specific role
+  skillLevel: string; // 'All' or one of SKILL_LEVELS
+  // Preferences
+  languages: string[];
+  openToRelocation: boolean;
+  preferredShift: string; // 'All' | 'Day' | 'Night' | 'Flexible'
 }
 
 interface WorkerSearchFiltersProps {
