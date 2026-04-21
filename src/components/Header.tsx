@@ -145,7 +145,7 @@ const Header = () => {
                       onClick={() => navigate('/auth?role=worker&mode=signup')}
                       className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors"
                     >
-                      <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950">
+                      <div className="p-2 rounded-lg bg-success/10 text-success">
                         <HardHat className="h-4 w-4" />
                       </div>
                       <div>
@@ -157,7 +157,7 @@ const Header = () => {
                       onClick={() => navigate('/auth?role=employer&mode=signup')}
                       className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors mt-1"
                     >
-                      <div className="p-2 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950">
+                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
                         <Briefcase className="h-4 w-4" />
                       </div>
                       <div>
