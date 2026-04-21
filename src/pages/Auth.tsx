@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Eye, EyeOff, Loader2, Briefcase, HardHat, Users, ArrowLeft, Mail, Phone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
@@ -37,6 +38,11 @@ export default function Auth() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [assigningRole, setAssigningRole] = useState<AppRole | null>(null);
+  // Role chooser modal shown BEFORE triggering Google OAuth so we know which
+  // role the user intends to use. The chosen role is stashed in sessionStorage
+  // and consumed after the OAuth redirect lands back on /auth.
+  const [googleRoleOpen, setGoogleRoleOpen] = useState(false);
+  const [googleRoleContext, setGoogleRoleContext] = useState<'login' | 'signup'>('login');
 
   // Login
   const [loginIdentifier, setLoginIdentifier] = useState('');
@@ -69,10 +75,41 @@ export default function Auth() {
   // If an authenticated user lands here without a role (e.g. fresh Google
   // sign-in), force them into the role-select flow instead of redirecting.
   useEffect(() => {
-    if (isAuthenticated && needsRoleSelection) {
-      setView('role-select');
+    if (!isAuthenticated || !needsRoleSelection) return;
+
+    // If the user picked a role BEFORE clicking "Sign in with Google",
+    // auto-assign it now so they never see the role-select screen again.
+    const pending = sessionStorage.getItem('pending_oauth_role') as AppRole | null;
+    if (pending && (pending === 'worker' || pending === 'employer' || pending === 'agent')) {
+      sessionStorage.removeItem('pending_oauth_role');
+      handleRoleSelect(pending);
+      return;
     }
+
+    setView('role-select');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, needsRoleSelection]);
+
+  // If the user picked a role pre-OAuth but already has a DIFFERENT role on
+  // their account, sign them out and show a clear mismatch error.
+  useEffect(() => {
+    if (!isAuthenticated || !role) return;
+    const pending = sessionStorage.getItem('pending_oauth_role') as AppRole | null;
+    if (!pending) return;
+    sessionStorage.removeItem('pending_oauth_role');
+    if (pending !== role) {
+      const labelMap: Record<AppRole, string> = {
+        worker: 'Worker', employer: 'Employer', agent: 'Agent', admin: 'Admin',
+      };
+      (async () => {
+        await supabase.auth.signOut();
+        setError(
+          `This account is already registered as a ${labelMap[role]}. ` +
+          `Please sign in with the correct role.`
+        );
+      })();
+    }
+  }, [isAuthenticated, role]);
 
   // Redirect once both auth + role are ready.
   useEffect(() => {
@@ -85,22 +122,32 @@ export default function Auth() {
     }
   }, [isAuthenticated, role, navigate, assigningRole]);
 
-  const handleGoogleSignIn = async () => {
+  // Step 1 — open the role chooser modal. We do NOT trigger OAuth yet.
+  const openGoogleRoleChooser = (context: 'login' | 'signup') => {
+    setError('');
+    setGoogleRoleContext(context);
+    setGoogleRoleOpen(true);
+  };
+
+  // Step 2 — user picked a role inside the modal. Persist it and start OAuth.
+  const handleGoogleRolePick = async (chosenRole: AppRole) => {
     setGoogleLoading(true);
     setError('');
     try {
+      sessionStorage.setItem('pending_oauth_role', chosenRole);
       const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth`,
       });
       if (result.error) {
+        sessionStorage.removeItem('pending_oauth_role');
         setError(result.error instanceof Error ? result.error.message : 'Google sign-in failed');
+        setGoogleLoading(false);
+        return;
       }
-      if (result.redirected) return;
-      // Authenticated. The role-select effect above will switch the view if
-      // no role is set. Otherwise the redirect effect will navigate.
-    } catch (err) {
+      if (result.redirected) return; // Browser will navigate to Google
+    } catch {
+      sessionStorage.removeItem('pending_oauth_role');
       setError('Google sign-in failed. Please try again.');
-    } finally {
       setGoogleLoading(false);
     }
   };
@@ -248,12 +295,12 @@ export default function Auth() {
     setView('signup');
   };
 
-  const GoogleButton = ({ label }: { label: string }) => (
+  const GoogleButton = ({ label, context = 'login' }: { label: string; context?: 'login' | 'signup' }) => (
     <Button
       type="button"
       variant="outline"
       className="w-full h-11 gap-2 font-medium"
-      onClick={handleGoogleSignIn}
+      onClick={() => openGoogleRoleChooser(context)}
       disabled={googleLoading}
     >
       {googleLoading ? (
@@ -397,7 +444,7 @@ export default function Auth() {
                   <ArrowLeft className="h-3.5 w-3.5" /> Change role
                 </button>
 
-                <GoogleButton label="Sign up with Google" />
+                <GoogleButton label="Sign up with Google" context="signup" />
                 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
@@ -480,6 +527,46 @@ export default function Auth() {
           <a href="/privacy" className="underline">Privacy Policy</a>.
         </p>
       </div>
+
+      {/* Google role chooser — shown BEFORE OAuth so we know the user's
+          intended role (Worker vs Employer) up front. */}
+      <Dialog open={googleRoleOpen} onOpenChange={(open) => { if (!googleLoading) setGoogleRoleOpen(open); }}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle>
+              {googleRoleContext === 'signup' ? 'Sign up with Google as' : 'Continue with Google as'}
+            </DialogTitle>
+            <DialogDescription>
+              Choose how you want to use SafeWorkGlobal. You can only use one role per Google account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            {roles.filter(r => r.value !== 'agent').map(r => (
+              <button
+                key={r.value}
+                type="button"
+                onClick={() => handleGoogleRolePick(r.value)}
+                disabled={googleLoading}
+                className={cn(
+                  'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left disabled:opacity-60 disabled:cursor-not-allowed',
+                  r.color
+                )}
+              >
+                <div className="shrink-0">
+                  {googleLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : r.icon}
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">{r.label}</div>
+                  <div className="text-xs text-muted-foreground">{r.description}</div>
+                </div>
+              </button>
+            ))}
+            <p className="text-[11px] text-muted-foreground text-center pt-1">
+              Your selection determines which dashboard you'll land on after signing in.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
