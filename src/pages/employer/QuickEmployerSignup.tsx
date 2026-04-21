@@ -126,7 +126,7 @@ export default function QuickEmployerSignup() {
 
           <Button type="button" variant="outline" className="w-full h-11" onClick={handleGoogle} disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Continue with Google as Employer
+            Continue with Google
           </Button>
 
           <div className="relative my-4">
