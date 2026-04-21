@@ -120,7 +120,11 @@ export default function QuickWorkerSignup() {
       });
 
       if (signupErr) {
-        setError(signupErr.message);
+        if (/already registered|already exists/i.test(signupErr.message)) {
+          setError("This email is already registered. Please sign in instead.");
+        } else {
+          setError(signupErr.message);
+        }
         setLoading(false);
         return;
       }
@@ -128,10 +132,22 @@ export default function QuickWorkerSignup() {
       // Try immediate sign-in (works when email auto-confirm is on)
       await supabase.auth.signInWithPassword({ email: authEmail, password });
 
-      // Persist signup country to worker_profiles (handle_new_user creates the row)
-      // Wait briefly for trigger to complete
+      // Verify role matches (defends against an existing employer account being reused).
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        const { data: roleRow } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (roleRow && roleRow.role !== 'worker') {
+          await supabase.auth.signOut();
+          setError(
+            `This account is already registered as a ${roleRow.role}. Please log in with the correct role.`
+          );
+          setLoading(false);
+          return;
+        }
         await supabase.from('worker_profiles')
           .upsert({ user_id: user.id, country, nationality: country } as any, { onConflict: 'user_id' });
         await supabase.from('profiles')
