@@ -527,6 +527,46 @@ export default function Auth() {
           <a href="/privacy" className="underline">Privacy Policy</a>.
         </p>
       </div>
+
+      {/* Google role chooser — shown BEFORE OAuth so we know the user's
+          intended role (Worker vs Employer) up front. */}
+      <Dialog open={googleRoleOpen} onOpenChange={(open) => { if (!googleLoading) setGoogleRoleOpen(open); }}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle>
+              {googleRoleContext === 'signup' ? 'Sign up with Google as' : 'Continue with Google as'}
+            </DialogTitle>
+            <DialogDescription>
+              Choose how you want to use SafeWorkGlobal. You can only use one role per Google account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            {roles.filter(r => r.value !== 'agent').map(r => (
+              <button
+                key={r.value}
+                type="button"
+                onClick={() => handleGoogleRolePick(r.value)}
+                disabled={googleLoading}
+                className={cn(
+                  'w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left disabled:opacity-60 disabled:cursor-not-allowed',
+                  r.color
+                )}
+              >
+                <div className="shrink-0">
+                  {googleLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : r.icon}
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">{r.label}</div>
+                  <div className="text-xs text-muted-foreground">{r.description}</div>
+                </div>
+              </button>
+            ))}
+            <p className="text-[11px] text-muted-foreground text-center pt-1">
+              Your selection determines which dashboard you'll land on after signing in.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
