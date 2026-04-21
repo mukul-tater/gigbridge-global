@@ -58,7 +58,7 @@ export default function EscrowQuickActions({ payments }: EscrowQuickActionsProps
         <div className="p-3 rounded-lg bg-yellow-500/10 text-center">
           <Percent className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mx-auto mb-1.5" />
           <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{formatAmount(totalPlatformFees)}</p>
-          <p className="text-[10px] text-muted-foreground">!% fee Per month</p>
+          <p className="text-[10px] text-muted-foreground">1% platform fee</p>
         </div>
         <div className="p-3 rounded-lg bg-blue-500/10 text-center">
           <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400 mx-auto mb-1.5" />
