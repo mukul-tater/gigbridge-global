@@ -128,7 +128,37 @@ export default function Auth() {
     }
 
     const result = await login(emailToUse, loginPassword);
-    if (!result.success) setError(result.error || 'Login failed');
+    if (!result.success) {
+      setError(result.error || 'Login failed');
+      setLoading(false);
+      return;
+    }
+
+    // Enforce one-role-per-account: if a role hint was supplied, verify the
+    // signed-in user actually holds that role. Otherwise sign them out.
+    if (roleHint) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: roleRow } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        const storedRole = roleRow?.role as AppRole | undefined;
+        if (storedRole && storedRole !== roleHint) {
+          await supabase.auth.signOut();
+          const labelMap: Record<AppRole, string> = {
+            worker: 'Worker', employer: 'Employer', agent: 'Agent', admin: 'Admin',
+          };
+          setError(
+            `This account is already registered as a ${labelMap[storedRole]}. ` +
+            `Please log in with the correct role.`
+          );
+          setLoading(false);
+          return;
+        }
+      }
+    }
     setLoading(false);
   };
 
