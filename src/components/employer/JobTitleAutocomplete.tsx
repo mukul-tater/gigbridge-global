@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { POPULAR_JOB_TITLES } from "@/lib/constants";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface JobTitleAutocompleteProps {
@@ -21,6 +21,7 @@ export default function JobTitleAutocomplete({
 }: JobTitleAutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
+  const [customMode, setCustomMode] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
@@ -54,6 +55,14 @@ export default function JobTitleAutocomplete({
   const select = (s: string) => {
     onChange(s);
     setOpen(false);
+    setCustomMode(false);
+  };
+
+  const enterCustomMode = () => {
+    setCustomMode(true);
+    setOpen(false);
+    onChange("");
+    // focus handled by autoFocus on the custom input
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -81,18 +90,41 @@ export default function JobTitleAutocomplete({
 
   return (
     <div ref={wrapperRef} className="relative">
-      <Input
-        id={id}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => {
-          onChange(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        onKeyDown={handleKeyDown}
-        autoComplete="off"
-      />
+      {customMode ? (
+        <div className="space-y-1">
+          <Input
+            id={id}
+            value={value}
+            placeholder="Enter your custom job title"
+            onChange={(e) => onChange(e.target.value)}
+            autoComplete="off"
+            autoFocus
+          />
+          <button
+            type="button"
+            className="text-xs text-muted-foreground hover:text-foreground underline"
+            onClick={() => {
+              setCustomMode(false);
+              setOpen(true);
+            }}
+          >
+            ← Choose from suggestions instead
+          </button>
+        </div>
+      ) : (
+        <Input
+          id={id}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKeyDown}
+          autoComplete="off"
+        />
+      )}
       {open && filtered.length > 0 && (
         <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
           <ul className="max-h-64 overflow-auto py-1 text-sm">
@@ -115,6 +147,16 @@ export default function JobTitleAutocomplete({
                 )}
               </li>
             ))}
+            <li
+              onMouseDown={(e) => {
+                e.preventDefault();
+                enterCustomMode();
+              }}
+              className="flex cursor-pointer items-center gap-2 border-t px-3 py-2 font-medium text-primary hover:bg-accent/60"
+            >
+              <Pencil className="h-4 w-4" />
+              Other (specify custom job title)
+            </li>
             {showCustomHint && (
               <li className="border-t mt-1 px-3 py-2 text-xs text-muted-foreground flex items-center gap-1">
                 <Sparkles className="h-3 w-3" />
