@@ -37,7 +37,17 @@ export default function QuickEmployerSignup() {
           },
         },
       });
-      if (error) throw error;
+      if (error) {
+        // If the email is already registered with a different role, surface a
+        // clear message instead of letting Supabase's "User already registered"
+        // bubble up unexplained.
+        if (/already registered|already exists/i.test(error.message)) {
+          toast.error("This email is already registered. Please sign in instead.");
+          navigate("/auth?role=employer");
+          return;
+        }
+        throw error;
+      }
 
       // Try immediate sign-in (works when email confirmation disabled)
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
@@ -47,9 +57,22 @@ export default function QuickEmployerSignup() {
         return;
       }
 
-      // Persist company name onto employer profile
+      // Verify role matches (defends against an existing account being reused).
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        const { data: roleRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (roleRow && roleRow.role !== "employer") {
+          await supabase.auth.signOut();
+          toast.error(
+            `This account is already registered as a ${roleRow.role}. Please log in with the correct role.`
+          );
+          navigate("/auth");
+          return;
+        }
         await supabase.from("employer_profiles").update({ company_name: companyName.trim() }).eq("user_id", user.id);
       }
 
