@@ -118,6 +118,12 @@ export default function QuickEmployerSignup() {
             <p className="text-xs text-muted-foreground mt-1">Takes less than 2 minutes</p>
           </div>
 
+          {/* Role indicator — makes it explicit which role you're signing up as */}
+          <div className="mb-4 mx-auto w-fit flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+            <Building2 className="h-3.5 w-3.5" />
+            Signing up as an Employer
+          </div>
+
           <form onSubmit={handleSignup} className="space-y-3">
             <div>
               <Label htmlFor="company">Company name *</Label>
@@ -147,7 +153,7 @@ export default function QuickEmployerSignup() {
           </div>
 
           <Button type="button" variant="outline" className="w-full h-11" onClick={handleGoogle} disabled={loading}>
-            Continue with Google
+            Continue with Google as Employer
           </Button>
 
           <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">

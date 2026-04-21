@@ -50,7 +50,7 @@ const HeroSection = () => {
 
   const handleFindJobs = () => {
     if (!isAuthenticated) {
-      navigate('/auth?role=worker&mode=signup');
+      navigate('/worker/quick-signup');
       return;
     }
     if (role === 'employer') {
@@ -62,7 +62,7 @@ const HeroSection = () => {
 
   const handleHireWorkers = () => {
     if (!isAuthenticated) {
-      navigate('/auth?role=employer&mode=signup');
+      navigate('/employer/quick-signup');
       return;
     }
     if (role === 'worker') {

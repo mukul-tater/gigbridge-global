@@ -142,7 +142,7 @@ const Header = () => {
                       I want to…
                     </p>
                     <button
-                      onClick={() => navigate('/auth?role=worker&mode=signup')}
+                      onClick={() => navigate('/worker/quick-signup')}
                       className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors"
                     >
                       <div className="p-2 rounded-lg bg-success/10 text-success">
@@ -154,7 +154,7 @@ const Header = () => {
                       </div>
                     </button>
                     <button
-                      onClick={() => navigate('/auth?role=employer&mode=signup')}
+                      onClick={() => navigate('/employer/quick-signup')}
                       className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors mt-1"
                     >
                       <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -273,7 +273,7 @@ const Header = () => {
                       variant="default"
                       size="lg"
                       className="w-full justify-start gap-3"
-                      onClick={() => { navigate('/auth?role=worker&mode=signup'); closeMobileMenu(); }}
+                      onClick={() => { navigate('/worker/quick-signup'); closeMobileMenu(); }}
                     >
                       <HardHat className="h-4 w-4" />
                       Find a job (Worker signup)
@@ -282,7 +282,7 @@ const Header = () => {
                       variant="secondary"
                       size="lg"
                       className="w-full justify-start gap-3"
-                      onClick={() => { navigate('/auth?role=employer&mode=signup'); closeMobileMenu(); }}
+                      onClick={() => { navigate('/employer/quick-signup'); closeMobileMenu(); }}
                     >
                       <Briefcase className="h-4 w-4" />
                       Hire workers (Employer signup)

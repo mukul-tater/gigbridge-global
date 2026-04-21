@@ -13,8 +13,9 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Phone, Mail, ShieldCheck, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Loader2, Phone, Mail, ShieldCheck, CheckCircle2, ArrowLeft, HardHat } from 'lucide-react';
 import { NATIONALITIES } from '@/lib/constants';
+import { lovable } from '@/integrations/lovable/index';
 
 type Method = 'mobile' | 'email';
 type Step = 'form' | 'otp';
@@ -38,6 +39,26 @@ export default function QuickWorkerSignup() {
   const [email, setEmail] = useState('');
   const [country, setCountry] = useState('');
   const [otp, setOtp] = useState('');
+
+  const handleGoogle = async () => {
+    setLoading(true);
+    try {
+      // Pre-select Worker role so the OAuth callback auto-assigns it
+      // — user is NOT asked again on /auth.
+      sessionStorage.setItem('pending_oauth_role', 'worker');
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: `${window.location.origin}/auth`,
+      });
+      if (result.error) {
+        sessionStorage.removeItem('pending_oauth_role');
+        toast.error('Google signup failed');
+        setLoading(false);
+      }
+    } catch {
+      sessionStorage.removeItem('pending_oauth_role');
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isAuthenticated && role === 'worker') {
@@ -182,6 +203,12 @@ export default function QuickWorkerSignup() {
           <p className="text-sm text-muted-foreground mt-1">Takes under 2 minutes • No agent fees</p>
         </div>
 
+        {/* Role indicator — makes it explicit which role you're signing up as */}
+        <div className="mb-4 flex items-center justify-center gap-2 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-xs font-semibold text-success">
+          <HardHat className="h-3.5 w-3.5" />
+          Signing up as a Worker
+        </div>
+
         <Card className="shadow-lg border-border/60">
           <CardContent className="p-6">
             {error && (
@@ -262,6 +289,22 @@ export default function QuickWorkerSignup() {
 
                 <Button type="submit" className="w-full h-11 font-semibold">
                   Continue
+                </Button>
+
+                <div className="relative my-1">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+                  <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">OR</span></div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-11"
+                  onClick={handleGoogle}
+                  disabled={loading}
+                >
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Continue with Google as Worker
                 </Button>
 
                 <div className="flex items-center gap-2 text-xs text-success bg-success/5 border border-success/20 rounded-lg p-2.5">
