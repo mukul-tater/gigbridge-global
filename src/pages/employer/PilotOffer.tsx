@@ -32,7 +32,7 @@ export default function PilotOffer() {
               { icon: Sparkles, text: "Fill 5–10 roles" },
               { icon: CheckCircle2, text: "Shortlists in 7–10 days" },
               { icon: ShieldCheck, text: "No upfront fees" },
-              { icon: Wallet, text: "Pay only 1% after hiring" },
+              { icon: Wallet, text: "Pay only after you hire" },
             ].map((p) => (
               <div key={p.text} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card/50">
                 <div className="p-2 rounded-lg bg-primary/10">
