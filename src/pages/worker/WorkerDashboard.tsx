@@ -12,6 +12,7 @@ import JobJourneyProgressCard from "@/components/worker/JobJourneyProgressCard";
 import ApplicationProgressCard from "@/components/worker/ApplicationProgressCard";
 import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import { DashboardSkeleton } from "@/components/ui/page-skeleton";
+import SalaryProtectionPromise from "@/components/SalaryProtectionPromise";
 import { Link } from "react-router-dom";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 import { formatDistanceToNow } from "date-fns";
@@ -163,6 +164,10 @@ export default function WorkerDashboard() {
 
       <div className="mb-6">
         <ApplicationProgressCard userId={profile?.id || ""} />
+      </div>
+
+      <div className="mb-6">
+        <SalaryProtectionPromise />
       </div>
 
       {jobFormalities.length > 0 && (
