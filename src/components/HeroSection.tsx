@@ -224,6 +224,9 @@ const HeroSection = () => {
 
             {/* Feature Cards */}
             <div className="space-y-3">
+              {/* Plain-language salary protection — primary trust driver */}
+              <SalaryProtectionPromise variant="hero" />
+
               {[
                 {
                   icon: Globe,
@@ -238,13 +241,6 @@ const HeroSection = () => {
                   description: "Countries with 1-4 week hiring times and simplified visa processes",
                   iconBg: "bg-secondary/15",
                   iconColor: "text-secondary"
-                },
-                {
-                  icon: Users,
-                  title: "Verified Opportunities",
-                  description: "Every job verified with transparent salaries and real employer reviews",
-                  iconBg: "bg-success/15",
-                  iconColor: "text-success"
                 }
               ].map((feature) => (
                 <div
