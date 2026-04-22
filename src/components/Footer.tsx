@@ -106,6 +106,7 @@ const Footer = () => {
                   </button>
                 </li>
                 <li><Link to="/about" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">How It Works</Link></li>
+                <li><Link to="/benefits-for-employers" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Benefits for Employers</Link></li>
                 <li><Link to="/contact" className="text-xs sm:text-sm text-background/50 hover:text-background transition-colors">Talk to our team</Link></li>
               </ul>
               <div className="rounded-lg border border-background/10 bg-background/5 p-3">

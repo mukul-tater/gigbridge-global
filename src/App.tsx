@@ -29,6 +29,7 @@ import CulturalGuides from "./pages/resources/CulturalGuides";
 import CountryInsightsPage from "./pages/resources/CountryInsightsPage";
 import LanguageResources from "./pages/resources/LanguageResources";
 import LegalAdvice from "./pages/resources/LegalAdvice";
+import BenefitsForEmployers from "./pages/BenefitsForEmployers";
 
 import WorkerDashboard from "./pages/worker/WorkerDashboard";
 import WorkerProfile from "./pages/worker/WorkerProfile";
@@ -140,6 +141,7 @@ function App() {
                 <Route path="/country-insights" element={<CountryInsightsPage />} />
                 <Route path="/language-resources" element={<LanguageResources />} />
                 <Route path="/legal-advice" element={<LegalAdvice />} />
+                <Route path="/benefits-for-employers" element={<BenefitsForEmployers />} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
                 {/* Worker quick-start (public — handles auth itself) */}
