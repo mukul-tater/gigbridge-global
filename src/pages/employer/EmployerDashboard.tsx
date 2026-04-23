@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import BackgroundVerificationCard from "@/components/employer/BackgroundVerificationCard";
 import EscrowQuickActions from "@/components/employer/EscrowQuickActions";
@@ -18,6 +19,7 @@ import { employerNavGroups, employerProfileMenu } from "@/config/employerNav";
 
 export default function EmployerDashboard() {
   const { profile, user } = useAuth();
+  const navigate = useNavigate();
   const employerId = user?.id ?? profile?.id;
   const [verifications, setVerifications] = useState([]);
   const [payments, setPayments] = useState([]);
