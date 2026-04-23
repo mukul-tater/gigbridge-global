@@ -259,26 +259,40 @@ export default function EmployerDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ShortlistedCandidatesCard workers={shortlistedWorkers} loading={loading} />
         <Card className="p-5">
-          <h2 className="text-lg font-bold mb-3">Top Performing Jobs</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold">Top Performing Jobs</h2>
+            <Link to="/employer/manage-jobs" className="text-sm text-primary hover:underline">View all</Link>
+          </div>
           <div className="space-y-3">
             {topPerformingJobs.length > 0 ? topPerformingJobs.map(({ job, count }) => (
-              <div key={job.id} className="p-3 bg-muted/50 rounded-lg">
+              <Link
+                key={job.id}
+                to={`/jobs/${job.slug || job.id}`}
+                className="block p-3 bg-muted/50 rounded-lg hover:bg-muted hover:shadow-sm transition-all cursor-pointer"
+              >
                 <h3 className="font-semibold text-sm mb-1 truncate">{job.title}</h3>
                 <p className="text-xs text-muted-foreground mb-1">{count} applications • {job.location}</p>
                 <span className={`text-xs px-2 py-0.5 rounded ${job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                   {job.status}
                 </span>
-              </div>
+              </Link>
             )) : jobs.length > 0 ? jobs.slice(0, 3).map((job: any) => (
-              <div key={job.id} className="p-3 bg-muted/50 rounded-lg">
+              <Link
+                key={job.id}
+                to={`/jobs/${job.slug || job.id}`}
+                className="block p-3 bg-muted/50 rounded-lg hover:bg-muted hover:shadow-sm transition-all cursor-pointer"
+              >
                 <h3 className="font-semibold text-sm mb-1 truncate">{job.title}</h3>
                 <p className="text-xs text-muted-foreground mb-1">0 applications • {job.location}</p>
                 <span className={`text-xs px-2 py-0.5 rounded ${job.status === 'ACTIVE' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                   {job.status}
                 </span>
-              </div>
+              </Link>
             )) : (
-              <p className="text-muted-foreground text-center py-6 text-sm">No jobs posted yet</p>
+              <div className="text-center py-6">
+                <p className="text-muted-foreground text-sm mb-3">No jobs posted yet</p>
+                <Link to="/employer/post-job" className="text-sm text-primary hover:underline">Post your first job →</Link>
+              </div>
             )}
           </div>
         </Card>
