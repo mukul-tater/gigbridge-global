@@ -1786,6 +1786,7 @@ export type Database = {
           years_of_experience: number
         }[]
       }
+      seed_demo_users: { Args: { p_users: Json }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "employer" | "worker" | "agent"
