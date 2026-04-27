@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ThemeProvider } from "./components/ThemeProvider";
 import PageTransition from "./components/PageTransition";
+import PilotPhaseBanner from "./components/PilotPhaseBanner";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Jobs from "./pages/Jobs";
@@ -116,6 +117,7 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <ErrorBoundary>
+            <PilotPhaseBanner />
             <PageTransition>
               <Routes>
                 <Route path="/" element={<Index />} />
