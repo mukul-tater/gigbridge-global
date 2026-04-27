@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { 
   User, FileText, Briefcase, GraduationCap, Building2, 
-  CheckCircle2, ChevronRight, X, Mail 
+  CheckCircle2, ChevronRight, X, Mail, CalendarClock
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,11 +52,10 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
       };
 
       if (role === 'worker') {
-        const [profileRes, docsRes, skillsRes, expRes] = await Promise.all([
+        const [profileRes, docsRes, skillsRes] = await Promise.all([
           supabase.from('worker_profiles').select('*').eq('user_id', user.id).maybeSingle(),
           supabase.from('worker_documents').select('id').eq('worker_id', user.id),
           supabase.from('worker_skills').select('id').eq('worker_id', user.id),
-          supabase.from('work_experience').select('id').eq('worker_id', user.id)
         ]);
 
         const workerProfile = profileRes.data;
@@ -64,7 +63,7 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
         const hasBio = !!workerProfile?.bio;
         const hasDocs = (docsRes.data?.length || 0) > 0;
         const hasSkills = (skillsRes.data?.length || 0) > 0;
-        const hasExp = (expRes.data?.length || 0) > 0;
+        const hasAvailability = !!workerProfile?.availability;
 
         setSteps([
           emailStep,
@@ -93,12 +92,12 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
             completed: hasSkills
           },
           {
-            id: 'experience',
-            title: 'Work Experience',
-            description: 'Add previous job history',
-            icon: <Briefcase className="h-5 w-5" />,
+            id: 'availability',
+            title: 'Set Availability',
+            description: 'Tell employers when you can start',
+            icon: <CalendarClock className="h-5 w-5" />,
             route: '/worker/profile',
-            completed: hasExp
+            completed: hasAvailability
           }
         ]);
       } else if (role === 'employer') {
