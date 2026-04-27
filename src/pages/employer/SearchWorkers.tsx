@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom';
 import { WorkerListSkeleton } from '@/components/ui/page-skeleton';
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
 import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
+import SendJobRequestDialog from "@/components/employer/SendJobRequestDialog";
 import { ArrowRight } from "lucide-react";
 import { WORKER_SORT_OPTIONS } from "@/lib/constants";
 
@@ -544,9 +545,15 @@ export default function SearchWorkers() {
                       <Link to={`/worker-profile/${worker.id}`}>
                         <Button size="sm" className="text-xs md:text-sm">View Profile</Button>
                       </Link>
-                      <Button variant="outline" size="sm" className="text-xs md:text-sm">
-                        <Mail className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />Contact
-                      </Button>
+                      <SendJobRequestDialog
+                        workerId={worker.id}
+                        workerName={worker.full_name}
+                        trigger={
+                          <Button variant="outline" size="sm" className="text-xs md:text-sm">
+                            <Mail className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />Send Job Request
+                          </Button>
+                        }
+                      />
                       <Button
                         variant={shortlistedIds.has(worker.id) ? "default" : "outline"}
                         size="sm"
