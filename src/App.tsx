@@ -104,6 +104,7 @@ import QuickEmployerSignup from "./pages/employer/QuickEmployerSignup";
 import EmployerTrust from "./pages/employer/EmployerTrust";
 import QuickPostJob from "./pages/employer/QuickPostJob";
 import PilotOffer from "./pages/employer/PilotOffer";
+import RecommendedWorkers from "./pages/employer/RecommendedWorkers";
 
 const qc = new QueryClient();
 
@@ -180,6 +181,7 @@ function App() {
                 <Route path="/employer/trust" element={<ProtectedRoute allowedRoles={["employer"]}><EmployerTrust /></ProtectedRoute>} />
                 <Route path="/employer/quick-post-job" element={<ProtectedRoute allowedRoles={["employer"]}><QuickPostJob /></ProtectedRoute>} />
                 <Route path="/employer/pilot-offer" element={<ProtectedRoute allowedRoles={["employer"]}><PilotOffer /></ProtectedRoute>} />
+                <Route path="/employer/recommended-workers" element={<ProtectedRoute allowedRoles={["employer"]}><RecommendedWorkers /></ProtectedRoute>} />
 
                 {/* Employer */}
                 <Route path="/employer/onboarding" element={<ProtectedRoute allowedRoles={["employer"]}><EmployerOnboarding /></ProtectedRoute>} />
