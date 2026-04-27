@@ -228,7 +228,7 @@ function salaryScore(job: JobForMatch, worker: WorkerForMatch): number {
   const jMin = job.salary_min ?? 0;
   const jMax = job.salary_max ?? jMin;
   const wMin = worker.expected_salary_min ?? 0;
-  const wMax = worker.expected_salary_max ?? wMin || jMax;
+  const wMax = (worker.expected_salary_max ?? wMin) || jMax;
   if (!jMax || !wMin) return 10; // unknown → neutral
   // Overlap of two ranges
   const overlap = Math.max(0, Math.min(jMax, wMax) - Math.max(jMin, wMin));
