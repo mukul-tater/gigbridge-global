@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Star, Trash2, User, FileText, GitCompare, Plus, Handshake, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EmployerFlowStepper from "@/components/employer/EmployerFlowStepper";
+import SendJobRequestDialog from "@/components/employer/SendJobRequestDialog";
+import { Send } from "lucide-react";
 
 interface ShortlistedWorker {
   id: string;
@@ -323,6 +325,16 @@ export default function WorkerShortlist() {
                   Hire & Open Escrow
                   <Shield className="h-3.5 w-3.5 opacity-80" />
                 </Button>
+                <SendJobRequestDialog
+                  workerId={worker.worker_id}
+                  workerName={worker.profiles?.full_name}
+                  trigger={
+                    <Button variant="outline" size="sm" className="w-full mb-2 gap-1">
+                      <Send className="h-4 w-4" />
+                      Send Job Request
+                    </Button>
+                  }
+                />
                 <div className="flex gap-2">
                   <Dialog>
                     <DialogTrigger asChild>
