@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import VerificationBadge, { calculateVerificationLevel, VerificationLevel } from '@/components/worker/VerificationBadge';
+import SendJobRequestDialog from '@/components/employer/SendJobRequestDialog';
 
 interface WorkerProfile {
   user_id: string;
@@ -395,10 +396,16 @@ export default function WorkerPublicProfile() {
 
                     {role === 'employer' && (
                       <div className="flex gap-2">
-                        <Button onClick={handleContact}>
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          Contact
-                        </Button>
+                        <SendJobRequestDialog
+                          workerId={profile.id}
+                          workerName={profile.full_name}
+                          trigger={
+                            <Button>
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Send Job Request
+                            </Button>
+                          }
+                        />
                         <Button
                           variant={isShortlisted ? "secondary" : "outline"}
                           onClick={handleShortlist}
