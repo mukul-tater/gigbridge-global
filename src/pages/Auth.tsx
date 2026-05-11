@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { passwordValidation } from '@/components/ValidatedInput';
 
 type AuthView = 'login' | 'signup' | 'forgot' | 'role-select';
 type LoginMethod = 'email' | 'mobile';
