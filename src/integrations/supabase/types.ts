@@ -831,6 +831,13 @@ export type Database = {
             foreignKeyName: "jobs_employer_id_fkey"
             columns: ["employer_id"]
             isOneToOne: false
+            referencedRelation: "employer_company_info"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "jobs_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
             referencedRelation: "employer_profiles"
             referencedColumns: ["user_id"]
           },
@@ -1720,7 +1727,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      employer_company_info: {
+        Row: {
+          bio: string | null
+          business_type: string | null
+          company_logo_url: string | null
+          company_name: string | null
+          company_size: string | null
+          country: string | null
+          created_at: string | null
+          follows_safety_standards: boolean | null
+          industry: string | null
+          office_state: string | null
+          provides_ppe: string | null
+          site_safety_level: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          business_type?: string | null
+          company_logo_url?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          country?: string | null
+          created_at?: string | null
+          follows_safety_standards?: boolean | null
+          industry?: string | null
+          office_state?: string | null
+          provides_ppe?: string | null
+          site_safety_level?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          business_type?: string | null
+          company_logo_url?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          country?: string | null
+          created_at?: string | null
+          follows_safety_standards?: boolean | null
+          industry?: string | null
+          office_state?: string | null
+          provides_ppe?: string | null
+          site_safety_level?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       assign_initial_role: {
