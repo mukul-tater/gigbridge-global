@@ -120,7 +120,7 @@ export default function JobDetail() {
           .maybeSingle();
 
         if (employerData && !cancelled) {
-          setEmployer(employerData);
+          setEmployer(employerData as any);
         }
 
         // Check if user has already applied and if job is saved
