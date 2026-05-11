@@ -69,10 +69,13 @@ export default function SeedDataButton() {
               <div key={idx} className="flex justify-between">
                 <span className="text-primary">{account.role.toUpperCase()}</span>
                 <span>{account.email}</span>
-                <span className="text-muted-foreground">{account.password}</span>
+                <span className="text-muted-foreground">••••••••</span>
               </div>
             ))}
           </div>
+          <p className="text-xs text-muted-foreground">
+            Demo passwords are stored securely and not displayed in the UI. Retrieve them from the secure admin credentials store if needed.
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -86,7 +89,7 @@ export default function SeedDataButton() {
             <li>• Sample notifications for all user types (worker, employer, admin)</li>
           </ul>
           <p className="text-xs text-amber-600 mt-2">
-            Tip: Log in as an employer (employer@safeworkglobal.demo / Employer@2024!) before seeding for best results.
+            Tip: Log in as an employer demo account before seeding for best results.
           </p>
         </div>
 
