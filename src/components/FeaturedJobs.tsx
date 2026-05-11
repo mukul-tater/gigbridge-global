@@ -47,7 +47,6 @@ export default function FeaturedJobs() {
           .from('jobs')
           .select(`
             *,
-            employer_profiles!jobs_employer_id_fkey (company_name),
             job_skills (skill_name)
           `)
           .eq('status', 'ACTIVE')
@@ -55,7 +54,20 @@ export default function FeaturedJobs() {
           .limit(6);
 
         if (error) throw error;
-        setJobs((data as any) || []);
+        const employerIds = Array.from(new Set((data || []).map((j: any) => j.employer_id).filter(Boolean)));
+        let companyMap: Record<string, string> = {};
+        if (employerIds.length > 0) {
+          const { data: companies } = await supabase
+            .from('employer_company_info' as any)
+            .select('user_id, company_name')
+            .in('user_id', employerIds);
+          companyMap = Object.fromEntries((companies || []).map((c: any) => [c.user_id, c.company_name]));
+        }
+        const enriched = (data || []).map((j: any) => ({
+          ...j,
+          employer_profiles: { company_name: companyMap[j.employer_id] || 'Company' },
+        }));
+        setJobs(enriched as any);
       } catch (error) {
         console.error('Error loading jobs:', error);
       } finally {

@@ -114,13 +114,13 @@ export default function JobDetail() {
 
         // Fetch employer profile
         const { data: employerData } = await supabase
-          .from('employer_profiles')
+          .from('employer_company_info' as any)
           .select('company_name, industry, company_size, bio')
           .eq('user_id', jobData.employer_id)
           .maybeSingle();
 
         if (employerData && !cancelled) {
-          setEmployer(employerData);
+          setEmployer(employerData as any);
         }
 
         // Check if user has already applied and if job is saved
