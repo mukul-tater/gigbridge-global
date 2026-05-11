@@ -215,7 +215,10 @@ export default function Auth() {
     if (!signupRole) { setError('Please select a role'); return; }
     if (!signupName.trim()) { setError('Full name is required'); return; }
     if (!signupPhone.trim()) { setError('Mobile number is required'); return; }
-    if (signupPassword.length < 6) { setError('Password must be at least 6 characters'); return; }
+    {
+      const pwErr = passwordValidation(signupPassword);
+      if (pwErr) { setError(pwErr); return; }
+    }
     setLoading(true);
 
     const result = await signup({
