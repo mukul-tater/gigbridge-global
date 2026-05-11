@@ -200,7 +200,53 @@ serve(async (req) => {
   }
 
   try {
+    // Require authenticated caller
+    const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const authClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claims, error: authError } = await authClient.auth.getClaims(authHeader.replace("Bearer ", ""));
+    if (authError || !claims?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const callerId = claims.claims.sub as string;
+
     const { userId, title, message, url, notificationId } = await req.json();
+
+    // Caller may only push to themselves unless they are an admin or have an
+    // existing employer<->worker relationship with the recipient.
+    if (userId !== callerId) {
+      const { data: isAdmin } = await authClient.rpc("has_role", { _user_id: callerId, _role: "admin" });
+      if (!isAdmin) {
+        const { data: rel } = await authClient
+          .from("job_applications")
+          .select("id")
+          .or(`and(employer_id.eq.${callerId},worker_id.eq.${userId}),and(employer_id.eq.${userId},worker_id.eq.${callerId})`)
+          .limit(1)
+          .maybeSingle();
+        if (!rel) {
+          return new Response(JSON.stringify({ error: "Forbidden" }), {
+            status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+    }
+
+    // Validate URL is internal (no external links)
+    if (url && typeof url === "string" && !url.startsWith("/")) {
+      return new Response(JSON.stringify({ error: "Invalid url: must be internal path" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
     const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
