@@ -100,13 +100,22 @@ export default function Jobs() {
         .from('jobs')
         .select(`
           *,
-          job_skills (skill_name),
-          employer_profiles!jobs_employer_id_fkey (company_name)
+          job_skills (skill_name)
         `)
         .eq('status', 'ACTIVE')
         .order('posted_at', { ascending: false });
 
       if (error) throw error;
+
+      const employerIds = Array.from(new Set((data || []).map((j: any) => j.employer_id).filter(Boolean)));
+      let companyMap: Record<string, string> = {};
+      if (employerIds.length > 0) {
+        const { data: companies } = await supabase
+          .from('employer_company_info' as any)
+          .select('user_id, company_name')
+          .in('user_id', employerIds);
+        companyMap = Object.fromEntries((companies || []).map((c: any) => [c.user_id, c.company_name]));
+      }
 
       const formattedJobs: Job[] = (data || []).map((job: any) => {
         const salaryMinVal = job.salary_min == null ? null : (job.currency === 'INR' ? job.salary_min : job.salary_min * 83);
@@ -116,7 +125,7 @@ export default function Jobs() {
           id: job.id,
           slug: job.slug || job.id,
           title: job.title,
-          company: job.employer_profiles?.company_name || 'Company',
+          company: companyMap[job.employer_id] || 'Company',
           location: `${job.location}, ${job.country}`,
           country: job.country,
           salary: formatSalaryINR(job.salary_min, job.salary_max, job.currency),
