@@ -126,7 +126,14 @@ function App() {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/verify-email" element={<EmailVerificationPending />} />
                 <Route path="/install" element={<InstallPWA />} />
-                <Route path="/seed-data" element={<SeedData />} />
+                <Route
+                  path="/seed-data"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <SeedData />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/jobs" element={<Jobs />} />
                 <Route path="/jobs/:slug" element={<JobDetail />} />
                 <Route path="/workers" element={<Workers />} />
