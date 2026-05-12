@@ -356,6 +356,57 @@ export type Database = {
           },
         ]
       }
+      employer_company_info: {
+        Row: {
+          bio: string | null
+          business_type: string | null
+          company_logo_url: string | null
+          company_name: string | null
+          company_size: string | null
+          country: string | null
+          created_at: string | null
+          follows_safety_standards: boolean | null
+          industry: string | null
+          office_state: string | null
+          provides_ppe: string | null
+          site_safety_level: string | null
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          business_type?: string | null
+          company_logo_url?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          country?: string | null
+          created_at?: string | null
+          follows_safety_standards?: boolean | null
+          industry?: string | null
+          office_state?: string | null
+          provides_ppe?: string | null
+          site_safety_level?: string | null
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          business_type?: string | null
+          company_logo_url?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          country?: string | null
+          created_at?: string | null
+          follows_safety_standards?: boolean | null
+          industry?: string | null
+          office_state?: string | null
+          provides_ppe?: string | null
+          site_safety_level?: string | null
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       employer_profiles: {
         Row: {
           billing_address: string | null
@@ -827,13 +878,6 @@ export type Database = {
           visa_sponsorship?: boolean | null
         }
         Relationships: [
-          {
-            foreignKeyName: "jobs_employer_id_fkey"
-            columns: ["employer_id"]
-            isOneToOne: false
-            referencedRelation: "employer_company_info"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "jobs_employer_id_fkey"
             columns: ["employer_id"]
@@ -1488,6 +1532,105 @@ export type Database = {
           },
         ]
       }
+      worker_profile_employer_info: {
+        Row: {
+          availability: string | null
+          bio: string | null
+          country: string | null
+          created_at: string | null
+          currency: string | null
+          current_city: string | null
+          current_location: string | null
+          ecr_category: string | null
+          ecr_status: string | null
+          expected_salary_max: number | null
+          expected_salary_min: number | null
+          expected_wage_amount: number | null
+          expected_wage_type: string | null
+          experience_range: string | null
+          has_passport: boolean | null
+          has_visa: boolean | null
+          languages: string[] | null
+          nationality: string | null
+          onboarding_completed: boolean | null
+          open_to_relocation: boolean | null
+          preferred_shift: string | null
+          primary_work_type: string | null
+          project_types_worked: string[] | null
+          secondary_skills: string[] | null
+          skill_level: string | null
+          updated_at: string | null
+          user_id: string
+          visa_countries: string[] | null
+          work_preference: string | null
+          years_of_experience: number | null
+        }
+        Insert: {
+          availability?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          current_city?: string | null
+          current_location?: string | null
+          ecr_category?: string | null
+          ecr_status?: string | null
+          expected_salary_max?: number | null
+          expected_salary_min?: number | null
+          expected_wage_amount?: number | null
+          expected_wage_type?: string | null
+          experience_range?: string | null
+          has_passport?: boolean | null
+          has_visa?: boolean | null
+          languages?: string[] | null
+          nationality?: string | null
+          onboarding_completed?: boolean | null
+          open_to_relocation?: boolean | null
+          preferred_shift?: string | null
+          primary_work_type?: string | null
+          project_types_worked?: string[] | null
+          secondary_skills?: string[] | null
+          skill_level?: string | null
+          updated_at?: string | null
+          user_id: string
+          visa_countries?: string[] | null
+          work_preference?: string | null
+          years_of_experience?: number | null
+        }
+        Update: {
+          availability?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          current_city?: string | null
+          current_location?: string | null
+          ecr_category?: string | null
+          ecr_status?: string | null
+          expected_salary_max?: number | null
+          expected_salary_min?: number | null
+          expected_wage_amount?: number | null
+          expected_wage_type?: string | null
+          experience_range?: string | null
+          has_passport?: boolean | null
+          has_visa?: boolean | null
+          languages?: string[] | null
+          nationality?: string | null
+          onboarding_completed?: boolean | null
+          open_to_relocation?: boolean | null
+          preferred_shift?: string | null
+          primary_work_type?: string | null
+          project_types_worked?: string[] | null
+          secondary_skills?: string[] | null
+          skill_level?: string | null
+          updated_at?: string | null
+          user_id?: string
+          visa_countries?: string[] | null
+          work_preference?: string | null
+          years_of_experience?: number | null
+        }
+        Relationships: []
+      }
       worker_profiles: {
         Row: {
           availability: string | null
@@ -1727,57 +1870,7 @@ export type Database = {
       }
     }
     Views: {
-      employer_company_info: {
-        Row: {
-          bio: string | null
-          business_type: string | null
-          company_logo_url: string | null
-          company_name: string | null
-          company_size: string | null
-          country: string | null
-          created_at: string | null
-          follows_safety_standards: boolean | null
-          industry: string | null
-          office_state: string | null
-          provides_ppe: string | null
-          site_safety_level: string | null
-          user_id: string | null
-          website: string | null
-        }
-        Insert: {
-          bio?: string | null
-          business_type?: string | null
-          company_logo_url?: string | null
-          company_name?: string | null
-          company_size?: string | null
-          country?: string | null
-          created_at?: string | null
-          follows_safety_standards?: boolean | null
-          industry?: string | null
-          office_state?: string | null
-          provides_ppe?: string | null
-          site_safety_level?: string | null
-          user_id?: string | null
-          website?: string | null
-        }
-        Update: {
-          bio?: string | null
-          business_type?: string | null
-          company_logo_url?: string | null
-          company_name?: string | null
-          company_size?: string | null
-          country?: string | null
-          created_at?: string | null
-          follows_safety_standards?: boolean | null
-          industry?: string | null
-          office_state?: string | null
-          provides_ppe?: string | null
-          site_safety_level?: string | null
-          user_id?: string | null
-          website?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       assign_initial_role: {
