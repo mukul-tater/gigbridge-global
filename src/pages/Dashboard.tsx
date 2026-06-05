@@ -39,8 +39,21 @@ export default function Dashboard() {
       case 'admin':
         go("/admin/dashboard");
         break;
-      case 'agent':
-        go("/agent/dashboard");
+      case 'partner':
+        (async () => {
+          try {
+            const { data } = await supabase
+              .from('partner_profiles')
+              .select('status,submitted_at')
+              .eq('user_id', user?.id || '')
+              .maybeSingle();
+            const submitted = !!data?.submitted_at;
+            go(submitted ? "/partner/dashboard" : "/partner/onboarding");
+          } catch (err) {
+            console.error('Partner status check failed:', err);
+            go("/partner/onboarding");
+          }
+        })();
         break;
       case 'employer':
         (async () => {
