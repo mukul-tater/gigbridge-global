@@ -91,7 +91,9 @@ import InvestorDashboard from "./pages/admin/InvestorDashboard";
 import InvestorRelations from "./pages/InvestorRelations";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
-import AgentDashboard from "./pages/agent/AgentDashboard";
+import PartnerDashboard from "./pages/partner/PartnerDashboard";
+import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
+import PartnerApprovals from "./pages/admin/PartnerApprovals";
 
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
 import WorkerOnboarding from "./pages/worker/WorkerOnboarding";
@@ -229,8 +231,10 @@ function App() {
                 <Route path="/admin/contact-submissions" element={<ProtectedRoute allowedRoles={["admin"]}><ContactSubmissions /></ProtectedRoute>} />
                 <Route path="/admin/investor-dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><InvestorDashboard /></ProtectedRoute>} />
 
-                {/* Agent */}
-                <Route path="/agent/dashboard" element={<ProtectedRoute allowedRoles={["agent"]}><AgentDashboard /></ProtectedRoute>} />
+                {/* Partner (e-Mitra) */}
+                <Route path="/partner/onboarding" element={<ProtectedRoute allowedRoles={["partner"]}><PartnerOnboarding /></ProtectedRoute>} />
+                <Route path="/partner/dashboard" element={<ProtectedRoute allowedRoles={["partner"]}><PartnerDashboard /></ProtectedRoute>} />
+                <Route path="/admin/partners" element={<ProtectedRoute allowedRoles={["admin"]}><PartnerApprovals /></ProtectedRoute>} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>
