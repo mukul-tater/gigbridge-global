@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 
-export type AppRole = 'admin' | 'employer' | 'worker' | 'agent';
+export type AppRole = 'admin' | 'employer' | 'worker' | 'partner';
 
 interface Profile {
   id: string;
