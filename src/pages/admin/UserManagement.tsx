@@ -119,8 +119,8 @@ export default function UserManagement() {
       } else if (user.role === "employer") {
         const { data } = await supabase.from("employer_profiles").select("*").eq("user_id", user.id).maybeSingle();
         setViewProfile(data);
-      } else if (user.role === "agent") {
-        const { data } = await supabase.from("agent_profiles").select("*").eq("user_id", user.id).maybeSingle();
+      } else if (user.role === "partner") {
+        const { data } = await supabase.from("partner_profiles").select("*").eq("user_id", user.id).maybeSingle();
         setViewProfile(data);
       }
     } catch (err) {
@@ -169,7 +169,7 @@ export default function UserManagement() {
             <SelectItem value="all">All Roles</SelectItem>
             <SelectItem value="worker">Worker</SelectItem>
             <SelectItem value="employer">Employer</SelectItem>
-            <SelectItem value="agent">Agent</SelectItem>
+            <SelectItem value="partner">Partner (e-Mitra)</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
           </SelectContent>
         </Select>
@@ -312,11 +312,13 @@ export default function UserManagement() {
                         <div><span className="text-muted-foreground">Onboarded:</span> {viewProfile.onboarding_completed ? "Yes" : "No"}</div>
                       </>
                     )}
-                    {viewUser.role === "agent" && (
+                    {viewUser.role === "partner" && (
                       <>
-                        <div><span className="text-muted-foreground">Agency:</span> {viewProfile.agency_name || "N/A"}</div>
-                        <div><span className="text-muted-foreground">Placements:</span> {viewProfile.total_placements || 0}</div>
-                        <div><span className="text-muted-foreground">License:</span> {viewProfile.license_number || "N/A"}</div>
+                        <div><span className="text-muted-foreground">Center:</span> {viewProfile.center_name || "N/A"}</div>
+                        <div><span className="text-muted-foreground">Owner:</span> {viewProfile.owner_name || "N/A"}</div>
+                        <div><span className="text-muted-foreground">District:</span> {viewProfile.district || "N/A"}</div>
+                        <div><span className="text-muted-foreground">State:</span> {viewProfile.state || "N/A"}</div>
+                        <div><span className="text-muted-foreground">Status:</span> {viewProfile.status || "applied"}</div>
                       </>
                     )}
                   </div>
