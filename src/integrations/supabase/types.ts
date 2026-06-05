@@ -14,42 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
-      agent_profiles: {
+      admin_actions: {
         Row: {
-          agency_name: string | null
-          bio: string | null
-          commission_rate: number | null
-          created_at: string | null
+          action: string
+          admin_id: string
+          created_at: string
           id: string
-          license_number: string | null
-          regions_covered: string[] | null
-          total_placements: number | null
-          updated_at: string | null
-          user_id: string
+          metadata: Json | null
+          reason: string | null
+          target_id: string
+          target_type: string
         }
         Insert: {
-          agency_name?: string | null
-          bio?: string | null
-          commission_rate?: number | null
-          created_at?: string | null
+          action: string
+          admin_id: string
+          created_at?: string
           id?: string
-          license_number?: string | null
-          regions_covered?: string[] | null
-          total_placements?: number | null
-          updated_at?: string | null
-          user_id: string
+          metadata?: Json | null
+          reason?: string | null
+          target_id: string
+          target_type: string
         }
         Update: {
-          agency_name?: string | null
-          bio?: string | null
-          commission_rate?: number | null
-          created_at?: string | null
+          action?: string
+          admin_id?: string
+          created_at?: string
           id?: string
-          license_number?: string | null
-          regions_covered?: string[] | null
-          total_placements?: number | null
-          updated_at?: string | null
-          user_id?: string
+          metadata?: Json | null
+          reason?: string | null
+          target_id?: string
+          target_type?: string
         }
         Relationships: []
       }
@@ -1048,6 +1042,147 @@ export type Database = {
           },
         ]
       }
+      partner_profiles: {
+        Row: {
+          aadhaar_back_url: string | null
+          aadhaar_front_url: string | null
+          aadhaar_number: string | null
+          accepted_privacy: boolean | null
+          accepted_terms: boolean | null
+          account_holder: string | null
+          account_number: string | null
+          address: string | null
+          agency_name: string | null
+          bio: string | null
+          center_name: string | null
+          commission_rate: number | null
+          confirmed_accuracy: boolean | null
+          created_at: string | null
+          current_step: number
+          district: string | null
+          email: string | null
+          id: string
+          ifsc: string | null
+          license_number: string | null
+          mobile: string | null
+          monthly_footfall: number | null
+          offers_doc_scanning: boolean | null
+          offers_passport_service: boolean | null
+          offers_worker_registration: boolean | null
+          owner_name: string | null
+          pan_card_url: string | null
+          pan_number: string | null
+          pincode: string | null
+          regions_covered: string[] | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          services_offered: string[] | null
+          shop_photo_url: string | null
+          state: string | null
+          status: Database["public"]["Enums"]["partner_status"]
+          submitted_at: string | null
+          total_placements: number | null
+          updated_at: string | null
+          upi_id: string | null
+          user_id: string
+          whatsapp: string | null
+          years_in_operation: number | null
+        }
+        Insert: {
+          aadhaar_back_url?: string | null
+          aadhaar_front_url?: string | null
+          aadhaar_number?: string | null
+          accepted_privacy?: boolean | null
+          accepted_terms?: boolean | null
+          account_holder?: string | null
+          account_number?: string | null
+          address?: string | null
+          agency_name?: string | null
+          bio?: string | null
+          center_name?: string | null
+          commission_rate?: number | null
+          confirmed_accuracy?: boolean | null
+          created_at?: string | null
+          current_step?: number
+          district?: string | null
+          email?: string | null
+          id?: string
+          ifsc?: string | null
+          license_number?: string | null
+          mobile?: string | null
+          monthly_footfall?: number | null
+          offers_doc_scanning?: boolean | null
+          offers_passport_service?: boolean | null
+          offers_worker_registration?: boolean | null
+          owner_name?: string | null
+          pan_card_url?: string | null
+          pan_number?: string | null
+          pincode?: string | null
+          regions_covered?: string[] | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          services_offered?: string[] | null
+          shop_photo_url?: string | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["partner_status"]
+          submitted_at?: string | null
+          total_placements?: number | null
+          updated_at?: string | null
+          upi_id?: string | null
+          user_id: string
+          whatsapp?: string | null
+          years_in_operation?: number | null
+        }
+        Update: {
+          aadhaar_back_url?: string | null
+          aadhaar_front_url?: string | null
+          aadhaar_number?: string | null
+          accepted_privacy?: boolean | null
+          accepted_terms?: boolean | null
+          account_holder?: string | null
+          account_number?: string | null
+          address?: string | null
+          agency_name?: string | null
+          bio?: string | null
+          center_name?: string | null
+          commission_rate?: number | null
+          confirmed_accuracy?: boolean | null
+          created_at?: string | null
+          current_step?: number
+          district?: string | null
+          email?: string | null
+          id?: string
+          ifsc?: string | null
+          license_number?: string | null
+          mobile?: string | null
+          monthly_footfall?: number | null
+          offers_doc_scanning?: boolean | null
+          offers_passport_service?: boolean | null
+          offers_worker_registration?: boolean | null
+          owner_name?: string | null
+          pan_card_url?: string | null
+          pan_number?: string | null
+          pincode?: string | null
+          regions_covered?: string[] | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          services_offered?: string[] | null
+          shop_photo_url?: string | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["partner_status"]
+          submitted_at?: string | null
+          total_placements?: number | null
+          updated_at?: string | null
+          upi_id?: string | null
+          user_id?: string
+          whatsapp?: string | null
+          years_in_operation?: number | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -1940,6 +2075,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "employer" | "worker" | "agent" | "partner"
+      partner_status:
+        | "applied"
+        | "under_review"
+        | "approved"
+        | "active"
+        | "suspended"
+        | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2068,6 +2210,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "employer", "worker", "agent", "partner"],
+      partner_status: [
+        "applied",
+        "under_review",
+        "approved",
+        "active",
+        "suspended",
+        "rejected",
+      ],
     },
   },
 } as const
