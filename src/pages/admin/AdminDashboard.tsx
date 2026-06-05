@@ -154,7 +154,7 @@ export default function AdminDashboard() {
       case 'admin': return 'bg-destructive/10 text-destructive';
       case 'employer': return 'bg-primary/10 text-primary';
       case 'worker': return 'bg-success/10 text-success';
-      case 'agent': return 'bg-warning/10 text-warning';
+      case 'partner': return 'bg-warning/10 text-warning';
       default: return 'bg-muted text-muted-foreground';
     }
   };
