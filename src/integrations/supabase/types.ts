@@ -1939,7 +1939,7 @@ export type Database = {
       seed_demo_users: { Args: { p_users: Json }; Returns: number }
     }
     Enums: {
-      app_role: "admin" | "employer" | "worker" | "agent"
+      app_role: "admin" | "employer" | "worker" | "agent" | "partner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2067,7 +2067,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "employer", "worker", "agent"],
+      app_role: ["admin", "employer", "worker", "agent", "partner"],
     },
   },
 } as const
