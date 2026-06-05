@@ -21,7 +21,7 @@ type LoginMethod = 'email' | 'mobile';
 const roles: { value: AppRole; label: string; description: string; icon: React.ReactNode; color: string }[] = [
   { value: 'worker', label: 'Worker', description: 'Find international job opportunities', icon: <HardHat className="h-6 w-6" />, color: 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:border-emerald-400' },
   { value: 'employer', label: 'Employer', description: 'Hire skilled workers globally', icon: <Briefcase className="h-6 w-6" />, color: 'bg-blue-50 text-blue-600 border-blue-200 hover:border-blue-400' },
-  { value: 'agent', label: 'Agent', description: 'Recruit & place workers for employers', icon: <Users className="h-6 w-6" />, color: 'bg-amber-50 text-amber-600 border-amber-200 hover:border-amber-400' },
+  { value: 'partner', label: 'Partner (e-Mitra)', description: 'Register workers from your service center', icon: <Users className="h-6 w-6" />, color: 'bg-amber-50 text-amber-600 border-amber-200 hover:border-amber-400' },
 ];
 
 export default function Auth() {
@@ -64,7 +64,7 @@ export default function Auth() {
   useEffect(() => {
     if (!roleHint) return;
     if (isAuthenticated) return; // already logged in — let other effects handle it
-    if (roleHint === 'worker' || roleHint === 'employer' || roleHint === 'agent') {
+    if (roleHint === 'worker' || roleHint === 'employer' || roleHint === 'partner') {
       setSignupRole(roleHint);
       // Redirect to the dedicated quick-signup pages for worker/employer.
       if (roleHint === 'worker') navigate('/worker/quick-signup', { replace: true });
@@ -81,7 +81,7 @@ export default function Auth() {
     // If the user picked a role BEFORE clicking "Sign in with Google",
     // auto-assign it now so they never see the role-select screen again.
     const pending = sessionStorage.getItem('pending_oauth_role') as AppRole | null;
-    if (pending && (pending === 'worker' || pending === 'employer' || pending === 'agent')) {
+    if (pending && (pending === 'worker' || pending === 'employer' || pending === 'partner')) {
       sessionStorage.removeItem('pending_oauth_role');
       handleRoleSelect(pending);
       return;
@@ -100,7 +100,7 @@ export default function Auth() {
     sessionStorage.removeItem('pending_oauth_role');
     if (pending !== role) {
       const labelMap: Record<AppRole, string> = {
-        worker: 'Worker', employer: 'Employer', agent: 'Agent', admin: 'Admin',
+        worker: 'Worker', employer: 'Employer', partner: 'Partner (e-Mitra)', admin: 'Admin',
       };
       (async () => {
         await supabase.auth.signOut();
@@ -196,7 +196,7 @@ export default function Auth() {
         if (storedRole && storedRole !== roleHint) {
           await supabase.auth.signOut();
           const labelMap: Record<AppRole, string> = {
-            worker: 'Worker', employer: 'Employer', agent: 'Agent', admin: 'Admin',
+            worker: 'Worker', employer: 'Employer', partner: 'Partner (e-Mitra)', admin: 'Admin',
           };
           setError(
             `This account is already registered as a ${labelMap[storedRole]}. ` +
@@ -282,7 +282,7 @@ export default function Auth() {
       } else if (selectedRole === 'employer') {
         navigate('/employer/trust', { replace: true });
       } else {
-        navigate('/agent/dashboard', { replace: true });
+        navigate('/partner/onboarding', { replace: true });
       }
       return;
     }
@@ -545,7 +545,7 @@ export default function Auth() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 pt-2">
-            {roles.filter(r => r.value !== 'agent').map(r => (
+            {roles.map(r => (
               <button
                 key={r.value}
                 type="button"
