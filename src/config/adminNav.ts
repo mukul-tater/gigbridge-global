@@ -1,4 +1,4 @@
-import { LayoutDashboard, TrendingUp, Users, FileCheck, CreditCard, Plane, CheckCircle, Shield, BarChart3, AlertTriangle, Mail } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Users, FileCheck, CreditCard, Plane, CheckCircle, Shield, BarChart3, AlertTriangle, Mail, Store } from "lucide-react";
 import type { NavGroup } from "@/components/layout/DashboardSidebar";
 
 export const adminNavGroups: NavGroup[] = [
@@ -15,6 +15,7 @@ export const adminNavGroups: NavGroup[] = [
     defaultOpen: true,
     items: [
       { path: "/admin/users", icon: Users, label: "User Management" },
+      { path: "/admin/partners", icon: Store, label: "Partner Approvals" },
       { path: "/admin/document-verification", icon: FileCheck, label: "Documents" },
       { path: "/admin/id-verification", icon: CreditCard, label: "ID Verification" },
       { path: "/admin/ecr-management", icon: Plane, label: "ECR Management" },

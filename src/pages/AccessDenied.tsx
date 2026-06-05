@@ -8,7 +8,7 @@ const dashboardForRole: Record<AppRole, { path: string; label: string }> = {
   worker: { path: "/worker/dashboard", label: "Worker Dashboard" },
   employer: { path: "/employer/dashboard", label: "Employer Dashboard" },
   admin: { path: "/admin/dashboard", label: "Admin Dashboard" },
-  agent: { path: "/agent/dashboard", label: "Agent Dashboard" },
+  partner: { path: "/partner/dashboard", label: "Partner Dashboard" },
 };
 
 export default function AccessDenied() {
