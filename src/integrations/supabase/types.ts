@@ -1052,26 +1052,41 @@ export type Database = {
           account_holder: string | null
           account_number: string | null
           address: string | null
+          address_proof_url: string | null
           agency_name: string | null
           bio: string | null
           center_name: string | null
           commission_rate: number | null
+          compliance_acknowledged_at: string | null
           confirmed_accuracy: boolean | null
           created_at: string | null
           current_step: number
           district: string | null
           email: string | null
+          emitra_certificate_url: string | null
+          emitra_id: string | null
+          has_computer: boolean | null
+          has_internet: boolean | null
+          has_printer: boolean | null
+          has_scanner: boolean | null
           id: string
           ifsc: string | null
+          info_request_message: string | null
+          leaderboard_rank: number | null
           license_number: string | null
           mobile: string | null
+          mobile_verified: boolean | null
           monthly_footfall: number | null
+          no_jobs_promise: boolean | null
+          no_unauthorized_fees: boolean | null
           offers_doc_scanning: boolean | null
           offers_passport_service: boolean | null
           offers_worker_registration: boolean | null
           owner_name: string | null
+          owner_photo_url: string | null
           pan_card_url: string | null
           pan_number: string | null
+          partner_code: string | null
           pincode: string | null
           regions_covered: string[] | null
           rejection_reason: string | null
@@ -1082,11 +1097,17 @@ export type Database = {
           state: string | null
           status: Database["public"]["Enums"]["partner_status"]
           submitted_at: string | null
+          tier: Database["public"]["Enums"]["partner_tier"] | null
+          total_incentives_earned: number | null
           total_placements: number | null
           updated_at: string | null
           upi_id: string | null
           user_id: string
+          village_city: string | null
           whatsapp: string | null
+          worker_categories: string[] | null
+          workers_placed: number | null
+          workers_registered: number | null
           years_in_operation: number | null
         }
         Insert: {
@@ -1098,26 +1119,41 @@ export type Database = {
           account_holder?: string | null
           account_number?: string | null
           address?: string | null
+          address_proof_url?: string | null
           agency_name?: string | null
           bio?: string | null
           center_name?: string | null
           commission_rate?: number | null
+          compliance_acknowledged_at?: string | null
           confirmed_accuracy?: boolean | null
           created_at?: string | null
           current_step?: number
           district?: string | null
           email?: string | null
+          emitra_certificate_url?: string | null
+          emitra_id?: string | null
+          has_computer?: boolean | null
+          has_internet?: boolean | null
+          has_printer?: boolean | null
+          has_scanner?: boolean | null
           id?: string
           ifsc?: string | null
+          info_request_message?: string | null
+          leaderboard_rank?: number | null
           license_number?: string | null
           mobile?: string | null
+          mobile_verified?: boolean | null
           monthly_footfall?: number | null
+          no_jobs_promise?: boolean | null
+          no_unauthorized_fees?: boolean | null
           offers_doc_scanning?: boolean | null
           offers_passport_service?: boolean | null
           offers_worker_registration?: boolean | null
           owner_name?: string | null
+          owner_photo_url?: string | null
           pan_card_url?: string | null
           pan_number?: string | null
+          partner_code?: string | null
           pincode?: string | null
           regions_covered?: string[] | null
           rejection_reason?: string | null
@@ -1128,11 +1164,17 @@ export type Database = {
           state?: string | null
           status?: Database["public"]["Enums"]["partner_status"]
           submitted_at?: string | null
+          tier?: Database["public"]["Enums"]["partner_tier"] | null
+          total_incentives_earned?: number | null
           total_placements?: number | null
           updated_at?: string | null
           upi_id?: string | null
           user_id: string
+          village_city?: string | null
           whatsapp?: string | null
+          worker_categories?: string[] | null
+          workers_placed?: number | null
+          workers_registered?: number | null
           years_in_operation?: number | null
         }
         Update: {
@@ -1144,26 +1186,41 @@ export type Database = {
           account_holder?: string | null
           account_number?: string | null
           address?: string | null
+          address_proof_url?: string | null
           agency_name?: string | null
           bio?: string | null
           center_name?: string | null
           commission_rate?: number | null
+          compliance_acknowledged_at?: string | null
           confirmed_accuracy?: boolean | null
           created_at?: string | null
           current_step?: number
           district?: string | null
           email?: string | null
+          emitra_certificate_url?: string | null
+          emitra_id?: string | null
+          has_computer?: boolean | null
+          has_internet?: boolean | null
+          has_printer?: boolean | null
+          has_scanner?: boolean | null
           id?: string
           ifsc?: string | null
+          info_request_message?: string | null
+          leaderboard_rank?: number | null
           license_number?: string | null
           mobile?: string | null
+          mobile_verified?: boolean | null
           monthly_footfall?: number | null
+          no_jobs_promise?: boolean | null
+          no_unauthorized_fees?: boolean | null
           offers_doc_scanning?: boolean | null
           offers_passport_service?: boolean | null
           offers_worker_registration?: boolean | null
           owner_name?: string | null
+          owner_photo_url?: string | null
           pan_card_url?: string | null
           pan_number?: string | null
+          partner_code?: string | null
           pincode?: string | null
           regions_covered?: string[] | null
           rejection_reason?: string | null
@@ -1174,11 +1231,17 @@ export type Database = {
           state?: string | null
           status?: Database["public"]["Enums"]["partner_status"]
           submitted_at?: string | null
+          tier?: Database["public"]["Enums"]["partner_tier"] | null
+          total_incentives_earned?: number | null
           total_placements?: number | null
           updated_at?: string | null
           upi_id?: string | null
           user_id?: string
+          village_city?: string | null
           whatsapp?: string | null
+          worker_categories?: string[] | null
+          workers_placed?: number | null
+          workers_registered?: number | null
           years_in_operation?: number | null
         }
         Relationships: []
@@ -2012,6 +2075,7 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
       }
+      ensure_whitelisted_admin: { Args: never; Returns: boolean }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -2082,6 +2146,7 @@ export type Database = {
         | "active"
         | "suspended"
         | "rejected"
+      partner_tier: "bronze" | "silver" | "gold" | "platinum"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2218,6 +2283,7 @@ export const Constants = {
         "suspended",
         "rejected",
       ],
+      partner_tier: ["bronze", "silver", "gold", "platinum"],
     },
   },
 } as const
