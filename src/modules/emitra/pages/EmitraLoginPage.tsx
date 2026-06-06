@@ -171,7 +171,8 @@ export default function EmitraLoginPage() {
 
   return (
     <EmitraLayout title="E-Mitra Partner Login" subtitle="Sign in to manage worker registrations">
-      <Card className="max-w-md mx-auto p-6 md:p-8 shadow-lg">
+      <Card className="max-w-md border-border/60 shadow-lg">
+        <div className="p-6 md:p-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2.5 rounded-xl bg-primary/10">
             <Store className="h-6 w-6 text-primary" />
@@ -254,6 +255,7 @@ export default function EmitraLoginPage() {
             Apply as SafeWork Partner
           </Link>
         </p>
+        </div>
       </Card>
     </EmitraLayout>
   );

@@ -215,36 +215,42 @@ export default function EmitraRegisterPage() {
       title="Become a SafeWork Partner"
       subtitle="E-Mitra / Cyber Cafe operators — register workers into SafeWork Global"
     >
-      <Card className="p-4 mb-4">
+      <Card className="p-4 mb-4 border-border/60 shadow-sm">
         <div className="flex justify-between text-xs text-muted-foreground mb-2">
-          <span>Step {step} of {STEPS.length}</span>
+          <span>Step {step} of {STEPS.length}: {STEPS[step - 1].title}</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <Progress value={progress} className="h-2 mb-3" />
-        <div className="grid grid-cols-7 gap-1">
+        <Progress value={progress} className="h-2 mb-4" />
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {STEPS.map(s => {
             const Icon = s.icon;
             const done = step > s.id;
             const active = step === s.id;
             return (
               <div key={s.id} className="text-center">
-                <div className={`mx-auto h-8 w-8 rounded-full flex items-center justify-center text-xs ${
+                <div className={`mx-auto h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center text-xs ${
                   done ? 'bg-primary text-primary-foreground' :
-                  active ? 'bg-primary/20 text-primary border-2 border-primary' :
+                  active ? 'bg-primary/15 text-primary border-2 border-primary' :
                   'bg-muted text-muted-foreground'
                 }`}>
                   {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                 </div>
+                <p className={`hidden sm:block text-[10px] mt-1.5 leading-tight ${active ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                  {s.title}
+                </p>
               </div>
             );
           })}
         </div>
       </Card>
 
-      <Card className="p-5 md:p-7">
-        <div className="flex items-center gap-3 mb-5">
+      <Card className="p-5 md:p-7 border-border/60 shadow-lg">
+        <div className="flex items-center gap-3 mb-5 pb-4 border-b border-border">
           <div className="p-2.5 rounded-xl bg-primary/10 text-primary"><StepIcon className="h-5 w-5" /></div>
-          <h2 className="text-xl font-semibold">{STEPS[step - 1].title}</h2>
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Step {step}</p>
+            <h2 className="text-xl font-semibold font-heading">{STEPS[step - 1].title}</h2>
+          </div>
         </div>
 
         {step === 1 && (
@@ -334,7 +340,7 @@ export default function EmitraRegisterPage() {
                 { key: 'has_printer', label: 'Printer Available' },
                 { key: 'has_internet', label: 'Internet Available' },
               ].map(item => (
-                <label key={item.key} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer">
+                <label key={item.key} className="flex items-center gap-2 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
                   <Checkbox checked={!!data[item.key]} onCheckedChange={v => update({ [item.key]: !!v })} />
                   <span className="text-sm">{item.label}</span>
                 </label>
@@ -346,7 +352,7 @@ export default function EmitraRegisterPage() {
                 {WORKER_SKILLS.map(skill => {
                   const checked = (data.worker_categories || []).includes(skill);
                   return (
-                    <label key={skill} className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer text-sm ${checked ? 'border-primary bg-primary/5' : ''}`}>
+                    <label key={skill} className={`flex items-center gap-2 p-2 rounded-lg border border-border cursor-pointer text-sm transition-colors ${checked ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`}>
                       <Checkbox checked={checked} onCheckedChange={() => {
                         const cur = data.worker_categories || [];
                         update({ worker_categories: checked ? cur.filter((x: string) => x !== skill) : [...cur, skill] });

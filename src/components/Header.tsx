@@ -175,7 +175,7 @@ const Header = () => {
                         <Handshake className="h-4 w-4" />
                       </div>
                       <div>
-                        <div className="font-semibold text-sm">Register workers</div>
+                        <div className="font-semibold text-sm">Partner</div>
                         <div className="text-xs text-muted-foreground">Sign up as a Partner</div>
                       </div>
                     </button>
@@ -314,7 +314,7 @@ const Header = () => {
                       onClick={() => { navigate('/emitra/register'); closeMobileMenu(); }}
                     >
                       <Handshake className="h-4 w-4" />
-                      Register workers (Partner signup)
+                      Partner
                     </Button>
                     <button
                       onClick={() => { navigate('/auth'); closeMobileMenu(); }}
