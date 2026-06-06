@@ -311,12 +311,7 @@ export default function Jobs() {
             className="flex-1 sm:flex-none h-9 text-sm"
             onClick={(e) => {
               e.stopPropagation();
-              if (!isAuthenticated) {
-                toast.error('Please login to apply for jobs');
-                navigate('/auth');
-              } else {
-                navigate(`/jobs/${job.slug}`);
-              }
+              navigate(`/jobs/${job.slug}`);
             }}
           >
             View & Apply

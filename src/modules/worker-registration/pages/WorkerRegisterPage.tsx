@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { Loader2, ArrowRight, Clock, Shield } from 'lucide-react';
+import { Loader2, Clock, Shield } from 'lucide-react';
 import RegistrationLayout from '../components/RegistrationLayout';
 import FormField from '../components/FormField';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,11 +123,10 @@ export default function WorkerRegisterPage() {
         </>
       }
     >
-      <div className="mb-6 grid gap-3 sm:grid-cols-3">
+      <div className="mb-6 grid gap-3 sm:grid-cols-2">
         {[
           { icon: Clock, text: 'Under 1 minute' },
           { icon: Shield, text: 'Secure & verified' },
-          { icon: ArrowRight, text: 'Instant job matching' },
         ].map(({ icon: Icon, text }) => (
           <div
             key={text}

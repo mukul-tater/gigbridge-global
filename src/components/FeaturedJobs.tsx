@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Building2, Clock, ArrowRight, Bookmark, Share2, Zap, Sparkles, BadgeCheck } from 'lucide-react';
 import { formatSalaryLakh } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import { SkeletonJobGrid } from '@/components/ui/skeleton-card';
 
 interface FeaturedJob {
@@ -43,7 +42,6 @@ function hasSalary(job: FeaturedJob): boolean {
 
 export default function FeaturedJobs() {
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<FeaturedJob[]>([]);
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
@@ -135,11 +133,6 @@ export default function FeaturedJobs() {
   };
 
   const handleQuickApply = (jobSlug: string) => {
-    if (!isAuthenticated) {
-      toast({ title: "Login required", description: "Please login to apply for jobs", variant: "destructive" });
-      navigate('/auth');
-      return;
-    }
     navigate(`/jobs/${jobSlug}`);
   };
 

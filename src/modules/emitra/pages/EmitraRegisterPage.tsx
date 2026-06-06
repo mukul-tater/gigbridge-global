@@ -212,69 +212,105 @@ export default function EmitraRegisterPage() {
 
   return (
     <EmitraLayout
+      maxWidth="3xl"
       title="Become a SafeWork Partner"
-      subtitle="E-Mitra / Cyber Cafe operators — register workers into SafeWork Global"
+      subtitle="Apply as an E-Mitra or cyber cafe partner. Complete all steps to submit your application for review."
     >
-      <Card className="p-4 mb-4 border-border/60 shadow-sm">
-        <div className="flex justify-between text-xs text-muted-foreground mb-2">
-          <span>Step {step} of {STEPS.length}: {STEPS[step - 1].title}</span>
-          <span>{Math.round(progress)}%</span>
+      <Card className="mb-5 border-border/60 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-border bg-muted/30">
+          <div className="flex items-center justify-between gap-4 mb-3">
+            <p className="text-sm font-medium text-foreground">
+              Step {step} of {STEPS.length}
+              <span className="text-muted-foreground font-normal"> — {STEPS[step - 1].title}</span>
+            </p>
+            <span className="text-xs font-medium text-primary tabular-nums">{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-1.5 bg-muted" />
         </div>
-        <Progress value={progress} className="h-2 mb-4" />
-        <div className="grid grid-cols-7 gap-1 sm:gap-2">
-          {STEPS.map(s => {
-            const Icon = s.icon;
-            const done = step > s.id;
-            const active = step === s.id;
-            return (
-              <div key={s.id} className="text-center">
-                <div className={`mx-auto h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center text-xs ${
-                  done ? 'bg-primary text-primary-foreground' :
-                  active ? 'bg-primary/15 text-primary border-2 border-primary' :
-                  'bg-muted text-muted-foreground'
-                }`}>
-                  {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+        <div className="px-3 py-4 sm:px-5 overflow-x-auto">
+          <div className="flex min-w-[520px] sm:min-w-0 items-start justify-between gap-1">
+            {STEPS.map((s, idx) => {
+              const Icon = s.icon;
+              const done = step > s.id;
+              const active = step === s.id;
+              return (
+                <div key={s.id} className="flex flex-1 items-center">
+                  <div className="flex flex-col items-center flex-1 min-w-0">
+                    <div
+                      className={`h-9 w-9 rounded-full flex items-center justify-center transition-colors ${
+                        done
+                          ? 'bg-primary text-primary-foreground'
+                          : active
+                            ? 'bg-primary/15 text-primary ring-2 ring-primary ring-offset-2 ring-offset-background'
+                            : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {done ? <CheckCircle2 className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
+                    </div>
+                    <p
+                      className={`hidden lg:block text-[10px] mt-2 text-center leading-tight max-w-[4.5rem] ${
+                        active ? 'text-primary font-medium' : 'text-muted-foreground'
+                      }`}
+                    >
+                      {s.title}
+                    </p>
+                  </div>
+                  {idx < STEPS.length - 1 && (
+                    <div
+                      className={`h-0.5 flex-1 mx-1 mt-4 rounded-full ${
+                        step > s.id ? 'bg-primary' : 'bg-muted'
+                      }`}
+                    />
+                  )}
                 </div>
-                <p className={`hidden sm:block text-[10px] mt-1.5 leading-tight ${active ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                  {s.title}
-                </p>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </Card>
 
-      <Card className="p-5 md:p-7 border-border/60 shadow-lg">
-        <div className="flex items-center gap-3 mb-5 pb-4 border-b border-border">
-          <div className="p-2.5 rounded-xl bg-primary/10 text-primary"><StepIcon className="h-5 w-5" /></div>
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Step {step}</p>
-            <h2 className="text-xl font-semibold font-heading">{STEPS[step - 1].title}</h2>
+      <Card className="border-border/60 shadow-lg">
+        <div className="px-5 py-5 md:px-7 md:py-6 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
+              <StepIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                Step {step} of {STEPS.length}
+              </p>
+              <h2 className="text-xl font-semibold font-heading">{STEPS[step - 1].title}</h2>
+            </div>
           </div>
         </div>
 
+        <div className="px-5 py-6 md:px-7 md:py-7">
         {step === 1 && (
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Full Name" error={errors.owner_name} required>
-              <Input value={data.owner_name || ''} onChange={e => update({ owner_name: e.target.value })} />
+              <Input className="h-11" value={data.owner_name || ''} onChange={e => update({ owner_name: e.target.value })} />
             </Field>
             <Field label="Email" error={errors.email} required>
-              <Input type="email" value={data.email || ''} onChange={e => update({ email: e.target.value })} />
+              <Input className="h-11" type="email" value={data.email || ''} onChange={e => update({ email: e.target.value })} />
             </Field>
             <Field label="Mobile Number" error={errors.mobile} required>
               <div className="flex gap-2">
-                <Input inputMode="numeric" maxLength={10} value={data.mobile || ''}
-                  onChange={e => update({ mobile: e.target.value.replace(/\D/g, '') })} placeholder="10-digit" />
+                <Input className="h-11" inputMode="numeric" maxLength={10} value={data.mobile || ''}
+                  onChange={e => update({ mobile: e.target.value.replace(/\D/g, '') })} placeholder="10-digit mobile" />
                 {!mobileVerified ? (
-                  <Button type="button" variant="outline" onClick={requestOtp} disabled={otpStep}>Verify</Button>
+                  <Button type="button" variant="secondary" className="h-11 shrink-0 px-4" onClick={requestOtp} disabled={otpStep}>
+                    Verify
+                  </Button>
                 ) : (
-                  <Badge className="self-center shrink-0">Verified</Badge>
+                  <Badge className="self-center shrink-0 h-11 px-3 flex items-center bg-success/10 text-success border-success/20 hover:bg-success/10">
+                    Verified
+                  </Badge>
                 )}
               </div>
             </Field>
             {otpStep && !mobileVerified && (
-              <div className="sm:col-span-2 p-4 border rounded-lg space-y-3">
-                <p className="text-sm">Enter OTP sent to {data.mobile}</p>
+              <div className="sm:col-span-2 rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                <p className="text-sm text-muted-foreground">Enter OTP sent to {data.mobile}</p>
                 <InputOTP maxLength={6} value={otp} onChange={setOtp}>
                   <InputOTPGroup>{[0,1,2,3,4,5].map(i => <InputOTPSlot key={i} index={i} />)}</InputOTPGroup>
                 </InputOTP>
@@ -282,7 +318,7 @@ export default function EmitraRegisterPage() {
               </div>
             )}
             <Field label="WhatsApp Number" error={errors.whatsapp} required>
-              <Input inputMode="numeric" maxLength={10} value={data.whatsapp || ''}
+              <Input className="h-11" inputMode="numeric" maxLength={10} value={data.whatsapp || ''}
                 onChange={e => update({ whatsapp: e.target.value.replace(/\D/g, '') })} />
             </Field>
           </div>
@@ -422,19 +458,21 @@ export default function EmitraRegisterPage() {
           </div>
         )}
 
-        <div className="flex justify-between mt-7 pt-5 border-t">
-          <Button type="button" variant="outline" onClick={() => setStep(s => Math.max(1, s - 1))} disabled={step === 1 || saving}>
+        </div>
+
+        <div className="flex justify-between gap-3 px-5 py-5 md:px-7 border-t border-border bg-muted/20">
+          <Button type="button" variant="outline" className="h-11" onClick={() => setStep(s => Math.max(1, s - 1))} disabled={step === 1 || saving}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
           {step < STEPS.length ? (
-            <Button type="button" onClick={handleNext} disabled={saving}>
+            <Button type="button" className="h-11 px-6" onClick={handleNext} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
               Continue <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (
-            <Button type="button" onClick={handleSubmit} disabled={saving}>
+            <Button type="button" className="h-11 px-6" onClick={handleSubmit} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-              Apply as SafeWork Partner
+              Submit Application
             </Button>
           )}
         </div>

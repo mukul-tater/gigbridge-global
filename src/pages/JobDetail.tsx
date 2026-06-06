@@ -162,8 +162,7 @@ export default function JobDetail() {
 
   const openApplyDialog = () => {
     if (!isAuthenticated) {
-      toast({ title: 'Login Required', description: 'Please login to apply for jobs', variant: 'destructive' });
-      navigate('/auth');
+      navigate('/register', { state: { returnTo: `/jobs/${slug}` } });
       return;
     }
     if (role === 'employer') {
@@ -269,12 +268,7 @@ export default function JobDetail() {
 
   const handleSave = async () => {
     if (!isAuthenticated) {
-      toast({
-        title: 'Login Required',
-        description: 'Please login to save jobs',
-        variant: 'destructive'
-      });
-      navigate('/auth');
+      navigate('/login', { state: { returnTo: `/jobs/${slug}` } });
       return;
     }
 
@@ -571,7 +565,7 @@ export default function JobDetail() {
                           Already Applied
                         </>
                       ) : !isAuthenticated ? (
-                        'Login to Apply'
+                        'Sign Up to Apply'
                       ) : (
                         'Apply Now'
                       )}
