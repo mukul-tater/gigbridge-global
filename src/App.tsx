@@ -22,6 +22,11 @@ import TermsOfService from "./pages/TermsOfService";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
 import EmployerComingSoon from "./pages/employer/EmployerComingSoon";
+import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import PartnerApprovals from "./pages/admin/PartnerApprovals";
+import AdminLoginPage from "./pages/admin/AdminLoginPage";
+import AdminRegisterPage from "./pages/admin/AdminRegisterPage";
 import {
   EmitraRegisterPage,
   EmitraLoginPage,
@@ -158,8 +163,30 @@ function AppShell() {
             }
           />
 
+          {/* Admin — partner approval (required for E-Mitra go-live) */}
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/register" element={<AdminRegisterPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]} loginPath="/admin/login">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/partners"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]} loginPath="/admin/login">
+                <PartnerApprovals />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/admin" element={<Navigate to="/admin/partners" replace />} />
+
           {/*
-            Other legacy routes (employer, admin, legacy worker portal) remain disabled.
+            Other legacy routes (employer, other admin pages, legacy worker portal) remain disabled.
             See src/routes/LegacyRoutes.archive.tsx to restore.
           */}
 

@@ -5,9 +5,10 @@ import AccessDenied from '@/pages/AccessDenied';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: AppRole[];
+  loginPath?: string;
 }
 
-export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, allowedRoles, loginPath = '/auth' }: ProtectedRouteProps) {
   const { isAuthenticated, role, loading, profileLoading, needsRoleSelection } = useAuth();
 
   if (loading || profileLoading) {
@@ -22,7 +23,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to={loginPath} replace />;
   }
 
   // Authenticated but no role yet (e.g. fresh Google sign-in) — send to

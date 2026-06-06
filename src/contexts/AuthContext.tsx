@@ -35,6 +35,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   hasRole: (role: AppRole) => boolean;
   refreshProfile: () => Promise<void>;
+  /** Reload role from user_roles after admin promotion. */
+  refreshRole: () => Promise<void>;
   /** Assign a role to the current user (used after OAuth sign-in when role is missing). */
   assignRole: (role: AppRole) => Promise<{ success: boolean; error?: string }>;
 }
@@ -245,6 +247,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) await fetchOrCreateProfile(user);
   };
 
+  const refreshRole = async () => {
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (currentUser) await fetchUserRole(currentUser.id);
+  };
+
   const assignRole = async (newRole: AppRole) => {
     if (!user) return { success: false, error: 'Not authenticated' };
     if (newRole === 'admin') {
@@ -292,6 +299,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         hasRole,
         refreshProfile,
+        refreshRole,
         assignRole,
       }}
     >

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { CheckCircle, XCircle, Eye, Search, ShieldOff, ShieldCheck, Store, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import PartnerApprovalFlow from "@/components/admin/PartnerApprovalFlow";
 
 type Partner = any;
 
@@ -137,7 +138,11 @@ export default function PartnerApprovals() {
   return (
     <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
       <h1 className="text-2xl md:text-3xl font-bold mb-2">Partner Approvals</h1>
-      <p className="text-muted-foreground text-sm mb-6">Review e-Mitra partner applications and manage their account status.</p>
+      <p className="text-muted-foreground text-sm mb-4">Review e-Mitra partner applications and manage their account status.</p>
+
+      <div className="mb-6">
+        <PartnerApprovalFlow compact />
+      </div>
 
       <div className="relative mb-4 max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
