@@ -21,6 +21,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
+import EmployerComingSoon from "./pages/employer/EmployerComingSoon";
 import {
   EmitraRegisterPage,
   EmitraLoginPage,
@@ -69,6 +70,9 @@ function AppShell() {
           <Route path="/login" element={<WorkerLoginPage />} />
           <Route path="/worker/quick-signup" element={<Navigate to="/register" replace />} />
           <Route path="/worker-start" element={<Navigate to="/register" replace />} />
+
+          {/* Employer — coming soon (Phase 2) */}
+          <Route path="/employer/quick-signup" element={<EmployerComingSoon />} />
           <Route
             path="/home"
             element={
