@@ -1,49 +1,61 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  HardHat,
+  Zap,
+  Flame,
+  Wrench,
+  Factory,
+  Truck,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import constructionIcon from "@/assets/construction-icon.png";
-import electricianIcon from "@/assets/electrician-icon.png";
-import welderIcon from "@/assets/welder-icon.png";
 
-const categories = [
+const categories: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  demand: string;
+  countries: string;
+}[] = [
   {
-    icon: constructionIcon,
+    icon: HardHat,
     title: "Construction",
     description: "Infrastructure, residential & commercial building",
     demand: "High",
     countries: "UAE, Saudi Arabia, Japan",
   },
   {
-    icon: electricianIcon,
+    icon: Zap,
     title: "Electrical",
     description: "Industrial electrical & renewable energy projects",
     demand: "Very High",
     countries: "Germany, UAE, Australia",
   },
   {
-    icon: welderIcon,
+    icon: Flame,
     title: "Welding",
     description: "Pipeline, shipbuilding & heavy industry",
     demand: "High",
     countries: "Qatar, Kuwait, Oman",
   },
   {
-    icon: "🔧",
+    icon: Wrench,
     title: "Plumbing",
     description: "Residential & commercial plumbing systems",
     demand: "Medium",
     countries: "UK, Australia, New Zealand",
   },
   {
-    icon: "🏭",
+    icon: Factory,
     title: "Manufacturing",
     description: "Assembly, quality control & machine operation",
     demand: "High",
     countries: "Japan, Poland, Malaysia",
   },
   {
-    icon: "🚚",
+    icon: Truck,
     title: "Logistics",
     description: "Delivery, freight & supply chain operations",
     demand: "Very High",
@@ -81,11 +93,9 @@ export default function HomeJobCategories() {
             >
               <CardContent className="p-5">
                 <div className="flex items-center gap-3 mb-3">
-                  {typeof cat.icon === "string" ? (
-                    <span className="text-2xl">{cat.icon}</span>
-                  ) : (
-                    <img src={cat.icon} alt={cat.title} className="h-10 w-10 object-contain" />
-                  )}
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <cat.icon className="h-5 w-5" aria-hidden />
+                  </div>
                   <div>
                     <h3 className="font-semibold font-heading text-foreground">{cat.title}</h3>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${demandClass(cat.demand)}`}>

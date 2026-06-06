@@ -282,7 +282,7 @@ export default function Auth() {
       } else if (selectedRole === 'employer') {
         navigate('/employer/trust', { replace: true });
       } else {
-        navigate('/partner/onboarding', { replace: true });
+        navigate('/emitra/register', { replace: true });
       }
       return;
     }

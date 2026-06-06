@@ -1,0 +1,448 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import EmitraLayout from '../components/EmitraLayout';
+import PartnerDocUpload from '@/components/partner/PartnerDocUpload';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import {
+  ArrowLeft, ArrowRight, CheckCircle2, Loader2, User, Store, MapPin,
+  Monitor, Landmark, FileSignature, Shield,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { indianStates } from '@/lib/validations/partner';
+import { WORKER_SKILLS } from '../config/constants';
+import {
+  emitraPersonalSchema, emitraDetailsSchema, emitraLocationSchema,
+  emitraInfrastructureSchema, emitraBankSchema, emitraDocumentsSchema, emitraDeclarationsSchema,
+} from '../validations/emitra';
+
+const STEPS = [
+  { id: 1, title: 'Personal Info', icon: User },
+  { id: 2, title: 'E-Mitra Details', icon: Store },
+  { id: 3, title: 'Location', icon: MapPin },
+  { id: 4, title: 'Infrastructure', icon: Monitor },
+  { id: 5, title: 'Banking', icon: Landmark },
+  { id: 6, title: 'Documents', icon: Shield },
+  { id: 7, title: 'Declaration', icon: FileSignature },
+] as const;
+
+type FormData = Record<string, any>;
+
+export default function EmitraRegisterPage() {
+  const navigate = useNavigate();
+  const { signup, user } = useAuth();
+  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [mobileVerified, setMobileVerified] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [data, setData] = useState<FormData>({
+    worker_categories: [],
+    has_computer: false,
+    has_scanner: false,
+    has_printer: false,
+    has_internet: false,
+    accepted_terms: false,
+    no_jobs_promise: false,
+    no_unauthorized_fees: false,
+    mobile_verified: false,
+  });
+
+  const update = (patch: Partial<FormData>) => setData(d => ({ ...d, ...patch }));
+
+  const validateStep = (): boolean => {
+    setErrors({});
+    const schemas = [
+      null,
+      emitraPersonalSchema,
+      emitraDetailsSchema,
+      emitraLocationSchema,
+      emitraInfrastructureSchema,
+      emitraBankSchema,
+      emitraDocumentsSchema,
+      emitraDeclarationsSchema,
+    ];
+    const schema = schemas[step];
+    if (!schema) return true;
+    const payload = step === 7 ? { ...data, mobile_verified: mobileVerified } : data;
+    const result = schema.safeParse(payload);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const k = issue.path[0] as string;
+        if (k && !fieldErrors[k]) fieldErrors[k] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error('Please fix the highlighted fields');
+      return false;
+    }
+    return true;
+  };
+
+  const requestOtp = () => {
+    const digits = (data.mobile || '').replace(/\D/g, '');
+    if (digits.length !== 10) {
+      toast.error('Enter a valid mobile number first');
+      return;
+    }
+    toast.success(`OTP sent to ${digits}`, { description: 'Demo: enter any 6 digits' });
+    setOtpStep(true);
+  };
+
+  const verifyOtp = () => {
+    if (otp.length !== 6) {
+      toast.error('Enter 6-digit OTP');
+      return;
+    }
+    setMobileVerified(true);
+    update({ mobile_verified: true });
+    setOtpStep(false);
+    toast.success('Mobile verified');
+  };
+
+  const ensureAccount = async (): Promise<string | null> => {
+    if (user) return user.id;
+    const digits = (data.mobile || '').replace(/\D/g, '');
+    const authEmail = data.email?.trim() || `emitra${digits}@partners.safeworkglobal.app`;
+    const password = `SWP-${digits}`;
+
+    const result = await signup({
+      email: authEmail,
+      password,
+      full_name: data.owner_name,
+      phone: digits,
+      role: 'partner',
+    });
+
+    if (!result.success) {
+      toast.error(result.error || 'Account creation failed');
+      return null;
+    }
+
+    const { data: { user: newUser } } = await supabase.auth.getUser();
+    return newUser?.id || null;
+  };
+
+  const handleNext = async () => {
+    if (step === 1 && !mobileVerified) {
+      toast.error('Please verify your mobile number with OTP');
+      return;
+    }
+    if (!validateStep()) return;
+
+    if (step === 1) {
+      setSaving(true);
+      const uid = await ensureAccount();
+      setSaving(false);
+      if (!uid) return;
+    }
+
+    setStep(s => Math.min(s + 1, STEPS.length));
+  };
+
+  const handleSubmit = async () => {
+    if (!validateStep()) return;
+    setSaving(true);
+    try {
+      const uid = user?.id || (await ensureAccount());
+      if (!uid) return;
+
+      const { error } = await supabase.from('partner_profiles').upsert({
+        user_id: uid,
+        owner_name: data.owner_name,
+        mobile: data.mobile,
+        whatsapp: data.whatsapp,
+        email: data.email,
+        emitra_id: data.emitra_id,
+        center_name: data.center_name,
+        years_in_operation: data.years_in_operation,
+        address: data.address,
+        village_city: data.village_city,
+        district: data.district,
+        state: data.state,
+        pincode: data.pincode,
+        has_computer: data.has_computer,
+        has_scanner: data.has_scanner,
+        has_printer: data.has_printer,
+        has_internet: data.has_internet,
+        worker_categories: data.worker_categories,
+        account_holder: data.account_holder,
+        account_number: data.account_number,
+        ifsc: data.ifsc,
+        upi_id: data.upi_id || null,
+        pan_number: data.pan_number,
+        emitra_certificate_url: data.emitra_certificate_url,
+        pan_card_url: data.pan_card_url,
+        address_proof_url: data.address_proof_url,
+        shop_photo_url: data.shop_photo_url,
+        owner_photo_url: data.owner_photo_url,
+        accepted_terms: data.accepted_terms,
+        no_jobs_promise: data.no_jobs_promise,
+        no_unauthorized_fees: data.no_unauthorized_fees,
+        mobile_verified: true,
+        status: 'under_review',
+        submitted_at: new Date().toISOString(),
+        current_step: STEPS.length,
+      }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+
+      toast.success('Application submitted! Our team will review it shortly.');
+      navigate('/emitra/login');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Submission failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const progress = (step / STEPS.length) * 100;
+  const StepIcon = STEPS[step - 1].icon;
+
+  return (
+    <EmitraLayout
+      title="Become a SafeWork Partner"
+      subtitle="E-Mitra / Cyber Cafe operators — register workers into SafeWork Global"
+    >
+      <Card className="p-4 mb-4">
+        <div className="flex justify-between text-xs text-muted-foreground mb-2">
+          <span>Step {step} of {STEPS.length}</span>
+          <span>{Math.round(progress)}%</span>
+        </div>
+        <Progress value={progress} className="h-2 mb-3" />
+        <div className="grid grid-cols-7 gap-1">
+          {STEPS.map(s => {
+            const Icon = s.icon;
+            const done = step > s.id;
+            const active = step === s.id;
+            return (
+              <div key={s.id} className="text-center">
+                <div className={`mx-auto h-8 w-8 rounded-full flex items-center justify-center text-xs ${
+                  done ? 'bg-primary text-primary-foreground' :
+                  active ? 'bg-primary/20 text-primary border-2 border-primary' :
+                  'bg-muted text-muted-foreground'
+                }`}>
+                  {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      <Card className="p-5 md:p-7">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="p-2.5 rounded-xl bg-primary/10 text-primary"><StepIcon className="h-5 w-5" /></div>
+          <h2 className="text-xl font-semibold">{STEPS[step - 1].title}</h2>
+        </div>
+
+        {step === 1 && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Full Name" error={errors.owner_name} required>
+              <Input value={data.owner_name || ''} onChange={e => update({ owner_name: e.target.value })} />
+            </Field>
+            <Field label="Email" error={errors.email} required>
+              <Input type="email" value={data.email || ''} onChange={e => update({ email: e.target.value })} />
+            </Field>
+            <Field label="Mobile Number" error={errors.mobile} required>
+              <div className="flex gap-2">
+                <Input inputMode="numeric" maxLength={10} value={data.mobile || ''}
+                  onChange={e => update({ mobile: e.target.value.replace(/\D/g, '') })} placeholder="10-digit" />
+                {!mobileVerified ? (
+                  <Button type="button" variant="outline" onClick={requestOtp} disabled={otpStep}>Verify</Button>
+                ) : (
+                  <Badge className="self-center shrink-0">Verified</Badge>
+                )}
+              </div>
+            </Field>
+            {otpStep && !mobileVerified && (
+              <div className="sm:col-span-2 p-4 border rounded-lg space-y-3">
+                <p className="text-sm">Enter OTP sent to {data.mobile}</p>
+                <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+                  <InputOTPGroup>{[0,1,2,3,4,5].map(i => <InputOTPSlot key={i} index={i} />)}</InputOTPGroup>
+                </InputOTP>
+                <Button type="button" size="sm" onClick={verifyOtp}>Confirm OTP</Button>
+              </div>
+            )}
+            <Field label="WhatsApp Number" error={errors.whatsapp} required>
+              <Input inputMode="numeric" maxLength={10} value={data.whatsapp || ''}
+                onChange={e => update({ whatsapp: e.target.value.replace(/\D/g, '') })} />
+            </Field>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="E-Mitra ID" error={errors.emitra_id} required>
+              <Input value={data.emitra_id || ''} onChange={e => update({ emitra_id: e.target.value })} />
+            </Field>
+            <Field label="Kiosk Name" error={errors.center_name} required>
+              <Input value={data.center_name || ''} onChange={e => update({ center_name: e.target.value })} />
+            </Field>
+            <Field label="Years of Operation" error={errors.years_in_operation} required>
+              <Input type="number" min={0} value={data.years_in_operation ?? ''}
+                onChange={e => update({ years_in_operation: e.target.value === '' ? null : Number(e.target.value) })} />
+            </Field>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="sm:col-span-2">
+              <Field label="Address" error={errors.address} required>
+                <Textarea rows={2} value={data.address || ''} onChange={e => update({ address: e.target.value })} />
+              </Field>
+            </div>
+            <Field label="Village / City" error={errors.village_city} required>
+              <Input value={data.village_city || ''} onChange={e => update({ village_city: e.target.value })} />
+            </Field>
+            <Field label="District" error={errors.district} required>
+              <Input value={data.district || ''} onChange={e => update({ district: e.target.value })} />
+            </Field>
+            <Field label="State" error={errors.state} required>
+              <Select value={data.state || ''} onValueChange={v => update({ state: v })}>
+                <SelectTrigger><SelectValue placeholder="Select state" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {indianStates.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="PIN Code" error={errors.pincode} required>
+              <Input inputMode="numeric" maxLength={6} value={data.pincode || ''}
+                onChange={e => update({ pincode: e.target.value.replace(/\D/g, '') })} />
+            </Field>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-5">
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                { key: 'has_computer', label: 'Computer Available' },
+                { key: 'has_scanner', label: 'Scanner Available' },
+                { key: 'has_printer', label: 'Printer Available' },
+                { key: 'has_internet', label: 'Internet Available' },
+              ].map(item => (
+                <label key={item.key} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer">
+                  <Checkbox checked={!!data[item.key]} onCheckedChange={v => update({ [item.key]: !!v })} />
+                  <span className="text-sm">{item.label}</span>
+                </label>
+              ))}
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Worker Categories Available <span className="text-destructive">*</span></Label>
+              <div className="grid sm:grid-cols-3 gap-2 mt-2">
+                {WORKER_SKILLS.map(skill => {
+                  const checked = (data.worker_categories || []).includes(skill);
+                  return (
+                    <label key={skill} className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer text-sm ${checked ? 'border-primary bg-primary/5' : ''}`}>
+                      <Checkbox checked={checked} onCheckedChange={() => {
+                        const cur = data.worker_categories || [];
+                        update({ worker_categories: checked ? cur.filter((x: string) => x !== skill) : [...cur, skill] });
+                      }} />
+                      {skill}
+                    </label>
+                  );
+                })}
+              </div>
+              {errors.worker_categories && <p className="text-xs text-destructive mt-1">{errors.worker_categories}</p>}
+            </div>
+          </div>
+        )}
+
+        {step === 5 && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Account Holder Name" error={errors.account_holder} required>
+              <Input value={data.account_holder || ''} onChange={e => update({ account_holder: e.target.value })} />
+            </Field>
+            <Field label="Account Number" error={errors.account_number} required>
+              <Input inputMode="numeric" value={data.account_number || ''}
+                onChange={e => update({ account_number: e.target.value.replace(/\D/g, '') })} />
+            </Field>
+            <Field label="IFSC" error={errors.ifsc} required>
+              <Input maxLength={11} value={data.ifsc || ''} onChange={e => update({ ifsc: e.target.value.toUpperCase() })} />
+            </Field>
+            <Field label="UPI ID (optional)" error={errors.upi_id}>
+              <Input value={data.upi_id || ''} onChange={e => update({ upi_id: e.target.value })} />
+            </Field>
+          </div>
+        )}
+
+        {step === 6 && (
+          <div className="space-y-4">
+            <Field label="PAN Number" error={errors.pan_number} required>
+              <Input maxLength={10} value={data.pan_number || ''} onChange={e => update({ pan_number: e.target.value.toUpperCase() })} />
+            </Field>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <PartnerDocUpload label="E-Mitra Certificate" field="emitra-cert" value={data.emitra_certificate_url}
+                onChange={v => update({ emitra_certificate_url: v })} />
+              <PartnerDocUpload label="PAN Card" field="pan-card" value={data.pan_card_url} onChange={v => update({ pan_card_url: v })} />
+              <PartnerDocUpload label="Address Proof" field="address-proof" value={data.address_proof_url}
+                onChange={v => update({ address_proof_url: v })} />
+              <PartnerDocUpload label="Kiosk Photograph" field="kiosk-photo" accept="image/*" value={data.shop_photo_url}
+                onChange={v => update({ shop_photo_url: v })} />
+              <PartnerDocUpload label="Owner Photograph" field="owner-photo" accept="image/*" value={data.owner_photo_url}
+                onChange={v => update({ owner_photo_url: v })} />
+            </div>
+          </div>
+        )}
+
+        {step === 7 && (
+          <div className="space-y-4">
+            {[
+              { key: 'accepted_terms', label: 'I agree to SafeWork Partner Terms' },
+              { key: 'no_jobs_promise', label: 'I will not promise jobs or visas' },
+              { key: 'no_unauthorized_fees', label: 'I will not collect unauthorized fees' },
+            ].map(item => (
+              <div key={item.key}>
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <Checkbox className="mt-0.5" checked={!!data[item.key]} onCheckedChange={v => update({ [item.key]: !!v })} />
+                  <span className="text-sm">{item.label}</span>
+                </label>
+                {errors[item.key] && <p className="text-xs text-destructive ml-6">{errors[item.key]}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex justify-between mt-7 pt-5 border-t">
+          <Button type="button" variant="outline" onClick={() => setStep(s => Math.max(1, s - 1))} disabled={step === 1 || saving}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
+          </Button>
+          {step < STEPS.length ? (
+            <Button type="button" onClick={handleNext} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+              Continue <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          ) : (
+            <Button type="button" onClick={handleSubmit} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+              Apply as SafeWork Partner
+            </Button>
+          )}
+        </div>
+      </Card>
+    </EmitraLayout>
+  );
+}
+
+function Field({ label, error, children, required }: { label: string; error?: string; children: React.ReactNode; required?: boolean }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-sm font-medium">{label}{required && <span className="text-destructive ml-0.5">*</span>}</Label>
+      {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}

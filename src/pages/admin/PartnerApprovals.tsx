@@ -35,7 +35,7 @@ export default function PartnerApprovals() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Partner | null>(null);
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
-  const [actionDialog, setActionDialog] = useState<null | { action: "approve" | "reject" | "suspend" | "reactivate"; partner: Partner }>(null);
+  const [actionDialog, setActionDialog] = useState<null | { action: "approve" | "reject" | "suspend" | "reactivate" | "request_info"; partner: Partner }>(null);
   const [reason, setReason] = useState("");
   const [acting, setActing] = useState(false);
 
@@ -55,7 +55,10 @@ export default function PartnerApprovals() {
   const openDetail = async (p: Partner) => {
     setSelected(p);
     setSignedUrls({});
-    const fields = ["aadhaar_front_url", "aadhaar_back_url", "pan_card_url", "shop_photo_url"];
+    const fields = [
+      "aadhaar_front_url", "aadhaar_back_url", "pan_card_url", "shop_photo_url",
+      "emitra_certificate_url", "address_proof_url", "owner_photo_url",
+    ];
     const next: Record<string, string> = {};
     for (const f of fields) {
       const path: string | null = p[f];
@@ -76,8 +79,8 @@ export default function PartnerApprovals() {
   const submitAction = async () => {
     if (!actionDialog || !user) return;
     const { action, partner } = actionDialog;
-    if ((action === "reject" || action === "suspend") && !reason.trim()) {
-      toast.error("Please provide a reason");
+    if ((action === "reject" || action === "suspend" || action === "request_info") && !reason.trim()) {
+      toast.error("Please provide a reason or message");
       return;
     }
     setActing(true);
@@ -87,6 +90,10 @@ export default function PartnerApprovals() {
       else if (action === "reject") { patch.status = "rejected"; patch.rejection_reason = reason; }
       else if (action === "suspend") { patch.status = "suspended"; patch.rejection_reason = reason; }
       else if (action === "reactivate") { patch.status = "active"; patch.rejection_reason = null; }
+      else if (action === "request_info") {
+        patch.status = "under_review";
+        patch.info_request_message = reason;
+      }
 
       const { error } = await supabase.from("partner_profiles").update(patch).eq("id", partner.id);
       if (error) throw error;
@@ -106,8 +113,11 @@ export default function PartnerApprovals() {
         type: "partner_status",
         title: action === "approve" ? "Partner application approved" :
                action === "reject" ? "Partner application rejected" :
-               action === "suspend" ? "Partner account suspended" : "Partner account reactivated",
-        message: action === "approve" ? "Welcome aboard! You can now register workers." :
+               action === "suspend" ? "Partner account suspended" :
+               action === "request_info" ? "Additional information requested" :
+               "Partner account reactivated",
+        message: action === "approve" ? `Welcome aboard! Your Partner ID will be assigned. Login at /emitra/login` :
+                 action === "request_info" ? reason :
                  reason || `Your partner account status was changed to ${patch.status}.`,
         is_read: false,
       });
@@ -189,11 +199,22 @@ export default function PartnerApprovals() {
 
               <div className="space-y-5">
                 <Section title="Business">
+                  <KV k="Partner ID" v={selected.partner_code} />
+                  <KV k="E-Mitra ID" v={selected.emitra_id} />
                   <KV k="Owner" v={selected.owner_name} />
                   <KV k="Mobile" v={selected.mobile} />
                   <KV k="WhatsApp" v={selected.whatsapp} />
                   <KV k="Email" v={selected.email} />
-                  <KV k="Address" v={[selected.address, selected.district, selected.state, selected.pincode].filter(Boolean).join(", ")} />
+                  <KV k="Kiosk" v={selected.center_name} />
+                  <KV k="Address" v={[selected.address, selected.village_city, selected.district, selected.state, selected.pincode].filter(Boolean).join(", ")} />
+                </Section>
+
+                <Section title="Infrastructure">
+                  <KV k="Computer" v={selected.has_computer ? "Yes" : "No"} />
+                  <KV k="Scanner" v={selected.has_scanner ? "Yes" : "No"} />
+                  <KV k="Printer" v={selected.has_printer ? "Yes" : "No"} />
+                  <KV k="Internet" v={selected.has_internet ? "Yes" : "No"} />
+                  <KV k="Worker Categories" v={(selected.worker_categories || []).join(", ")} />
                 </Section>
 
                 <Section title="Identity">
@@ -203,7 +224,7 @@ export default function PartnerApprovals() {
 
                 <Section title="Documents">
                   <div className="grid grid-cols-2 gap-3 col-span-2">
-                    {(["aadhaar_front_url","aadhaar_back_url","pan_card_url","shop_photo_url"] as const).map(f => (
+                    {(["emitra_certificate_url","pan_card_url","address_proof_url","shop_photo_url","owner_photo_url","aadhaar_front_url","aadhaar_back_url"] as const).map(f => (
                       <div key={f} className="border rounded-lg p-2">
                         <p className="text-xs text-muted-foreground mb-1 capitalize">{f.replace(/_url$/, "").replace(/_/g, " ")}</p>
                         {signedUrls[f] ? (
@@ -249,6 +270,9 @@ export default function PartnerApprovals() {
               <DialogFooter className="flex flex-wrap gap-2 pt-4 border-t mt-4">
                 {(selected.status === "applied" || selected.status === "under_review") && (
                   <>
+                    <Button variant="outline" onClick={() => setActionDialog({ action: "request_info", partner: selected })}>
+                      Request Info
+                    </Button>
                     <Button variant="destructive" onClick={() => setActionDialog({ action: "reject", partner: selected })}>
                       <XCircle className="h-4 w-4 mr-1" /> Reject
                     </Button>
@@ -281,16 +305,20 @@ export default function PartnerApprovals() {
               <DialogHeader>
                 <DialogTitle className="capitalize">{actionDialog.action} partner</DialogTitle>
                 <DialogDescription>
-                  {actionDialog.action === "approve" && "Approving will give this partner full access to register workers."}
+                  {actionDialog.action === "approve" && "Approving generates a Partner ID (SWP-XXXXX) and grants full worker registration access."}
                   {actionDialog.action === "reject" && "Rejecting will block this partner from operational features. They will see your reason."}
                   {actionDialog.action === "suspend" && "Suspension immediately revokes operational access. The partner will see your reason."}
+                  {actionDialog.action === "request_info" && "The partner will be notified to provide additional information."}
                   {actionDialog.action === "reactivate" && "Reactivation restores full partner access."}
                 </DialogDescription>
               </DialogHeader>
-              {(actionDialog.action === "reject" || actionDialog.action === "suspend") && (
+              {(actionDialog.action === "reject" || actionDialog.action === "suspend" || actionDialog.action === "request_info") && (
                 <div className="space-y-1.5 mt-2">
-                  <label className="text-sm font-medium">Reason <span className="text-destructive">*</span></label>
-                  <Textarea rows={3} value={reason} onChange={e => setReason(e.target.value)} placeholder="Explain why…" />
+                  <label className="text-sm font-medium">
+                    {actionDialog.action === "request_info" ? "Message" : "Reason"} <span className="text-destructive">*</span>
+                  </label>
+                  <Textarea rows={3} value={reason} onChange={e => setReason(e.target.value)}
+                    placeholder={actionDialog.action === "request_info" ? "What additional information is needed?" : "Explain why…"} />
                 </div>
               )}
               <DialogFooter className="mt-4">

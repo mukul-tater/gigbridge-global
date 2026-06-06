@@ -1,8 +1,14 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import HomePlatformStats from "@/components/HomePlatformStats";
 import WhySafeWork from "@/components/WhySafeWork";
+import AgentComparison from "@/components/AgentComparison";
+import SalaryProtectionSection from "@/components/SalaryProtectionSection";
+import GlobalDestinations from "@/components/GlobalDestinations";
+import HomeJobCategories from "@/components/HomeJobCategories";
 import ProcessTimeline from "@/components/ProcessTimeline";
 import FeaturedJobs from "@/components/FeaturedJobs";
+import PlatformFeatures from "@/components/PlatformFeatures";
 import HomeFooterCTA from "@/components/HomeFooterCTA";
 import EmployerHomeSections from "@/components/EmployerHomeSections";
 import Footer from "@/components/Footer";
@@ -37,6 +43,7 @@ const Index = () => {
 
       {!authResolving && isEmployer ? (
         <>
+          <HomePlatformStats />
           <ScrollReveal>
             <ProcessTimeline />
           </ScrollReveal>
@@ -46,8 +53,26 @@ const Index = () => {
         </>
       ) : !authResolving ? (
         <>
+          <HomePlatformStats />
+
           <ScrollReveal>
             <WhySafeWork />
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <AgentComparison />
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <SalaryProtectionSection />
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <GlobalDestinations />
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <HomeJobCategories />
           </ScrollReveal>
 
           <ScrollReveal>
@@ -56,6 +81,10 @@ const Index = () => {
 
           <ScrollReveal>
             <FeaturedJobs />
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <PlatformFeatures />
           </ScrollReveal>
 
           <ScrollReveal>

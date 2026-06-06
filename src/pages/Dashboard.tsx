@@ -48,7 +48,7 @@ export default function Dashboard() {
               .eq('user_id', user?.id || '')
               .maybeSingle();
             const submitted = !!data?.submitted_at;
-            go(submitted ? "/partner/dashboard" : "/partner/onboarding");
+            go(submitted ? "/emitra/dashboard" : "/emitra/register");
           } catch (err) {
             console.error('Partner status check failed:', err);
             go("/partner/onboarding");

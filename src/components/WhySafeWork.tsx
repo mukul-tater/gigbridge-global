@@ -1,31 +1,31 @@
-import { Shield, BadgeCheck, Wallet, FileCheck } from "lucide-react";
+import { Shield, BadgeCheck, FileCheck, Ban } from "lucide-react";
 
 const trustPoints = [
   {
-    icon: Wallet,
-    title: "Worker pays ₹0",
-    description: "Free to sign up and apply. No agent fees, no hidden charges.",
+    icon: Ban,
+    title: "No agent fees",
+    description: "Sign up and apply without paying recruitment agents. Standard government visa & emigration fees still apply.",
     iconBg: "bg-success/10",
     iconColor: "text-success",
   },
   {
     icon: BadgeCheck,
     title: "Verified jobs only",
-    description: "Every employer and job listing is checked before it goes live.",
+    description: "Every employer and job listing is checked by our team before it goes live.",
     iconBg: "bg-primary/10",
     iconColor: "text-primary",
   },
   {
     icon: Shield,
     title: "Salary protected",
-    description: "Your salary is held safely until you complete the work — no wage theft.",
+    description: "Employer deposits your salary into a protected account before you start work.",
     iconBg: "bg-info/10",
     iconColor: "text-info",
   },
   {
     icon: FileCheck,
     title: "Compliance support",
-    description: "ECR/ECNR checks, digital contracts, and visa guidance when you need it.",
+    description: "ECR/ECNR checks, digital contracts, PDOT training, and visa guidance.",
     iconBg: "bg-secondary/10",
     iconColor: "text-secondary",
   },
@@ -33,25 +33,56 @@ const trustPoints = [
 
 export default function WhySafeWork() {
   return (
-    <section className="py-12 sm:py-16 bg-muted/30">
+    <section className="py-16 sm:py-20 lg:py-24 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="text-center mb-8 sm:mb-10 max-w-2xl mx-auto">
-          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-success/10 text-success mb-3">
-            Why SafeWork Global
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-bold font-heading tracking-tight mb-2">
-            A safe way to work abroad
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Built for Indian workers — no agents, no upfront fees, no fake promises.
-          </p>
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start mb-12 sm:mb-16">
+          <div>
+            <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-success/10 text-success mb-4">
+              Why SafeWork Global
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading tracking-tight mb-4">
+              Replacing unsafe agents with a{" "}
+              <span className="text-gradient">compliance-first</span> platform
+            </h2>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              Every year, Indian workers lose lakhs to fake overseas job agents — paying
+              ₹50,000 to ₹2,00,000 upfront for jobs that never exist. SafeWork Global
+              connects you directly with verified employers, with your salary protected
+              and your contract in writing.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              We are building the trusted infrastructure for safe, ethical migrant
+              employment — starting with UAE, Oman, and expanding across the GCC, Japan,
+              and Europe.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-destructive/20 bg-destructive/[0.03] p-6 sm:p-8">
+            <h3 className="font-semibold font-heading text-foreground mb-4 flex items-center gap-2">
+              <span className="text-destructive">⚠</span> What workers face with agents
+            </h3>
+            <ul className="space-y-3 text-sm text-muted-foreground">
+              {[
+                "Hidden fees of 10–30% of your salary",
+                "Fake job offers and passport retention",
+                "No written contract — verbal promises only",
+                "No protection if employer doesn't pay",
+                "Forced into unsafe, unregulated migration routes",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2">
+                  <span className="text-destructive mt-0.5">×</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {trustPoints.map((point) => (
             <div
               key={point.title}
-              className="rounded-xl border border-border/60 bg-card p-5 hover:border-primary/30 transition-colors"
+              className="rounded-xl border border-border/60 bg-card p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all"
             >
               <div className={`inline-flex p-2.5 rounded-lg ${point.iconBg} mb-3`}>
                 <point.icon className={`h-5 w-5 ${point.iconColor}`} />

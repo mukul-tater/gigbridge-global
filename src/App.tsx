@@ -94,6 +94,16 @@ import TermsOfService from "./pages/TermsOfService";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
 import PartnerApprovals from "./pages/admin/PartnerApprovals";
+import {
+  EmitraRegisterPage,
+  EmitraLoginPage,
+  EmitraDashboardPage,
+  EmitraWorkersPage,
+  EmitraRegisterWorkerPage,
+  EmitraWorkerDetailPage,
+  EmitraNotificationsPage,
+  EmitraCompliancePage,
+} from "./modules/emitra";
 
 import WorkerVerificationStatus from "./pages/worker/VerificationStatus";
 import WorkerOnboarding from "./pages/worker/WorkerOnboarding";
@@ -129,8 +139,11 @@ function AppShell() {
       {!isWorkerRegistration && <PilotPhaseBanner />}
       <PageTransition>
         <Routes>
-          {/* Phase-1 Worker Registration (live entry points) */}
-          <Route path="/" element={<WorkerRegistrationHome />} />
+          {/* Main platform home */}
+          <Route path="/" element={<Index />} />
+
+          {/* Phase-1 worker registration entry (alternate landing) */}
+          <Route path="/worker-start" element={<WorkerRegistrationHome />} />
           <Route path="/register" element={<WorkerRegisterPage />} />
           <Route path="/login" element={<WorkerLoginPage />} />
           <Route
@@ -150,7 +163,7 @@ function AppShell() {
             }
           />
 
-          {/* Legacy platform routes (preserved, not linked from new flow) */}
+          {/* Legacy alias — redirects same home */}
           <Route path="/legacy" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
@@ -259,7 +272,17 @@ function AppShell() {
                 <Route path="/admin/contact-submissions" element={<ProtectedRoute allowedRoles={["admin"]}><ContactSubmissions /></ProtectedRoute>} />
                 <Route path="/admin/investor-dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><InvestorDashboard /></ProtectedRoute>} />
 
-                {/* Partner (e-Mitra) */}
+                {/* E-Mitra Partner (public + protected) */}
+                <Route path="/emitra/register" element={<EmitraRegisterPage />} />
+                <Route path="/emitra/login" element={<EmitraLoginPage />} />
+                <Route path="/emitra/dashboard" element={<ProtectedRoute allowedRoles={["partner"]}><EmitraDashboardPage /></ProtectedRoute>} />
+                <Route path="/emitra/workers" element={<ProtectedRoute allowedRoles={["partner"]}><EmitraWorkersPage /></ProtectedRoute>} />
+                <Route path="/emitra/workers/register" element={<ProtectedRoute allowedRoles={["partner"]}><EmitraRegisterWorkerPage /></ProtectedRoute>} />
+                <Route path="/emitra/workers/:workerId" element={<ProtectedRoute allowedRoles={["partner"]}><EmitraWorkerDetailPage /></ProtectedRoute>} />
+                <Route path="/emitra/notifications" element={<ProtectedRoute allowedRoles={["partner"]}><EmitraNotificationsPage /></ProtectedRoute>} />
+                <Route path="/emitra/compliance" element={<ProtectedRoute allowedRoles={["partner"]}><EmitraCompliancePage /></ProtectedRoute>} />
+
+                {/* Legacy partner routes (redirect aliases) */}
                 <Route path="/partner/onboarding" element={<ProtectedRoute allowedRoles={["partner"]}><PartnerOnboarding /></ProtectedRoute>} />
                 <Route path="/partner/dashboard" element={<ProtectedRoute allowedRoles={["partner"]}><PartnerDashboard /></ProtectedRoute>} />
                 <Route path="/admin/partners" element={<ProtectedRoute allowedRoles={["admin"]}><PartnerApprovals /></ProtectedRoute>} />

@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 
-const WORKER_REGISTRATION_PATHS = ['/', '/register', '/login', '/home', '/onboarding'];
+const WORKER_REGISTRATION_PATHS = ['/worker-start', '/register', '/login', '/home', '/onboarding'];
 
 export function useIsWorkerRegistrationRoute(): boolean {
   const { pathname } = useLocation();

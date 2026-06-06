@@ -1,0 +1,126 @@
+export type PartnerWorkerStatus =
+  | 'registered'
+  | 'verified'
+  | 'shortlisted'
+  | 'interview_scheduled'
+  | 'interviewed'
+  | 'selected'
+  | 'placed';
+
+export type MigrationReadinessCategory =
+  | 'placement_ready'
+  | 'needs_preparation'
+  | 'not_ready';
+
+export type PartnerTier = 'bronze' | 'silver' | 'gold' | 'platinum';
+
+export interface PartnerProfile {
+  id: string;
+  user_id: string;
+  center_name: string | null;
+  owner_name: string | null;
+  mobile: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  emitra_id: string | null;
+  village_city: string | null;
+  state: string | null;
+  district: string | null;
+  address: string | null;
+  pincode: string | null;
+  has_computer: boolean | null;
+  has_scanner: boolean | null;
+  has_printer: boolean | null;
+  has_internet: boolean | null;
+  worker_categories: string[] | null;
+  years_in_operation: number | null;
+  account_holder: string | null;
+  account_number: string | null;
+  ifsc: string | null;
+  upi_id: string | null;
+  emitra_certificate_url: string | null;
+  pan_card_url: string | null;
+  address_proof_url: string | null;
+  shop_photo_url: string | null;
+  owner_photo_url: string | null;
+  pan_number: string | null;
+  status: string;
+  partner_code: string | null;
+  tier: PartnerTier | null;
+  mobile_verified: boolean | null;
+  compliance_acknowledged_at: string | null;
+  info_request_message: string | null;
+  no_jobs_promise: boolean | null;
+  no_unauthorized_fees: boolean | null;
+  total_incentives_earned: number | null;
+  workers_registered: number | null;
+  workers_placed: number | null;
+  leaderboard_rank: number | null;
+  submitted_at: string | null;
+  rejection_reason: string | null;
+  accepted_terms: boolean | null;
+}
+
+export interface PartnerWorker {
+  id: string;
+  partner_profile_id: string;
+  full_name: string;
+  mobile: string;
+  whatsapp: string | null;
+  skill: string;
+  experience_level: string;
+  passport_available: boolean;
+  preferred_country: string | null;
+  state: string | null;
+  district: string | null;
+  skill_level: string | null;
+  operator_notes: string | null;
+  ready_to_relocate: boolean | null;
+  family_consent: boolean | null;
+  previous_gcc_experience: boolean | null;
+  expected_salary: number | null;
+  migration_readiness_score: number;
+  migration_category: MigrationReadinessCategory;
+  photo_url: string | null;
+  video_url: string | null;
+  status: PartnerWorkerStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PartnerActivity {
+  id: string;
+  partner_profile_id: string;
+  activity_type: string;
+  title: string;
+  description: string | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface PartnerIncentive {
+  id: string;
+  partner_profile_id: string;
+  worker_id: string | null;
+  incentive_type: string;
+  amount: number;
+  description: string | null;
+  created_at: string;
+}
+
+export interface WorkerStatusHistory {
+  id: string;
+  worker_id: string;
+  status: PartnerWorkerStatus;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface DashboardStats {
+  totalRegistered: number;
+  verified: number;
+  interviewed: number;
+  selected: number;
+  placed: number;
+  incentivesEarned: number;
+}

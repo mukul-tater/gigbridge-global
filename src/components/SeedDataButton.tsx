@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Database, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Database, Loader2, CheckCircle, XCircle, IndianRupee } from 'lucide-react';
 import { seedService, DEMO_ACCOUNTS } from '@/services/SeedService';
 
 export default function SeedDataButton() {
   const [loading, setLoading] = useState(false);
+  const [salaryLoading, setSalaryLoading] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string; errors?: string[] } | null>(null);
 
   const handleSeed = async () => {
@@ -19,10 +20,27 @@ export default function SeedDataButton() {
     } catch (error) {
       setResult({
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to seed data'
+        message: error instanceof Error ? error.message : 'Failed to seed data',
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFixSalaries = async () => {
+    setSalaryLoading(true);
+    setResult(null);
+
+    try {
+      const fixResult = await seedService.normalizeAllJobSalaries();
+      setResult(fixResult);
+    } catch (error) {
+      setResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fix salaries',
+      });
+    } finally {
+      setSalaryLoading(false);
     }
   };
 
@@ -39,7 +57,7 @@ export default function SeedDataButton() {
       </CardHeader>
       <CardContent className="space-y-4">
         {result && (
-          <Alert variant={result.success ? "default" : "destructive"}>
+          <Alert variant={result.success ? 'default' : 'destructive'}>
             <div className="flex items-start gap-2">
               {result.success ? (
                 <CheckCircle className="h-4 w-4 mt-0.5" />
@@ -51,10 +69,13 @@ export default function SeedDataButton() {
                   {result.message}
                 </AlertDescription>
                 {result.errors && result.errors.length > 0 && (
-                  <ul className="mt-2 text-sm space-y-1">
-                    {result.errors.map((error, idx) => (
+                  <ul className="mt-2 text-sm space-y-1 max-h-32 overflow-y-auto">
+                    {result.errors.slice(0, 5).map((error, idx) => (
                       <li key={idx} className="text-destructive">• {error}</li>
                     ))}
+                    {result.errors.length > 5 && (
+                      <li className="text-muted-foreground">…and {result.errors.length - 5} more</li>
+                    )}
                   </ul>
                 )}
               </div>
@@ -73,29 +94,21 @@ export default function SeedDataButton() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">
-            Demo passwords are stored securely and not displayed in the UI. Retrieve them from the secure admin credentials store if needed.
-          </p>
         </div>
 
         <div className="space-y-2">
           <h3 className="font-semibold text-sm">What will be created:</h3>
           <ul className="text-sm space-y-1 text-muted-foreground">
             <li>• 100 sample job postings across 30+ countries</li>
-            <li>• Jobs distributed across all job categories</li>
+            <li>• Salaries in ₹50K–₹1L/month range (INR)</li>
             <li>• Job skills and requirements for each posting</li>
-            <li>• Worker profile data (if worker account exists)</li>
-            <li>• Job applications for workers to track</li>
-            <li>• Sample notifications for all user types (worker, employer, admin)</li>
+            <li>• Worker profiles, applications, and notifications</li>
           </ul>
-          <p className="text-xs text-amber-600 mt-2">
-            Tip: Log in as an employer demo account before seeding for best results.
-          </p>
         </div>
 
-        <Button 
-          onClick={handleSeed} 
-          disabled={loading}
+        <Button
+          onClick={handleSeed}
+          disabled={loading || salaryLoading}
           className="w-full"
           size="lg"
         >
@@ -103,8 +116,30 @@ export default function SeedDataButton() {
           {loading ? 'Seeding Database...' : 'Seed Demo Data'}
         </Button>
 
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">or fix existing jobs</span>
+          </div>
+        </div>
+
+        <Button
+          onClick={handleFixSalaries}
+          disabled={loading || salaryLoading}
+          variant="outline"
+          className="w-full"
+          size="lg"
+        >
+          {salaryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <IndianRupee className="mr-2 h-4 w-4" />
+          {salaryLoading ? 'Updating Salaries...' : 'Fix All Job Salaries (₹50K–₹1L)'}
+        </Button>
+
         <p className="text-xs text-muted-foreground text-center">
-          Note: This will create new demo accounts. If accounts already exist, seeding will fail.
+          Fix Salaries updates every active job in the database to realistic ₹50K–₹1L/month bands.
+          Requires admin login.
         </p>
       </CardContent>
     </Card>

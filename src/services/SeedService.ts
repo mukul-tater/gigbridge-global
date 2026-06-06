@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { generateOverseasJobSalary, normalizeSalaryForJob } from '@/lib/jobSalaryUtils';
 
 export interface DemoAccount {
   email: string;
@@ -245,9 +246,7 @@ class SeedService {
           const title = category.titles[Math.floor(Math.random() * category.titles.length)];
           const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
           const expLevel = experienceLevels[Math.floor(Math.random() * experienceLevels.length)];
-          
-          const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'INTERMEDIATE' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
-          const salaryVariation = Math.floor(Math.random() * 50000);
+          const salary = generateOverseasJobSalary(expLevel);
           
           jobs.push({
             title: `${title} - ${category.name}`,
@@ -259,9 +258,10 @@ class SeedService {
             country: location.country,
             job_type: jobType,
             experience_level: expLevel,
-            salary_min: baseSalary + salaryVariation,
-            salary_max: baseSalary + salaryVariation + 100000,
-            currency: 'INR',
+            salary_min: salary.salary_min,
+            salary_max: salary.salary_max,
+            salary_display: salary.salary_display,
+            currency: salary.currency,
             openings: Math.floor(Math.random() * 10) + 1,
             status: 'ACTIVE',
             visa_sponsorship: true,
@@ -281,9 +281,7 @@ class SeedService {
         const location = otherLocations[i % otherLocations.length];
         const jobType = jobTypes[Math.floor(Math.random() * jobTypes.length)];
         const expLevel = experienceLevels[Math.floor(Math.random() * experienceLevels.length)];
-        
-        const baseSalary = expLevel === 'ENTRY' ? 150000 : expLevel === 'INTERMEDIATE' ? 250000 : expLevel === 'SENIOR' ? 400000 : 600000;
-        const salaryVariation = Math.floor(Math.random() * 50000);
+        const salary = generateOverseasJobSalary(expLevel);
         
         jobs.push({
           title: `${title} - ${category.name}`,
@@ -295,9 +293,10 @@ class SeedService {
           country: location.country,
           job_type: jobType,
           experience_level: expLevel,
-          salary_min: baseSalary + salaryVariation,
-          salary_max: baseSalary + salaryVariation + 100000,
-          currency: 'INR',
+          salary_min: salary.salary_min,
+          salary_max: salary.salary_max,
+          salary_display: salary.salary_display,
+          currency: salary.currency,
           openings: Math.floor(Math.random() * 10) + 1,
           status: 'ACTIVE',
           visa_sponsorship: Math.random() > 0.2,
@@ -882,6 +881,70 @@ class SeedService {
         success: false,
         message: 'Failed to seed notifications',
         errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  async normalizeAllJobSalaries(): Promise<SeedResult> {
+    try {
+      const { data: jobs, error: fetchError } = await supabase
+        .from('jobs')
+        .select('id, experience_level')
+        .eq('status', 'ACTIVE');
+
+      if (fetchError) {
+        return { success: false, message: 'Failed to fetch jobs', errors: [fetchError.message] };
+      }
+
+      if (!jobs || jobs.length === 0) {
+        return { success: false, message: 'No active jobs found to update' };
+      }
+
+      let updated = 0;
+      const errors: string[] = [];
+
+      for (let i = 0; i < jobs.length; i++) {
+        const job = jobs[i];
+        const salary = normalizeSalaryForJob(
+          job.experience_level,
+          job.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+        );
+
+        const { error } = await supabase
+          .from('jobs')
+          .update({
+            salary_min: salary.salary_min,
+            salary_max: salary.salary_max,
+            salary_display: salary.salary_display,
+            currency: salary.currency,
+          })
+          .eq('id', job.id);
+
+        if (error) {
+          errors.push(`${job.id}: ${error.message}`);
+        } else {
+          updated++;
+        }
+      }
+
+      if (errors.length > 0 && updated === 0) {
+        return {
+          success: false,
+          message: 'Failed to update job salaries',
+          errors,
+        };
+      }
+
+      return {
+        success: true,
+        message: `Updated ${updated} of ${jobs.length} active jobs to ₹50K–₹1L/month`,
+        errors: errors.length > 0 ? errors : undefined,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Failed to normalize job salaries',
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
       };
     }
   }

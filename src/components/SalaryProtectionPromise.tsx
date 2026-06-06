@@ -69,10 +69,6 @@ export default function SalaryProtectionPromise({ className, variant = "card" }:
           </li>
         ))}
       </ol>
-
-      <p className="mt-3 pt-3 border-t border-border/60 text-[11px] text-muted-foreground">
-        SafeWork charges only a 1% platform fee. No hidden costs. No agent commissions.
-      </p>
     </div>
   );
 }
