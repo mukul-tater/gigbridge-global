@@ -68,7 +68,7 @@ export default function FeaturedJobs() {
             .from('employer_company_info' as any)
             .select('user_id, company_name')
             .in('user_id', employerIds);
-          companyMap = Object.fromEntries((companies || []).map((c: { user_id: string; company_name: string }) => [c.user_id, c.company_name]));
+          companyMap = Object.fromEntries(((companies as any[]) || []).map((c: { user_id: string; company_name: string }) => [c.user_id, c.company_name]));
         }
         const enriched = (data || []).map((j: { employer_id?: string }) => ({
           ...j,
