@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, Search, Globe, User, Bell, X, LogOut, ChevronRight, HardHat, Briefcase } from "lucide-react";
+import { Menu, Search, Globe, User, Bell, X, LogOut, ChevronRight, HardHat, Briefcase, Handshake } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -167,12 +167,30 @@ const Header = () => {
                         <div className="text-xs text-muted-foreground">Sign up as an Employer</div>
                       </div>
                     </button>
+                    <button
+                      onClick={() => navigate('/emitra/register')}
+                      className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors mt-1"
+                    >
+                      <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                        <Handshake className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">Register workers</div>
+                        <div className="text-xs text-muted-foreground">Sign up as a Partner</div>
+                      </div>
+                    </button>
                     <div className="border-t border-border my-2" />
                     <button
                       onClick={() => navigate('/auth')}
                       className="w-full text-xs text-center text-primary hover:underline py-1"
                     >
                       Already have an account? Sign in
+                    </button>
+                    <button
+                      onClick={() => navigate('/emitra/login')}
+                      className="w-full text-xs text-center text-muted-foreground hover:text-primary hover:underline py-1"
+                    >
+                      Partner account? E-Mitra sign in
                     </button>
                   </PopoverContent>
                 </Popover>
@@ -289,11 +307,26 @@ const Header = () => {
                       <Briefcase className="h-4 w-4" />
                       Hire workers (Employer signup)
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full justify-start gap-3"
+                      onClick={() => { navigate('/emitra/register'); closeMobileMenu(); }}
+                    >
+                      <Handshake className="h-4 w-4" />
+                      Register workers (Partner signup)
+                    </Button>
                     <button
                       onClick={() => { navigate('/auth'); closeMobileMenu(); }}
                       className="w-full text-xs text-center text-primary hover:underline py-1"
                     >
                       Already have an account? Sign in
+                    </button>
+                    <button
+                      onClick={() => { navigate('/emitra/login'); closeMobileMenu(); }}
+                      className="w-full text-xs text-center text-muted-foreground hover:text-primary hover:underline py-1"
+                    >
+                      Partner account? E-Mitra sign in
                     </button>
                   </div>
                 )}
