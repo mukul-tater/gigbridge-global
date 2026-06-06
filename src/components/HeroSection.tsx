@@ -4,16 +4,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Search,
   MapPin,
-  Globe,
-  TrendingUp,
   ArrowRight,
   CheckCircle,
-  Sparkles,
-  Users,
   Shield,
-  Phone,
+  Users,
+  Wallet,
+  BadgeCheck,
 } from "lucide-react";
-import SalaryProtectionPromise from "@/components/SalaryProtectionPromise";
 import heroImage from "@/assets/hero-workers.jpg";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,22 +22,34 @@ import { toast } from "sonner";
 const HeroSection = () => {
   const navigate = useNavigate();
   const { isAuthenticated, role, loading, profileLoading } = useAuth();
-  const isEmployer = role === 'employer';
-  const isWorker = role === 'worker';
+  const isEmployer = role === "employer";
   const authResolving = loading || (isAuthenticated && profileLoading);
   const [isSticky, setIsSticky] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+  const [jobCount, setJobCount] = useState<number | null>(null);
+  const [workerCount, setWorkerCount] = useState<number | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      const heroHeight = window.innerHeight * 0.6;
+      const heroHeight = window.innerHeight * 0.5;
       setIsSticky(window.scrollY > heroHeight);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const [jobRes, workerRes] = await Promise.all([
+        supabase.from("jobs").select("id", { count: "exact", head: true }).eq("status", "ACTIVE"),
+        supabase.from("worker_profiles").select("id", { count: "exact", head: true }),
+      ]);
+      if (jobRes.count != null) setJobCount(jobRes.count);
+      if (workerRes.count != null) setWorkerCount(workerRes.count);
+    };
+    fetchStats();
   }, []);
 
   const handleSearch = () => {
@@ -60,299 +69,203 @@ const HeroSection = () => {
 
   const handleFindJobs = () => {
     if (!isAuthenticated) {
-      navigate('/worker/quick-signup');
+      navigate("/worker/quick-signup");
       return;
     }
-    if (role === 'employer') {
+    if (role === "employer") {
       toast.error("This is an employer account. Switch to a worker account to browse jobs.");
       return;
     }
-    navigate('/jobs');
+    navigate("/jobs");
   };
 
   const handleHireWorkers = () => {
     if (!isAuthenticated) {
-      navigate('/employer/quick-signup');
+      navigate("/employer/quick-signup");
       return;
     }
-    if (role === 'worker') {
+    if (role === "worker") {
       toast.error("This is a worker account. Switch to an employer account to hire workers.");
       return;
     }
-    navigate('/employer/dashboard');
+    navigate("/employer/dashboard");
   };
 
-  const [jobCount, setJobCount] = useState(0);
-  const [countryCount, setCountryCount] = useState(0);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      const [jobRes, countryRes] = await Promise.all([
-        supabase.from("jobs").select("id", { count: "exact", head: true }).eq("status", "ACTIVE"),
-        supabase.from("jobs").select("country").eq("status", "ACTIVE"),
-      ]);
-      if (jobRes.count != null) setJobCount(jobRes.count);
-      if (countryRes.data) {
-        const unique = new Set(countryRes.data.map((r: any) => r.country));
-        setCountryCount(unique.size);
-      }
-    };
-    fetchStats();
-  }, []);
-
-  const stats = [
-    { value: jobCount > 0 ? `${jobCount.toLocaleString()}+` : "…", label: "Active Jobs", icon: TrendingUp },
-    { value: countryCount > 0 ? `${countryCount}+` : "…", label: "Countries", icon: Globe },
-    { value: "98%", label: "Success Rate", icon: CheckCircle },
+  const workerTrustBadges = [
+    { icon: Wallet, text: "Worker pays ₹0" },
+    { icon: BadgeCheck, text: "Verified jobs only" },
+    { icon: Shield, text: "Salary protected" },
   ];
 
+  const employerTrustBadges = [
+    { icon: Shield, text: "Verified workers" },
+    { icon: CheckCircle, text: "Escrow-secured" },
+    { icon: Users, text: "No upfront fees" },
+  ];
+
+  const trustBadges = isEmployer ? employerTrustBadges : workerTrustBadges;
+
+  const statsLine = !isEmployer && (workerCount != null || jobCount != null) && (
+    <p className="text-xs sm:text-sm text-muted-foreground mb-6">
+      {workerCount != null && workerCount > 0 && (
+        <span>{workerCount.toLocaleString()}+ workers onboarded</span>
+      )}
+      {workerCount != null && workerCount > 0 && jobCount != null && jobCount > 0 && (
+        <span> · </span>
+      )}
+      {jobCount != null && jobCount > 0 && (
+        <span>{jobCount.toLocaleString()} verified jobs open</span>
+      )}
+    </p>
+  );
+
   return (
-    <section className="relative min-h-[80vh] lg:min-h-screen overflow-hidden">
-      {/* Background */}
+    <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-background to-info/[0.03]">
-        <div className="absolute inset-0 bg-mesh opacity-60" />
         <img
           src={heroImage}
-          alt="Global workers connecting worldwide"
+          alt="Workers finding jobs abroad"
           className="absolute inset-0 w-full h-full object-cover opacity-[0.04] mix-blend-multiply"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/70 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
       </div>
 
-      {/* Decorative blobs - hidden on small screens */}
-      <div className="hidden sm:block absolute top-20 left-[5%] w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse-soft" />
-      <div className="hidden sm:block absolute top-40 right-[10%] w-96 h-96 bg-info/10 rounded-full blur-3xl animate-pulse-soft animation-delay-500" />
-
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center min-h-[80vh] lg:min-h-screen gap-8 lg:gap-16 py-12 lg:py-0">
-          {/* Left Content */}
-          <div className="flex-1 text-center lg:text-left max-w-2xl w-full">
-            {/* Hero highlight banner — primary value prop */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-success/15 via-primary/15 to-info/15 text-foreground px-4 py-2 rounded-full text-xs sm:text-sm font-bold mb-5 border-2 border-primary/30 shadow-primary/20 shadow-lg animate-fade-in backdrop-blur-sm">
-              <Shield className="h-4 w-4 text-success animate-pulse-soft" />
-              <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
-                {isEmployer
-                  ? "Hire verified workers — escrow-secured, no upfront fees"
-                  : "Get a safe foreign job — without agents"}
-              </span>
-            </div>
-
-            {/* Secondary trust badge */}
-            <div className="inline-flex items-center gap-2 bg-muted/50 text-muted-foreground px-3 py-1.5 rounded-full text-xs font-medium mb-6 border border-border/50 animate-fade-in">
-              <Sparkles className="h-3 w-3 text-primary" />
-              <span>
-                {isEmployer
-                  ? "Verified workers · Escrow-secured payments"
-                  : "900+ verified jobs · 40+ countries"}
-              </span>
-            </div>
-
-            {/* Heading */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-heading text-foreground mb-5 leading-[1.1] tracking-tight opacity-0 animate-fade-in-up animation-delay-100">
-              {isEmployer ? (
-                <>
-                  Hire Verified
-                  <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">Workers Worldwide</span>
-                </>
-              ) : (
-                <>
-                  Find Foreign
-                  <span className="block mt-1 text-gradient-animated bg-[length:200%_200%]">Jobs Abroad</span>
-                </>
-              )}
-            </h1>
-
-            {/* Subheading */}
-            <p className="text-base sm:text-lg text-muted-foreground mb-4 max-w-xl mx-auto lg:mx-0 leading-relaxed opacity-0 animate-fade-in-up animation-delay-200">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10 py-12 sm:py-16 lg:py-20">
+        <div className="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
+          {/* Single trust badge */}
+          <div className="inline-flex items-center gap-2 bg-success/10 text-success px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium mb-5 border border-success/20">
+            <Shield className="h-3.5 w-3.5" />
+            <span>
               {isEmployer
-                ? "No upfront fees. Pre-verified workers. Escrow-secured payments — pay only after you hire."
-                : "No agent fees. Verified jobs only. Connect directly with employers worldwide."}
-            </p>
-
-            {/* Primary CTA — role-aware. While auth is resolving, render nothing to avoid flashing the wrong CTA. */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-8 opacity-0 animate-fade-in-up animation-delay-200">
-              {!authResolving && !isEmployer && (
-                <Button
-                  size="lg"
-                  className="h-12 px-6 gap-2 text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary"
-                  onClick={handleFindJobs}
-                >
-                  Find Foreign Jobs <ArrowRight className="h-5 w-5" />
-                </Button>
-              )}
-              {!authResolving && !isWorker && (
-                <Button
-                  size="lg"
-                  variant={isEmployer ? "default" : "secondary"}
-                  className={`h-12 px-6 gap-2 text-base font-semibold rounded-xl ${isEmployer ? 'bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 shadow-primary' : ''}`}
-                  onClick={handleHireWorkers}
-                >
-                  <Users className="h-5 w-5" /> {isEmployer ? 'Browse Workers' : 'Hire Workers'}
-                </Button>
-              )}
-            </div>
-            {!authResolving && !isWorker && !isEmployer && (
-              <div className="-mt-4 mb-6 flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-2 sm:gap-3 text-xs text-muted-foreground">
-                <span>Employers: Hire verified workers — escrow-secured, no upfront fees.</span>
-                <a
-                  href="tel:+919950085843"
-                  className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
-                >
-                  <Phone className="h-3 w-3" />
-                  Call us: +91-9950085843
-                </a>
-              </div>
-            )}
-
-            {/* Search Form */}
-            <div className="glass-strong p-4 sm:p-5 rounded-2xl max-w-2xl mx-auto lg:mx-0 opacity-0 animate-fade-in-up animation-delay-300">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
-                <div className="relative group">
-                  <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    placeholder={isEmployer ? "Skill or worker type" : "Job title or skill"}
-                    className="pl-10 h-11 sm:h-12 bg-background/80 border-border/50 focus:border-primary focus:bg-background rounded-xl text-sm sm:text-base"
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  />
-                </div>
-
-                <div className="relative group">
-                  <MapPin className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 group-focus-within:text-primary transition-colors" />
-                  <Select value={searchLocation} onValueChange={setSearchLocation}>
-                    <SelectTrigger className="pl-10 h-11 sm:h-12 bg-background/80 border-border/50 rounded-xl text-sm sm:text-base">
-                      <SelectValue placeholder="Country" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-64">
-                      {DESTINATION_COUNTRIES.filter((c) => c !== "All Countries")
-                        .slice(0, 25)
-                        .map((country) => (
-                          <SelectItem key={country} value={country}>
-                            {country}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {!isEmployer && (
-                  <Select value={searchCategory} onValueChange={setSearchCategory}>
-                    <SelectTrigger className="h-11 sm:h-12 bg-background/80 border-border/50 rounded-xl sm:col-span-2 lg:col-span-1 text-sm sm:text-base">
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-64">
-                      {JOB_CATEGORIES.filter((c) => c !== "All Categories").map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              <Button
-                size="lg"
-                className="w-full h-11 sm:h-12 gap-2 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-primary-hover hover:opacity-90 rounded-xl shadow-primary transition-all duration-300 hover:shadow-hover"
-                onClick={handleSearch}
-              >
-                {isEmployer ? 'Search Workers' : 'Search Jobs'}
-                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-              </Button>
-            </div>
-
-            {/* Trust Badges */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-6 opacity-0 animate-fade-in-up animation-delay-400">
-              {(isEmployer
-                ? [
-                    { icon: Shield, text: "Verified Workers" },
-                    { icon: CheckCircle, text: "Escrow-Secured" },
-                    { icon: Globe, text: "Compliance Support" },
-                  ]
-                : [
-                    { icon: Shield, text: "Verified Employers" },
-                    { icon: CheckCircle, text: "Secure Process" },
-                    { icon: Globe, text: "Visa Support" },
-                  ]
-              ).map((badge) => (
-                <div key={badge.text} className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
-                  <div className="p-1 sm:p-1.5 rounded-lg bg-success/10">
-                    <badge.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-success" />
-                  </div>
-                  <span className="font-medium">{badge.text}</span>
-                </div>
-              ))}
-            </div>
+                ? "Hire verified workers — escrow-secured"
+                : "Safe jobs abroad — without agents"}
+            </span>
           </div>
 
-          {/* Right Content - Hidden on small mobile, visible from sm up */}
-          <div className="flex-1 w-full lg:max-w-lg hidden sm:block">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-3 mb-5 opacity-0 animate-slide-in-right animation-delay-300">
-              {stats.map((stat, index) => (
-                <div
-                  key={stat.label}
-                  className="group relative text-center p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300"
-                  style={{ animationDelay: `${300 + index * 100}ms` }}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-heading text-foreground mb-4 leading-[1.15] tracking-tight">
+            {isEmployer ? (
+              <>
+                Hire Verified
+                <span className="block mt-1 text-gradient">Workers Worldwide</span>
+              </>
+            ) : (
+              <>
+                Find Verified
+                <span className="block mt-1 text-gradient">Jobs Abroad</span>
+              </>
+            )}
+          </h1>
+
+          <p className="text-base sm:text-lg text-muted-foreground mb-4 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            {isEmployer
+              ? "No upfront fees. Pre-verified workers. Escrow-secured payments."
+              : "Free for workers. Verified employers. Your salary is protected."}
+          </p>
+
+          {statsLine}
+
+          {/* Primary CTA */}
+          {!authResolving && (
+            <div className="flex flex-col sm:flex-row gap-3 mb-8 justify-center lg:justify-start">
+              {isEmployer ? (
+                <Button
+                  size="lg"
+                  className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
+                  onClick={handleHireWorkers}
                 >
-                  <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary mx-auto mb-1.5" />
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold font-heading text-foreground mb-0.5">
-                    {stat.value}
-                  </div>
-                  <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">{stat.label}</div>
-                </div>
-              ))}
+                  Browse Workers <ArrowRight className="h-5 w-5" />
+                </Button>
+              ) : (
+                <Button
+                  size="lg"
+                  className="h-12 px-6 gap-2 text-base font-semibold rounded-xl"
+                  onClick={handleFindJobs}
+                >
+                  Browse Jobs <ArrowRight className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Search */}
+          <div className="glass-strong p-4 sm:p-5 rounded-2xl max-w-2xl mx-auto lg:mx-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
+              <div className="relative group">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  placeholder={isEmployer ? "Skill or worker type" : "Job title or skill"}
+                  className="pl-10 h-11 sm:h-12 bg-background/80 border-border/50 rounded-xl"
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
+              </div>
+
+              <div className="relative group">
+                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 group-focus-within:text-primary transition-colors" />
+                <Select value={searchLocation} onValueChange={setSearchLocation}>
+                  <SelectTrigger className="pl-10 h-11 sm:h-12 bg-background/80 border-border/50 rounded-xl">
+                    <SelectValue placeholder="Country" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-64">
+                    {DESTINATION_COUNTRIES.filter((c) => c !== "All Countries")
+                      .slice(0, 25)
+                      .map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {!isEmployer && (
+                <Select value={searchCategory} onValueChange={setSearchCategory}>
+                  <SelectTrigger className="h-11 sm:h-12 bg-background/80 border-border/50 rounded-xl sm:col-span-2 lg:col-span-1">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-64">
+                    {JOB_CATEGORIES.filter((c) => c !== "All Categories").map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
-            {/* Feature Cards */}
-            <div className="space-y-3">
-              {/* Plain-language salary protection — primary trust driver */}
+            <Button
+              size="lg"
+              className="w-full h-11 sm:h-12 gap-2 font-semibold rounded-xl"
+              onClick={handleSearch}
+            >
+              {isEmployer ? "Search Workers" : "Search Jobs"}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
 
-              {[
-                {
-                  icon: Globe,
-                  title: "Global Reach",
-                  description: "Access opportunities in 50+ countries with high demand for skilled workers",
-                  iconBg: "bg-primary/15",
-                  iconColor: "text-primary",
-                },
-                {
-                  icon: TrendingUp,
-                  title: "Fast Track Hiring",
-                  description: "Countries with 1-4 week hiring times and simplified visa processes",
-                  iconBg: "bg-secondary/15",
-                  iconColor: "text-secondary",
-                },
-              ].map((feature) => (
-                <div key={feature.title} className="group card-premium p-4 sm:p-5">
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div
-                      className={`p-2.5 sm:p-3 rounded-xl ${feature.iconBg} shrink-0 group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      <feature.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${feature.iconColor}`} />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="font-semibold font-heading text-foreground mb-1 text-base sm:text-lg">
-                        {feature.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                    </div>
-                  </div>
+          {/* Trust strip */}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-6">
+            {trustBadges.map((badge) => (
+              <div key={badge.text} className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
+                <div className="p-1 rounded-lg bg-success/10">
+                  <badge.icon className="h-3.5 w-3.5 text-success" />
                 </div>
-              ))}
-            </div>
+                <span className="font-medium">{badge.text}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Sticky Mobile Search Bar */}
-      {isSticky && (
-        <div className="md:hidden fixed top-16 left-0 right-0 z-40 glass-strong border-b border-border/50 animate-fade-in-down">
+      {/* Sticky mobile search */}
+      {isSticky && !isEmployer && (
+        <div className="md:hidden fixed top-16 left-0 right-0 z-40 glass-strong border-b border-border/50">
           <div className="container mx-auto px-4 py-3">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search jobs..."
                   className="pl-10 h-11 bg-background/80 rounded-xl"

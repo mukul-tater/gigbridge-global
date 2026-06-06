@@ -108,22 +108,50 @@ import QuickPostJob from "./pages/employer/QuickPostJob";
 import PilotOffer from "./pages/employer/PilotOffer";
 import RecommendedWorkers from "./pages/employer/RecommendedWorkers";
 
+import {
+  WorkerAuthProvider,
+  WorkerRegistrationHome,
+  WorkerRegisterPage,
+  WorkerLoginPage,
+  WorkerDashboardPage,
+  WorkerProtectedRoute,
+  WorkerOnboardingPage,
+} from "./modules/worker-registration";
+import { useIsWorkerRegistrationRoute } from "./modules/worker-registration/hooks/useIsWorkerRegistrationRoute";
+
 const qc = new QueryClient();
 
-function App() {
+function AppShell() {
+  const isWorkerRegistration = useIsWorkerRegistrationRoute();
+
   return (
-    <QueryClientProvider client={qc}>
-      <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <ErrorBoundary>
-            <PilotPhaseBanner />
-            <PageTransition>
-              <Routes>
-                <Route path="/" element={<Index />} />
+    <>
+      {!isWorkerRegistration && <PilotPhaseBanner />}
+      <PageTransition>
+        <Routes>
+          {/* Phase-1 Worker Registration (live entry points) */}
+          <Route path="/" element={<WorkerRegistrationHome />} />
+          <Route path="/register" element={<WorkerRegisterPage />} />
+          <Route path="/login" element={<WorkerLoginPage />} />
+          <Route
+            path="/home"
+            element={
+              <WorkerProtectedRoute>
+                <WorkerDashboardPage />
+              </WorkerProtectedRoute>
+            }
+          />
+          <Route
+            path="/onboarding"
+            element={
+              <WorkerProtectedRoute>
+                <WorkerOnboardingPage />
+              </WorkerProtectedRoute>
+            }
+          />
+
+          {/* Legacy platform routes (preserved, not linked from new flow) */}
+          <Route path="/legacy" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/verify-email" element={<EmailVerificationPending />} />
@@ -239,8 +267,25 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </PageTransition>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={qc}>
+      <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <WorkerAuthProvider>
+          <AuthProvider>
+            <ErrorBoundary>
+            <AppShell />
             </ErrorBoundary>
           </AuthProvider>
+          </WorkerAuthProvider>
         </BrowserRouter>
       </TooltipProvider>
       </ThemeProvider>

@@ -51,7 +51,7 @@ export default function FeaturedJobs() {
           `)
           .eq('status', 'ACTIVE')
           .order('posted_at', { ascending: false })
-          .limit(6);
+          .limit(4);
 
         if (error) throw error;
         const employerIds = Array.from(new Set((data || []).map((j: any) => j.employer_id).filter(Boolean)));
@@ -148,7 +148,7 @@ export default function FeaturedJobs() {
             <div className="h-8 w-72 rounded shimmer mx-auto mb-3" />
             <div className="h-5 w-64 rounded shimmer mx-auto" />
           </div>
-          <SkeletonJobGrid count={6} />
+          <SkeletonJobGrid count={4} />
         </div>
       </section>
     );
@@ -162,21 +162,29 @@ export default function FeaturedJobs() {
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-10 lg:mb-14">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-secondary/10 text-secondary mb-4">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-primary/10 text-primary mb-4">
             <Sparkles className="h-3.5 w-3.5" />
-            Hot Opportunities
+            Open Positions
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-foreground mb-3 tracking-tight">
-            Featured <span className="text-gradient">Opportunities</span>
+            Verified Jobs <span className="text-gradient">Abroad</span>
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Browse our latest job openings from verified employers worldwide
+            Real openings from verified employers — apply directly, no agents
           </p>
         </div>
 
         {jobs.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No jobs available at the moment.</p>
+          <div className="text-center py-12 max-w-md mx-auto">
+            <p className="text-muted-foreground mb-4">
+              New jobs are being added regularly. Sign up free to get notified when openings match your skills.
+            </p>
+            <Link to="/worker/quick-signup">
+              <Button size="lg" className="rounded-xl gap-2">
+                Sign Up Free
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         ) : (
           <>

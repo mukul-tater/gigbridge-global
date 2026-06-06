@@ -1,4 +1,4 @@
-import { Search, FileText, CheckCircle, Video, Shield, Plane, Building2, Users, FileSignature, Handshake, Wallet } from "lucide-react";
+import { UserPlus, FileText, CheckCircle, FileSignature, Plane, HeartHandshake, Users, Video, Wallet } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ProcessTimeline = () => {
@@ -7,12 +7,12 @@ const ProcessTimeline = () => {
   const isEmployer = role === "employer";
 
   const workerSteps = [
-    { number: 1, title: "Search Jobs", description: "Browse verified international opportunities", icon: Search, bgColor: "bg-primary", iconGradient: "bg-gradient-to-br from-primary to-primary/70" },
-    { number: 2, title: "Apply", description: "Submit application with your documents", icon: FileText, bgColor: "bg-secondary", iconGradient: "bg-gradient-to-br from-secondary to-secondary/70" },
-    { number: 3, title: "Get Shortlisted", description: "Employers review qualified candidates", icon: CheckCircle, bgColor: "bg-success", iconGradient: "bg-gradient-to-br from-success to-success/70" },
-    { number: 4, title: "Interview", description: "Complete interviews and get offer", icon: Video, bgColor: "bg-warning", iconGradient: "bg-gradient-to-br from-warning to-warning/70" },
-    { number: 5, title: "Visa Process", description: "Complete visa and ECR verification", icon: Shield, bgColor: "bg-info", iconGradient: "bg-gradient-to-br from-info to-info/70" },
-    { number: 6, title: "Travel", description: "Start your new career abroad", icon: Plane, bgColor: "bg-gradient-to-r from-primary to-info", iconGradient: "bg-gradient-to-br from-primary to-info" }
+    { number: 1, title: "Register Free", description: "Create your profile and search verified jobs", icon: UserPlus, bgColor: "bg-primary", iconGradient: "bg-gradient-to-br from-primary to-primary/70" },
+    { number: 2, title: "Apply to Jobs", description: "Submit your application to verified listings", icon: FileText, bgColor: "bg-secondary", iconGradient: "bg-gradient-to-br from-secondary to-secondary/70" },
+    { number: 3, title: "Get Selected", description: "Employer reviews and shortlists you", icon: CheckCircle, bgColor: "bg-success", iconGradient: "bg-gradient-to-br from-success to-success/70" },
+    { number: 4, title: "Sign Safe Contract", description: "Digital contract with salary held securely", icon: FileSignature, bgColor: "bg-warning", iconGradient: "bg-gradient-to-br from-warning to-warning/70" },
+    { number: 5, title: "Visa & Travel", description: "POE clearance and travel arrangements", icon: Plane, bgColor: "bg-info", iconGradient: "bg-gradient-to-br from-info to-info/70" },
+    { number: 6, title: "Support Abroad", description: "Insurance and ongoing help after you arrive", icon: HeartHandshake, bgColor: "bg-gradient-to-r from-primary to-info", iconGradient: "bg-gradient-to-br from-primary to-info" }
   ];
 
   const employerSteps = [
@@ -31,12 +31,12 @@ const ProcessTimeline = () => {
   const heading = !authResolving && isEmployer ? (
     <>Your Path to <span className="text-gradient">Hiring Success</span></>
   ) : (
-    <>Your Path to <span className="text-gradient">Global Success</span></>
+    <>Your Path to a <span className="text-gradient">Safe Job Abroad</span></>
   );
 
   const subheading = !authResolving && isEmployer
     ? "A simple, transparent 6-step process to hire verified workers — no upfront fees"
-    : "A simple, transparent 6-step process to help you land your dream job abroad";
+    : "From sign-up to working abroad — every step is verified and protected";
 
   return (
     <section className="py-14 sm:py-20 lg:py-28 relative overflow-hidden">

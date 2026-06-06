@@ -1,0 +1,156 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import {
+  WorkerRepository,
+  LocationRepository,
+  SkillRepository,
+} from '../repository/WorkerRepository.js';
+import { WorkerOnboardingRepository } from '../repository/WorkerOnboardingRepository.js';
+import type {
+  WorkerRegisterRequestDto,
+  WorkerLoginRequestDto,
+  WorkerProfileResponseDto,
+  WorkerAuthResponseDto,
+} from '../dto/WorkerDto.js';
+import { ConflictException, NotFoundException, UnauthorizedException } from '../exception/AppException.js';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'gigbridge-worker-dev-secret-change-in-production';
+const JWT_EXPIRES_IN = '7d';
+
+export class WorkerService {
+  constructor(
+    private readonly workerRepo = new WorkerRepository(),
+    private readonly locationRepo = new LocationRepository(),
+    private readonly skillRepo = new SkillRepository(),
+    private readonly onboardingRepo = new WorkerOnboardingRepository()
+  ) {}
+
+  async register(dto: WorkerRegisterRequestDto): Promise<WorkerAuthResponseDto> {
+    const existing = this.workerRepo.findByMobile(dto.mobileNumber);
+    if (existing) {
+      throw new ConflictException('Mobile number is already registered', {
+        mobileNumber: ['This mobile number is already registered'],
+      });
+    }
+
+    const state = this.locationRepo.findStateById(dto.stateId);
+    if (!state) {
+      throw new NotFoundException('Invalid state selected');
+    }
+
+    if (!this.locationRepo.districtBelongsToState(dto.districtId, dto.stateId)) {
+      throw new NotFoundException('District does not belong to the selected state');
+    }
+
+    const skill = this.skillRepo.findById(dto.primarySkillId);
+    if (!skill) {
+      throw new NotFoundException('Invalid skill selected');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const workerCode = this.workerRepo.getNextWorkerCode();
+
+    const worker = this.workerRepo.create({
+      workerCode,
+      fullName: dto.fullName.trim(),
+      mobileNumber: dto.mobileNumber,
+      passwordHash,
+      aadhaarNumber: dto.aadhaarNumber,
+      stateId: dto.stateId,
+      districtId: dto.districtId,
+      primarySkillId: dto.primarySkillId,
+      experienceLevel: dto.experienceLevel,
+    });
+
+    const profile = this.toProfileResponse(worker.id)!;
+    const token = this.generateToken(worker.id, worker.mobileNumber);
+
+    return { token, worker: profile };
+  }
+
+  async login(dto: WorkerLoginRequestDto): Promise<WorkerAuthResponseDto> {
+    const worker = this.workerRepo.findByMobile(dto.mobileNumber);
+    if (!worker) {
+      throw new UnauthorizedException('Invalid mobile number or password');
+    }
+
+    const valid = await bcrypt.compare(dto.password, worker.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Invalid mobile number or password');
+    }
+
+    const profile = this.toProfileResponse(worker.id)!;
+    const token = this.generateToken(worker.id, worker.mobileNumber);
+
+    return { token, worker: profile };
+  }
+
+  getProfile(id: number): WorkerProfileResponseDto {
+    const profile = this.toProfileResponse(id);
+    if (!profile) {
+      throw new NotFoundException('Worker not found');
+    }
+    return profile;
+  }
+
+  getReferenceData() {
+    return {
+      states: this.locationRepo.findAllStates(),
+      skills: this.skillRepo.findAll(),
+    };
+  }
+
+  getDistrictsByState(stateId: number) {
+    const state = this.locationRepo.findStateById(stateId);
+    if (!state) {
+      throw new NotFoundException('State not found');
+    }
+    return this.locationRepo.findDistrictsByStateId(stateId);
+  }
+
+  private toProfileResponse(id: number): WorkerProfileResponseDto | null {
+    const worker = this.workerRepo.findById(id);
+    if (!worker) return null;
+
+    const state = this.locationRepo.findStateById(worker.stateId);
+    const district = this.locationRepo.findDistrictById(worker.districtId);
+    const skill = this.skillRepo.findById(worker.primarySkillId);
+    const onboarding = this.onboardingRepo.findByWorkerId(id);
+
+    return {
+      id: worker.id,
+      workerCode: worker.workerCode,
+      fullName: worker.fullName,
+      mobileNumber: worker.mobileNumber,
+      aadhaarNumber: worker.aadhaarNumber,
+      stateId: worker.stateId,
+      stateName: state?.name ?? '',
+      districtId: worker.districtId,
+      districtName: district?.name ?? '',
+      primarySkillId: worker.primarySkillId,
+      primarySkillName: skill?.name ?? '',
+      experienceLevel: worker.experienceLevel,
+      profileCompletionPercentage: worker.profileCompletionPercentage,
+      registrationSource: worker.registrationSource,
+      status: worker.status,
+      onboardingCompleted: onboarding?.onboardingCompleted ?? false,
+      createdDate: worker.createdDate,
+      updatedDate: worker.updatedDate,
+    };
+  }
+
+  private generateToken(workerId: number, mobileNumber: string): string {
+    return jwt.sign({ sub: workerId, mobileNumber, type: 'worker' }, JWT_SECRET, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
+  }
+
+  verifyToken(token: string): { workerId: number } {
+    try {
+      const payload = jwt.verify(token, JWT_SECRET) as { sub: number };
+      return { workerId: payload.sub };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+}
