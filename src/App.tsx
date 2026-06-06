@@ -2,13 +2,23 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ThemeProvider } from "./components/ThemeProvider";
 import PageTransition from "./components/PageTransition";
+import PilotPhaseBanner from "./components/PilotPhaseBanner";
+import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Jobs from "./pages/Jobs";
+import JobDetail from "./pages/JobDetail";
+import JobCategories from "./pages/JobCategories";
+import Auth from "./pages/Auth";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
 import {
@@ -23,24 +33,38 @@ import {
 } from "./modules/emitra";
 import {
   WorkerAuthProvider,
-  WorkerRegistrationHome,
   WorkerRegisterPage,
   WorkerLoginPage,
   WorkerDashboardPage,
   WorkerProtectedRoute,
   WorkerOnboardingPage,
 } from "./modules/worker-registration";
+import { useIsActiveModuleRoute } from "./modules/worker-registration/hooks/useIsWorkerRegistrationRoute";
 
 const qc = new QueryClient();
 
 function AppShell() {
+  const isActiveModule = useIsActiveModuleRoute();
+
   return (
     <>
+      {!isActiveModule && <PilotPhaseBanner />}
       <PageTransition>
         <Routes>
-          {/* ── Worker (Phase-1 registration) ── */}
-          <Route path="/" element={<WorkerRegistrationHome />} />
-          <Route path="/worker-start" element={<Navigate to="/" replace />} />
+          {/* Original SafeWork Global home */}
+          <Route path="/" element={<Index />} />
+
+          {/* Public pages linked from home */}
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:slug" element={<JobDetail />} />
+          <Route path="/job-categories" element={<JobCategories />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/auth" element={<Auth />} />
+
+          {/* Phase-1 worker registration (backend API) */}
           <Route path="/register" element={<WorkerRegisterPage />} />
           <Route path="/login" element={<WorkerLoginPage />} />
           <Route
@@ -60,7 +84,7 @@ function AppShell() {
             }
           />
 
-          {/* ── E-Mitra partner ── */}
+          {/* E-Mitra partner */}
           <Route path="/emitra/register" element={<EmitraRegisterPage />} />
           <Route path="/emitra/login" element={<EmitraLoginPage />} />
           <Route
@@ -111,7 +135,6 @@ function AppShell() {
               </ProtectedRoute>
             }
           />
-          {/* Partner application flow (linked from E-Mitra nav) */}
           <Route
             path="/partner/onboarding"
             element={
@@ -130,9 +153,8 @@ function AppShell() {
           />
 
           {/*
-            ── DISABLED: Legacy platform routes ──
-            See src/routes/LegacyRoutes.archive.tsx and git history to restore.
-            Includes: Index home, /auth, /jobs, employer, admin, legacy /worker/* (Supabase), etc.
+            Other legacy routes (employer, admin, legacy worker portal) remain disabled.
+            See src/routes/LegacyRoutes.archive.tsx to restore.
           */}
 
           <Route path="*" element={<NotFound />} />

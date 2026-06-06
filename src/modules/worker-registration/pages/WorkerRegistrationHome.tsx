@@ -23,15 +23,15 @@ export default function WorkerRegistrationHome() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-4 py-16 sm:px-6">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur">
-            <HardHat className="h-7 w-7" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-blue-300">GigBridge Global</p>
-            <p className="text-sm text-white/70">Overseas Blue-Collar Recruitment</p>
-          </div>
-        </div>
+        <header className="mb-8 flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/safework-global-logo.png" alt="SafeWork Global" className="h-12 w-12 rounded-xl" />
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wider text-blue-300">SafeWork Global</p>
+              <p className="text-sm text-white/70">Overseas Blue-Collar Recruitment</p>
+            </div>
+          </Link>
+        </header>
 
         <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
           Your gateway to overseas jobs

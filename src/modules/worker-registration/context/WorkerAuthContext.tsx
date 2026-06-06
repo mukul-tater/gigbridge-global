@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import type { WorkerProfile } from '../types/worker.types';
 import { workerApi } from '../services/workerApi';
 
-const SESSION_KEY = 'gigbridge_worker_session';
+const SESSION_KEY = 'safework_worker_session';
 
 interface WorkerSession {
   token: string;

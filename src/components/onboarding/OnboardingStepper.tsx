@@ -32,6 +32,10 @@ export default function OnboardingStepper({ onDismiss }: OnboardingStepperProps)
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     if (user && role) {
       checkOnboardingProgress();
     }

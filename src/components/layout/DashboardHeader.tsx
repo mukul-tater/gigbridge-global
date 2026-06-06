@@ -1,4 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { useWorkerAuth } from "@/modules/worker-registration/context/WorkerAuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,10 +28,20 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ portalName, profileMenuItems = [] }: DashboardHeaderProps) {
   const { user, profile, logout } = useAuth();
+  const { worker, logout: workerLogout, isAuthenticated: isWorkerSession } = useWorkerAuth();
   const navigate = useNavigate();
+
+  const displayName = worker?.fullName || profile?.full_name || "User";
+  const displaySubtext = worker?.mobileNumber || user?.email || "";
 
   const handleLogout = async () => {
     try {
+      if (isWorkerSession) {
+        workerLogout();
+        toast.success("Logged out successfully");
+        navigate("/login");
+        return;
+      }
       await logout();
       toast.success("Logged out successfully");
       navigate("/auth");
@@ -39,7 +50,7 @@ export default function DashboardHeader({ portalName, profileMenuItems = [] }: D
     }
   };
 
-  const fallbackChar = profile?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U";
+  const fallbackChar = displayName[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U";
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card/95 backdrop-blur-md supports-[backdrop-filter]:bg-card/80">
@@ -63,7 +74,7 @@ export default function DashboardHeader({ portalName, profileMenuItems = [] }: D
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 md:h-10 md:w-10 rounded-full ring-offset-background hover:ring-2 hover:ring-primary/20 transition-all">
                 <Avatar className="h-9 w-9 md:h-10 md:w-10 border-2 border-primary/10">
-                  <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "User"} />
+                  <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                     {fallbackChar}
                   </AvatarFallback>
@@ -73,8 +84,8 @@ export default function DashboardHeader({ portalName, profileMenuItems = [] }: D
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{profile?.full_name || "User"}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                  <p className="text-sm font-medium leading-none">{displayName}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{displaySubtext}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

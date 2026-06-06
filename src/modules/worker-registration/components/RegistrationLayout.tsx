@@ -1,4 +1,4 @@
-import { HardHat } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface RegistrationLayoutProps {
   title: string;
@@ -12,13 +12,17 @@ export default function RegistrationLayout({ title, subtitle, children, footer }
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-8 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg">
-            <HardHat className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary">GigBridge Global</p>
-            <p className="text-xs text-muted-foreground">Overseas Blue-Collar Recruitment</p>
-          </div>
+          <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <img
+              src="/safework-global-logo.png"
+              alt="SafeWork Global"
+              className="h-11 w-11 rounded-xl shadow-lg"
+            />
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wider text-primary">SafeWork Global</p>
+              <p className="text-xs text-muted-foreground">Overseas Blue-Collar Recruitment</p>
+            </div>
+          </Link>
         </header>
 
         <main className="flex flex-1 flex-col justify-center">

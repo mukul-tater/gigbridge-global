@@ -1,15 +1,12 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import HomePlatformStats from "@/components/HomePlatformStats";
-import WhySafeWork from "@/components/WhySafeWork";
-import AgentComparison from "@/components/AgentComparison";
-import SalaryProtectionSection from "@/components/SalaryProtectionSection";
-import GlobalDestinations from "@/components/GlobalDestinations";
-import HomeJobCategories from "@/components/HomeJobCategories";
+import SuccessMetrics from "@/components/SuccessMetrics";
 import ProcessTimeline from "@/components/ProcessTimeline";
 import FeaturedJobs from "@/components/FeaturedJobs";
-import PlatformFeatures from "@/components/PlatformFeatures";
-import HomeFooterCTA from "@/components/HomeFooterCTA";
+import JobCategories from "@/components/JobCategories";
+import InteractiveJobMap from "@/components/InteractiveJobMap";
+import CountryInsights from "@/components/CountryInsights";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import EmployerHomeSections from "@/components/EmployerHomeSections";
 import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -20,7 +17,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  const { loading, profileLoading, role, isAuthenticated } = useAuth();
+  const { isAuthenticated, role, loading, profileLoading } = useAuth();
   const authResolving = loading || (isAuthenticated && profileLoading);
   const isEmployer = role === "employer";
 
@@ -41,59 +38,50 @@ const Index = () => {
 
       <HeroSection />
 
+      <ScrollReveal>
+        <SuccessMetrics />
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <ProcessTimeline />
+      </ScrollReveal>
+
+      {/*
+        Worker-centric sections (job listings, categories, job map) only make
+        sense for guests and logged-in workers. Employers see employer-focused
+        quick actions and value props instead. While auth is still resolving
+        we render nothing here to avoid flashing the wrong content.
+      */}
       {!authResolving && isEmployer ? (
-        <>
-          <HomePlatformStats />
-          <ScrollReveal>
-            <ProcessTimeline />
-          </ScrollReveal>
-          <ScrollReveal>
-            <EmployerHomeSections />
-          </ScrollReveal>
-        </>
+        <ScrollReveal>
+          <EmployerHomeSections />
+        </ScrollReveal>
       ) : !authResolving ? (
         <>
-          <HomePlatformStats />
-
-          <ScrollReveal>
-            <WhySafeWork />
-          </ScrollReveal>
-
-          <ScrollReveal>
-            <AgentComparison />
-          </ScrollReveal>
-
-          <ScrollReveal>
-            <SalaryProtectionSection />
-          </ScrollReveal>
-
-          <ScrollReveal>
-            <GlobalDestinations />
-          </ScrollReveal>
-
-          <ScrollReveal>
-            <HomeJobCategories />
-          </ScrollReveal>
-
-          <ScrollReveal>
-            <ProcessTimeline />
-          </ScrollReveal>
-
           <ScrollReveal>
             <FeaturedJobs />
           </ScrollReveal>
 
           <ScrollReveal>
-            <PlatformFeatures />
+            <JobCategories />
           </ScrollReveal>
 
           <ScrollReveal>
-            <HomeFooterCTA />
+            <InteractiveJobMap />
           </ScrollReveal>
         </>
       ) : null}
 
+      <ScrollReveal>
+        <CountryInsights />
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <TestimonialsSection />
+      </ScrollReveal>
+
       <Footer />
+
       <MobileBottomNav />
     </div>
   );
