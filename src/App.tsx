@@ -27,6 +27,17 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import PartnerApprovals from "./pages/admin/PartnerApprovals";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminRegisterPage from "./pages/admin/AdminRegisterPage";
+import InvestorDashboard from "./pages/admin/InvestorDashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import DocumentVerification from "./pages/admin/DocumentVerification";
+import IDVerification from "./pages/admin/IDVerification";
+import ECRManagement from "./pages/admin/ECRManagement";
+import JobVerification from "./pages/admin/JobVerification";
+import EditJob from "./pages/admin/EditJob";
+import ComplianceCheck from "./pages/admin/ComplianceCheck";
+import Reports from "./pages/admin/Reports";
+import DisputeResolution from "./pages/admin/DisputeResolution";
+import ContactSubmissions from "./pages/admin/ContactSubmissions";
 import {
   EmitraRegisterPage,
   EmitraLoginPage,
@@ -48,6 +59,14 @@ import {
 import { useIsActiveModuleRoute } from "./modules/worker-registration/hooks/useIsWorkerRegistrationRoute";
 
 const qc = new QueryClient();
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <ProtectedRoute allowedRoles={["admin"]} loginPath="/admin/login">
+      {children}
+    </ProtectedRoute>
+  );
+}
 
 function AppShell() {
   const isActiveModule = useIsActiveModuleRoute();
@@ -163,30 +182,27 @@ function AppShell() {
             }
           />
 
-          {/* Admin — partner approval (required for E-Mitra go-live) */}
+          {/* Admin portal */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/register" element={<AdminRegisterPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]} loginPath="/admin/login">
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/partners"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]} loginPath="/admin/login">
-                <PartnerApprovals />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/admin" element={<Navigate to="/admin/partners" replace />} />
+          <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/investor-dashboard" element={<AdminRoute><InvestorDashboard /></AdminRoute>} />
+          <Route path="/admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
+          <Route path="/admin/partners" element={<AdminRoute><PartnerApprovals /></AdminRoute>} />
+          <Route path="/admin/document-verification" element={<AdminRoute><DocumentVerification /></AdminRoute>} />
+          <Route path="/admin/id-verification" element={<AdminRoute><IDVerification /></AdminRoute>} />
+          <Route path="/admin/ecr-management" element={<AdminRoute><ECRManagement /></AdminRoute>} />
+          <Route path="/admin/job-verification" element={<AdminRoute><JobVerification /></AdminRoute>} />
+          <Route path="/admin/edit-job/:jobId" element={<AdminRoute><EditJob /></AdminRoute>} />
+          <Route path="/admin/compliance" element={<AdminRoute><ComplianceCheck /></AdminRoute>} />
+          <Route path="/admin/reports" element={<AdminRoute><Reports /></AdminRoute>} />
+          <Route path="/admin/disputes" element={<AdminRoute><DisputeResolution /></AdminRoute>} />
+          <Route path="/admin/contact-submissions" element={<AdminRoute><ContactSubmissions /></AdminRoute>} />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
 
           {/*
-            Other legacy routes (employer, other admin pages, legacy worker portal) remain disabled.
+            Other legacy routes (employer, legacy worker portal) remain disabled.
             See src/routes/LegacyRoutes.archive.tsx to restore.
           */}
 

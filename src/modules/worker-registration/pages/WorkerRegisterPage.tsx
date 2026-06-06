@@ -114,6 +114,7 @@ export default function WorkerRegisterPage() {
     <RegistrationLayout
       title="Register as a Worker"
       subtitle="Complete in under 1 minute. Start matching with overseas jobs today."
+      maxWidth="3xl"
       footer={
         <>
           Already registered?{' '}
