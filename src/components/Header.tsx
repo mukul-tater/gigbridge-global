@@ -144,7 +144,7 @@ const Header = () => {
                       I want to…
                     </p>
                     <button
-                      onClick={() => navigate('/worker/quick-signup')}
+                      onClick={() => navigate('/register')}
                       className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors"
                     >
                       <div className="p-2 rounded-lg bg-success/10 text-success">
@@ -293,7 +293,7 @@ const Header = () => {
                       variant="default"
                       size="lg"
                       className="w-full justify-start gap-3"
-                      onClick={() => { navigate('/worker/quick-signup'); closeMobileMenu(); }}
+                      onClick={() => { navigate('/register'); closeMobileMenu(); }}
                     >
                       <HardHat className="h-4 w-4" />
                       Find a job (Worker signup)

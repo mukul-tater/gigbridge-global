@@ -54,7 +54,7 @@ const HeroSection = () => {
 
   const handleFindJobs = () => {
     if (!isAuthenticated) {
-      navigate("/worker/quick-signup");
+      navigate("/register");
       return;
     }
     if (role === "employer") {
@@ -165,7 +165,7 @@ const HeroSection = () => {
                       size="lg"
                       variant="outline"
                       className="h-12 px-6 rounded-xl"
-                      onClick={() => navigate("/worker/quick-signup")}
+                      onClick={() => navigate("/register")}
                     >
                       Sign Up Free
                     </Button>

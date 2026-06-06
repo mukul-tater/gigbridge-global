@@ -67,7 +67,7 @@ export default function Auth() {
     if (roleHint === 'worker' || roleHint === 'employer' || roleHint === 'partner') {
       setSignupRole(roleHint);
       // Redirect to the dedicated quick-signup pages for worker/employer.
-      if (roleHint === 'worker') navigate('/worker/quick-signup', { replace: true });
+      if (roleHint === 'worker') navigate('/register', { replace: true });
       else if (roleHint === 'employer') navigate('/employer/quick-signup', { replace: true });
       else setView('signup');
     }
@@ -289,7 +289,7 @@ export default function Auth() {
 
     // Not authenticated yet — original signup flow.
     if (selectedRole === 'worker') {
-      navigate('/worker/quick-signup');
+      navigate('/register');
       return;
     }
     if (selectedRole === 'employer') {
