@@ -1,4 +1,8 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase as supabaseTyped } from '@/integrations/supabase/client';
+// Many tables referenced here (partner_workers, partner_activities, partner_incentives,
+// partner_worker_status_history) and the partner-worker-media bucket are not yet in the
+// generated types. Use an untyped client to avoid TS schema errors until migrations land.
+const supabase: any = supabaseTyped;
 import { calculateMigrationScore, getMigrationCategory } from '../lib/migrationScore';
 import type {
   DashboardStats,
