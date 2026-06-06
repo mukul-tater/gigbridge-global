@@ -25,6 +25,7 @@ import {
   emitraPersonalSchema, emitraDetailsSchema, emitraLocationSchema,
   emitraInfrastructureSchema, emitraBankSchema, emitraDocumentsSchema, emitraDeclarationsSchema,
 } from '../validations/emitra';
+import { savePartnerApplication } from '../services/emitraService';
 
 const STEPS = [
   { id: 1, title: 'Personal Info', icon: User },
@@ -134,6 +135,49 @@ export default function EmitraRegisterPage() {
     return newUser?.id || null;
   };
 
+  const buildPayload = (overrides: Record<string, unknown> = {}) => ({
+    owner_name: data.owner_name,
+    mobile: data.mobile,
+    whatsapp: data.whatsapp,
+    email: data.email,
+    emitra_id: data.emitra_id,
+    center_name: data.center_name,
+    years_in_operation: data.years_in_operation,
+    address: data.address,
+    village_city: data.village_city,
+    district: data.district,
+    state: data.state,
+    pincode: data.pincode,
+    has_computer: data.has_computer,
+    has_scanner: data.has_scanner,
+    has_printer: data.has_printer,
+    has_internet: data.has_internet,
+    worker_categories: data.worker_categories,
+    account_holder: data.account_holder,
+    account_number: data.account_number,
+    ifsc: data.ifsc,
+    upi_id: data.upi_id || null,
+    pan_number: data.pan_number,
+    emitra_certificate_url: data.emitra_certificate_url,
+    pan_card_url: data.pan_card_url,
+    address_proof_url: data.address_proof_url,
+    shop_photo_url: data.shop_photo_url,
+    owner_photo_url: data.owner_photo_url,
+    accepted_terms: data.accepted_terms,
+    no_jobs_promise: data.no_jobs_promise,
+    no_unauthorized_fees: data.no_unauthorized_fees,
+    mobile_verified: mobileVerified,
+    current_step: step,
+    ...overrides,
+  });
+
+  const persistProgress = async (overrides: Record<string, unknown> = {}) => {
+    const uid = user?.id || (await ensureAccount());
+    if (!uid) throw new Error('Account not ready. Please verify mobile and try again.');
+    await savePartnerApplication(uid, buildPayload(overrides));
+    return uid;
+  };
+
   const handleNext = async () => {
     if (step === 1 && !mobileVerified) {
       toast.error('Please verify your mobile number with OTP');
@@ -141,62 +185,26 @@ export default function EmitraRegisterPage() {
     }
     if (!validateStep()) return;
 
-    if (step === 1) {
-      setSaving(true);
-      const uid = await ensureAccount();
+    setSaving(true);
+    try {
+      await persistProgress({ current_step: Math.min(step + 1, STEPS.length) });
+      setStep(s => Math.min(s + 1, STEPS.length));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not save progress');
+    } finally {
       setSaving(false);
-      if (!uid) return;
     }
-
-    setStep(s => Math.min(s + 1, STEPS.length));
   };
 
   const handleSubmit = async () => {
     if (!validateStep()) return;
     setSaving(true);
     try {
-      const uid = user?.id || (await ensureAccount());
-      if (!uid) return;
-
-      const { error } = await supabase.from('partner_profiles').upsert({
-        user_id: uid,
-        owner_name: data.owner_name,
-        mobile: data.mobile,
-        whatsapp: data.whatsapp,
-        email: data.email,
-        emitra_id: data.emitra_id,
-        center_name: data.center_name,
-        years_in_operation: data.years_in_operation,
-        address: data.address,
-        village_city: data.village_city,
-        district: data.district,
-        state: data.state,
-        pincode: data.pincode,
-        has_computer: data.has_computer,
-        has_scanner: data.has_scanner,
-        has_printer: data.has_printer,
-        has_internet: data.has_internet,
-        worker_categories: data.worker_categories,
-        account_holder: data.account_holder,
-        account_number: data.account_number,
-        ifsc: data.ifsc,
-        upi_id: data.upi_id || null,
-        pan_number: data.pan_number,
-        emitra_certificate_url: data.emitra_certificate_url,
-        pan_card_url: data.pan_card_url,
-        address_proof_url: data.address_proof_url,
-        shop_photo_url: data.shop_photo_url,
-        owner_photo_url: data.owner_photo_url,
-        accepted_terms: data.accepted_terms,
-        no_jobs_promise: data.no_jobs_promise,
-        no_unauthorized_fees: data.no_unauthorized_fees,
-        mobile_verified: true,
+      await persistProgress({
         status: 'under_review',
         submitted_at: new Date().toISOString(),
         current_step: STEPS.length,
-      }, { onConflict: 'user_id' });
-
-      if (error) throw error;
+      });
 
       toast.success('Application submitted! Our team will review it shortly.');
       navigate('/emitra/login');

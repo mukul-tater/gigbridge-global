@@ -18,6 +18,61 @@ export async function getPartnerProfile(userId: string): Promise<PartnerProfile 
   return data as PartnerProfile | null;
 }
 
+export type PartnerApplicationPayload = Partial<
+  Omit<PartnerProfile, 'id' | 'user_id' | 'status' | 'partner_code' | 'tier'>
+> & {
+  current_step?: number;
+  submitted_at?: string | null;
+  status?: string;
+};
+
+function mapPartnerProfileError(error: { code?: string; message?: string }): Error {
+  const message = error.message || 'Failed to save partner application';
+
+  if (
+    error.code === 'PGRST204'
+    || /could not find the '.*' column/i.test(message)
+  ) {
+    return new Error(
+      'Partner database is missing E-Mitra columns. Run supabase migration 20260607180000_partner_profiles_emitra_columns.sql in the Supabase SQL editor, then retry.',
+    );
+  }
+
+  if (error.code === '42501' || /row-level security/i.test(message)) {
+    return new Error('You do not have permission to save this application. Please sign in again.');
+  }
+
+  return new Error(message);
+}
+
+/** Update or insert partner_profiles without PostgREST upsert (more reliable with RLS). */
+export async function savePartnerApplication(
+  userId: string,
+  payload: PartnerApplicationPayload,
+): Promise<void> {
+  const { data: existing, error: fetchError } = await supabase
+    .from('partner_profiles')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (fetchError) throw mapPartnerProfileError(fetchError);
+
+  const row = { user_id: userId, ...payload };
+
+  if (existing) {
+    const { error } = await supabase
+      .from('partner_profiles')
+      .update(row)
+      .eq('user_id', userId);
+    if (error) throw mapPartnerProfileError(error);
+    return;
+  }
+
+  const { error } = await supabase.from('partner_profiles').insert(row);
+  if (error) throw mapPartnerProfileError(error);
+}
+
 export function isPartnerOperational(profile: PartnerProfile | null): boolean {
   return !!profile && (profile.status === 'approved' || profile.status === 'active');
 }
