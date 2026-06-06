@@ -31,7 +31,7 @@ export default function PilotPhaseBanner() {
         <p className="text-center">
           <span className="font-semibold">Pilot phase:</span>{" "}
           Hiring, applications &amp; interviews are live. Escrow payments, insurance
-          and remittance are rolling out soon.
+          and remittance are rolling out soon. Full Functionality in sometime
         </p>
         <button
           onClick={dismiss}
