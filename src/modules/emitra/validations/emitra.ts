@@ -60,17 +60,25 @@ export const emitraDeclarationsSchema = z.object({
   mobile_verified: z.literal(true, { errorMap: () => ({ message: 'Mobile OTP verification required' }) }),
 });
 
-export const workerQuickRegistrationSchema = z.object({
-  full_name: z.string().trim().min(2).max(120),
+/** Step 1 — personal details only */
+export const workerPersonalSchema = z.object({
+  full_name: z.string().trim().min(2, 'Full name is required').max(120),
   mobile: z.string().regex(phoneRegex, 'Valid 10-digit mobile required'),
   whatsapp: z.string().regex(phoneRegex, 'Valid WhatsApp required'),
+});
+
+/** Step 2 — job / location details */
+export const workerJobInfoSchema = z.object({
   skill: z.string().min(1, 'Select a skill'),
   experience_level: z.string().min(1, 'Select experience'),
   passport_available: z.boolean(),
   preferred_country: z.string().optional(),
-  state: z.string().trim().min(2).max(80),
-  district: z.string().trim().min(2).max(80),
+  state: z.enum(indianStates as unknown as [string, ...string[]], { message: 'State is required' }),
+  district: z.string().trim().min(2, 'District is required').max(80),
 });
+
+/** Full worker registration (used on final submit) */
+export const workerQuickRegistrationSchema = workerPersonalSchema.merge(workerJobInfoSchema);
 
 export const workerSkillScreeningSchema = z.object({
   skill_level: z.enum(['Helper', 'Semi Skilled', 'Skilled']),
@@ -82,5 +90,5 @@ export const workerMigrationSchema = z.object({
   ready_to_relocate: z.boolean(),
   family_consent: z.boolean(),
   previous_gcc_experience: z.boolean(),
-  expected_salary: z.coerce.number().min(0).optional(),
+  expected_salary: z.union([z.coerce.number().min(0), z.null()]).optional(),
 });

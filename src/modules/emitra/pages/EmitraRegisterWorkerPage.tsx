@@ -17,7 +17,7 @@ import {
   WORKER_SKILLS, EXPERIENCE_LEVELS, GCC_COUNTRIES, SKILL_LEVELS, MIGRATION_CATEGORY_LABELS,
 } from '../config/constants';
 import {
-  workerQuickRegistrationSchema, workerSkillScreeningSchema, workerMigrationSchema,
+  workerPersonalSchema, workerJobInfoSchema, workerSkillScreeningSchema, workerMigrationSchema,
 } from '../validations/emitra';
 import { calculateMigrationScore, getMigrationCategory } from '../lib/migrationScore';
 import {
@@ -69,37 +69,63 @@ export default function EmitraRegisterWorkerPage() {
   });
   const migrationCategory = getMigrationCategory(migrationScore);
 
-  const validate = (): boolean => {
-    setErrors({});
-    const schemas = [
-      workerQuickRegistrationSchema,
-      workerQuickRegistrationSchema,
-      workerSkillScreeningSchema,
-      workerMigrationSchema,
-      null,
-    ];
-    const schema = schemas[step];
+  const STEP_SCHEMAS = [
+    workerPersonalSchema,
+    workerJobInfoSchema,
+    workerSkillScreeningSchema,
+    workerMigrationSchema,
+    null,
+  ] as const;
+
+  const applySchemaErrors = (result: { success: false; error: { issues: { path: (string | number)[]; message: string }[] } }) => {
+    const fieldErrors: Record<string, string> = {};
+    for (const issue of result.error.issues) {
+      const k = issue.path[0] as string;
+      if (k && !fieldErrors[k]) fieldErrors[k] = issue.message;
+    }
+    setErrors(fieldErrors);
+    toast.error('Please fix highlighted fields');
+  };
+
+  const validateStep = (stepIndex: number): boolean => {
+    const schema = STEP_SCHEMAS[stepIndex];
     if (!schema) {
-      if (!photoFile) { toast.error('Worker photo is required'); return false; }
-      if (!videoFile) { toast.error('Worker video introduction is required'); return false; }
+      if (!photoFile) {
+        toast.error('Worker photo is required');
+        return false;
+      }
+      if (!videoFile) {
+        toast.error('Worker video introduction is required');
+        return false;
+      }
       return true;
     }
     const result = schema.safeParse(data);
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const k = issue.path[0] as string;
-        if (k && !fieldErrors[k]) fieldErrors[k] = issue.message;
-      }
-      setErrors(fieldErrors);
-      toast.error('Please fix highlighted fields');
+      applySchemaErrors(result);
       return false;
     }
     return true;
   };
 
+  const validateCurrentStep = (): boolean => {
+    setErrors({});
+    return validateStep(step);
+  };
+
+  const validateAllSteps = (): boolean => {
+    for (let i = 0; i < STEPS.length; i++) {
+      setErrors({});
+      if (!validateStep(i)) {
+        setStep(i);
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
-    if (!validate() || !partnerId || !user) return;
+    if (!validateAllSteps() || !partnerId || !user) return;
     setSaving(true);
     try {
       let photoUrl: string | null = null;
@@ -277,7 +303,7 @@ export default function EmitraRegisterWorkerPage() {
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
           {step < STEPS.length - 1 ? (
-            <Button type="button" onClick={() => { if (validate()) setStep(s => s + 1); }} disabled={saving}>
+            <Button type="button" onClick={() => { if (validateCurrentStep()) setStep(s => s + 1); }} disabled={saving}>
               Continue <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (
