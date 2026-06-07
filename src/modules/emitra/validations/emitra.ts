@@ -69,7 +69,7 @@ export const workerPersonalSchema = z.object({
 
 /** Step 2 — job / location details */
 export const workerJobInfoSchema = z.object({
-  skill: z.string().min(1, 'Select a skill'),
+  skills: z.array(z.string()).min(1, 'Select at least one skill'),
   experience_level: z.string().min(1, 'Select experience'),
   passport_available: z.boolean(),
   preferred_country: z.string().optional(),

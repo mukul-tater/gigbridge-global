@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Progress } from '@/components/ui/progress';
@@ -27,23 +28,78 @@ import { indianStates } from '@/lib/validations/partner';
 
 const STEPS = ['Personal', 'Job Info', 'Skill Screening', 'Migration', 'Photo & Video'] as const;
 
+const DEFAULT_DATA: Record<string, unknown> = {
+  skills: [],
+  passport_available: false,
+  ready_to_relocate: false,
+  family_consent: false,
+  previous_gcc_experience: false,
+};
+
+function draftKey(userId: string) {
+  return `emitra_worker_reg_draft:${userId}`;
+}
+
+function loadDraft(userId: string): { data: Record<string, unknown>; step: number } | null {
+  try {
+    const raw = sessionStorage.getItem(draftKey(userId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      data: { ...DEFAULT_DATA, ...(parsed.data || {}) },
+      step: typeof parsed.step === 'number' ? Math.min(parsed.step, STEPS.length - 1) : 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(userId: string, data: Record<string, unknown>, step: number) {
+  try {
+    sessionStorage.setItem(draftKey(userId), JSON.stringify({ data, step }));
+  } catch {
+    /* storage full or unavailable */
+  }
+}
+
+function clearDraft(userId: string) {
+  try {
+    sessionStorage.removeItem(draftKey(userId));
+  } catch {
+    /* ignore */
+  }
+}
+
 export default function EmitraRegisterWorkerPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [maxStepReached, setMaxStepReached] = useState(0);
   const [saving, setSaving] = useState(false);
   const [partnerId, setPartnerId] = useState<string | null>(null);
-  const [data, setData] = useState<Record<string, any>>({
-    passport_available: false,
-    ready_to_relocate: false,
-    family_consent: false,
-    previous_gcc_experience: false,
-  });
+  const [data, setData] = useState<Record<string, any>>({ ...DEFAULT_DATA });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
+  const draftLoaded = useRef(false);
+
+  useEffect(() => {
+    if (!user || draftLoaded.current) return;
+    const draft = loadDraft(user.id);
+    if (draft) {
+      setData(draft.data);
+      setStep(draft.step);
+      setMaxStepReached(draft.step);
+    }
+    draftLoaded.current = true;
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !draftLoaded.current) return;
+    saveDraft(user.id, data, step);
+  }, [user, data, step]);
 
   useEffect(() => {
     if (!user) return;
@@ -59,6 +115,15 @@ export default function EmitraRegisterWorkerPage() {
   }, [user, navigate]);
 
   const update = (patch: Record<string, unknown>) => setData(d => ({ ...d, ...patch }));
+
+  const toggleSkill = (skill: string) => {
+    const current: string[] = Array.isArray(data.skills) ? data.skills : [];
+    update({
+      skills: current.includes(skill)
+        ? current.filter(s => s !== skill)
+        : [...current, skill],
+    });
+  };
 
   const migrationScore = calculateMigrationScore({
     passportAvailable: !!data.passport_available,
@@ -108,19 +173,27 @@ export default function EmitraRegisterWorkerPage() {
     return true;
   };
 
-  const validateCurrentStep = (): boolean => {
+  const goToStep = (target: number) => {
+    if (target < 0 || target >= STEPS.length) return;
     setErrors({});
-    return validateStep(step);
+    setStep(target);
+  };
+
+  const handleContinue = () => {
+    if (!validateStep(step)) return;
+    const next = step + 1;
+    setMaxStepReached(m => Math.max(m, next));
+    goToStep(next);
   };
 
   const validateAllSteps = (): boolean => {
     for (let i = 0; i < STEPS.length; i++) {
-      setErrors({});
       if (!validateStep(i)) {
         setStep(i);
         return false;
       }
     }
+    setErrors({});
     return true;
   };
 
@@ -150,6 +223,7 @@ export default function EmitraRegisterWorkerPage() {
 
       if (error || !worker) throw new Error(error || 'Registration failed');
 
+      clearDraft(user.id);
       toast.success(`${data.full_name} registered successfully!`);
       navigate(`/emitra/workers/${worker.id}`);
     } catch (e) {
@@ -160,6 +234,7 @@ export default function EmitraRegisterWorkerPage() {
   };
 
   const progress = ((step + 1) / STEPS.length) * 100;
+  const selectedSkills: string[] = Array.isArray(data.skills) ? data.skills : [];
 
   return (
     <DashboardLayout navGroups={emitraNavGroups} portalLabel="E-Mitra Portal" portalName="SafeWork Global" profileMenuItems={emitraProfileMenu}>
@@ -170,13 +245,21 @@ export default function EmitraRegisterWorkerPage() {
         <Progress value={progress} className="h-2 mb-2" />
         <div className="flex justify-between text-xs text-muted-foreground">
           {STEPS.map((s, i) => (
-            <span key={s} className={i === step ? 'text-primary font-medium' : ''}>{s}</span>
+            <button
+              key={s}
+              type="button"
+              disabled={i > maxStepReached}
+              onClick={() => goToStep(i)}
+              className={`transition-colors ${i === step ? 'text-primary font-medium' : ''} ${i <= maxStepReached ? 'hover:text-primary cursor-pointer' : 'cursor-default opacity-50'}`}
+            >
+              {s}
+            </button>
           ))}
         </div>
       </Card>
 
       <Card className="p-5 md:p-7">
-        {step === 0 && (
+        <div className={step === 0 ? '' : 'hidden'}>
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Full Name" error={errors.full_name} required>
               <Input value={data.full_name || ''} onChange={e => update({ full_name: e.target.value })} />
@@ -190,16 +273,29 @@ export default function EmitraRegisterWorkerPage() {
                 onChange={e => update({ whatsapp: e.target.value.replace(/\D/g, '') })} />
             </Field>
           </div>
-        )}
+        </div>
 
-        {step === 1 && (
+        <div className={step === 1 ? '' : 'hidden'}>
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Skill" error={errors.skill} required>
-              <Select value={data.skill || ''} onValueChange={v => update({ skill: v })}>
-                <SelectTrigger><SelectValue placeholder="Select skill" /></SelectTrigger>
-                <SelectContent>{WORKER_SKILLS.filter(s => s !== 'Other').map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
+            <div className="sm:col-span-2">
+              <Label className="text-sm font-medium">Skills <span className="text-destructive">*</span></Label>
+              <p className="text-xs text-muted-foreground mb-2">Select all skills that apply</p>
+              <div className="grid sm:grid-cols-3 gap-2">
+                {WORKER_SKILLS.map(skill => {
+                  const checked = selectedSkills.includes(skill);
+                  return (
+                    <label
+                      key={skill}
+                      className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer text-sm transition-colors ${checked ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}
+                    >
+                      <Checkbox checked={checked} onCheckedChange={() => toggleSkill(skill)} />
+                      {skill}
+                    </label>
+                  );
+                })}
+              </div>
+              {errors.skills && <p className="text-xs text-destructive mt-1">{errors.skills}</p>}
+            </div>
             <Field label="Experience" error={errors.experience_level} required>
               <Select value={data.experience_level || ''} onValueChange={v => update({ experience_level: v })}>
                 <SelectTrigger><SelectValue placeholder="Select experience" /></SelectTrigger>
@@ -228,9 +324,9 @@ export default function EmitraRegisterWorkerPage() {
               <Input value={data.district || ''} onChange={e => update({ district: e.target.value })} />
             </Field>
           </div>
-        )}
+        </div>
 
-        {step === 2 && (
+        <div className={step === 2 ? '' : 'hidden'}>
           <div className="space-y-4">
             <Field label="Skill Level" error={errors.skill_level} required>
               <Select value={data.skill_level || ''} onValueChange={v => update({ skill_level: v })}>
@@ -243,9 +339,9 @@ export default function EmitraRegisterWorkerPage() {
                 placeholder="e.g. Good electrician, worked in construction site, previous GCC experience" />
             </Field>
           </div>
-        )}
+        </div>
 
-        {step === 3 && (
+        <div className={step === 3 ? '' : 'hidden'}>
           <div className="space-y-4">
             {[
               { key: 'passport_available', label: 'Passport Available?' },
@@ -270,9 +366,9 @@ export default function EmitraRegisterWorkerPage() {
               <p className="text-sm text-muted-foreground mt-1">{MIGRATION_CATEGORY_LABELS[migrationCategory]}</p>
             </Card>
           </div>
-        )}
+        </div>
 
-        {step === 4 && (
+        <div className={step === 4 ? '' : 'hidden'}>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="border-2 border-dashed rounded-lg p-6 text-center">
               <Camera className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
@@ -296,14 +392,14 @@ export default function EmitraRegisterWorkerPage() {
               {videoFile && <p className="text-xs text-success mt-2 flex items-center justify-center gap-1"><CheckCircle2 className="h-3 w-3" /> {videoFile.name}</p>}
             </div>
           </div>
-        )}
+        </div>
 
         <div className="flex justify-between mt-7 pt-5 border-t">
-          <Button type="button" variant="outline" onClick={() => setStep(s => Math.max(0, s - 1))} disabled={step === 0 || saving}>
+          <Button type="button" variant="outline" onClick={() => goToStep(step - 1)} disabled={step === 0 || saving}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
           {step < STEPS.length - 1 ? (
-            <Button type="button" onClick={() => { if (validateCurrentStep()) setStep(s => s + 1); }} disabled={saving}>
+            <Button type="button" onClick={handleContinue} disabled={saving}>
               Continue <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (

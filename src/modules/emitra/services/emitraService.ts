@@ -215,7 +215,9 @@ export async function createPartnerWorker(
       full_name: payload.full_name,
       mobile: payload.mobile,
       whatsapp: payload.whatsapp,
-      skill: payload.skill,
+      skill: Array.isArray(payload.skills)
+        ? (payload.skills as string[]).join(', ')
+        : (payload.skill as string),
       experience_level: payload.experience_level,
       passport_available: payload.passport_available,
       preferred_country: payload.preferred_country || null,
