@@ -439,11 +439,19 @@ function DeclarationsStep({ data, update, errors, skippedOptional }: StepProps &
         { key: "confirmed_accuracy", label: "I confirm that all information provided is true and accurate.", err: errors.confirmed_accuracy },
       ].map(item => (
         <div key={item.key}>
-          <label className="flex items-start gap-2 cursor-pointer">
-            <Checkbox className="mt-0.5" checked={!!data[item.key]} onCheckedChange={v => update({ [item.key]: !!v })} />
-            <span className="text-sm">{item.label}</span>
+          <label
+            htmlFor={`decl-${item.key}`}
+            className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted/30 transition-colors"
+          >
+            <Checkbox
+              id={`decl-${item.key}`}
+              className="mt-0.5"
+              checked={!!data[item.key]}
+              onCheckedChange={v => update({ [item.key]: !!v })}
+            />
+            <span className="text-sm leading-snug pt-0.5">{item.label}</span>
           </label>
-          {item.err && <p className="text-xs text-destructive ml-6">{item.err}</p>}
+          {item.err && <p className="text-xs text-destructive mt-1 ml-10">{item.err}</p>}
         </div>
       ))}
     </div>

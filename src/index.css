@@ -179,9 +179,13 @@
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 
-  /* Touch Targets */
+  /* Touch Targets — exclude compact form controls (checkbox, radio) */
   @media (pointer: coarse) {
-    button, a, input, select, textarea {
+    button:not([role="checkbox"]):not([role="radio"]),
+    a,
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
       min-height: 44px;
       min-width: 44px;
     }

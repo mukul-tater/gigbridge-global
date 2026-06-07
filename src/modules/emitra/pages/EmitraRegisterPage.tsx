@@ -211,7 +211,7 @@ export default function EmitraRegisterPage() {
 
     setSaving(true);
     try {
-      await persistProgress({ current_step: STEPS.length, skipped_optional_steps: true });
+      await persistProgress({ current_step: STEPS.length });
       setSkippedOptional(true);
       setStep(STEPS.length);
       toast.info('Optional steps skipped. Review declarations to submit your application.');
@@ -483,19 +483,29 @@ export default function EmitraRegisterPage() {
                 You skipped location, banking, and documents. You can complete those later — submit now with the details you have provided.
               </p>
             )}
-            {[
-              { key: 'accepted_terms', label: 'I agree to SafeWork Partner Terms' },
-              { key: 'no_jobs_promise', label: 'I will not promise jobs or visas' },
-              { key: 'no_unauthorized_fees', label: 'I will not collect unauthorized fees' },
-            ].map(item => (
-              <div key={item.key}>
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <Checkbox className="mt-0.5" checked={!!data[item.key]} onCheckedChange={v => update({ [item.key]: !!v })} />
-                  <span className="text-sm">{item.label}</span>
-                </label>
-                {errors[item.key] && <p className="text-xs text-destructive ml-6">{errors[item.key]}</p>}
-              </div>
-            ))}
+            <div className="space-y-2">
+              {[
+                { key: 'accepted_terms', label: 'I agree to SafeWork Partner Terms' },
+                { key: 'no_jobs_promise', label: 'I will not promise jobs or visas' },
+                { key: 'no_unauthorized_fees', label: 'I will not collect unauthorized fees' },
+              ].map(item => (
+                <div key={item.key}>
+                  <label
+                    htmlFor={`decl-${item.key}`}
+                    className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted/30 transition-colors"
+                  >
+                    <Checkbox
+                      id={`decl-${item.key}`}
+                      className="mt-0.5"
+                      checked={!!data[item.key]}
+                      onCheckedChange={v => update({ [item.key]: !!v })}
+                    />
+                    <span className="text-sm leading-snug pt-0.5">{item.label}</span>
+                  </label>
+                  {errors[item.key] && <p className="text-xs text-destructive mt-1 ml-10">{errors[item.key]}</p>}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
