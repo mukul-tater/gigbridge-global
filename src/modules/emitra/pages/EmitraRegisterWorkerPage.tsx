@@ -22,7 +22,9 @@ import {
 } from '../validations/emitra';
 import { calculateMigrationScore, getMigrationCategory } from '../lib/migrationScore';
 import {
-  createPartnerWorker, getPartnerProfile, isPartnerOperational, uploadWorkerMedia,
+  createPartnerWorker, deleteWorkerRegistrationDraft, getPartnerProfile,
+  isPartnerOperational, loadWorkerRegistrationDraft, saveWorkerRegistrationDraft,
+  uploadWorkerMedia,
 } from '../services/emitraService';
 import { indianStates } from '@/lib/validations/partner';
 
@@ -75,31 +77,17 @@ export default function EmitraRegisterWorkerPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [maxStepReached, setMaxStepReached] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [data, setData] = useState<Record<string, any>>({ ...DEFAULT_DATA });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [savedPhotoPath, setSavedPhotoPath] = useState<string | null>(null);
+  const [savedVideoPath, setSavedVideoPath] = useState<string | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
-  const draftLoaded = useRef(false);
-
-  useEffect(() => {
-    if (!user || draftLoaded.current) return;
-    const draft = loadDraft(user.id);
-    if (draft) {
-      setData(draft.data);
-      setStep(draft.step);
-      setMaxStepReached(draft.step);
-    }
-    draftLoaded.current = true;
-  }, [user]);
-
-  useEffect(() => {
-    if (!user || !draftLoaded.current) return;
-    saveDraft(user.id, data, step);
-  }, [user, data, step]);
 
   useEffect(() => {
     if (!user) return;
@@ -111,8 +99,35 @@ export default function EmitraRegisterWorkerPage() {
         return;
       }
       setPartnerId(p.id);
+
+      const dbDraft = await loadWorkerRegistrationDraft(p.id, user.id);
+      if (dbDraft) {
+        setData({ ...DEFAULT_DATA, ...dbDraft.draft_data });
+        setStep(dbDraft.current_step);
+        setMaxStepReached(dbDraft.current_step);
+        setSavedPhotoPath(dbDraft.photo_url);
+        setSavedVideoPath(dbDraft.video_url);
+      } else {
+        const localDraft = loadDraft(user.id);
+        if (localDraft) {
+          setData(localDraft.data);
+          setStep(localDraft.step);
+          setMaxStepReached(localDraft.step);
+        }
+      }
+      setLoading(false);
     })();
   }, [user, navigate]);
+
+  const persistDraft = async (
+    nextStep: number,
+    media?: { photo_url?: string | null; video_url?: string | null },
+  ) => {
+    if (!partnerId || !user) return { error: 'Not ready' };
+    const result = await saveWorkerRegistrationDraft(partnerId, user.id, nextStep, data, media);
+    if (!result.error) saveDraft(user.id, data, nextStep);
+    return result;
+  };
 
   const update = (patch: Record<string, unknown>) => setData(d => ({ ...d, ...patch }));
 
@@ -155,11 +170,11 @@ export default function EmitraRegisterWorkerPage() {
   const validateStep = (stepIndex: number): boolean => {
     const schema = STEP_SCHEMAS[stepIndex];
     if (!schema) {
-      if (!photoFile) {
+      if (!photoFile && !savedPhotoPath) {
         toast.error('Worker photo is required');
         return false;
       }
-      if (!videoFile) {
+      if (!videoFile && !savedVideoPath) {
         toast.error('Worker video introduction is required');
         return false;
       }
@@ -173,17 +188,53 @@ export default function EmitraRegisterWorkerPage() {
     return true;
   };
 
-  const goToStep = (target: number) => {
+  const goToStep = async (target: number) => {
     if (target < 0 || target >= STEPS.length) return;
     setErrors({});
     setStep(target);
+    if (partnerId && user && target < step) {
+      await persistDraft(target, { photo_url: savedPhotoPath, video_url: savedVideoPath });
+    }
   };
 
-  const handleContinue = () => {
-    if (!validateStep(step)) return;
+  const handleContinue = async () => {
+    if (!validateStep(step) || !partnerId || !user) return;
     const next = step + 1;
-    setMaxStepReached(m => Math.max(m, next));
-    goToStep(next);
+    setSaving(true);
+    try {
+      const { error } = await persistDraft(next, { photo_url: savedPhotoPath, video_url: savedVideoPath });
+      if (error) throw new Error(error);
+      setMaxStepReached(m => Math.max(m, next));
+      setErrors({});
+      setStep(next);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not save progress');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleMediaUpload = async (file: File | null, type: 'photo' | 'video') => {
+    if (!file || !user || !partnerId) return;
+    setSaving(true);
+    try {
+      const { path, error } = await uploadWorkerMedia(user.id, file, type);
+      if (error || !path) throw new Error(error || 'Upload failed');
+      if (type === 'photo') {
+        setPhotoFile(file);
+        setSavedPhotoPath(path);
+        await persistDraft(step, { photo_url: path, video_url: savedVideoPath });
+      } else {
+        setVideoFile(file);
+        setSavedVideoPath(path);
+        await persistDraft(step, { photo_url: savedPhotoPath, video_url: path });
+      }
+      toast.success(`${type === 'photo' ? 'Photo' : 'Video'} saved`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Upload failed');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const validateAllSteps = (): boolean => {
@@ -201,15 +252,15 @@ export default function EmitraRegisterWorkerPage() {
     if (!validateAllSteps() || !partnerId || !user) return;
     setSaving(true);
     try {
-      let photoUrl: string | null = null;
-      let videoUrl: string | null = null;
+      let photoUrl = savedPhotoPath;
+      let videoUrl = savedVideoPath;
 
-      if (photoFile) {
+      if (photoFile && !savedPhotoPath) {
         const { path, error } = await uploadWorkerMedia(user.id, photoFile, 'photo');
         if (error) throw new Error(error);
         photoUrl = path;
       }
-      if (videoFile) {
+      if (videoFile && !savedVideoPath) {
         const { path, error } = await uploadWorkerMedia(user.id, videoFile, 'video');
         if (error) throw new Error(error);
         videoUrl = path;
@@ -223,6 +274,7 @@ export default function EmitraRegisterWorkerPage() {
 
       if (error || !worker) throw new Error(error || 'Registration failed');
 
+      await deleteWorkerRegistrationDraft(partnerId, user.id);
       clearDraft(user.id);
       toast.success(`${data.full_name} registered successfully!`);
       navigate(`/emitra/workers/${worker.id}`);
@@ -235,6 +287,14 @@ export default function EmitraRegisterWorkerPage() {
 
   const progress = ((step + 1) / STEPS.length) * 100;
   const selectedSkills: string[] = Array.isArray(data.skills) ? data.skills : [];
+
+  if (loading) {
+    return (
+      <DashboardLayout navGroups={emitraNavGroups} portalLabel="E-Mitra Portal" portalName="SafeWork Global" profileMenuItems={emitraProfileMenu}>
+        <div className="py-12 text-center text-muted-foreground">Loading registration…</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout navGroups={emitraNavGroups} portalLabel="E-Mitra Portal" portalName="SafeWork Global" profileMenuItems={emitraProfileMenu}>
@@ -374,32 +434,40 @@ export default function EmitraRegisterWorkerPage() {
               <Camera className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm font-medium mb-2">Worker Photo</p>
               <input ref={photoRef} type="file" accept="image/*" capture="user" className="hidden"
-                onChange={e => setPhotoFile(e.target.files?.[0] || null)} />
-              <Button type="button" variant="outline" onClick={() => photoRef.current?.click()}>
-                <Upload className="h-4 w-4 mr-1" /> {photoFile ? 'Change Photo' : 'Capture Photo'}
+                onChange={e => handleMediaUpload(e.target.files?.[0] || null, 'photo')} />
+              <Button type="button" variant="outline" onClick={() => photoRef.current?.click()} disabled={saving}>
+                <Upload className="h-4 w-4 mr-1" /> {(photoFile || savedPhotoPath) ? 'Change Photo' : 'Capture Photo'}
               </Button>
-              {photoFile && <p className="text-xs text-success mt-2 flex items-center justify-center gap-1"><CheckCircle2 className="h-3 w-3" /> {photoFile.name}</p>}
+              {(photoFile || savedPhotoPath) && (
+                <p className="text-xs text-success mt-2 flex items-center justify-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> {photoFile?.name || 'Photo saved'}
+                </p>
+              )}
             </div>
             <div className="border-2 border-dashed rounded-lg p-6 text-center">
               <Video className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm font-medium mb-1">Video Introduction</p>
               <p className="text-xs text-muted-foreground mb-2">Name, skill, experience</p>
               <input ref={videoRef} type="file" accept="video/*" capture="environment" className="hidden"
-                onChange={e => setVideoFile(e.target.files?.[0] || null)} />
-              <Button type="button" variant="outline" onClick={() => videoRef.current?.click()}>
-                <Upload className="h-4 w-4 mr-1" /> {videoFile ? 'Change Video' : 'Record Video'}
+                onChange={e => handleMediaUpload(e.target.files?.[0] || null, 'video')} />
+              <Button type="button" variant="outline" onClick={() => videoRef.current?.click()} disabled={saving}>
+                <Upload className="h-4 w-4 mr-1" /> {(videoFile || savedVideoPath) ? 'Change Video' : 'Record Video'}
               </Button>
-              {videoFile && <p className="text-xs text-success mt-2 flex items-center justify-center gap-1"><CheckCircle2 className="h-3 w-3" /> {videoFile.name}</p>}
+              {(videoFile || savedVideoPath) && (
+                <p className="text-xs text-success mt-2 flex items-center justify-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> {videoFile?.name || 'Video saved'}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
         <div className="flex justify-between mt-7 pt-5 border-t">
-          <Button type="button" variant="outline" onClick={() => goToStep(step - 1)} disabled={step === 0 || saving}>
+          <Button type="button" variant="outline" onClick={() => void goToStep(step - 1)} disabled={step === 0 || saving}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
           {step < STEPS.length - 1 ? (
-            <Button type="button" onClick={handleContinue} disabled={saving}>
+            <Button type="button" onClick={() => void handleContinue()} disabled={saving}>
               Continue <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (

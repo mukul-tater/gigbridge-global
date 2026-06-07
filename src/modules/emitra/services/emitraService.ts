@@ -250,6 +250,89 @@ export async function createPartnerWorker(
   return { worker: data as PartnerWorker };
 }
 
+export interface WorkerRegistrationDraft {
+  current_step: number;
+  draft_data: Record<string, unknown>;
+  photo_url: string | null;
+  video_url: string | null;
+}
+
+export async function loadWorkerRegistrationDraft(
+  partnerProfileId: string,
+  userId: string,
+): Promise<WorkerRegistrationDraft | null> {
+  const { data, error } = await supabase
+    .from('partner_worker_drafts')
+    .select('current_step, draft_data, photo_url, video_url')
+    .eq('partner_profile_id', partnerProfileId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return {
+    current_step: data.current_step ?? 0,
+    draft_data: (data.draft_data as Record<string, unknown>) || {},
+    photo_url: data.photo_url ?? null,
+    video_url: data.video_url ?? null,
+  };
+}
+
+export async function saveWorkerRegistrationDraft(
+  partnerProfileId: string,
+  userId: string,
+  currentStep: number,
+  draftData: Record<string, unknown>,
+  media?: { photo_url?: string | null; video_url?: string | null },
+): Promise<{ error?: string }> {
+  const row: Record<string, unknown> = {
+    partner_profile_id: partnerProfileId,
+    user_id: userId,
+    current_step: currentStep,
+    draft_data: draftData,
+    updated_at: new Date().toISOString(),
+  };
+  if (media?.photo_url !== undefined) row.photo_url = media.photo_url;
+  if (media?.video_url !== undefined) row.video_url = media.video_url;
+
+  const { data: existing, error: fetchError } = await supabase
+    .from('partner_worker_drafts')
+    .select('id')
+    .eq('partner_profile_id', partnerProfileId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (fetchError) {
+    const missing = /could not find the table|partner_worker_drafts|PGRST205/i.test(fetchError.message || '');
+    return {
+      error: missing
+        ? 'Draft saving is unavailable. Run migration 20260609160000_partner_worker_drafts.sql in Supabase.'
+        : fetchError.message,
+    };
+  }
+
+  if (existing?.id) {
+    const { error } = await supabase
+      .from('partner_worker_drafts')
+      .update(row)
+      .eq('id', existing.id);
+    return error ? { error: error.message } : {};
+  }
+
+  const { error } = await supabase.from('partner_worker_drafts').insert(row);
+  return error ? { error: error.message } : {};
+}
+
+export async function deleteWorkerRegistrationDraft(
+  partnerProfileId: string,
+  userId: string,
+): Promise<void> {
+  await supabase
+    .from('partner_worker_drafts')
+    .delete()
+    .eq('partner_profile_id', partnerProfileId)
+    .eq('user_id', userId);
+}
+
 export async function updatePartnerWorker(
   workerId: string,
   payload: Record<string, unknown>

@@ -59,6 +59,7 @@ export interface PartnerProfile {
   submitted_at: string | null;
   rejection_reason: string | null;
   accepted_terms: boolean | null;
+  current_step?: number | null;
 }
 
 export interface PartnerWorker {

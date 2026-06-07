@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,7 +25,7 @@ import {
   emitraPersonalSchema, emitraDetailsSchema, emitraLocationSchema,
   emitraBankSchema, emitraDocumentsSchema, emitraDeclarationsSchema,
 } from '../validations/emitra';
-import { savePartnerApplication } from '../services/emitraService';
+import { getPartnerProfile, savePartnerApplication } from '../services/emitraService';
 
 const STEPS = [
   { id: 1, title: 'Personal Info', icon: User },
@@ -42,6 +42,7 @@ export default function EmitraRegisterPage() {
   const navigate = useNavigate();
   const { signup, user } = useAuth();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(!!user);
   const [saving, setSaving] = useState(false);
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState('');
@@ -61,6 +62,37 @@ export default function EmitraRegisterPage() {
   });
 
   const update = (patch: Partial<FormData>) => setData(d => ({ ...d, ...patch }));
+
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    (async () => {
+      const row = await getPartnerProfile(user.id);
+      if (row) {
+        if (row.submitted_at) {
+          navigate('/emitra/dashboard', { replace: true });
+          return;
+        }
+        setData(d => ({
+          ...d,
+          ...row,
+          worker_categories: row.worker_categories || [],
+          has_computer: row.has_computer ?? false,
+          has_scanner: row.has_scanner ?? false,
+          has_printer: row.has_printer ?? false,
+          has_internet: row.has_internet ?? false,
+          accepted_terms: row.accepted_terms ?? false,
+          no_jobs_promise: row.no_jobs_promise ?? false,
+          no_unauthorized_fees: row.no_unauthorized_fees ?? false,
+        }));
+        if (row.current_step) setStep(Math.min(Math.max(row.current_step, 1), STEPS.length));
+        if (row.mobile_verified) setMobileVerified(true);
+      }
+      setLoading(false);
+    })();
+  }, [user, navigate]);
 
   const validateStep = (): boolean => {
     setErrors({});
@@ -261,6 +293,14 @@ export default function EmitraRegisterPage() {
 
   const progress = (step / STEPS.length) * 100;
   const StepIcon = STEPS[step - 1].icon;
+
+  if (loading) {
+    return (
+      <EmitraLayout maxWidth="3xl" title="Become a SafeWork Partner" subtitle="Loading your application…">
+        <Card className="p-8 text-center text-muted-foreground">Loading saved progress…</Card>
+      </EmitraLayout>
+    );
+  }
 
   return (
     <EmitraLayout
