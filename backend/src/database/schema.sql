@@ -40,7 +40,6 @@ CREATE TABLE IF NOT EXISTS workers (
 );
 
 CREATE INDEX IF NOT EXISTS idx_workers_mobile ON workers(mobile_number);
-CREATE INDEX IF NOT EXISTS idx_workers_email ON workers(email);
 CREATE INDEX IF NOT EXISTS idx_workers_status ON workers(status);
 CREATE INDEX IF NOT EXISTS idx_districts_state ON districts(state_id);
 

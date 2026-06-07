@@ -6,17 +6,22 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function runMigrations(): void {
-  const workerColumns = db.prepare('PRAGMA table_info(workers)').all() as { name: string }[];
-  if (workerColumns.length > 0 && !workerColumns.some((c) => c.name === 'mobile_verified')) {
-    db.exec('ALTER TABLE workers ADD COLUMN mobile_verified INTEGER NOT NULL DEFAULT 0');
-  }
+  let workerColumns = db.prepare('PRAGMA table_info(workers)').all() as { name: string }[];
 
   if (workerColumns.length > 0 && !workerColumns.some((c) => c.name === 'email')) {
     db.exec('ALTER TABLE workers ADD COLUMN email TEXT');
     db.exec(
       "UPDATE workers SET email = 'worker' || id || '@workers.safeworkglobal.app' WHERE email IS NULL OR email = ''"
     );
+    workerColumns = db.prepare('PRAGMA table_info(workers)').all() as { name: string }[];
+  }
+
+  if (workerColumns.some((c) => c.name === 'email')) {
     db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_workers_email ON workers(email)');
+  }
+
+  if (workerColumns.length > 0 && !workerColumns.some((c) => c.name === 'mobile_verified')) {
+    db.exec('ALTER TABLE workers ADD COLUMN mobile_verified INTEGER NOT NULL DEFAULT 0');
   }
 
   const onboardingExists = db

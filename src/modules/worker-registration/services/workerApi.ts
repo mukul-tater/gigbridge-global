@@ -64,6 +64,13 @@ export const workerApi = {
     });
   },
 
+  verifyFirebaseOtp(mobileNumber: string, idToken: string): Promise<VerifyOtpResponse> {
+    return request('/workers/otp/verify-firebase', {
+      method: 'POST',
+      body: JSON.stringify({ mobileNumber, idToken }),
+    });
+  },
+
   register(payload: WorkerRegisterPayload): Promise<WorkerAuthResponse> {
     return request('/workers/register', {
       method: 'POST',

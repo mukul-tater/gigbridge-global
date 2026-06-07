@@ -7,7 +7,8 @@ import {
   workerGoogleAuthSchema,
   formatZodErrors,
 } from '../validation/workerValidation.js';
-import { sendOtpSchema, verifyOtpSchema } from '../validation/otpValidation.js';
+import { sendOtpSchema, verifyOtpSchema, verifyFirebaseOtpSchema } from '../validation/otpValidation.js';
+import { verifyPhoneIdToken } from '../service/FirebaseAdminService.js';
 import { ValidationException } from '../exception/AppException.js';
 import type { ApiSuccessResponseDto } from '../dto/WorkerDto.js';
 
@@ -133,6 +134,26 @@ export class WorkerController {
         success: true,
         data: result,
         message: 'Mobile number verified',
+      };
+      res.json(body);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  verifyFirebaseOtp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const parsed = verifyFirebaseOtpSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw new ValidationException(formatZodErrors(parsed.error));
+      }
+
+      await verifyPhoneIdToken(parsed.data.idToken, parsed.data.mobileNumber);
+      const result = otpService.issueRegistrationToken(parsed.data.mobileNumber);
+      const body: ApiSuccessResponseDto<typeof result> = {
+        success: true,
+        data: result,
+        message: 'Mobile number verified via Firebase',
       };
       res.json(body);
     } catch (err) {

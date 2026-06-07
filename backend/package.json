@@ -13,7 +13,9 @@
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.7.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
+    "firebase-admin": "^13.10.0",
     "jsonwebtoken": "^9.0.2",
     "zod": "^3.25.76"
   },

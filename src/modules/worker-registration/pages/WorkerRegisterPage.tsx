@@ -26,12 +26,16 @@ import {
 } from '../validation/registrationSchema';
 import GoogleAuthButton, { AuthDivider } from '../components/GoogleAuthButton';
 import { consumeGooglePrefill } from '../hooks/useWorkerGoogleAuth';
+import { useFirebasePhoneOtp } from '../hooks/useFirebasePhoneOtp';
+import { getOtpChannel } from '@/lib/otpConfig';
 
 const phoneRegex = /^[6-9]\d{9}$/;
 
 export default function WorkerRegisterPage() {
   const navigate = useNavigate();
   const { register: registerWorker, isAuthenticated } = useWorkerAuth();
+  const firebaseOtp = useFirebasePhoneOtp();
+  const useFirebase = getOtpChannel() === 'firebase';
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -82,16 +86,23 @@ export default function WorkerRegisterPage() {
 
     setOtpSending(true);
     try {
-      const result = await workerApi.sendOtp(digits);
       setValue('mobileNumber', digits);
       setOtpStep(true);
       setMobileVerified(false);
       setValue('otpToken', '');
       setOtp('');
-      toast.success(result.message, {
-        description: result.demo ? 'Pilot mode: enter any 6 digits' : undefined,
-      });
+
+      if (useFirebase) {
+        await firebaseOtp.sendOtp(digits);
+        toast.success('OTP sent to your mobile number');
+      } else {
+        const result = await workerApi.sendOtp(digits);
+        toast.success(result.message, {
+          description: result.demo ? 'Dev mode: enter any 6 digits' : undefined,
+        });
+      }
     } catch (err) {
+      firebaseOtp.resetRecaptcha();
       toast.error(err instanceof Error ? err.message : 'Failed to send OTP');
     } finally {
       setOtpSending(false);
@@ -107,7 +118,13 @@ export default function WorkerRegisterPage() {
 
     setOtpVerifying(true);
     try {
-      const result = await workerApi.verifyOtp(digits, otp);
+      let result;
+      if (useFirebase) {
+        const idToken = await firebaseOtp.verifyOtp(otp);
+        result = await workerApi.verifyFirebaseOtp(digits, idToken);
+      } else {
+        result = await workerApi.verifyOtp(digits, otp);
+      }
       setValue('otpToken', result.otpToken, { shouldValidate: true });
       setMobileVerified(true);
       setOtpStep(false);
@@ -151,6 +168,7 @@ export default function WorkerRegisterPage() {
         </p>
       }
     >
+      <div id="worker-recaptcha" />
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Card className="border-border/60 shadow-lg overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-primary via-primary/80 to-cyan-500" />

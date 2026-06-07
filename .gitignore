@@ -12,6 +12,31 @@ dist
 dist-ssr
 *.local
 
+# Environment & secrets (never commit)
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Firebase / GCP service accounts
+firebase-service-account.json
+firebase-adminsdk*.json
+*-service-account.json
+backend/firebase-service-account.json
+backend/data/
+
+# API keys & certs
+*.pem
+*.p12
+credentials.json
+secrets.json
+.secrets
+
+# Cursor MCP (may contain client IDs / local paths)
+.cursor/mcp.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
