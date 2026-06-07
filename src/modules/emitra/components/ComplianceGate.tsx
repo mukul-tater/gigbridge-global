@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -8,7 +9,7 @@ import { toast } from 'sonner';
 
 interface Props {
   partnerProfileId: string;
-  onAcknowledged: () => void;
+  onAcknowledged: () => void | Promise<void>;
 }
 
 const RULES = [
@@ -20,6 +21,7 @@ const RULES = [
 ];
 
 export default function ComplianceGate({ partnerProfileId, onAcknowledged }: Props) {
+  const navigate = useNavigate();
   const [checks, setChecks] = useState<boolean[]>(RULES.map(() => false));
   const [saving, setSaving] = useState(false);
 
@@ -38,7 +40,8 @@ export default function ComplianceGate({ partnerProfileId, onAcknowledged }: Pro
       return;
     }
     toast.success('Compliance acknowledged. Welcome to your dashboard.');
-    onAcknowledged();
+    await onAcknowledged();
+    navigate('/emitra/dashboard', { replace: true });
   };
 
   return (

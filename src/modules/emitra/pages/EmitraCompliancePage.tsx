@@ -31,7 +31,10 @@ export default function EmitraCompliancePage() {
       <h1 className="text-2xl font-bold mb-6">Partner Compliance</h1>
 
       {!profile.compliance_acknowledged_at ? (
-        <ComplianceGate partnerProfileId={profile.id} onAcknowledged={() => getPartnerProfile(user!.id).then(setProfile)} />
+        <ComplianceGate
+          partnerProfileId={profile.id}
+          onAcknowledged={() => getPartnerProfile(user!.id).then(setProfile)}
+        />
       ) : (
         <Card className="p-6">
           <div className="flex items-center gap-3 mb-4">
