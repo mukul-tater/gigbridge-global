@@ -16,6 +16,7 @@ import PartnerTierBadge from '../components/PartnerTierBadge';
 import {
   getPartnerProfile, getDashboardStats, getPartnerActivities,
   getPartnerIncentives, getLeaderboardRank, isPartnerOperational,
+  isComplianceAcknowledged,
 } from '../services/emitraService';
 import type { PartnerActivity, PartnerIncentive, PartnerProfile } from '../types/emitra.types';
 import { INCENTIVE_AMOUNTS } from '../config/constants';
@@ -64,7 +65,7 @@ export default function EmitraDashboardPage() {
   }
 
   const operational = row.status === 'approved' || row.status === 'active';
-  const needsCompliance = operational && !row.compliance_acknowledged_at;
+  const needsCompliance = operational && !isComplianceAcknowledged(row);
 
   if (needsCompliance) {
     return (

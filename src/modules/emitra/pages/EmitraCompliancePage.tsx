@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { emitraNavGroups, emitraProfileMenu } from '../config/emitraNav';
 import ComplianceGate from '../components/ComplianceGate';
-import { getPartnerProfile } from '../services/emitraService';
+import { getPartnerProfile, isComplianceAcknowledged } from '../services/emitraService';
 import type { PartnerProfile } from '../types/emitra.types';
 
 const RULES = [
@@ -30,7 +30,7 @@ export default function EmitraCompliancePage() {
     <DashboardLayout navGroups={emitraNavGroups} portalLabel="E-Mitra Portal" portalName="SafeWork Global" profileMenuItems={emitraProfileMenu}>
       <h1 className="text-2xl font-bold mb-6">Partner Compliance</h1>
 
-      {!profile.compliance_acknowledged_at ? (
+      {!isComplianceAcknowledged(profile) ? (
         <ComplianceGate
           partnerProfileId={profile.id}
           onAcknowledged={() => getPartnerProfile(user!.id).then(setProfile)}

@@ -258,23 +258,34 @@ export async function updateWorkerStatus(
   return updatePartnerWorker(workerId, { status });
 }
 
-export async function acknowledgeCompliance(_partnerProfileId: string): Promise<{ error?: string }> {
-  const { error } = await supabase.rpc('acknowledge_partner_compliance');
+function complianceStorageKey(profileId: string) {
+  return `emitra_compliance_ack:${profileId}`;
+}
 
-  if (error) {
-    const missingRpc = /could not find the function|function public.acknowledge_partner_compliance|PGRST202/i.test(
-      error.message || '',
-    );
-    if (missingRpc) {
-      return {
-        error:
-          'Compliance setup is incomplete. Run migration 20260608120000_partner_compliance_acknowledge.sql in Supabase, then retry.',
-      };
-    }
+export function isComplianceAcknowledged(profile: PartnerProfile): boolean {
+  if (profile.compliance_acknowledged_at) return true;
+  try {
+    return localStorage.getItem(complianceStorageKey(profile.id)) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export async function acknowledgeCompliance(partnerProfileId: string): Promise<{ error?: string }> {
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('partner_profiles')
+    .update({ compliance_acknowledged_at: now, updated_at: now })
+    .eq('id', partnerProfileId);
+
+  if (!error) return {};
+
+  try {
+    localStorage.setItem(complianceStorageKey(partnerProfileId), '1');
+    return {};
+  } catch {
     return { error: error.message };
   }
-
-  return {};
 }
 
 export async function uploadWorkerMedia(
