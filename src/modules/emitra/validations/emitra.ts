@@ -18,6 +18,7 @@ export const emitraDetailsSchema = z.object({
   emitra_id: z.string().trim().min(3, 'E-Mitra ID is required').max(50),
   center_name: z.string().trim().min(2, 'Kiosk name is required').max(150),
   years_in_operation: z.coerce.number().int().min(0).max(100),
+  worker_categories: z.array(z.string()).min(1, 'Select at least one worker category'),
 });
 
 export const emitraLocationSchema = z.object({

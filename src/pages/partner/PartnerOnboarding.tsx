@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, Store, ShieldCheck, Building2, Landmark, FileSignature } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, Store, ShieldCheck, Building2, Landmark, FileSignature, SkipForward } from "lucide-react";
 import { toast } from "sonner";
 import PartnerDocUpload from "@/components/partner/PartnerDocUpload";
 import {
@@ -45,6 +45,7 @@ export default function PartnerOnboarding() {
     confirmed_accuracy: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [skippedOptional, setSkippedOptional] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -121,6 +122,36 @@ export default function PartnerOnboarding() {
   };
 
   const handleBack = () => setStep(s => Math.max(1, s - 1));
+
+  const handleSkip = async () => {
+    const businessOk = businessInfoSchema.safeParse(data);
+    const identityOk = identitySchema.safeParse(data);
+    if (!businessOk.success || !identityOk.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of [
+        ...(businessOk.success ? [] : businessOk.error.issues),
+        ...(identityOk.success ? [] : identityOk.error.issues),
+      ]) {
+        const k = issue.path[0] as string;
+        if (k && !fieldErrors[k]) fieldErrors[k] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error("Complete business information and identity verification before skipping");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await persist({ ...data, current_step: STEPS.length });
+      setSkippedOptional(true);
+      setStep(STEPS.length);
+      toast.info("Optional steps skipped. Review declarations to submit your application.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save progress");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!validateStep()) return;
@@ -200,23 +231,30 @@ export default function PartnerOnboarding() {
           {step === 2 && <IdentityStep data={data} update={update} errors={errors} />}
           {step === 3 && <BusinessDetailsStep data={data} update={update} errors={errors} />}
           {step === 4 && <BankStep data={data} update={update} errors={errors} />}
-          {step === 5 && <DeclarationsStep data={data} update={update} errors={errors} />}
+          {step === 5 && <DeclarationsStep data={data} update={update} errors={errors} skippedOptional={skippedOptional} />}
 
-          <div className="flex justify-between mt-7 pt-5 border-t">
+          <div className="flex flex-col sm:flex-row justify-between gap-3 mt-7 pt-5 border-t">
             <Button type="button" variant="outline" onClick={handleBack} disabled={step === 1 || saving}>
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
             </Button>
-            {step < STEPS.length ? (
-              <Button type="button" onClick={handleNext} disabled={saving}>
-                {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : null}
-                Save & Continue <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            ) : (
-              <Button type="button" onClick={handleSubmit} disabled={saving}>
-                {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : null}
-                Submit Application
-              </Button>
-            )}
+            <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+              {step >= 2 && step < STEPS.length && (
+                <Button type="button" variant="ghost" onClick={handleSkip} disabled={saving}>
+                  <SkipForward className="h-4 w-4 mr-1" /> Skip optional steps
+                </Button>
+              )}
+              {step < STEPS.length ? (
+                <Button type="button" onClick={handleNext} disabled={saving}>
+                  {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : null}
+                  Save & Continue <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
+              ) : (
+                <Button type="button" onClick={handleSubmit} disabled={saving}>
+                  {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : null}
+                  Submit Application
+                </Button>
+              )}
+            </div>
           </div>
         </Card>
       </div>
@@ -378,9 +416,14 @@ function BankStep({ data, update, errors }: StepProps) {
   );
 }
 
-function DeclarationsStep({ data, update, errors }: StepProps) {
+function DeclarationsStep({ data, update, errors, skippedOptional }: StepProps & { skippedOptional?: boolean }) {
   return (
     <div className="space-y-4">
+      {skippedOptional && (
+        <p className="text-sm text-muted-foreground bg-muted/40 rounded-lg p-3">
+          You skipped business details and bank information. Submit now with the details you have provided — you can update your profile later.
+        </p>
+      )}
       <div className="bg-muted/40 rounded-lg p-4 text-sm space-y-2 max-h-48 overflow-y-auto">
         <p className="font-medium">Summary of your application</p>
         <p><span className="text-muted-foreground">Center:</span> {data.center_name || "—"}</p>

@@ -16,14 +16,14 @@ import { Badge } from '@/components/ui/badge';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Loader2, User, Store, MapPin,
-  Monitor, Landmark, FileSignature, Shield,
+  Landmark, FileSignature, Shield, SkipForward,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { indianStates } from '@/lib/validations/partner';
 import { WORKER_SKILLS } from '../config/constants';
 import {
   emitraPersonalSchema, emitraDetailsSchema, emitraLocationSchema,
-  emitraInfrastructureSchema, emitraBankSchema, emitraDocumentsSchema, emitraDeclarationsSchema,
+  emitraBankSchema, emitraDocumentsSchema, emitraDeclarationsSchema,
 } from '../validations/emitra';
 import { savePartnerApplication } from '../services/emitraService';
 
@@ -31,10 +31,9 @@ const STEPS = [
   { id: 1, title: 'Personal Info', icon: User },
   { id: 2, title: 'E-Mitra Details', icon: Store },
   { id: 3, title: 'Location', icon: MapPin },
-  { id: 4, title: 'Infrastructure', icon: Monitor },
-  { id: 5, title: 'Banking', icon: Landmark },
-  { id: 6, title: 'Documents', icon: Shield },
-  { id: 7, title: 'Declaration', icon: FileSignature },
+  { id: 4, title: 'Banking', icon: Landmark },
+  { id: 5, title: 'Documents', icon: Shield },
+  { id: 6, title: 'Declaration', icon: FileSignature },
 ] as const;
 
 type FormData = Record<string, any>;
@@ -48,6 +47,7 @@ export default function EmitraRegisterPage() {
   const [otp, setOtp] = useState('');
   const [mobileVerified, setMobileVerified] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [skippedOptional, setSkippedOptional] = useState(false);
   const [data, setData] = useState<FormData>({
     worker_categories: [],
     has_computer: false,
@@ -69,14 +69,13 @@ export default function EmitraRegisterPage() {
       emitraPersonalSchema,
       emitraDetailsSchema,
       emitraLocationSchema,
-      emitraInfrastructureSchema,
       emitraBankSchema,
       emitraDocumentsSchema,
       emitraDeclarationsSchema,
     ];
     const schema = schemas[step];
     if (!schema) return true;
-    const payload = step === 7 ? { ...data, mobile_verified: mobileVerified } : data;
+    const payload = step === STEPS.length ? { ...data, mobile_verified: mobileVerified } : data;
     const result = schema.safeParse(payload);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -176,6 +175,51 @@ export default function EmitraRegisterPage() {
     if (!uid) throw new Error('Account not ready. Please verify mobile and try again.');
     await savePartnerApplication(uid, buildPayload(overrides));
     return uid;
+  };
+
+  const handleSkip = async () => {
+    if (step === 1 && !mobileVerified) {
+      toast.error('Please verify your mobile number first');
+      return;
+    }
+
+    const personalOk = emitraPersonalSchema.safeParse(data);
+    if (!personalOk.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of personalOk.error.issues) {
+        const k = issue.path[0] as string;
+        if (k && !fieldErrors[k]) fieldErrors[k] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error('Complete personal information before skipping');
+      return;
+    }
+
+    if (step >= 2) {
+      const detailsOk = emitraDetailsSchema.safeParse(data);
+      if (!detailsOk.success) {
+        const fieldErrors: Record<string, string> = {};
+        for (const issue of detailsOk.error.issues) {
+          const k = issue.path[0] as string;
+          if (k && !fieldErrors[k]) fieldErrors[k] = issue.message;
+        }
+        setErrors(fieldErrors);
+        toast.error('Complete E-Mitra details before skipping');
+        return;
+      }
+    }
+
+    setSaving(true);
+    try {
+      await persistProgress({ current_step: STEPS.length, skipped_optional_steps: true });
+      setSkippedOptional(true);
+      setStep(STEPS.length);
+      toast.info('Optional steps skipped. Review declarations to submit your application.');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not save progress');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleNext = async () => {
@@ -333,17 +377,37 @@ export default function EmitraRegisterPage() {
         )}
 
         {step === 2 && (
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="E-Mitra ID" error={errors.emitra_id} required>
-              <Input value={data.emitra_id || ''} onChange={e => update({ emitra_id: e.target.value })} />
-            </Field>
-            <Field label="Kiosk Name" error={errors.center_name} required>
-              <Input value={data.center_name || ''} onChange={e => update({ center_name: e.target.value })} />
-            </Field>
-            <Field label="Years of Operation" error={errors.years_in_operation} required>
-              <Input type="number" min={0} value={data.years_in_operation ?? ''}
-                onChange={e => update({ years_in_operation: e.target.value === '' ? null : Number(e.target.value) })} />
-            </Field>
+          <div className="space-y-5">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="E-Mitra ID" error={errors.emitra_id} required>
+                <Input value={data.emitra_id || ''} onChange={e => update({ emitra_id: e.target.value })} />
+              </Field>
+              <Field label="Kiosk Name" error={errors.center_name} required>
+                <Input value={data.center_name || ''} onChange={e => update({ center_name: e.target.value })} />
+              </Field>
+              <Field label="Years of Operation" error={errors.years_in_operation} required>
+                <Input type="number" min={0} value={data.years_in_operation ?? ''}
+                  onChange={e => update({ years_in_operation: e.target.value === '' ? null : Number(e.target.value) })} />
+              </Field>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Worker Categories Available <span className="text-destructive">*</span></Label>
+              <div className="grid sm:grid-cols-3 gap-2 mt-2">
+                {WORKER_SKILLS.map(skill => {
+                  const checked = (data.worker_categories || []).includes(skill);
+                  return (
+                    <label key={skill} className={`flex items-center gap-2 p-2 rounded-lg border border-border cursor-pointer text-sm transition-colors ${checked ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`}>
+                      <Checkbox checked={checked} onCheckedChange={() => {
+                        const cur = data.worker_categories || [];
+                        update({ worker_categories: checked ? cur.filter((x: string) => x !== skill) : [...cur, skill] });
+                      }} />
+                      {skill}
+                    </label>
+                  );
+                })}
+              </div>
+              {errors.worker_categories && <p className="text-xs text-destructive mt-1">{errors.worker_categories}</p>}
+            </div>
           </div>
         )}
 
@@ -376,42 +440,6 @@ export default function EmitraRegisterPage() {
         )}
 
         {step === 4 && (
-          <div className="space-y-5">
-            <div className="grid sm:grid-cols-2 gap-3">
-              {[
-                { key: 'has_computer', label: 'Computer Available' },
-                { key: 'has_scanner', label: 'Scanner Available' },
-                { key: 'has_printer', label: 'Printer Available' },
-                { key: 'has_internet', label: 'Internet Available' },
-              ].map(item => (
-                <label key={item.key} className="flex items-center gap-2 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
-                  <Checkbox checked={!!data[item.key]} onCheckedChange={v => update({ [item.key]: !!v })} />
-                  <span className="text-sm">{item.label}</span>
-                </label>
-              ))}
-            </div>
-            <div>
-              <Label className="text-sm font-medium">Worker Categories Available <span className="text-destructive">*</span></Label>
-              <div className="grid sm:grid-cols-3 gap-2 mt-2">
-                {WORKER_SKILLS.map(skill => {
-                  const checked = (data.worker_categories || []).includes(skill);
-                  return (
-                    <label key={skill} className={`flex items-center gap-2 p-2 rounded-lg border border-border cursor-pointer text-sm transition-colors ${checked ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`}>
-                      <Checkbox checked={checked} onCheckedChange={() => {
-                        const cur = data.worker_categories || [];
-                        update({ worker_categories: checked ? cur.filter((x: string) => x !== skill) : [...cur, skill] });
-                      }} />
-                      {skill}
-                    </label>
-                  );
-                })}
-              </div>
-              {errors.worker_categories && <p className="text-xs text-destructive mt-1">{errors.worker_categories}</p>}
-            </div>
-          </div>
-        )}
-
-        {step === 5 && (
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Account Holder Name" error={errors.account_holder} required>
               <Input value={data.account_holder || ''} onChange={e => update({ account_holder: e.target.value })} />
@@ -429,7 +457,7 @@ export default function EmitraRegisterPage() {
           </div>
         )}
 
-        {step === 6 && (
+        {step === 5 && (
           <div className="space-y-4">
             <Field label="PAN Number" error={errors.pan_number} required>
               <Input maxLength={10} value={data.pan_number || ''} onChange={e => update({ pan_number: e.target.value.toUpperCase() })} />
@@ -448,8 +476,13 @@ export default function EmitraRegisterPage() {
           </div>
         )}
 
-        {step === 7 && (
+        {step === 6 && (
           <div className="space-y-4">
+            {skippedOptional && (
+              <p className="text-sm text-muted-foreground bg-muted/40 rounded-lg p-3">
+                You skipped location, banking, and documents. You can complete those later — submit now with the details you have provided.
+              </p>
+            )}
             {[
               { key: 'accepted_terms', label: 'I agree to SafeWork Partner Terms' },
               { key: 'no_jobs_promise', label: 'I will not promise jobs or visas' },
@@ -468,21 +501,28 @@ export default function EmitraRegisterPage() {
 
         </div>
 
-        <div className="flex justify-between gap-3 px-5 py-5 md:px-7 border-t border-border bg-muted/20">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 px-5 py-5 md:px-7 border-t border-border bg-muted/20">
           <Button type="button" variant="outline" className="h-11" onClick={() => setStep(s => Math.max(1, s - 1))} disabled={step === 1 || saving}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
-          {step < STEPS.length ? (
-            <Button type="button" className="h-11 px-6" onClick={handleNext} disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-              Continue <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          ) : (
-            <Button type="button" className="h-11 px-6" onClick={handleSubmit} disabled={saving}>
-              {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-              Submit Application
-            </Button>
-          )}
+          <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+            {step >= 2 && step < STEPS.length && (
+              <Button type="button" variant="ghost" className="h-11" onClick={handleSkip} disabled={saving}>
+                <SkipForward className="h-4 w-4 mr-1" /> Skip optional steps
+              </Button>
+            )}
+            {step < STEPS.length ? (
+              <Button type="button" className="h-11 px-6" onClick={handleNext} disabled={saving}>
+                {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                Continue <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            ) : (
+              <Button type="button" className="h-11 px-6" onClick={handleSubmit} disabled={saving}>
+                {saving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                Submit Application
+              </Button>
+            )}
+          </div>
         </div>
       </Card>
     </EmitraLayout>
