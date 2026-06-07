@@ -25,7 +25,6 @@ import {
   type WorkerRegisterFormValues,
 } from '../validation/registrationSchema';
 import GoogleAuthButton, { AuthDivider } from '../components/GoogleAuthButton';
-import { consumeGooglePrefill } from '../hooks/useWorkerGoogleAuth';
 import { useFirebasePhoneOtp } from '../hooks/useFirebasePhoneOtp';
 import { getOtpChannel } from '@/lib/otpConfig';
 
@@ -69,13 +68,6 @@ export default function WorkerRegisterPage() {
       navigate('/home', { replace: true });
     }
   }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    const prefill = consumeGooglePrefill();
-    if (prefill) {
-      setValue('email', prefill.email);
-    }
-  }, [setValue]);
 
   const handleSendOtp = async () => {
     const digits = mobileNumber.replace(/\D/g, '');
@@ -173,7 +165,7 @@ export default function WorkerRegisterPage() {
         <Card className="border-border/60 shadow-lg overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-primary via-primary/80 to-cyan-500" />
           <CardContent className="p-6 md:p-8 space-y-6">
-            <GoogleAuthButton label="Sign up with Google" returnPath="/register" />
+            <GoogleAuthButton label="Sign up with Google" />
             <AuthDivider />
 
             <FormField label="Mobile Number" error={errors.mobileNumber?.message} required>

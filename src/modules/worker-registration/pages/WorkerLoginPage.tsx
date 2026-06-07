@@ -7,7 +7,6 @@ import { Eye, EyeOff, Loader2, Lock, Mail, Phone } from 'lucide-react';
 import RegistrationLayout from '../components/RegistrationLayout';
 import FormField from '../components/FormField';
 import GoogleAuthButton, { AuthDivider } from '../components/GoogleAuthButton';
-import { useWorkerGoogleAuth } from '../hooks/useWorkerGoogleAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -22,8 +21,6 @@ export default function WorkerLoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-
-  useWorkerGoogleAuth();
 
   const {
     register,
@@ -89,7 +86,7 @@ export default function WorkerLoginPage() {
             </Alert>
           )}
 
-          <GoogleAuthButton label="Sign in with Google" returnPath="/login" />
+          <GoogleAuthButton label="Sign in with Google" />
           <AuthDivider />
 
           <Tabs

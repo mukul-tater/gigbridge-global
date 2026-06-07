@@ -1,32 +1,34 @@
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { lovable } from '@/integrations/lovable';
 
 interface Props {
   label?: string;
-  returnPath?: string;
 }
 
+/** Lovable Google OAuth — same flow as /auth and QuickWorkerSignup. */
 export default function GoogleAuthButton({
   label = 'Continue with Google',
-  returnPath,
 }: Props) {
   const [loading, setLoading] = useState(false);
 
   const handleGoogle = async () => {
     setLoading(true);
     try {
-      sessionStorage.setItem('worker_oauth_return', returnPath || window.location.pathname);
+      sessionStorage.setItem('pending_oauth_role', 'worker');
       const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: `${window.location.origin}/login`,
+        redirect_uri: `${window.location.origin}/auth`,
       });
       if (result.error) {
-        sessionStorage.removeItem('worker_oauth_return');
+        sessionStorage.removeItem('pending_oauth_role');
+        toast.error('Google sign-in failed');
         setLoading(false);
       }
     } catch {
-      sessionStorage.removeItem('worker_oauth_return');
+      sessionStorage.removeItem('pending_oauth_role');
+      toast.error('Google sign-in failed');
       setLoading(false);
     }
   };

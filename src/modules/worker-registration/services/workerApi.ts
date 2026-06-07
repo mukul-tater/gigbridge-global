@@ -13,19 +13,74 @@ import type {
   VerifyOtpResponse,
 } from '../types/worker.types';
 import type { OnboardingCompleteResult, WorkerOnboardingData } from '../types/onboarding.types';
+import { mockWorkerPortal } from './mockWorkerPortal';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_WORKER_API_URL || '/api';
+
+const MOCK_FALLBACK_ROUTES = new Set([
+  '/workers/otp/send',
+  '/workers/otp/verify',
+  '/workers/register',
+]);
+
+function isHtmlResponse(text: string): boolean {
+  const trimmed = text.trim().toLowerCase();
+  return trimmed.startsWith('<!doctype') || trimmed.startsWith('<html');
+}
+
+function callMockFallback<T>(path: string, options?: RequestInit): T {
+  const body = options?.body ? JSON.parse(options.body as string) : {};
+
+  if (path.endsWith('/otp/send')) {
+    return mockWorkerPortal.sendOtp(String(body.mobileNumber)) as T;
+  }
+  if (path.endsWith('/otp/verify')) {
+    return mockWorkerPortal.verifyOtp(String(body.mobileNumber), String(body.otp)) as T;
+  }
+  if (path.endsWith('/register')) {
+    return mockWorkerPortal.register(body as WorkerRegisterPayload) as T;
+  }
+
+  throw new Error('Worker API is unavailable in demo mode for this action.');
+}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-    ...options,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+      ...options,
+    });
+  } catch {
+    if (MOCK_FALLBACK_ROUTES.has(path)) {
+      return callMockFallback<T>(path, options);
+    }
+    throw new Error('Worker API is unreachable. Run npm run dev:all locally.');
+  }
 
-  const body = (await response.json()) as ApiResponse<T>;
+  const text = await response.text();
+
+  if (isHtmlResponse(text)) {
+    if (MOCK_FALLBACK_ROUTES.has(path)) {
+      return callMockFallback<T>(path, options);
+    }
+    throw new Error(
+      'Worker API returned an invalid response. Use npm run dev:all locally or deploy the worker API.',
+    );
+  }
+
+  let body: ApiResponse<T>;
+  try {
+    body = JSON.parse(text) as ApiResponse<T>;
+  } catch {
+    if (MOCK_FALLBACK_ROUTES.has(path)) {
+      return callMockFallback<T>(path, options);
+    }
+    throw new Error('Worker API returned an invalid response. Please try again.');
+  }
 
   if (!response.ok || !body.success) {
     const message = body.message || 'Request failed';

@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.contract-expiry-reminder]
 verify_jwt = false
+
+[functions.worker-portal]
+verify_jwt = false
