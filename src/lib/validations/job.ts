@@ -93,3 +93,24 @@ export const jobPostingSchema = z.object({
 );
 
 export type JobPostingFormData = z.infer<typeof jobPostingSchema>;
+
+/** Admin edit form — all job statuses, optional expiry, relaxed requirements */
+export const adminJobEditSchema = jobPostingSchema
+  .omit({ status: true, expires_at: true, requirements: true })
+  .extend({
+    requirements: z
+      .union([z.string().trim().max(3000), z.literal("")])
+      .optional(),
+    expires_at: z.string().optional().or(z.literal("")),
+    status: z.enum([
+      "DRAFT",
+      "PENDING",
+      "ACTIVE",
+      "PAUSED",
+      "CLOSED",
+      "EXPIRED",
+      "REJECTED",
+    ]),
+  });
+
+export type AdminJobEditFormData = z.infer<typeof adminJobEditSchema>;

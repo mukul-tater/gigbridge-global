@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, CheckCircle, XCircle, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { adminDeleteJob } from "@/services/AdminService";
 import { useNavigate } from "react-router-dom";
 import {
   AlertDialog,
@@ -87,7 +88,7 @@ export default function JobVerification() {
       fetchJobs();
     } catch (error: any) {
       console.error("Error approving job:", error);
-      toast.error("Failed to approve job");
+      toast.error(error.message || "Failed to approve job");
     }
   };
 
@@ -103,7 +104,7 @@ export default function JobVerification() {
       fetchJobs();
     } catch (error: any) {
       console.error("Error rejecting job:", error);
-      toast.error("Failed to reject job");
+      toast.error(error.message || "Failed to reject job");
     }
   };
 
@@ -111,15 +112,14 @@ export default function JobVerification() {
     if (!deleteJobId) return;
 
     try {
-      const { error } = await supabase.from("jobs").delete().eq("id", deleteJobId);
-
-      if (error) throw error;
+      const { error } = await adminDeleteJob(deleteJobId);
+      if (error) throw new Error(error);
       toast.success("Job deleted successfully");
       setDeleteJobId(null);
       fetchJobs();
     } catch (error: any) {
       console.error("Error deleting job:", error);
-      toast.error("Failed to delete job");
+      toast.error(error.message || "Failed to delete job");
     }
   };
 
@@ -194,7 +194,7 @@ export default function JobVerification() {
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  {job.status === "PENDING" || job.status === "DRAFT" ? (
+                  {["PENDING", "DRAFT", "PAUSED"].includes(job.status) ? (
                     <>
                       <Button
                         variant="outline"

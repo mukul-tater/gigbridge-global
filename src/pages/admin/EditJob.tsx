@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { jobPostingSchema, type JobPostingFormData } from "@/lib/validations/job";
+import { adminJobEditSchema, type AdminJobEditFormData } from "@/lib/validations/job";
 import { X, Plus, ArrowLeft, Loader2 } from "lucide-react";
 import { DESTINATION_COUNTRIES, CURRENCIES } from "@/lib/constants";
 
@@ -34,8 +34,8 @@ export default function EditJob() {
     setValue,
     watch,
     reset,
-  } = useForm<JobPostingFormData>({
-    resolver: zodResolver(jobPostingSchema),
+  } = useForm<AdminJobEditFormData>({
+    resolver: zodResolver(adminJobEditSchema),
   });
 
   const jobType = watch("job_type");
@@ -124,7 +124,7 @@ export default function EditJob() {
     setValue("skills", updatedSkills);
   };
 
-  const onSubmit = async (data: JobPostingFormData) => {
+  const onSubmit = async (data: AdminJobEditFormData) => {
     if (!jobId) return;
 
     setIsSubmitting(true);
@@ -148,7 +148,8 @@ export default function EditJob() {
         visa_sponsorship: data.visa_sponsorship,
         remote_allowed: data.remote_allowed,
         status: data.status,
-        expires_at: data.expires_at,
+        expires_at: data.expires_at || null,
+        posted_at: data.status === "ACTIVE" ? new Date().toISOString() : undefined,
         updated_at: new Date().toISOString(),
       };
 
@@ -342,7 +343,7 @@ export default function EditJob() {
                     <Input id="openings" type="number" {...register("openings", { valueAsNumber: true })} />
                   </div>
                   <div>
-                    <Label htmlFor="expires_at">Expiry Date *</Label>
+                    <Label htmlFor="expires_at">Expiry Date</Label>
                     <Input id="expires_at" type="date" {...register("expires_at")} />
                   </div>
                 </div>
@@ -357,7 +358,9 @@ export default function EditJob() {
                       <SelectItem value="DRAFT">Draft</SelectItem>
                       <SelectItem value="PENDING">Pending</SelectItem>
                       <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="PAUSED">Paused</SelectItem>
                       <SelectItem value="CLOSED">Closed</SelectItem>
+                      <SelectItem value="EXPIRED">Expired</SelectItem>
                       <SelectItem value="REJECTED">Rejected</SelectItem>
                     </SelectContent>
                   </Select>

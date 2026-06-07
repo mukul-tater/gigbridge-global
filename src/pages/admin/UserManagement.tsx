@@ -12,11 +12,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { adminDeleteUser, adminSetUserRole } from "@/services/AdminService";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+const BANNED_ACTIONS = new Set(["banned", "blocked", "suspended"]);
 
 interface User {
   id: string;
@@ -29,18 +32,21 @@ interface User {
 }
 
 export default function UserManagement() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [actionType, setActionType] = useState<"ban" | "unban" | null>(null);
   const [reason, setReason] = useState("");
   const [showDialog, setShowDialog] = useState(false);
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [roleUpdating, setRoleUpdating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewUser, setViewUser] = useState<User | null>(null);
   const [viewProfile, setViewProfile] = useState<any>(null);
-  const navigate = useNavigate();
 
   useEffect(() => { fetchUsers(); }, []);
 
@@ -68,7 +74,7 @@ export default function UserManagement() {
           full_name: profile.full_name,
           phone: profile.phone,
           role: userRole?.role || "worker",
-          is_banned: moderation?.action === "ban" || moderation?.action === "suspend",
+          is_banned: moderation ? BANNED_ACTIONS.has(moderation.action) : false,
           joined: new Date(profile.created_at).toISOString().split("T")[0],
         };
       });
@@ -87,10 +93,16 @@ export default function UserManagement() {
       return;
     }
     try {
+      const adminId = (await supabase.auth.getUser()).data.user?.id;
+      if (!adminId) throw new Error("Not authenticated");
+
       if (actionType === "ban") {
         const { error } = await supabase.from("user_moderation").insert({
-          user_id: selectedUser.id, action: "ban", reason: reason.trim(),
-          actioned_by: (await supabase.auth.getUser()).data.user?.id, is_active: true,
+          user_id: selectedUser.id,
+          action: "banned",
+          reason: reason.trim(),
+          actioned_by: adminId,
+          is_active: true,
         });
         if (error) throw error;
         toast.success(`${selectedUser.full_name || selectedUser.email} has been banned`);
@@ -105,9 +117,50 @@ export default function UserManagement() {
       fetchUsers();
     } catch (error: any) {
       console.error("Error updating user status:", error);
-      toast.error("Failed to update user status");
+      toast.error(error.message || "Failed to update user status");
     }
   };
+
+  const handleDeleteUser = async () => {
+    if (!deleteUser) return;
+    setDeleting(true);
+    try {
+      const { error } = await adminDeleteUser(deleteUser.id);
+      if (error) throw new Error(error);
+      toast.success(`${deleteUser.full_name || deleteUser.email} has been deleted`);
+      setDeleteUser(null);
+      if (viewUser?.id === deleteUser.id) setViewUser(null);
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      toast.error(error.message || "Failed to delete user");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleRoleChange = async (user: User, newRole: string) => {
+    if (user.role === newRole) return;
+    setRoleUpdating(true);
+    try {
+      const { error } = await adminSetUserRole(
+        user.id,
+        newRole as "worker" | "employer" | "partner" | "agent"
+      );
+      if (error) throw new Error(error);
+      toast.success(`Role updated to ${newRole}`);
+      setViewUser((prev) => (prev?.id === user.id ? { ...prev, role: newRole } : prev));
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Error updating role:", error);
+      toast.error(error.message || "Failed to update role");
+    } finally {
+      setRoleUpdating(false);
+    }
+  };
+
+  const canDeleteUser = (user: User) =>
+    user.id !== currentUser?.id && user.role !== "admin";
 
   const handleViewUser = async (user: User) => {
     setViewUser(user);
@@ -234,6 +287,11 @@ export default function UserManagement() {
                     <UserX className="h-4 w-4 text-destructive" />
                   </Button>
                 )}
+                {canDeleteUser(user) && (
+                  <Button variant="outline" size="icon" onClick={() => setDeleteUser(user)} title="Delete user">
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
@@ -280,7 +338,28 @@ export default function UserManagement() {
                 <div><Label className="text-xs text-muted-foreground">Name</Label><p className="font-medium">{viewUser.full_name || "N/A"}</p></div>
                 <div><Label className="text-xs text-muted-foreground">Email</Label><p className="font-medium text-sm">{viewUser.email}</p></div>
                 <div><Label className="text-xs text-muted-foreground">Phone</Label><p className="font-medium">{viewUser.phone || "N/A"}</p></div>
-                <div><Label className="text-xs text-muted-foreground">Role</Label><Badge>{viewUser.role}</Badge></div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Role</Label>
+                  {viewUser.role === "admin" || viewUser.id === currentUser?.id ? (
+                    <Badge>{viewUser.role}</Badge>
+                  ) : (
+                    <Select
+                      value={viewUser.role}
+                      onValueChange={(value) => handleRoleChange(viewUser, value)}
+                      disabled={roleUpdating}
+                    >
+                      <SelectTrigger className="h-8 mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="worker">Worker</SelectItem>
+                        <SelectItem value="employer">Employer</SelectItem>
+                        <SelectItem value="partner">Partner</SelectItem>
+                        <SelectItem value="agent">Agent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
                 <div><Label className="text-xs text-muted-foreground">Status</Label>
                   <Badge variant={viewUser.is_banned ? "destructive" : "default"}>{viewUser.is_banned ? "Banned" : "Active"}</Badge>
                 </div>
@@ -335,11 +414,34 @@ export default function UserManagement() {
                     <UserX className="h-4 w-4 mr-1" /> Disable User
                   </Button>
                 )}
+                {canDeleteUser(viewUser) && (
+                  <Button size="sm" variant="destructive" onClick={() => { setDeleteUser(viewUser); setViewUser(null); }}>
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete User
+                  </Button>
+                )}
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteUser} onOpenChange={() => !deleting && setDeleteUser(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Permanently delete {deleteUser?.full_name || deleteUser?.email}? This removes their
+              account and all associated data. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} disabled={deleting}>
+              {deleting ? "Deleting..." : "Delete User"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
