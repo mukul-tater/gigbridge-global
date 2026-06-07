@@ -27,11 +27,13 @@ import WorkerTrust from '@/pages/worker/WorkerTrust';
 import WorkerDiscover from '@/pages/worker/WorkerDiscover';
 import ApplicationSuccess from '@/pages/worker/ApplicationSuccess';
 
-function WorkerRoute({ path, children }: { path: string; children: ReactNode }) {
+/** Must return <Route> directly — wrapper components break React Router v6 matching. */
+function workerRoute(path: string, page: ReactNode) {
   return (
     <Route
+      key={path}
       path={path}
-      element={<ProtectedRoute allowedRoles={['worker']}>{children}</ProtectedRoute>}
+      element={<ProtectedRoute allowedRoles={['worker']}>{page}</ProtectedRoute>}
     />
   );
 }
@@ -39,34 +41,30 @@ function WorkerRoute({ path, children }: { path: string; children: ReactNode }) 
 /** Supabase/Lovable worker portal routes (restored from legacy App.tsx). */
 export const legacyWorkerRoutes = (
   <>
-    <WorkerRoute path="/worker/trust"><WorkerTrust /></WorkerRoute>
-    <WorkerRoute path="/worker/discover"><WorkerDiscover /></WorkerRoute>
-    <WorkerRoute path="/worker/application-success/:applicationId">
-      <ApplicationSuccess />
-    </WorkerRoute>
-    <WorkerRoute path="/worker/onboarding"><WorkerOnboarding /></WorkerRoute>
-    <WorkerRoute path="/worker/dashboard"><WorkerDashboard /></WorkerRoute>
-    <WorkerRoute path="/worker/profile"><WorkerProfile /></WorkerRoute>
-    <WorkerRoute path="/worker/applications"><WorkerApplications /></WorkerRoute>
-    <WorkerRoute path="/worker/applications/:applicationId">
-      <WorkerApplicationDetail />
-    </WorkerRoute>
-    <WorkerRoute path="/worker/application-tracking"><ApplicationTracking /></WorkerRoute>
-    <WorkerRoute path="/worker/messaging"><WorkerMessaging /></WorkerRoute>
-    <WorkerRoute path="/worker/training"><WorkerTraining /></WorkerRoute>
-    <WorkerRoute path="/worker/contracts"><WorkerContracts /></WorkerRoute>
-    <WorkerRoute path="/worker/travel"><WorkerTravelStatus /></WorkerRoute>
-    <WorkerRoute path="/worker/insurance"><WorkerInsurance /></WorkerRoute>
-    <WorkerRoute path="/worker/documents"><WorkerDocuments /></WorkerRoute>
-    <WorkerRoute path="/worker/notifications"><WorkerNotifications /></WorkerRoute>
-    <WorkerRoute path="/worker/saved-searches"><WorkerSavedSearches /></WorkerRoute>
-    <WorkerRoute path="/worker/saved-jobs"><WorkerSavedJobs /></WorkerRoute>
-    <WorkerRoute path="/worker/offers"><WorkerOffers /></WorkerRoute>
-    <WorkerRoute path="/worker/interviews"><WorkerInterviews /></WorkerRoute>
-    <WorkerRoute path="/worker/calendar"><WorkerCalendar /></WorkerRoute>
-    <WorkerRoute path="/worker/contract-history"><WorkerContractHistory /></WorkerRoute>
-    <WorkerRoute path="/worker/verification"><WorkerVerificationStatus /></WorkerRoute>
-    <WorkerRoute path="/worker/payments"><WorkerPayments /></WorkerRoute>
+    {workerRoute('/worker/trust', <WorkerTrust />)}
+    {workerRoute('/worker/discover', <WorkerDiscover />)}
+    {workerRoute('/worker/application-success/:applicationId', <ApplicationSuccess />)}
+    {workerRoute('/worker/onboarding', <WorkerOnboarding />)}
+    {workerRoute('/worker/dashboard', <WorkerDashboard />)}
+    {workerRoute('/worker/profile', <WorkerProfile />)}
+    {workerRoute('/worker/applications', <WorkerApplications />)}
+    {workerRoute('/worker/applications/:applicationId', <WorkerApplicationDetail />)}
+    {workerRoute('/worker/application-tracking', <ApplicationTracking />)}
+    {workerRoute('/worker/messaging', <WorkerMessaging />)}
+    {workerRoute('/worker/training', <WorkerTraining />)}
+    {workerRoute('/worker/contracts', <WorkerContracts />)}
+    {workerRoute('/worker/travel', <WorkerTravelStatus />)}
+    {workerRoute('/worker/insurance', <WorkerInsurance />)}
+    {workerRoute('/worker/documents', <WorkerDocuments />)}
+    {workerRoute('/worker/notifications', <WorkerNotifications />)}
+    {workerRoute('/worker/saved-searches', <WorkerSavedSearches />)}
+    {workerRoute('/worker/saved-jobs', <WorkerSavedJobs />)}
+    {workerRoute('/worker/offers', <WorkerOffers />)}
+    {workerRoute('/worker/interviews', <WorkerInterviews />)}
+    {workerRoute('/worker/calendar', <WorkerCalendar />)}
+    {workerRoute('/worker/contract-history', <WorkerContractHistory />)}
+    {workerRoute('/worker/verification', <WorkerVerificationStatus />)}
+    {workerRoute('/worker/payments', <WorkerPayments />)}
     <Route path="/worker-profile/:id" element={<WorkerPublicProfile />} />
   </>
 );
