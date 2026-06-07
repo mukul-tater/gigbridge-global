@@ -149,7 +149,6 @@ export default function EditJob() {
         remote_allowed: data.remote_allowed,
         status: data.status,
         expires_at: data.expires_at || null,
-        posted_at: data.status === "ACTIVE" ? new Date().toISOString() : undefined,
         updated_at: new Date().toISOString(),
       };
 
