@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     if (isAuthenticated && role === 'admin') {
-      navigate('/admin/partners', { replace: true });
+      navigate('/admin/dashboard', { replace: true });
     }
   }, [isAuthenticated, role, navigate]);
 
@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
 
     await refreshRole();
     toast.success('Welcome back');
-    navigate('/admin/partners', { replace: true });
+    navigate('/admin/dashboard', { replace: true });
     setLoading(false);
   };
 
@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
       centered
       maxWidth="md"
       title="Admin Sign In"
-      subtitle="Sign in to review partner applications and manage the platform."
+      subtitle="Sign in to manage workers, employers, partners, jobs, and platform operations."
     >
       <Card className="border-border/60 shadow-lg">
         <CardContent className="p-6 md:p-8">

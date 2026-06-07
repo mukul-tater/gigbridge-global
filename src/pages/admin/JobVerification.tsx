@@ -141,7 +141,7 @@ export default function JobVerification() {
   if (loading) {
     return (
       <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
-        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Job Verification & Management</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">All Jobs</h1>
         <p className="text-muted-foreground">Loading jobs...</p>
       </DashboardLayout>
     );
@@ -149,7 +149,10 @@ export default function JobVerification() {
 
   return (
     <DashboardLayout navGroups={adminNavGroups} portalLabel="Admin Panel" portalName="Admin Panel" profileMenuItems={adminProfileMenu}>
-          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Job Verification & Management</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">All Jobs</h1>
+          <p className="text-muted-foreground text-sm mb-6 md:mb-8">
+            Complete job listings — review, approve, edit, and manage all employer postings
+          </p>
 
           <div className="space-y-4">
             {jobs.map((job) => (

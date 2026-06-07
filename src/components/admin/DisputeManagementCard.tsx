@@ -64,7 +64,7 @@ export default function DisputeManagementCard({ disputes }: DisputeManagementCar
             <p className="text-sm text-muted-foreground">Employer-Worker disputes</p>
           </div>
         </div>
-        <Button onClick={() => navigate('/admin/dispute-resolution')} size="sm">
+        <Button onClick={() => navigate('/admin/disputes')} size="sm">
           View All
         </Button>
       </div>

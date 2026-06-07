@@ -202,6 +202,25 @@ export default function AdminDashboard() {
         )}
       </div>
 
+      <div className="mb-8">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Quick Access</h2>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "Workers", path: "/admin/workers" },
+            { label: "Employers", path: "/admin/employers" },
+            { label: "Partners", path: "/admin/partners" },
+            { label: "Applications", path: "/admin/applications" },
+            { label: "All Jobs", path: "/admin/jobs" },
+            { label: "E-Mitra Workers", path: "/admin/partner-workers" },
+            { label: "All Users", path: "/admin/users" },
+          ].map((link) => (
+            <Button key={link.path} variant="outline" size="sm" onClick={() => navigate(link.path)}>
+              {link.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       <div id="section-overview" className="mb-8">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-primary" />
@@ -332,7 +351,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5" /> Recent Jobs</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => navigate('/admin/job-verification')}>Manage All</Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/admin/jobs')}>Manage All</Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

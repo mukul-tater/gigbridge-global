@@ -39,6 +39,12 @@ import ComplianceCheck from "./pages/admin/ComplianceCheck";
 import Reports from "./pages/admin/Reports";
 import DisputeResolution from "./pages/admin/DisputeResolution";
 import ContactSubmissions from "./pages/admin/ContactSubmissions";
+import AdminWorkers from "./pages/admin/AdminWorkers";
+import AdminEmployers from "./pages/admin/AdminEmployers";
+import AdminApplications from "./pages/admin/AdminApplications";
+import AdminPartnerWorkers from "./pages/admin/AdminPartnerWorkers";
+import AdminContentModeration from "./pages/admin/AdminContentModeration";
+import AdminMessages from "./pages/admin/AdminMessages";
 import {
   EmitraRegisterPage,
   EmitraLoginPage,
@@ -193,7 +199,14 @@ function AppShell() {
           <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/investor-dashboard" element={<AdminRoute><InvestorDashboard /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><UserManagement /></AdminRoute>} />
+          <Route path="/admin/workers" element={<AdminRoute><AdminWorkers /></AdminRoute>} />
+          <Route path="/admin/employers" element={<AdminRoute><AdminEmployers /></AdminRoute>} />
+          <Route path="/admin/applications" element={<AdminRoute><AdminApplications /></AdminRoute>} />
+          <Route path="/admin/partner-workers" element={<AdminRoute><AdminPartnerWorkers /></AdminRoute>} />
           <Route path="/admin/partners" element={<AdminRoute><PartnerApprovals /></AdminRoute>} />
+          <Route path="/admin/jobs" element={<AdminRoute><JobVerification /></AdminRoute>} />
+          <Route path="/admin/content-moderation" element={<AdminRoute><AdminContentModeration /></AdminRoute>} />
+          <Route path="/admin/messages" element={<AdminRoute><AdminMessages /></AdminRoute>} />
           <Route path="/admin/document-verification" element={<AdminRoute><DocumentVerification /></AdminRoute>} />
           <Route path="/admin/id-verification" element={<AdminRoute><IDVerification /></AdminRoute>} />
           <Route path="/admin/ecr-management" element={<AdminRoute><ECRManagement /></AdminRoute>} />

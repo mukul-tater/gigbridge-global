@@ -82,7 +82,7 @@ export default function UserManagementCard({ moderationActions, onRefresh }: Use
             <p className="text-sm text-muted-foreground">Moderation actions</p>
           </div>
         </div>
-        <Button onClick={() => navigate('/admin/user-management')} size="sm">
+        <Button onClick={() => navigate('/admin/users')} size="sm">
           Manage Users
         </Button>
       </div>

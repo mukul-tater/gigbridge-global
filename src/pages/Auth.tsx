@@ -530,6 +530,10 @@ export default function Auth() {
           <a href="/terms" className="underline">Terms of Service</a> and{' '}
           <a href="/privacy" className="underline">Privacy Policy</a>.
         </p>
+        <p className="text-xs text-center text-muted-foreground/60 mt-3">
+          Platform staff?{' '}
+          <a href="/admin/login" className="underline hover:text-muted-foreground">Admin Portal</a>
+        </p>
       </div>
 
       {/* Google role chooser — shown BEFORE OAuth so we know the user's
