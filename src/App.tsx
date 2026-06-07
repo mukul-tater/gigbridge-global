@@ -23,7 +23,7 @@ import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
 import EmployerComingSoon from "./pages/employer/EmployerComingSoon";
 import Dashboard from "./pages/Dashboard";
-import WorkerOnboarding from "./pages/worker/WorkerOnboarding";
+import { legacyWorkerRoutes } from "./routes/legacyWorkerRoutes";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import PartnerApprovals from "./pages/admin/PartnerApprovals";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
@@ -115,14 +115,8 @@ function AppShell() {
               </WorkerProtectedRoute>
             }
           />
-          <Route
-            path="/worker/onboarding"
-            element={
-              <ProtectedRoute allowedRoles={["worker"]}>
-                <WorkerOnboarding />
-              </ProtectedRoute>
-            }
-          />
+          {/* Legacy Supabase worker portal */}
+          {legacyWorkerRoutes}
 
           {/* E-Mitra partner */}
           <Route path="/emitra/register" element={<EmitraRegisterPage />} />
@@ -210,11 +204,6 @@ function AppShell() {
           <Route path="/admin/disputes" element={<AdminRoute><DisputeResolution /></AdminRoute>} />
           <Route path="/admin/contact-submissions" element={<AdminRoute><ContactSubmissions /></AdminRoute>} />
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-
-          {/*
-            Other legacy routes (employer, legacy worker portal) remain disabled.
-            See src/routes/LegacyRoutes.archive.tsx to restore.
-          */}
 
           <Route path="*" element={<NotFound />} />
         </Routes>
