@@ -9,6 +9,8 @@ import type {
   WorkerGoogleAuthResponse,
   WorkerProfile,
   WorkerRegisterPayload,
+  SendOtpResponse,
+  VerifyOtpResponse,
 } from '../types/worker.types';
 import type { OnboardingCompleteResult, WorkerOnboardingData } from '../types/onboarding.types';
 
@@ -46,6 +48,20 @@ export const workerApi = {
 
   getDistricts(stateId: number): Promise<District[]> {
     return request(`/workers/districts/${stateId}`);
+  },
+
+  sendOtp(mobileNumber: string): Promise<SendOtpResponse> {
+    return request('/workers/otp/send', {
+      method: 'POST',
+      body: JSON.stringify({ mobileNumber }),
+    });
+  },
+
+  verifyOtp(mobileNumber: string, otp: string): Promise<VerifyOtpResponse> {
+    return request('/workers/otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({ mobileNumber, otp }),
+    });
   },
 
   register(payload: WorkerRegisterPayload): Promise<WorkerAuthResponse> {

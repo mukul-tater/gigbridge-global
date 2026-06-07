@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { Briefcase, Home, LogIn, Menu, ShieldCheck, UserPlus } from 'lucide-react';
+import { Briefcase, Home, LogIn, Menu, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -18,8 +18,9 @@ interface RegistrationLayoutProps {
 }
 
 const publicNav = [
-  { path: '/register', label: 'Worker Registration', icon: UserPlus },
-  { path: '/login', label: 'Worker Login', icon: LogIn },
+  { path: '/worker-start', label: 'Find a Job', icon: Briefcase },
+  { path: '/register', label: 'Create Account', icon: UserPlus },
+  { path: '/login', label: 'Sign In', icon: LogIn },
   { path: '/', label: 'Back to Home', icon: Home },
 ] as const;
 
@@ -78,24 +79,6 @@ function SidebarBrand() {
   );
 }
 
-function SidebarFooter() {
-  return (
-    <div className="mt-auto pt-6 border-t border-border space-y-4">
-      <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 space-y-2.5">
-        {[
-          { icon: Briefcase, text: 'Verified overseas job listings' },
-          { icon: ShieldCheck, text: 'Government-compliant recruitment' },
-        ].map(({ icon: Icon, text }) => (
-          <div key={text} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
-            <Icon className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
-            <p>{text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function RegistrationLayout({
   title,
   subtitle,
@@ -112,7 +95,6 @@ export default function RegistrationLayout({
       <aside className="hidden md:flex flex-col w-[260px] bg-card border-r border-border min-h-screen p-5 shrink-0">
         <SidebarBrand />
         <SidebarNav />
-        <SidebarFooter />
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 relative">
@@ -135,7 +117,6 @@ export default function RegistrationLayout({
                   <SheetContent side="left" className="w-72 p-5 flex flex-col">
                     <SidebarBrand />
                     <SidebarNav onNavigate={() => setMenuOpen(false)} />
-                    <SidebarFooter />
                   </SheetContent>
                 </Sheet>
               )}

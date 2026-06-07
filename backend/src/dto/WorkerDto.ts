@@ -5,12 +5,8 @@ export interface WorkerRegisterRequestDto {
   mobileNumber: string;
   password: string;
   confirmPassword: string;
-  fullName: string;
-  aadhaarNumber: string;
-  stateId: number;
-  districtId: number;
-  primarySkillId: number;
-  experienceLevel: ExperienceLevel;
+  otpToken: string;
+  fullName?: string;
 }
 
 export interface WorkerLoginRequestDto {

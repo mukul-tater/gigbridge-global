@@ -1,11 +1,13 @@
 import type { Request, Response, NextFunction } from 'express';
 import { WorkerService } from '../service/WorkerService.js';
+import { otpService } from '../service/OtpService.js';
 import {
   workerRegisterSchema,
   workerLoginSchema,
   workerGoogleAuthSchema,
   formatZodErrors,
 } from '../validation/workerValidation.js';
+import { sendOtpSchema, verifyOtpSchema } from '../validation/otpValidation.js';
 import { ValidationException } from '../exception/AppException.js';
 import type { ApiSuccessResponseDto } from '../dto/WorkerDto.js';
 
@@ -93,6 +95,44 @@ export class WorkerController {
         success: true,
         data: result,
         message: 'needsRegistration' in result ? 'Complete registration' : 'Google sign-in successful',
+      };
+      res.json(body);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  sendOtp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const parsed = sendOtpSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw new ValidationException(formatZodErrors(parsed.error));
+      }
+
+      const result = await otpService.sendOtp(parsed.data.mobileNumber);
+      const body: ApiSuccessResponseDto<typeof result> = {
+        success: true,
+        data: result,
+        message: result.message,
+      };
+      res.json(body);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  verifyOtp = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const parsed = verifyOtpSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw new ValidationException(formatZodErrors(parsed.error));
+      }
+
+      const result = otpService.verifyOtp(parsed.data.mobileNumber, parsed.data.otp);
+      const body: ApiSuccessResponseDto<typeof result> = {
+        success: true,
+        data: result,
+        message: 'Mobile number verified',
       };
       res.json(body);
     } catch (err) {

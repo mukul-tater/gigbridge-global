@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { Briefcase, Eye, EyeOff, Globe, Loader2, Lock, Mail, Phone, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, Mail, Phone } from 'lucide-react';
 import RegistrationLayout from '../components/RegistrationLayout';
 import FormField from '../components/FormField';
 import GoogleAuthButton, { AuthDivider } from '../components/GoogleAuthButton';
@@ -15,12 +15,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWorkerAuth } from '../context/WorkerAuthContext';
 import { workerLoginSchema, type WorkerLoginFormValues } from '../validation/registrationSchema';
-
-const TRUST_ITEMS = [
-  { icon: Briefcase, label: 'Overseas jobs', detail: 'GCC & Europe placements' },
-  { icon: ShieldCheck, label: 'Verified employers', detail: 'Licensed recruitment only' },
-  { icon: Globe, label: 'Full support', detail: 'Visa & travel guidance' },
-] as const;
 
 export default function WorkerLoginPage() {
   const navigate = useNavigate();
@@ -176,19 +170,6 @@ export default function WorkerLoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 grid grid-cols-3 gap-2">
-            {TRUST_ITEMS.map(({ icon: Icon, label, detail }) => (
-              <div
-                key={label}
-                className="rounded-lg border border-border/60 bg-muted/30 px-2 py-3 text-center"
-              >
-                <Icon className="h-4 w-4 text-primary mx-auto mb-1.5" />
-                <p className="text-[11px] font-semibold text-foreground leading-tight">{label}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug hidden sm:block">{detail}</p>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </RegistrationLayout>

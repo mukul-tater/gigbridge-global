@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS workers (
   primary_skill_id INTEGER NOT NULL,
   experience_level TEXT NOT NULL,
   profile_completion_percentage INTEGER NOT NULL DEFAULT 20,
+  mobile_verified INTEGER NOT NULL DEFAULT 0,
   registration_source TEXT NOT NULL DEFAULT 'WEB',
   status TEXT NOT NULL DEFAULT 'REGISTERED',
   created_date TEXT NOT NULL DEFAULT (datetime('now')),

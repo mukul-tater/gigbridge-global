@@ -17,6 +17,8 @@ export function createApp() {
 
   app.get('/api/workers/reference-data', workerController.getReferenceData);
   app.get('/api/workers/districts/:stateId', workerController.getDistricts);
+  app.post('/api/workers/otp/send', workerController.sendOtp);
+  app.post('/api/workers/otp/verify', workerController.verifyOtp);
   app.post('/api/workers/register', workerController.register);
   app.post('/api/workers/login', workerController.login);
   app.post('/api/workers/google-auth', workerController.googleAuth);

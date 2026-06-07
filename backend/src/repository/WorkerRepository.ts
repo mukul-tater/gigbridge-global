@@ -53,6 +53,9 @@ export interface CreateWorkerInput {
   districtId: number;
   primarySkillId: number;
   experienceLevel: ExperienceLevel;
+  mobileVerified?: boolean;
+  profileCompletionPercentage?: number;
+  status?: WorkerStatus;
 }
 
 export class WorkerRepository {
@@ -86,8 +89,8 @@ export class WorkerRepository {
       INSERT INTO workers (
         worker_code, full_name, email, mobile_number, password_hash, aadhaar_number,
         state_id, district_id, primary_skill_id, experience_level,
-        profile_completion_percentage, registration_source, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 20, 'WEB', 'REGISTERED')
+        profile_completion_percentage, registration_source, status, mobile_verified
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'WEB', ?, ?)
     `);
 
     const result = stmt.run(
@@ -100,7 +103,10 @@ export class WorkerRepository {
       input.stateId,
       input.districtId,
       input.primarySkillId,
-      input.experienceLevel
+      input.experienceLevel,
+      input.profileCompletionPercentage ?? 20,
+      input.status ?? 'REGISTERED',
+      input.mobileVerified ? 1 : 0
     );
 
     const worker = this.findById(Number(result.lastInsertRowid));

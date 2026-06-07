@@ -144,7 +144,7 @@ const Header = () => {
                       I want to…
                     </p>
                     <button
-                      onClick={() => navigate('/register')}
+                      onClick={() => navigate('/worker-start')}
                       className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent text-left transition-colors"
                     >
                       <div className="p-2 rounded-lg bg-success/10 text-success">
@@ -181,10 +181,10 @@ const Header = () => {
                     </button>
                     <div className="border-t border-border my-2" />
                     <button
-                      onClick={() => navigate('/auth')}
+                      onClick={() => navigate('/login')}
                       className="w-full text-xs text-center text-primary hover:underline py-1"
                     >
-                      Already have an account? Sign in
+                      Already registered as a worker? Sign in
                     </button>
                     <button
                       onClick={() => navigate('/emitra/login')}
@@ -293,7 +293,7 @@ const Header = () => {
                       variant="default"
                       size="lg"
                       className="w-full justify-start gap-3"
-                      onClick={() => { navigate('/register'); closeMobileMenu(); }}
+                      onClick={() => { navigate('/worker-start'); closeMobileMenu(); }}
                     >
                       <HardHat className="h-4 w-4" />
                       Find a job (Worker signup)
@@ -317,10 +317,10 @@ const Header = () => {
                       Partner
                     </Button>
                     <button
-                      onClick={() => { navigate('/auth'); closeMobileMenu(); }}
+                      onClick={() => { navigate('/login'); closeMobileMenu(); }}
                       className="w-full text-xs text-center text-primary hover:underline py-1"
                     >
-                      Already have an account? Sign in
+                      Already registered as a worker? Sign in
                     </button>
                     <button
                       onClick={() => { navigate('/emitra/login'); closeMobileMenu(); }}

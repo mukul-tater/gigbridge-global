@@ -15,6 +15,7 @@ import type {
   WorkerAuthResponseDto,
 } from '../dto/WorkerDto.js';
 import { ConflictException, NotFoundException, UnauthorizedException } from '../exception/AppException.js';
+import { otpService } from './OtpService.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'gigbridge-worker-dev-secret-change-in-production';
 const JWT_EXPIRES_IN = '7d';
@@ -28,6 +29,8 @@ export class WorkerService {
   ) {}
 
   async register(dto: WorkerRegisterRequestDto): Promise<WorkerAuthResponseDto> {
+    otpService.consumeRegistrationToken(dto.mobileNumber, dto.otpToken);
+
     const existingMobile = this.workerRepo.findByMobile(dto.mobileNumber);
     if (existingMobile) {
       throw new ConflictException('Mobile number is already registered', {
@@ -42,34 +45,29 @@ export class WorkerService {
       });
     }
 
-    const state = this.locationRepo.findStateById(dto.stateId);
-    if (!state) {
-      throw new NotFoundException('Invalid state selected');
-    }
-
-    if (!this.locationRepo.districtBelongsToState(dto.districtId, dto.stateId)) {
-      throw new NotFoundException('District does not belong to the selected state');
-    }
-
-    const skill = this.skillRepo.findById(dto.primarySkillId);
-    if (!skill) {
-      throw new NotFoundException('Invalid skill selected');
-    }
+    const defaults = this.resolveRegistrationDefaults();
+    const fullName =
+      dto.fullName?.trim() ||
+      dto.email.split('@')[0]?.replace(/[._-]+/g, ' ').trim() ||
+      `Worker ${dto.mobileNumber.slice(-4)}`;
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const workerCode = this.workerRepo.getNextWorkerCode();
 
     const worker = this.workerRepo.create({
       workerCode,
-      fullName: dto.fullName.trim(),
+      fullName,
       email: dto.email.trim().toLowerCase(),
       mobileNumber: dto.mobileNumber,
       passwordHash,
-      aadhaarNumber: dto.aadhaarNumber,
-      stateId: dto.stateId,
-      districtId: dto.districtId,
-      primarySkillId: dto.primarySkillId,
-      experienceLevel: dto.experienceLevel,
+      aadhaarNumber: 'PENDING',
+      stateId: defaults.stateId,
+      districtId: defaults.districtId,
+      primarySkillId: defaults.primarySkillId,
+      experienceLevel: 'FRESHER',
+      mobileVerified: true,
+      profileCompletionPercentage: 10,
+      status: 'PROFILE_INCOMPLETE',
     });
 
     const profile = this.toProfileResponse(worker.id)!;
@@ -170,6 +168,28 @@ export class WorkerService {
       createdDate: worker.createdDate,
       updatedDate: worker.updatedDate,
     };
+  }
+
+  private resolveRegistrationDefaults(): { stateId: number; districtId: number; primarySkillId: number } {
+    const states = this.locationRepo.findAllStates();
+    const state = states[0];
+    if (!state) {
+      throw new NotFoundException('Reference data not available. Contact support.');
+    }
+
+    const districts = this.locationRepo.findDistrictsByStateId(state.id);
+    const district = districts[0];
+    if (!district) {
+      throw new NotFoundException('Reference data not available. Contact support.');
+    }
+
+    const skills = this.skillRepo.findAll();
+    const skill = skills[0];
+    if (!skill) {
+      throw new NotFoundException('Reference data not available. Contact support.');
+    }
+
+    return { stateId: state.id, districtId: district.id, primarySkillId: skill.id };
   }
 
   private generateToken(workerId: number, mobileNumber: string): string {

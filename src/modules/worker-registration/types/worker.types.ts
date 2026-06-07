@@ -47,12 +47,17 @@ export interface WorkerRegisterPayload {
   mobileNumber: string;
   password: string;
   confirmPassword: string;
-  fullName: string;
-  aadhaarNumber: string;
-  stateId: number;
-  districtId: number;
-  primarySkillId: number;
-  experienceLevel: ExperienceLevel;
+  otpToken: string;
+}
+
+export interface SendOtpResponse {
+  demo?: boolean;
+  message: string;
+}
+
+export interface VerifyOtpResponse {
+  otpToken: string;
+  expiresInSeconds: number;
 }
 
 export interface WorkerLoginPayload {

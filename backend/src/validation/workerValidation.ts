@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
 const phoneRegex = /^[6-9]\d{9}$/;
-const aadhaarRegex = /^\d{12}$/;
-
 export const experienceLevelSchema = z.enum([
   'FRESHER',
   'ONE_TO_THREE',
@@ -20,12 +18,8 @@ export const workerRegisterSchema = z
       .regex(phoneRegex, 'Mobile number must be 10 digits starting with 6-9'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string().min(1, 'Confirm password is required'),
-    fullName: z.string().trim().min(2, 'Full name is required').max(120),
-    aadhaarNumber: z.string().regex(aadhaarRegex, 'Aadhaar must be 12 digits'),
-    stateId: z.coerce.number().int().positive('State is required'),
-    districtId: z.coerce.number().int().positive('District is required'),
-    primarySkillId: z.coerce.number().int().positive('Primary skill is required'),
-    experienceLevel: experienceLevelSchema,
+    otpToken: z.string().min(1, 'Verify your mobile number with OTP'),
+    fullName: z.string().trim().min(2).max(120).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',

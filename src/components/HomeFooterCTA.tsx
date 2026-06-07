@@ -8,7 +8,7 @@ export default function HomeFooterCTA() {
   const { isAuthenticated } = useAuth();
 
   const handleSignUp = () => {
-    navigate(isAuthenticated ? "/jobs" : "/register");
+    navigate(isAuthenticated ? "/jobs" : "/worker-start");
   };
 
   return (

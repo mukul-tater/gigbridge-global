@@ -3,38 +3,43 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { Loader2, Clock, Shield } from 'lucide-react';
+import {
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  Phone,
+} from 'lucide-react';
 import RegistrationLayout from '../components/RegistrationLayout';
 import FormField from '../components/FormField';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useWorkerAuth } from '../context/WorkerAuthContext';
 import { workerApi } from '../services/workerApi';
 import {
   workerRegisterSchema,
   type WorkerRegisterFormValues,
 } from '../validation/registrationSchema';
-import type { District, Skill, State } from '../types/worker.types';
-import { EXPERIENCE_OPTIONS } from '../types/worker.types';
 import GoogleAuthButton, { AuthDivider } from '../components/GoogleAuthButton';
 import { consumeGooglePrefill } from '../hooks/useWorkerGoogleAuth';
+
+const phoneRegex = /^[6-9]\d{9}$/;
 
 export default function WorkerRegisterPage() {
   const navigate = useNavigate();
   const { register: registerWorker, isAuthenticated } = useWorkerAuth();
   const [submitting, setSubmitting] = useState(false);
-  const [states, setStates] = useState<State[]>([]);
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [districts, setDistricts] = useState<District[]>([]);
-  const [loadingRef, setLoadingRef] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [mobileVerified, setMobileVerified] = useState(false);
 
   const {
     register,
@@ -49,16 +54,11 @@ export default function WorkerRegisterPage() {
       mobileNumber: '',
       password: '',
       confirmPassword: '',
-      fullName: '',
-      aadhaarNumber: '',
-      stateId: undefined,
-      districtId: undefined,
-      primarySkillId: undefined,
-      experienceLevel: undefined,
+      otpToken: '',
     },
   });
 
-  const selectedStateId = watch('stateId');
+  const mobileNumber = watch('mobileNumber');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -70,251 +70,235 @@ export default function WorkerRegisterPage() {
     const prefill = consumeGooglePrefill();
     if (prefill) {
       setValue('email', prefill.email);
-      setValue('fullName', prefill.fullName);
     }
   }, [setValue]);
 
-  useEffect(() => {
-    workerApi
-      .getReferenceData()
-      .then((data) => {
-        setStates(data.states);
-        setSkills(data.skills);
-      })
-      .catch(() => toast.error('Failed to load form options'))
-      .finally(() => setLoadingRef(false));
-  }, []);
-
-  useEffect(() => {
-    if (!selectedStateId) {
-      setDistricts([]);
-      setValue('districtId', undefined as unknown as number);
+  const handleSendOtp = async () => {
+    const digits = mobileNumber.replace(/\D/g, '');
+    if (!phoneRegex.test(digits)) {
+      toast.error('Enter a valid 10-digit mobile number first');
       return;
     }
 
-    workerApi
-      .getDistricts(selectedStateId)
-      .then(setDistricts)
-      .catch(() => toast.error('Failed to load districts'));
-  }, [selectedStateId, setValue]);
+    setOtpSending(true);
+    try {
+      const result = await workerApi.sendOtp(digits);
+      setValue('mobileNumber', digits);
+      setOtpStep(true);
+      setMobileVerified(false);
+      setValue('otpToken', '');
+      setOtp('');
+      toast.success(result.message, {
+        description: result.demo ? 'Pilot mode: enter any 6 digits' : undefined,
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to send OTP');
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const digits = mobileNumber.replace(/\D/g, '');
+    if (otp.length !== 6) {
+      toast.error('Enter the 6-digit OTP');
+      return;
+    }
+
+    setOtpVerifying(true);
+    try {
+      const result = await workerApi.verifyOtp(digits, otp);
+      setValue('otpToken', result.otpToken, { shouldValidate: true });
+      setMobileVerified(true);
+      setOtpStep(false);
+      toast.success('Mobile number verified');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Invalid OTP');
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
 
   const onSubmit = async (values: WorkerRegisterFormValues) => {
+    if (!values.otpToken) {
+      toast.error('Verify your mobile number with OTP before continuing');
+      return;
+    }
+
     setSubmitting(true);
-    const result = await registerWorker(values as Parameters<typeof registerWorker>[0]);
+    const result = await registerWorker(values);
     setSubmitting(false);
 
     if (result.success) {
-      toast.success('Registration successful! Welcome aboard.');
-      navigate('/home', { replace: true });
+      toast.success('Account created! Complete your profile next.');
+      navigate('/onboarding', { replace: true });
     } else {
       toast.error(result.error || 'Registration failed');
     }
   };
 
-  if (loadingRef) {
-    return (
-      <RegistrationLayout title="Worker Registration" subtitle="Loading registration form...">
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </RegistrationLayout>
-    );
-  }
-
   return (
     <RegistrationLayout
-      title="Register as a Worker"
-      subtitle="Complete in under 1 minute. Start matching with overseas jobs today."
-      maxWidth="3xl"
+      title="Create your worker account"
+      subtitle="Sign up in under a minute. Add skills, location, and documents later."
+      maxWidth="md"
       footer={
-        <>
+        <p className="pt-6 border-t border-border">
           Already registered?{' '}
           <Link to="/login" className="font-medium text-primary hover:underline">
-            Sign in
+            Sign in to your account
           </Link>
-        </>
+        </p>
       }
     >
-      <div className="mb-6 grid gap-3 sm:grid-cols-2">
-        {[
-          { icon: Clock, text: 'Under 1 minute' },
-          { icon: Shield, text: 'Secure & verified' },
-        ].map(({ icon: Icon, text }) => (
-          <div
-            key={text}
-            className="flex items-center gap-2 rounded-lg border bg-background/80 px-3 py-2 text-sm text-muted-foreground backdrop-blur"
-          >
-            <Icon className="h-4 w-4 text-primary" />
-            {text}
-          </div>
-        ))}
-      </div>
-
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Card className="border-0 shadow-xl shadow-primary/5">
-          <CardHeader className="pb-4">
-            <CardTitle>Quick Registration</CardTitle>
-            <CardDescription>All fields marked with * are required</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-8">
+        <Card className="border-border/60 shadow-lg overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-primary via-primary/80 to-cyan-500" />
+          <CardContent className="p-6 md:p-8 space-y-6">
             <GoogleAuthButton label="Sign up with Google" returnPath="/register" />
             <AuthDivider />
 
-            <section>
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-primary">
-                Account
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField label="Email Address" error={errors.email?.message} required className="sm:col-span-2">
-                  <Input type="email" placeholder="you@example.com" {...register('email')} />
-                </FormField>
-                <FormField label="Mobile Number" error={errors.mobileNumber?.message} required>
+            <FormField label="Mobile Number" error={errors.mobileNumber?.message} required>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     inputMode="numeric"
                     maxLength={10}
-                    placeholder="10-digit mobile"
+                    placeholder="10-digit mobile number"
+                    className="h-11 pl-10"
+                    disabled={mobileVerified}
                     {...register('mobileNumber', {
                       onChange: (e) => {
                         e.target.value = e.target.value.replace(/\D/g, '');
+                        if (mobileVerified) {
+                          setMobileVerified(false);
+                          setValue('otpToken', '');
+                        }
                       },
                     })}
                   />
-                </FormField>
-                <div className="hidden sm:block" />
-                <FormField label="Password" error={errors.password?.message} required>
-                  <Input type="password" placeholder="Min. 6 characters" {...register('password')} />
-                </FormField>
-                <FormField label="Confirm Password" error={errors.confirmPassword?.message} required>
-                  <Input type="password" placeholder="Re-enter password" {...register('confirmPassword')} />
-                </FormField>
+                </div>
+                {mobileVerified ? (
+                  <Button type="button" variant="secondary" className="h-11 shrink-0 gap-1.5" disabled>
+                    <CheckCircle2 className="h-4 w-4 text-success" />
+                    Verified
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="h-11 shrink-0 px-4"
+                    onClick={handleSendOtp}
+                    disabled={otpSending || otpStep}
+                  >
+                    {otpSending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send OTP'}
+                  </Button>
+                )}
               </div>
-            </section>
+            </FormField>
 
-            <section>
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-primary">
-                Personal Information
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField label="Full Name" error={errors.fullName?.message} required className="sm:col-span-2">
-                  <Input placeholder="As per Aadhaar" {...register('fullName')} />
-                </FormField>
-                <FormField label="Aadhaar Number" error={errors.aadhaarNumber?.message} required className="sm:col-span-2">
-                  <Input
-                    inputMode="numeric"
-                    maxLength={12}
-                    placeholder="12-digit Aadhaar"
-                    {...register('aadhaarNumber', {
-                      onChange: (e) => {
-                        e.target.value = e.target.value.replace(/\D/g, '');
-                      },
-                    })}
-                  />
-                </FormField>
-              </div>
-            </section>
-
-            <section>
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-primary">
-                Location
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField label="State" error={errors.stateId?.message} required>
-                  <Select
-                    value={selectedStateId ? String(selectedStateId) : ''}
-                    onValueChange={(v) => {
-                      setValue('stateId', Number(v), { shouldValidate: true });
-                      setValue('districtId', undefined as unknown as number);
+            {otpStep && !mobileVerified && (
+              <div className="rounded-lg border border-border/60 bg-muted/30 p-4 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Enter the OTP sent to <span className="font-medium text-foreground">{mobileNumber}</span>
+                </p>
+                <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+                  <InputOTPGroup>
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
+                      <InputOTPSlot key={i} index={i} />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleVerifyOtp}
+                    disabled={otpVerifying || otp.length !== 6}
+                  >
+                    {otpVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Verify OTP'}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setOtpStep(false);
+                      setOtp('');
                     }}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select state" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-72">
-                      {states.map((s) => (
-                        <SelectItem key={s.id} value={String(s.id)}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <FormField label="District / City" error={errors.districtId?.message} required>
-                  <Select
-                    value={watch('districtId') ? String(watch('districtId')) : ''}
-                    onValueChange={(v) => setValue('districtId', Number(v), { shouldValidate: true })}
-                    disabled={!selectedStateId || districts.length === 0}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={selectedStateId ? 'Select district' : 'Select state first'} />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-72">
-                      {districts.map((d) => (
-                        <SelectItem key={d.id} value={String(d.id)}>
-                          {d.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
+                    Change number
+                  </Button>
+                </div>
               </div>
-            </section>
+            )}
 
-            <section>
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-primary">
-                Skills & Experience
-              </h3>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField label="Primary Skill" error={errors.primarySkillId?.message} required>
-                  <Select
-                    value={watch('primarySkillId') ? String(watch('primarySkillId')) : ''}
-                    onValueChange={(v) => setValue('primarySkillId', Number(v), { shouldValidate: true })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select skill" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-72">
-                      {skills.map((s) => (
-                        <SelectItem key={s.id} value={String(s.id)}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
-                <FormField label="Experience" error={errors.experienceLevel?.message} required>
-                  <Select
-                    value={watch('experienceLevel') || ''}
-                    onValueChange={(v) =>
-                      setValue('experienceLevel', v as WorkerRegisterFormValues['experienceLevel'], {
-                        shouldValidate: true,
-                      })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select experience" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {EXPERIENCE_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormField>
+            <FormField label="Email Address" error={errors.email?.message} required>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input type="email" placeholder="you@example.com" className="h-11 pl-10" {...register('email')} />
               </div>
-            </section>
+            </FormField>
 
-            <Button type="submit" className="w-full h-12 text-base" disabled={submitting}>
+            <FormField label="Password" error={errors.password?.message} required>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Min. 6 characters"
+                  className="h-11 pl-10 pr-10"
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </FormField>
+
+            <FormField label="Confirm Password" error={errors.confirmPassword?.message} required>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Re-enter password"
+                  className="h-11 pl-10 pr-10"
+                  {...register('confirmPassword')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </FormField>
+
+            {errors.otpToken?.message && (
+              <p className="text-sm text-destructive">{errors.otpToken.message}</p>
+            )}
+
+            <Button type="submit" className="w-full h-11 font-medium" disabled={submitting || !mobileVerified}>
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Registering...
+                  Creating account...
                 </>
               ) : (
-                'Complete Registration'
+                'Create account & continue'
               )}
             </Button>
+
+            <p className="text-xs text-center text-muted-foreground">
+              Name, skills, Aadhaar, and location can be added on the next screen.
+            </p>
           </CardContent>
         </Card>
       </form>

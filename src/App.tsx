@@ -50,6 +50,7 @@ import {
 } from "./modules/emitra";
 import {
   WorkerAuthProvider,
+  WorkerRegistrationHome,
   WorkerRegisterPage,
   WorkerLoginPage,
   WorkerDashboardPage,
@@ -93,7 +94,7 @@ function AppShell() {
           <Route path="/register" element={<WorkerRegisterPage />} />
           <Route path="/login" element={<WorkerLoginPage />} />
           <Route path="/worker/quick-signup" element={<Navigate to="/register" replace />} />
-          <Route path="/worker-start" element={<Navigate to="/register" replace />} />
+          <Route path="/worker-start" element={<WorkerRegistrationHome />} />
 
           {/* Employer — coming soon (Phase 2) */}
           <Route path="/employer/quick-signup" element={<EmployerComingSoon />} />
