@@ -23,6 +23,7 @@ import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
 import EmployerComingSoon from "./pages/employer/EmployerComingSoon";
 import Dashboard from "./pages/Dashboard";
+import WorkerOnboarding from "./pages/worker/WorkerOnboarding";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import PartnerApprovals from "./pages/admin/PartnerApprovals";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
@@ -112,6 +113,14 @@ function AppShell() {
               <WorkerProtectedRoute>
                 <WorkerOnboardingPage />
               </WorkerProtectedRoute>
+            }
+          />
+          <Route
+            path="/worker/onboarding"
+            element={
+              <ProtectedRoute allowedRoles={["worker"]}>
+                <WorkerOnboarding />
+              </ProtectedRoute>
             }
           />
 
