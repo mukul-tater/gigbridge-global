@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ProfileSkeleton } from "@/components/ui/page-skeleton";
 import PortalBreadcrumb from "@/components/PortalBreadcrumb";
+import OnboardingStepper from "@/components/onboarding/OnboardingStepper";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { ReactNode } from "react";
+
+function ProfileSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Card className="border-border/60 shadow-md overflow-hidden">
+      <div className="h-1 bg-gradient-to-r from-primary via-primary/80 to-cyan-500" />
+      <div className="p-6">
+        <h2 className="text-lg font-semibold font-heading">{title}</h2>
+        {description ? (
+          <p className="text-sm text-muted-foreground mt-1 mb-5">{description}</p>
+        ) : (
+          <div className="mb-5" />
+        )}
+        {children}
+      </div>
+    </Card>
+  );
+}
 
 interface WorkerVideo {
   id: string;
@@ -203,341 +230,356 @@ export default function WorkerProfile() {
     await refreshProfile();
   };
 
+  const layout = (content: ReactNode) => (
+    <DashboardLayout
+      navGroups={workerNavGroups}
+      portalLabel="Worker Portal"
+      portalName="Worker Portal"
+      profileMenuItems={workerProfileMenu}
+    >
+      {content}
+    </DashboardLayout>
+  );
+
   if (!user || !profile || loading) {
-    return (
-      <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
-            <ProfileSkeleton />
-          </DashboardLayout>
-    );
+    return layout(<ProfileSkeleton />);
   }
 
-  return (
-    <DashboardLayout navGroups={workerNavGroups} portalLabel="Worker Portal" portalName="Worker Portal" profileMenuItems={workerProfileMenu}>
-          <PortalBreadcrumb />
-          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">My Profile</h1>
+  return layout(
+    <>
+      <PortalBreadcrumb />
+      <OnboardingStepper />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-4 md:space-y-6">
-          {/* Avatar Section */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Profile Picture</h2>
-            <AvatarUpload
-              currentAvatarUrl={profile.avatar_url}
-              userId={user.id}
-              onUploadComplete={handleAvatarUploadComplete}
-              fallbackText={profile.full_name?.[0] || 'W'}
-            />
-          </Card>
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold mb-1">My Profile</h1>
+        <p className="text-muted-foreground text-sm">
+          Keep your details up to date so employers can find and shortlist you faster.
+        </p>
+      </div>
 
-          {/* Video Portfolio */}
-          <WorkerVideoUpload
-            workerId={user.id}
-            videos={videos}
-            onVideosChange={fetchVideos}
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl space-y-6">
+        <ProfileSection title="Profile Picture" description="A clear photo helps employers trust your application.">
+          <AvatarUpload
+            currentAvatarUrl={profile.avatar_url}
+            userId={user.id}
+            onUploadComplete={handleAvatarUploadComplete}
+            fallbackText={profile.full_name?.[0] || 'W'}
           />
+        </ProfileSection>
 
-          {/* Personal Information */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Personal Information</h2>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="full_name">Full Name *</Label>
-                <Input
-                  id="full_name"
-                  {...register('full_name')}
-                  className={errors.full_name ? 'border-destructive' : ''}
-          />
+        <WorkerVideoUpload workerId={user.id} videos={videos} onVideosChange={fetchVideos} />
 
-          {/* Resume Upload */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Resume / CV</h2>
-            {resumeUrl ? (
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3 min-w-0">
-                  <FileText className="h-5 w-5 text-primary shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-medium text-sm truncate">{resumeName || 'Resume'}</p>
-                    <a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
-                      View file
-                    </a>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      await supabase.from('worker_documents').delete()
-                        .eq('worker_id', user.id).eq('document_type', 'resume');
-                      setResumeUrl(null);
-                      setResumeName(null);
-                      toast.success("Resume removed");
-                    } catch { toast.error("Failed to remove resume"); }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground mb-3">Upload your resume to attach it when applying for jobs.</p>
-            )}
-            <div className="mt-3">
+        <ProfileSection
+          title="Personal Information"
+          description="Basic contact details used across your worker account."
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label htmlFor="full_name">Full Name *</Label>
               <Input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                disabled={uploadingResume}
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !user) return;
-                  setUploadingResume(true);
-                  try {
-                    const ext = file.name.split('.').pop();
-                    const path = `${user.id}/${Date.now()}-resume.${ext}`;
-                    const { error: upErr } = await supabase.storage.from('worker-documents').upload(path, file);
-                    if (upErr) throw upErr;
-                    const { data: urlData } = supabase.storage.from('worker-documents').getPublicUrl(path);
-                    
-                    // Remove old resume doc entry
-                    await supabase.from('worker_documents').delete()
-                      .eq('worker_id', user.id).eq('document_type', 'resume');
-                    
-                    // Save new resume doc entry
-                    await supabase.from('worker_documents').insert({
-                      worker_id: user.id,
-                      document_type: 'resume',
-                      document_name: file.name,
-                      file_url: urlData.publicUrl,
-                      file_size: file.size,
-                    });
+                id="full_name"
+                className={`mt-1.5 h-11 ${errors.full_name ? 'border-destructive' : ''}`}
+                {...register('full_name')}
+              />
+              {errors.full_name && (
+                <p className="text-sm text-destructive mt-1">{errors.full_name.message}</p>
+              )}
+            </div>
 
-                    setResumeUrl(urlData.publicUrl);
-                    setResumeName(file.name);
-                    toast.success("Resume uploaded successfully!");
-                  } catch (err: any) {
-                    toast.error(err.message || "Failed to upload resume");
-                  } finally {
-                    setUploadingResume(false);
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={user.email || ''}
+                disabled
+                className="mt-1.5 h-11 bg-muted"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                placeholder="10-digit mobile number"
+                className={`mt-1.5 h-11 ${errors.phone ? 'border-destructive' : ''}`}
+                {...register('phone')}
+              />
+              {errors.phone && (
+                <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>
+              )}
+            </div>
+
+            <div className="sm:col-span-2">
+              <Label htmlFor="nationality">Nationality *</Label>
+              <Select value={nationality} onValueChange={setNationality}>
+                <SelectTrigger className="mt-1.5 h-11">
+                  <SelectValue placeholder="Select your nationality" />
+                </SelectTrigger>
+                <SelectContent>
+                  {NATIONALITIES.map((nat) => (
+                    <SelectItem key={nat} value={nat}>
+                      {nat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">Required for ECR status determination</p>
+            </div>
+
+            <div className="sm:col-span-2">
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                rows={4}
+                placeholder="Tell employers about your experience and strengths..."
+                className={`mt-1.5 ${errors.bio ? 'border-destructive' : ''}`}
+                {...register('bio')}
+              />
+              {errors.bio && (
+                <p className="text-sm text-destructive mt-1">{errors.bio.message}</p>
+              )}
+            </div>
+          </div>
+        </ProfileSection>
+
+        <ProfileSection
+          title="Resume / CV"
+          description="Upload your resume to attach it when applying for jobs."
+        >
+          {resumeUrl ? (
+            <div className="flex items-center justify-between gap-3 p-4 bg-muted/40 rounded-lg border border-border/60">
+              <div className="flex items-center gap-3 min-w-0">
+                <FileText className="h-5 w-5 text-primary shrink-0" />
+                <div className="min-w-0">
+                  <p className="font-medium text-sm truncate">{resumeName || 'Resume'}</p>
+                  <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline"
+                  >
+                    View file
+                  </a>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    await supabase
+                      .from('worker_documents')
+                      .delete()
+                      .eq('worker_id', user.id)
+                      .eq('document_type', 'resume');
+                    setResumeUrl(null);
+                    setResumeName(null);
+                    toast.success('Resume removed');
+                  } catch {
+                    toast.error('Failed to remove resume');
                   }
                 }}
-                className="cursor-pointer"
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          ) : null}
+          <div className={resumeUrl ? 'mt-4' : ''}>
+            <Input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              disabled={uploadingResume}
+              className="cursor-pointer h-11"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file || !user) return;
+                setUploadingResume(true);
+                try {
+                  const ext = file.name.split('.').pop();
+                  const path = `${user.id}/${Date.now()}-resume.${ext}`;
+                  const { error: upErr } = await supabase.storage
+                    .from('worker-documents')
+                    .upload(path, file);
+                  if (upErr) throw upErr;
+                  const { data: urlData } = supabase.storage
+                    .from('worker-documents')
+                    .getPublicUrl(path);
+
+                  await supabase
+                    .from('worker_documents')
+                    .delete()
+                    .eq('worker_id', user.id)
+                    .eq('document_type', 'resume');
+
+                  await supabase.from('worker_documents').insert({
+                    worker_id: user.id,
+                    document_type: 'resume',
+                    document_name: file.name,
+                    file_url: urlData.publicUrl,
+                    file_size: file.size,
+                  });
+
+                  setResumeUrl(urlData.publicUrl);
+                  setResumeName(file.name);
+                  toast.success('Resume uploaded successfully!');
+                } catch (err: unknown) {
+                  const message = err instanceof Error ? err.message : 'Failed to upload resume';
+                  toast.error(message);
+                } finally {
+                  setUploadingResume(false);
+                }
+              }}
+            />
+            {uploadingResume && (
+              <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Uploading...
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">PDF, DOC, or DOCX (max 10MB)</p>
+          </div>
+        </ProfileSection>
+
+        <ProfileSection title="Skills & Experience">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label htmlFor="skills">Primary Skills</Label>
+              <Input
+                id="skills"
+                placeholder="e.g., Welding, Electrical, Plumbing"
+                className={`mt-1.5 h-11 ${errors.skills ? 'border-destructive' : ''}`}
+                {...register('skills')}
               />
-              {uploadingResume && (
-                <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Uploading...
-                </div>
+              {errors.skills && (
+                <p className="text-sm text-destructive mt-1">{errors.skills.message}</p>
               )}
-              <p className="text-xs text-muted-foreground mt-1">PDF, DOC, or DOCX (max 10MB)</p>
             </div>
-          </Card>
-                {errors.full_name && (
-                  <p className="text-sm text-destructive mt-1">{errors.full_name.message}</p>
-                )}
-              </div>
 
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={user.email || ''}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground mt-1">Email cannot be changed</p>
-              </div>
-
-              <div>
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  {...register('phone')}
-                  placeholder="+1234567890"
-                  className={errors.phone ? 'border-destructive' : ''}
-                />
-                {errors.phone && (
-                  <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="nationality">Nationality *</Label>
-                <Select value={nationality} onValueChange={setNationality}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your nationality" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {NATIONALITIES.map(nat => (
-                      <SelectItem key={nat} value={nat}>{nat}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Required for ECR status determination
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  {...register('bio')}
-                  rows={4}
-                  placeholder="Tell us about yourself..."
-                  className={errors.bio ? 'border-destructive' : ''}
-                />
-                {errors.bio && (
-                  <p className="text-sm text-destructive mt-1">{errors.bio.message}</p>
-                )}
-              </div>
+            <div>
+              <Label htmlFor="experience_years">Years of Experience</Label>
+              <Input
+                id="experience_years"
+                type="number"
+                placeholder="5"
+                className={`mt-1.5 h-11 ${errors.experience_years ? 'border-destructive' : ''}`}
+                {...register('experience_years', { valueAsNumber: true })}
+              />
+              {errors.experience_years && (
+                <p className="text-sm text-destructive mt-1">{errors.experience_years.message}</p>
+              )}
             </div>
-          </Card>
 
-          {/* Skills & Experience */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Skills & Experience</h2>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="skills">Primary Skills</Label>
-                <Input
-                  id="skills"
-                  {...register('skills')}
-                  placeholder="e.g., Welding, Electrical, Plumbing"
-                  className={errors.skills ? 'border-destructive' : ''}
-                />
-                {errors.skills && (
-                  <p className="text-sm text-destructive mt-1">{errors.skills.message}</p>
-                )}
-              </div>
+            <div className="sm:col-span-2">
+              <Label htmlFor="certifications">Certifications</Label>
+              <Textarea
+                id="certifications"
+                rows={3}
+                placeholder="List your certifications..."
+                className={`mt-1.5 ${errors.certifications ? 'border-destructive' : ''}`}
+                {...register('certifications')}
+              />
+              {errors.certifications && (
+                <p className="text-sm text-destructive mt-1">{errors.certifications.message}</p>
+              )}
+            </div>
+          </div>
+        </ProfileSection>
 
-              <div>
-                <Label htmlFor="experience_years">Years of Experience</Label>
+        <ProfileSection title="Immigration Documents">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="passport_number">Passport Number</Label>
+              <Input
+                id="passport_number"
+                placeholder="Enter passport number"
+                className={`mt-1.5 h-11 ${errors.passport_number ? 'border-destructive' : ''}`}
+                {...register('passport_number')}
+              />
+              {errors.passport_number && (
+                <p className="text-sm text-destructive mt-1">{errors.passport_number.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="visa_type">Visa Type</Label>
+              <Input
+                id="visa_type"
+                placeholder="e.g., Work Visa, Employment Visa"
+                className={`mt-1.5 h-11 ${errors.visa_type ? 'border-destructive' : ''}`}
+                {...register('visa_type')}
+              />
+              {errors.visa_type && (
+                <p className="text-sm text-destructive mt-1">{errors.visa_type.message}</p>
+              )}
+            </div>
+          </div>
+        </ProfileSection>
+
+        <ProfileSection title="Work Preferences">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="preferred_countries">Preferred Countries</Label>
+              <Input
+                id="preferred_countries"
+                placeholder="e.g., UAE, Qatar, Saudi Arabia, Kuwait"
+                className={`mt-1.5 h-11 ${errors.preferred_countries ? 'border-destructive' : ''}`}
+                {...register('preferred_countries')}
+              />
+              {errors.preferred_countries && (
+                <p className="text-sm text-destructive mt-1">{errors.preferred_countries.message}</p>
+              )}
+            </div>
+
+            <div>
+              <Label>Expected Salary Range (USD/month)</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1.5">
                 <Input
-                  id="experience_years"
                   type="number"
-                  {...register('experience_years', { valueAsNumber: true })}
-                  placeholder="5"
-                  className={errors.experience_years ? 'border-destructive' : ''}
+                  placeholder="Min"
+                  className={`h-11 ${errors.expected_salary_min ? 'border-destructive' : ''}`}
+                  {...register('expected_salary_min', { valueAsNumber: true })}
                 />
-                {errors.experience_years && (
-                  <p className="text-sm text-destructive mt-1">{errors.experience_years.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="certifications">Certifications</Label>
-                <Textarea
-                  id="certifications"
-                  {...register('certifications')}
-                  rows={3}
-                  placeholder="List your certifications..."
-                  className={errors.certifications ? 'border-destructive' : ''}
-                />
-                {errors.certifications && (
-                  <p className="text-sm text-destructive mt-1">{errors.certifications.message}</p>
-                )}
-              </div>
-            </div>
-          </Card>
-
-          {/* Immigration Documents */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Immigration Documents</h2>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="passport_number">Passport Number</Label>
                 <Input
-                  id="passport_number"
-                  {...register('passport_number')}
-                  placeholder="Enter passport number"
-                  className={errors.passport_number ? 'border-destructive' : ''}
+                  type="number"
+                  placeholder="Max"
+                  className={`h-11 ${errors.expected_salary_max ? 'border-destructive' : ''}`}
+                  {...register('expected_salary_max', { valueAsNumber: true })}
                 />
-                {errors.passport_number && (
-                  <p className="text-sm text-destructive mt-1">{errors.passport_number.message}</p>
-                )}
               </div>
-
-              <div>
-                <Label htmlFor="visa_type">Visa Type</Label>
-                <Input
-                  id="visa_type"
-                  {...register('visa_type')}
-                  placeholder="e.g., Work Visa, Employment Visa"
-                  className={errors.visa_type ? 'border-destructive' : ''}
-                />
-                {errors.visa_type && (
-                  <p className="text-sm text-destructive mt-1">{errors.visa_type.message}</p>
-                )}
-              </div>
+              {(errors.expected_salary_min || errors.expected_salary_max) && (
+                <p className="text-sm text-destructive mt-1">
+                  {errors.expected_salary_min?.message || errors.expected_salary_max?.message}
+                </p>
+              )}
             </div>
-          </Card>
+          </div>
+        </ProfileSection>
 
-          {/* Work Preferences */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Work Preferences</h2>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="preferred_countries">Preferred Countries</Label>
-                <Input
-                  id="preferred_countries"
-                  {...register('preferred_countries')}
-                  placeholder="e.g., UAE, Qatar, Saudi Arabia, Kuwait"
-                  className={errors.preferred_countries ? 'border-destructive' : ''}
-                />
-                {errors.preferred_countries && (
-                  <p className="text-sm text-destructive mt-1">{errors.preferred_countries.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label>Expected Salary Range (USD/month)</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Input
-                      type="number"
-                      {...register('expected_salary_min', { valueAsNumber: true })}
-                      placeholder="Min"
-                      className={errors.expected_salary_min ? 'border-destructive' : ''}
-                    />
-                    {errors.expected_salary_min && (
-                      <p className="text-sm text-destructive mt-1">{errors.expected_salary_min.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <Input
-                      type="number"
-                      {...register('expected_salary_max', { valueAsNumber: true })}
-                      placeholder="Max"
-                      className={errors.expected_salary_max ? 'border-destructive' : ''}
-                    />
-                    {errors.expected_salary_max && (
-                      <p className="text-sm text-destructive mt-1">{errors.expected_salary_max.message}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <div className="flex gap-4">
-            <Button type="submit" disabled={saving} className="flex-1">
+        <Card className="border-border/60 shadow-md p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button type="submit" disabled={saving} className="h-11 flex-1 font-medium">
               {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
             <Button
               type="button"
               variant="outline"
+              className="h-11 sm:w-32"
               onClick={() => reset()}
               disabled={saving}
             >
               Reset
             </Button>
           </div>
-        </form>
+        </Card>
+      </form>
 
-        <div className="max-w-3xl mt-6">
-          <ChangePasswordCard />
-        </div>
-      </DashboardLayout>
+      <div className="max-w-4xl mt-6">
+        <ChangePasswordCard />
+      </div>
+    </>,
   );
 }
