@@ -15,7 +15,8 @@ import SavedSearchDialog from '@/components/search/SavedSearchDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { formatSalaryINR } from '@/lib/utils';
+import { formatSalaryLakh } from '@/lib/utils';
+import { SALARY_FILTER_MIN, SALARY_FILTER_MAX } from '@/lib/jobSalaryUtils';
 
 const JOBS_PER_PAGE = 24;
 
@@ -49,8 +50,8 @@ export default function Jobs() {
     location: '',
     country: 'All Countries',
     jobCategory: 'All Categories',
-    salaryMin: 0,
-    salaryMax: 10000,
+    salaryMin: SALARY_FILTER_MIN,
+    salaryMax: SALARY_FILTER_MAX,
     visaSponsorship: false,
     skills: [],
     experienceLevel: 'All Levels'
@@ -128,7 +129,7 @@ export default function Jobs() {
           company: companyMap[job.employer_id] || 'Company',
           location: `${job.location}, ${job.country}`,
           country: job.country,
-          salary: formatSalaryINR(job.salary_min, job.salary_max, job.currency),
+          salary: job.salary_display || formatSalaryLakh(job.salary_min, job.salary_max, job.currency),
           salaryMin: salaryMinVal,
           salaryMax: salaryMaxVal,
           type: job.job_type === 'FULL_TIME' ? 'Full-time' : job.job_type === 'PART_TIME' ? 'Part-time' : 'Contract',
@@ -159,9 +160,9 @@ export default function Jobs() {
       case 'recent':
         return sorted.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
       case 'salary-high':
-        return sorted.sort((a, b) => b.salaryMax - a.salaryMax);
+        return sorted.sort((a, b) => (b.salaryMax ?? 0) - (a.salaryMax ?? 0));
       case 'salary-low':
-        return sorted.sort((a, b) => a.salaryMin - b.salaryMin);
+        return sorted.sort((a, b) => (a.salaryMin ?? 0) - (b.salaryMin ?? 0));
       case 'country-asc':
         return sorted.sort((a, b) => a.country.localeCompare(b.country));
       case 'country-desc':
@@ -214,6 +215,19 @@ export default function Jobs() {
           )
         )
       );
+    }
+
+    const isSalaryFilterActive =
+      currentFilters.salaryMin > SALARY_FILTER_MIN ||
+      currentFilters.salaryMax < SALARY_FILTER_MAX;
+
+    if (isSalaryFilterActive) {
+      filtered = filtered.filter(job => {
+        if (job.salaryMin == null && job.salaryMax == null) return false;
+        const jobMin = job.salaryMin ?? 0;
+        const jobMax = job.salaryMax ?? jobMin;
+        return jobMax >= currentFilters.salaryMin && jobMin <= currentFilters.salaryMax;
+      });
     }
 
     // Apply sorting

@@ -7,8 +7,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Search, Save, X, MapPin, DollarSign, Briefcase, Globe, Loader2 } from 'lucide-react';
+import { Search, Save, X, MapPin, IndianRupee, Briefcase, Globe, Loader2 } from 'lucide-react';
 import { DESTINATION_COUNTRIES, JOB_CATEGORIES, EXPERIENCE_LEVELS, POPULAR_SKILLS } from '@/lib/constants';
+import { SALARY_FILTER_MIN, SALARY_FILTER_MAX, SALARY_FILTER_STEP } from '@/lib/jobSalaryUtils';
+import { formatINRAmount } from '@/lib/utils';
 import { useDebounce } from '@/hooks/use-debounce';
 
 export interface JobFilters {
@@ -183,18 +185,18 @@ export default function JobSearchFilters({
       {/* Salary Range */}
       <div className="space-y-4">
         <Label>
-          <DollarSign className="h-4 w-4 inline mr-2" />
-          Expected Salary Range (USD/month)
+          <IndianRupee className="h-4 w-4 inline mr-2" />
+          Expected Salary Range (₹/month)
         </Label>
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span>${filters.salaryMin.toLocaleString()}</span>
-            <span>${filters.salaryMax.toLocaleString()}</span>
+          <div className="flex items-center justify-between text-sm tabular-nums">
+            <span>{formatINRAmount(filters.salaryMin)}</span>
+            <span>{formatINRAmount(filters.salaryMax)}</span>
           </div>
           <Slider
-            min={0}
-            max={10000}
-            step={500}
+            min={SALARY_FILTER_MIN}
+            max={SALARY_FILTER_MAX}
+            step={SALARY_FILTER_STEP}
             value={[filters.salaryMin, filters.salaryMax]}
             onValueChange={([min, max]) => 
               onFiltersChange({ ...filters, salaryMin: min, salaryMax: max })
@@ -204,20 +206,24 @@ export default function JobSearchFilters({
           <div className="grid grid-cols-2 gap-4">
             <Input
               type="number"
-              placeholder="Min"
+              placeholder="Min (₹)"
+              min={SALARY_FILTER_MIN}
+              max={SALARY_FILTER_MAX}
               value={filters.salaryMin}
               onChange={(e) => onFiltersChange({ 
                 ...filters, 
-                salaryMin: parseInt(e.target.value) || 0 
+                salaryMin: Math.min(parseInt(e.target.value) || 0, filters.salaryMax)
               })}
             />
             <Input
               type="number"
-              placeholder="Max"
+              placeholder="Max (₹)"
+              min={SALARY_FILTER_MIN}
+              max={SALARY_FILTER_MAX}
               value={filters.salaryMax}
               onChange={(e) => onFiltersChange({ 
                 ...filters, 
-                salaryMax: parseInt(e.target.value) || 10000 
+                salaryMax: Math.max(parseInt(e.target.value) || SALARY_FILTER_MAX, filters.salaryMin)
               })}
             />
           </div>
@@ -314,8 +320,8 @@ export default function JobSearchFilters({
             location: '',
             country: 'All Countries',
             jobCategory: 'All Categories',
-            salaryMin: 0,
-            salaryMax: 10000,
+            salaryMin: SALARY_FILTER_MIN,
+            salaryMax: SALARY_FILTER_MAX,
             visaSponsorship: false,
             skills: [],
             experienceLevel: 'All Levels'

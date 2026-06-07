@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Formats a plain INR amount for filters and inputs. */
+export function formatINRAmount(amount: number): string {
+  return `₹${amount.toLocaleString('en-IN')}`;
+}
+
 /**
  * Null-safe salary formatter. Converts to INR if needed and formats with Indian locale.
  * Handles all combinations of null/undefined min/max gracefully.

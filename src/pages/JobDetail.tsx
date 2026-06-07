@@ -407,7 +407,7 @@ export default function JobDetail() {
     <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <SEOHead
         title={`${job.title} at ${companyName} | SafeWorkGlobal`}
-        description={`Apply for ${job.title} in ${job.location}, ${job.country}. ${job.visa_sponsorship ? 'Visa sponsorship available.' : ''} Salary: ${job.currency} ${job.salary_min}-${job.salary_max}/month.`}
+        description={`Apply for ${job.title} in ${job.location}, ${job.country}. ${job.visa_sponsorship ? 'Visa sponsorship available.' : ''} Salary: ${formatSalaryINR(job.salary_min, job.salary_max, job.currency)}/month.`}
         keywords={`${job.title}, ${job.location} jobs, ${job.country} jobs, ${companyName} careers, ${job.job_skills?.map(s => s.skill_name).join(', ')}`}
         canonicalUrl={`${window.location.origin}/jobs/${job.slug}`}
         ogType="article"
@@ -459,7 +459,6 @@ export default function JobDetail() {
                       <span>{job.location}, {job.country}</span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <span className="font-bold text-primary">₹</span>
                       <span className="font-semibold text-foreground">
                         {formatSalaryINR(job.salary_min, job.salary_max, job.currency)}
                       </span>

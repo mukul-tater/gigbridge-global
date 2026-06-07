@@ -2,6 +2,11 @@
 export const SALARY_FLOOR_INR = 50_000;
 export const SALARY_CEILING_INR = 100_000;
 
+/** Salary filter bounds for the public jobs page (INR/month). */
+export const SALARY_FILTER_MIN = 0;
+export const SALARY_FILTER_MAX = 200_000;
+export const SALARY_FILTER_STEP = 5_000;
+
 const LEVEL_OFFSET: Record<string, number> = {
   ENTRY: 0,
   INTERMEDIATE: 3_000,
