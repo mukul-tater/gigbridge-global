@@ -290,6 +290,22 @@ export async function acknowledgeCompliance(partnerProfileId: string): Promise<{
   }
 }
 
+const WORKER_MEDIA_BUCKET = 'partner-worker-media';
+const WORKER_MEDIA_FALLBACK_BUCKET = 'partner-documents';
+
+function isBucketMissingError(message: string) {
+  return /bucket not found/i.test(message);
+}
+
+/** Stored as `path` or `bucket:path` when using fallback storage */
+function parseWorkerMediaRef(stored: string): { bucket: string; path: string } {
+  const sep = stored.indexOf(':');
+  if (sep > 0 && stored.startsWith('partner-')) {
+    return { bucket: stored.slice(0, sep), path: stored.slice(sep + 1) };
+  }
+  return { bucket: WORKER_MEDIA_BUCKET, path: stored };
+}
+
 export async function uploadWorkerMedia(
   userId: string,
   file: File,
@@ -299,17 +315,45 @@ export async function uploadWorkerMedia(
     return { path: null, error: `File must be under ${type === 'video' ? 50 : 8} MB` };
   }
   const ext = file.name.split('.').pop() || 'bin';
-  const path = `${userId}/${type}-${Date.now()}.${ext}`;
-  const { error } = await supabase.storage
-    .from('partner-worker-media')
-    .upload(path, file, { upsert: true, contentType: file.type });
-  if (error) return { path: null, error: error.message };
-  return { path };
+  const fileName = `${type}-${Date.now()}.${ext}`;
+  const uploadOpts = { upsert: true, contentType: file.type };
+
+  const primaryPath = `${userId}/${fileName}`;
+  const { error: primaryError } = await supabase.storage
+    .from(WORKER_MEDIA_BUCKET)
+    .upload(primaryPath, file, uploadOpts);
+
+  if (!primaryError) return { path: primaryPath };
+
+  if (!isBucketMissingError(primaryError.message || '')) {
+    return { path: null, error: primaryError.message };
+  }
+
+  const fallbackPath = `${userId}/worker-media/${fileName}`;
+  const { error: fallbackError } = await supabase.storage
+    .from(WORKER_MEDIA_FALLBACK_BUCKET)
+    .upload(fallbackPath, file, uploadOpts);
+
+  if (fallbackError) {
+    return {
+      path: null,
+      error:
+        'Worker media storage is not configured. Run migration 20260609140000_ensure_partner_worker_media_bucket.sql in Supabase SQL editor.',
+    };
+  }
+
+  return { path: `${WORKER_MEDIA_FALLBACK_BUCKET}:${fallbackPath}` };
 }
 
-export async function getSignedMediaUrl(path: string): Promise<string | null> {
-  const { data } = await supabase.storage
-    .from('partner-worker-media')
-    .createSignedUrl(path, 3600);
-  return data?.signedUrl || null;
+export async function getSignedMediaUrl(stored: string): Promise<string | null> {
+  const { bucket, path } = parseWorkerMediaRef(stored);
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
+  if (!error && data?.signedUrl) return data.signedUrl;
+
+  if (bucket !== WORKER_MEDIA_BUCKET) return null;
+
+  const { data: fallback } = await supabase.storage
+    .from(WORKER_MEDIA_FALLBACK_BUCKET)
+    .createSignedUrl(stored, 3600);
+  return fallback?.signedUrl || null;
 }
