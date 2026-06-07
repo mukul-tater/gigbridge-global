@@ -238,7 +238,15 @@ export async function createPartnerWorker(
     .select()
     .single();
 
-  if (error) return { worker: null, error: error.message };
+  if (error) {
+    const missingTable = /could not find the table|partner_workers|PGRST205/i.test(error.message || '');
+    return {
+      worker: null,
+      error: missingTable
+        ? 'Worker database tables are missing. Run migration 20260609150000_ensure_partner_workers_tables.sql in Supabase SQL editor, then retry.'
+        : error.message,
+    };
+  }
   return { worker: data as PartnerWorker };
 }
 
