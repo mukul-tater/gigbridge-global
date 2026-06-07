@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import WorkerDashboard from '@/pages/worker/WorkerDashboard';
 import WorkerProfile from '@/pages/worker/WorkerProfile';
@@ -24,7 +24,6 @@ import WorkerPayments from '@/pages/worker/WorkerPayments';
 import WorkerVerificationStatus from '@/pages/worker/VerificationStatus';
 import WorkerOnboarding from '@/pages/worker/WorkerOnboarding';
 import WorkerTrust from '@/pages/worker/WorkerTrust';
-import WorkerDiscover from '@/pages/worker/WorkerDiscover';
 import ApplicationSuccess from '@/pages/worker/ApplicationSuccess';
 
 /** Must return <Route> directly — wrapper components break React Router v6 matching. */
@@ -42,7 +41,7 @@ function workerRoute(path: string, page: ReactNode) {
 export const legacyWorkerRoutes = (
   <>
     {workerRoute('/worker/trust', <WorkerTrust />)}
-    {workerRoute('/worker/discover', <WorkerDiscover />)}
+    <Route path="/worker/discover" element={<Navigate to="/jobs" replace />} />
     {workerRoute('/worker/application-success/:applicationId', <ApplicationSuccess />)}
     {workerRoute('/worker/onboarding', <WorkerOnboarding />)}
     {workerRoute('/worker/dashboard', <WorkerDashboard />)}

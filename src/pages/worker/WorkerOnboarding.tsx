@@ -400,7 +400,7 @@ export default function WorkerOnboarding() {
         {/* Skip & browse jobs — always available */}
         <p className="text-center mt-3">
           <button
-            onClick={() => navigate('/worker/discover')}
+            onClick={() => navigate('/jobs')}
             disabled={saving}
             className="text-sm text-muted-foreground hover:text-foreground underline"
           >

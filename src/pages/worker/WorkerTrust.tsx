@@ -69,7 +69,7 @@ export default function WorkerTrust() {
         <div className="space-y-2.5">
           <Button
             className="w-full h-12 font-semibold gap-2"
-            onClick={() => navigate('/worker/discover')}
+            onClick={() => navigate('/jobs')}
           >
             See available jobs <ArrowRight className="h-4 w-4" />
           </Button>

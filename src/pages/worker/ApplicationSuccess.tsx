@@ -101,7 +101,7 @@ export default function ApplicationSuccess() {
           <Button
             variant="outline"
             className="w-full h-12 font-medium gap-2"
-            onClick={() => navigate('/worker/discover')}
+            onClick={() => navigate('/jobs')}
           >
             <Briefcase className="h-4 w-4" /> Apply to more jobs
           </Button>
