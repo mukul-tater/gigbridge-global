@@ -11,6 +11,7 @@ import {
   Lock,
   Mail,
   Phone,
+  User,
 } from 'lucide-react';
 import RegistrationLayout from '../components/RegistrationLayout';
 import FormField from '../components/FormField';
@@ -53,6 +54,7 @@ export default function WorkerRegisterPage() {
   } = useForm<WorkerRegisterFormValues>({
     resolver: zodResolver(workerRegisterSchema),
     defaultValues: {
+      fullName: '',
       email: '',
       mobileNumber: '',
       password: '',
@@ -167,6 +169,19 @@ export default function WorkerRegisterPage() {
           <CardContent className="p-6 md:p-8 space-y-6">
             <GoogleAuthButton label="Sign up with Google" />
             <AuthDivider />
+
+            <FormField label="Full Name" error={errors.fullName?.message} required>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="Your full name"
+                  className="h-11 pl-10"
+                  autoComplete="name"
+                  {...register('fullName')}
+                />
+              </div>
+            </FormField>
 
             <FormField label="Mobile Number" error={errors.mobileNumber?.message} required>
               <div className="flex gap-2">
@@ -307,7 +322,7 @@ export default function WorkerRegisterPage() {
             </Button>
 
             <p className="text-xs text-center text-muted-foreground">
-              Name, skills, Aadhaar, and location can be added on the next screen.
+              Skills, Aadhaar, and location can be added on the next screen.
             </p>
           </CardContent>
         </Card>

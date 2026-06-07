@@ -6,6 +6,11 @@ const emailSchema = z.string().trim().email('Enter a valid email address').max(2
 
 export const workerRegisterSchema = z
   .object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, 'Enter your full name')
+      .max(120, 'Name is too long'),
     email: emailSchema,
     mobileNumber: z
       .string()

@@ -94,8 +94,7 @@ export const mockWorkerPortal = {
 
     const email = payload.email.trim().toLowerCase();
     const workerId = Math.abs([...mobile].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 0)) % 1_000_000 || 1;
-    const fullName =
-      email.split('@')[0]?.replace(/[._-]+/g, ' ') || `Worker ${mobile.slice(-4)}`;
+    const fullName = payload.fullName.trim();
 
     return {
       token: randomToken(),

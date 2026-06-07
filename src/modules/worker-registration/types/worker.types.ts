@@ -43,6 +43,7 @@ export interface WorkerProfile {
 }
 
 export interface WorkerRegisterPayload {
+  fullName: string;
   email: string;
   mobileNumber: string;
   password: string;
