@@ -1,6 +1,7 @@
 import type { ExperienceLevel } from '../entity/Worker.js';
 
 export interface WorkerRegisterRequestDto {
+  email: string;
   mobileNumber: string;
   password: string;
   confirmPassword: string;
@@ -13,8 +14,20 @@ export interface WorkerRegisterRequestDto {
 }
 
 export interface WorkerLoginRequestDto {
-  mobileNumber: string;
+  mobileNumber?: string;
+  email?: string;
   password: string;
+}
+
+export interface WorkerGoogleAuthRequestDto {
+  email: string;
+  fullName: string;
+}
+
+export interface WorkerGoogleAuthResponseDto {
+  needsRegistration: true;
+  email: string;
+  fullName: string;
 }
 
 export interface WorkerAuthResponseDto {
@@ -26,6 +39,7 @@ export interface WorkerProfileResponseDto {
   id: number;
   workerCode: string;
   fullName: string;
+  email: string;
   mobileNumber: string;
   aadhaarNumber: string;
   stateId: number;

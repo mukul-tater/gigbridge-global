@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { WorkerProfile } from '../types/worker.types';
+import type { WorkerAuthResponse, WorkerProfile } from '../types/worker.types';
 import { workerApi } from '../services/workerApi';
 
 const SESSION_KEY = 'safework_worker_session';
@@ -14,7 +14,8 @@ interface WorkerAuthContextValue {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (mobileNumber: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (payload: { mobileNumber?: string; email?: string; password: string }) => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: (auth: WorkerAuthResponse) => Promise<{ success: boolean; error?: string }>;
   register: (payload: Parameters<typeof workerApi.register>[0]) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
@@ -61,10 +62,21 @@ export function WorkerAuthProvider({ children }: { children: React.ReactNode }) 
     setLoading(false);
   }, []);
 
-  const login = useCallback(async (mobileNumber: string, password: string) => {
+  const login = useCallback(async (payload: { mobileNumber?: string; email?: string; password: string }) => {
     try {
-      const data = await workerApi.login({ mobileNumber, password });
+      const data = await workerApi.login(payload);
       const next: WorkerSession = { token: data.token, worker: data.worker };
+      saveSession(next);
+      setSession(next);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: formatError(err) };
+    }
+  }, []);
+
+  const loginWithGoogle = useCallback(async (auth: WorkerAuthResponse) => {
+    try {
+      const next: WorkerSession = { token: auth.token, worker: auth.worker };
       saveSession(next);
       setSession(next);
       return { success: true };
@@ -119,12 +131,13 @@ export function WorkerAuthProvider({ children }: { children: React.ReactNode }) 
       isAuthenticated: !!session,
       loading,
       login,
+      loginWithGoogle,
       register,
       logout,
       refreshProfile,
       updateWorker,
     }),
-    [session, loading, login, register, logout, refreshProfile, updateWorker]
+    [session, loading, login, loginWithGoogle, register, logout, refreshProfile, updateWorker]
   );
 
   return <WorkerAuthContext.Provider value={value}>{children}</WorkerAuthContext.Provider>;

@@ -10,8 +10,11 @@ export const experienceLevelSchema = z.enum([
   'FIVE_PLUS',
 ]);
 
+const emailSchema = z.string().trim().email('Enter a valid email address').max(255);
+
 export const workerRegisterSchema = z
   .object({
+    email: emailSchema,
     mobileNumber: z
       .string()
       .regex(phoneRegex, 'Mobile number must be 10 digits starting with 6-9'),
@@ -29,11 +32,23 @@ export const workerRegisterSchema = z
     path: ['confirmPassword'],
   });
 
-export const workerLoginSchema = z.object({
-  mobileNumber: z
-    .string()
-    .regex(phoneRegex, 'Mobile number must be 10 digits starting with 6-9'),
-  password: z.string().min(1, 'Password is required'),
+export const workerLoginSchema = z
+  .object({
+    mobileNumber: z
+      .string()
+      .regex(phoneRegex, 'Mobile number must be 10 digits starting with 6-9')
+      .optional(),
+    email: emailSchema.optional(),
+    password: z.string().min(1, 'Password is required'),
+  })
+  .refine((data) => data.mobileNumber || data.email, {
+    message: 'Enter your mobile number or email',
+    path: ['mobileNumber'],
+  });
+
+export const workerGoogleAuthSchema = z.object({
+  email: emailSchema,
+  fullName: z.string().trim().min(2, 'Full name is required').max(120),
 });
 
 export function formatZodErrors(error: z.ZodError): Record<string, string[]> {

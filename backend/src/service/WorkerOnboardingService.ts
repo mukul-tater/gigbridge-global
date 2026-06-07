@@ -150,6 +150,7 @@ export class WorkerOnboardingService {
       id: worker.id,
       workerCode: worker.workerCode,
       fullName: worker.fullName,
+      email: worker.email,
       mobileNumber: worker.mobileNumber,
       aadhaarNumber: worker.aadhaarNumber,
       stateId: worker.stateId,

@@ -9,6 +9,8 @@ import { WorkerOnboardingRepository } from '../repository/WorkerOnboardingReposi
 import type {
   WorkerRegisterRequestDto,
   WorkerLoginRequestDto,
+  WorkerGoogleAuthRequestDto,
+  WorkerGoogleAuthResponseDto,
   WorkerProfileResponseDto,
   WorkerAuthResponseDto,
 } from '../dto/WorkerDto.js';
@@ -26,10 +28,17 @@ export class WorkerService {
   ) {}
 
   async register(dto: WorkerRegisterRequestDto): Promise<WorkerAuthResponseDto> {
-    const existing = this.workerRepo.findByMobile(dto.mobileNumber);
-    if (existing) {
+    const existingMobile = this.workerRepo.findByMobile(dto.mobileNumber);
+    if (existingMobile) {
       throw new ConflictException('Mobile number is already registered', {
         mobileNumber: ['This mobile number is already registered'],
+      });
+    }
+
+    const existingEmail = this.workerRepo.findByEmail(dto.email);
+    if (existingEmail) {
+      throw new ConflictException('Email is already registered', {
+        email: ['This email is already registered'],
       });
     }
 
@@ -53,6 +62,7 @@ export class WorkerService {
     const worker = this.workerRepo.create({
       workerCode,
       fullName: dto.fullName.trim(),
+      email: dto.email.trim().toLowerCase(),
       mobileNumber: dto.mobileNumber,
       passwordHash,
       aadhaarNumber: dto.aadhaarNumber,
@@ -69,19 +79,41 @@ export class WorkerService {
   }
 
   async login(dto: WorkerLoginRequestDto): Promise<WorkerAuthResponseDto> {
-    const worker = this.workerRepo.findByMobile(dto.mobileNumber);
+    const worker = dto.email
+      ? this.workerRepo.findByEmail(dto.email)
+      : this.workerRepo.findByMobile(dto.mobileNumber!);
+
     if (!worker) {
-      throw new UnauthorizedException('Invalid mobile number or password');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const valid = await bcrypt.compare(dto.password, worker.passwordHash);
     if (!valid) {
-      throw new UnauthorizedException('Invalid mobile number or password');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const profile = this.toProfileResponse(worker.id)!;
     const token = this.generateToken(worker.id, worker.mobileNumber);
 
+    return { token, worker: profile };
+  }
+
+  async googleAuth(
+    dto: WorkerGoogleAuthRequestDto
+  ): Promise<WorkerAuthResponseDto | WorkerGoogleAuthResponseDto> {
+    const email = dto.email.trim().toLowerCase();
+    const existing = this.workerRepo.findByEmail(email);
+
+    if (!existing) {
+      return {
+        needsRegistration: true,
+        email,
+        fullName: dto.fullName.trim(),
+      };
+    }
+
+    const profile = this.toProfileResponse(existing.id)!;
+    const token = this.generateToken(existing.id, existing.mobileNumber);
     return { token, worker: profile };
   }
 
@@ -121,6 +153,7 @@ export class WorkerService {
       id: worker.id,
       workerCode: worker.workerCode,
       fullName: worker.fullName,
+      email: worker.email,
       mobileNumber: worker.mobileNumber,
       aadhaarNumber: worker.aadhaarNumber,
       stateId: worker.stateId,

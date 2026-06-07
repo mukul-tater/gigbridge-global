@@ -5,6 +5,8 @@ import type {
   State,
   WorkerAuthResponse,
   WorkerLoginPayload,
+  WorkerGoogleAuthPayload,
+  WorkerGoogleAuthResponse,
   WorkerProfile,
   WorkerRegisterPayload,
 } from '../types/worker.types';
@@ -55,6 +57,13 @@ export const workerApi = {
 
   login(payload: WorkerLoginPayload): Promise<WorkerAuthResponse> {
     return request('/workers/login', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  googleAuth(payload: WorkerGoogleAuthPayload): Promise<WorkerGoogleAuthResponse> {
+    return request('/workers/google-auth', {
       method: 'POST',
       body: JSON.stringify(payload),
     });

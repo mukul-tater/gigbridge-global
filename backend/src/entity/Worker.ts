@@ -22,6 +22,7 @@ export interface Worker {
   id: number;
   workerCode: string;
   fullName: string;
+  email: string;
   mobileNumber: string;
   passwordHash: string;
   aadhaarNumber: string;

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS workers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   worker_code TEXT NOT NULL UNIQUE,
   full_name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
   mobile_number TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   aadhaar_number TEXT NOT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE IF NOT EXISTS workers (
 );
 
 CREATE INDEX IF NOT EXISTS idx_workers_mobile ON workers(mobile_number);
+CREATE INDEX IF NOT EXISTS idx_workers_email ON workers(email);
 CREATE INDEX IF NOT EXISTS idx_workers_status ON workers(status);
 CREATE INDEX IF NOT EXISTS idx_districts_state ON districts(state_id);
 

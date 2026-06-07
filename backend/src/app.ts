@@ -19,6 +19,7 @@ export function createApp() {
   app.get('/api/workers/districts/:stateId', workerController.getDistricts);
   app.post('/api/workers/register', workerController.register);
   app.post('/api/workers/login', workerController.login);
+  app.post('/api/workers/google-auth', workerController.googleAuth);
   app.get('/api/workers/profile/:id', workerController.getProfile);
 
   app.get('/api/workers/onboarding', authMiddleware, workerOnboardingController.getOnboarding);

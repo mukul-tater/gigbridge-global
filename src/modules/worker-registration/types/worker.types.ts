@@ -24,6 +24,7 @@ export interface WorkerProfile {
   id: number;
   workerCode: string;
   fullName: string;
+  email: string;
   mobileNumber: string;
   aadhaarNumber: string;
   stateId: number;
@@ -42,6 +43,7 @@ export interface WorkerProfile {
 }
 
 export interface WorkerRegisterPayload {
+  email: string;
   mobileNumber: string;
   password: string;
   confirmPassword: string;
@@ -54,9 +56,19 @@ export interface WorkerRegisterPayload {
 }
 
 export interface WorkerLoginPayload {
-  mobileNumber: string;
+  mobileNumber?: string;
+  email?: string;
   password: string;
 }
+
+export interface WorkerGoogleAuthPayload {
+  email: string;
+  fullName: string;
+}
+
+export type WorkerGoogleAuthResponse =
+  | WorkerAuthResponse
+  | { needsRegistration: true; email: string; fullName: string };
 
 export interface WorkerAuthResponse {
   token: string;

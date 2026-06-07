@@ -24,6 +24,8 @@ import {
 } from '../validation/registrationSchema';
 import type { District, Skill, State } from '../types/worker.types';
 import { EXPERIENCE_OPTIONS } from '../types/worker.types';
+import GoogleAuthButton, { AuthDivider } from '../components/GoogleAuthButton';
+import { consumeGooglePrefill } from '../hooks/useWorkerGoogleAuth';
 
 export default function WorkerRegisterPage() {
   const navigate = useNavigate();
@@ -43,6 +45,7 @@ export default function WorkerRegisterPage() {
   } = useForm<WorkerRegisterFormValues>({
     resolver: zodResolver(workerRegisterSchema),
     defaultValues: {
+      email: '',
       mobileNumber: '',
       password: '',
       confirmPassword: '',
@@ -62,6 +65,14 @@ export default function WorkerRegisterPage() {
       navigate('/home', { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const prefill = consumeGooglePrefill();
+    if (prefill) {
+      setValue('email', prefill.email);
+      setValue('fullName', prefill.fullName);
+    }
+  }, [setValue]);
 
   useEffect(() => {
     workerApi
@@ -146,11 +157,17 @@ export default function WorkerRegisterPage() {
             <CardDescription>All fields marked with * are required</CardDescription>
           </CardHeader>
           <CardContent className="space-y-8">
+            <GoogleAuthButton label="Sign up with Google" returnPath="/register" />
+            <AuthDivider />
+
             <section>
               <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-primary">
                 Account
               </h3>
               <div className="grid gap-4 sm:grid-cols-2">
+                <FormField label="Email Address" error={errors.email?.message} required className="sm:col-span-2">
+                  <Input type="email" placeholder="you@example.com" {...register('email')} />
+                </FormField>
                 <FormField label="Mobile Number" error={errors.mobileNumber?.message} required>
                   <Input
                     inputMode="numeric"

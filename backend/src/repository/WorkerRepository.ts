@@ -6,6 +6,7 @@ interface WorkerRow {
   id: number;
   worker_code: string;
   full_name: string;
+  email: string;
   mobile_number: string;
   password_hash: string;
   aadhaar_number: string;
@@ -25,6 +26,7 @@ function mapWorkerRow(row: WorkerRow): Worker {
     id: row.id,
     workerCode: row.worker_code,
     fullName: row.full_name,
+    email: row.email,
     mobileNumber: row.mobile_number,
     passwordHash: row.password_hash,
     aadhaarNumber: row.aadhaar_number,
@@ -43,6 +45,7 @@ function mapWorkerRow(row: WorkerRow): Worker {
 export interface CreateWorkerInput {
   workerCode: string;
   fullName: string;
+  email: string;
   mobileNumber: string;
   passwordHash: string;
   aadhaarNumber: string;
@@ -60,6 +63,13 @@ export class WorkerRepository {
     return row ? mapWorkerRow(row) : null;
   }
 
+  findByEmail(email: string): Worker | null {
+    const row = db
+      .prepare('SELECT * FROM workers WHERE LOWER(email) = LOWER(?)')
+      .get(email.trim()) as WorkerRow | undefined;
+    return row ? mapWorkerRow(row) : null;
+  }
+
   findById(id: number): Worker | null {
     const row = db.prepare('SELECT * FROM workers WHERE id = ?').get(id) as WorkerRow | undefined;
     return row ? mapWorkerRow(row) : null;
@@ -74,15 +84,16 @@ export class WorkerRepository {
   create(input: CreateWorkerInput): Worker {
     const stmt = db.prepare(`
       INSERT INTO workers (
-        worker_code, full_name, mobile_number, password_hash, aadhaar_number,
+        worker_code, full_name, email, mobile_number, password_hash, aadhaar_number,
         state_id, district_id, primary_skill_id, experience_level,
         profile_completion_percentage, registration_source, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 20, 'WEB', 'REGISTERED')
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 20, 'WEB', 'REGISTERED')
     `);
 
     const result = stmt.run(
       input.workerCode,
       input.fullName,
+      input.email.trim().toLowerCase(),
       input.mobileNumber,
       input.passwordHash,
       input.aadhaarNumber,

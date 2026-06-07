@@ -3,6 +3,7 @@ import { WorkerService } from '../service/WorkerService.js';
 import {
   workerRegisterSchema,
   workerLoginSchema,
+  workerGoogleAuthSchema,
   formatZodErrors,
 } from '../validation/workerValidation.js';
 import { ValidationException } from '../exception/AppException.js';
@@ -73,6 +74,25 @@ export class WorkerController {
       const body: ApiSuccessResponseDto<typeof data> = {
         success: true,
         data,
+      };
+      res.json(body);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  googleAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const parsed = workerGoogleAuthSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw new ValidationException(formatZodErrors(parsed.error));
+      }
+
+      const result = await workerService.googleAuth(parsed.data);
+      const body: ApiSuccessResponseDto<typeof result> = {
+        success: true,
+        data: result,
+        message: 'needsRegistration' in result ? 'Complete registration' : 'Google sign-in successful',
       };
       res.json(body);
     } catch (err) {

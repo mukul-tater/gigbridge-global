@@ -3,8 +3,11 @@ import { z } from 'zod';
 const phoneRegex = /^[6-9]\d{9}$/;
 const aadhaarRegex = /^\d{12}$/;
 
+const emailSchema = z.string().trim().email('Enter a valid email address').max(255);
+
 export const workerRegisterSchema = z
   .object({
+    email: emailSchema,
     mobileNumber: z
       .string()
       .regex(phoneRegex, 'Enter a valid 10-digit mobile number'),
@@ -24,12 +27,30 @@ export const workerRegisterSchema = z
     path: ['confirmPassword'],
   });
 
-export const workerLoginSchema = z.object({
-  mobileNumber: z
-    .string()
-    .regex(phoneRegex, 'Enter a valid 10-digit mobile number'),
-  password: z.string().min(1, 'Password is required'),
-});
+export const workerLoginSchema = z
+  .object({
+    loginMethod: z.enum(['mobile', 'email']).default('mobile'),
+    mobileNumber: z.string().optional(),
+    email: z.string().optional(),
+    password: z.string().min(1, 'Password is required'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.loginMethod === 'mobile') {
+      if (!data.mobileNumber || !phoneRegex.test(data.mobileNumber)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Enter a valid 10-digit mobile number',
+          path: ['mobileNumber'],
+        });
+      }
+    } else if (!data.email || !emailSchema.safeParse(data.email).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Enter a valid email address',
+        path: ['email'],
+      });
+    }
+  });
 
 export type WorkerRegisterFormValues = z.infer<typeof workerRegisterSchema>;
 export type WorkerLoginFormValues = z.infer<typeof workerLoginSchema>;
