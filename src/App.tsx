@@ -21,8 +21,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerOnboarding from "./pages/partner/PartnerOnboarding";
-import EmployerComingSoon from "./pages/employer/EmployerComingSoon";
+import BenefitsForEmployers from "./pages/BenefitsForEmployers";
 import Dashboard from "./pages/Dashboard";
+import { legacyEmployerRoutes } from "./routes/legacyEmployerRoutes";
 import { legacyWorkerRoutes } from "./routes/legacyWorkerRoutes";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import PartnerApprovals from "./pages/admin/PartnerApprovals";
@@ -95,6 +96,7 @@ function AppShell() {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/benefits-for-employers" element={<BenefitsForEmployers />} />
           <Route path="/auth" element={<Auth />} />
 
           {/* Phase-1 worker registration (backend API) */}
@@ -103,8 +105,9 @@ function AppShell() {
           <Route path="/worker/quick-signup" element={<Navigate to="/register" replace />} />
           <Route path="/worker-start" element={<WorkerRegistrationHome />} />
 
-          {/* Employer — coming soon (Phase 2) */}
-          <Route path="/employer/quick-signup" element={<EmployerComingSoon />} />
+          {/* Employer portal */}
+          {legacyEmployerRoutes}
+
           <Route
             path="/home"
             element={
